@@ -1,0 +1,21 @@
+.logDisplayWindow{
+    border:1px solid black;
+    width: 100%;
+    overflow:scroll
+}
+
+.logViewPanelConstrained{
+    height:480px;
+}
+.consoleLine{
+    font-family: monospace;
+    margin: 0px;
+    font-size: 12px;
+    padding-left: 3px;
+}
+.even{
+    background-color: #ffffff;
+}
+.odd{
+    background-color: #f0f0f0;
+}

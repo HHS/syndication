@@ -1,0 +1,43 @@
+{
+    "type":"object",
+    "$schema": "http://json-schema.org/draft-03/schema",
+    "id": "http://jsonschema.net",
+    "required":true,
+    "properties":{
+        "authorizationHeader": {
+            "type":"string",
+            "id": "http://jsonschema.net/authorizationHeader",
+            "required":true
+        },
+        "contentLengthHeader": {
+            "type":"string",
+            "id": "http://jsonschema.net/contentLengthHeader",
+            "required":false
+        },
+        "contentTypeHeader": {
+            "type":"string",
+            "id": "http://jsonschema.net/contentTypeHeader",
+            "required":false
+        },
+        "dataMd5": {
+            "type":"string",
+            "id": "http://jsonschema.net/dataMd5",
+            "required":true
+        },
+        "dateHeader": {
+            "type":"string",
+            "id": "http://jsonschema.net/dateHeader",
+            "required":true
+        },
+        "httpMethod": {
+            "type":"string",
+            "id": "http://jsonschema.net/httpMethod",
+            "required":true
+        },
+        "url": {
+            "type":"string",
+            "id": "http://jsonschema.net/url",
+            "required":true
+        }
+    }
+}

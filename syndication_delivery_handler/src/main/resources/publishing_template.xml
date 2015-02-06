@@ -1,0 +1,7 @@
+##make sure the template is set to never publish, not default.
+##also make sure not to leave space in the top line.
+#set ($display_title = $tools.esc.xml($sys.item.getProperty("rx:displaytitle").String))
+<?xml version="1.0" encoding="UTF-8"?>
+<json>
+    <![CDATA[{"language":1,"source":1,"sourceUrl":"$source_url","name":"$display_title"}]]>
+</json>

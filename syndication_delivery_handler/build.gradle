@@ -1,0 +1,99 @@
+apply plugin: 'maven'
+apply plugin: 'groovy'
+apply plugin: 'idea'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = project['ext']['gradleWrapperVersion']
+}
+
+configurations {
+    fatjar
+    itTestsCompile.extendsFrom testCompile
+    itTestsRuntime.extendsFrom testRuntime
+}
+
+sourceSets {
+    itTests {
+        groovy {
+            compileClasspath = sourceSets.main.output + configurations.testRuntime
+            runtimeClasspath = output + sourceSets.main.output + configurations.testRuntime
+        }
+        //noinspection GroovyAssignabilityCheck
+        resources {
+            srcDir file('src/test/resources')
+        }
+    }
+}
+
+dependencies {
+
+    compile 'org.codehaus.groovy:groovy-all:2.1.9'
+    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    compile 'com.ctacorp.commons:api-key-utils:1.5.0'
+
+    compile 'rhythmyx:rxbusiness:6.7.0'
+    compile 'rhythmyx:rxutils:6.7.0'
+    compile 'rhythmyx:rxservices:6.7.0'
+    compile 'rhythmyx:rxclient:6.7.0'
+
+    fatjar 'org.codehaus.groovy:groovy-all:2.1.9'
+    fatjar 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    fatjar ('com.ctacorp.commons:api-key-utils:1.4.2') {
+        exclude group: 'org.bouncycastle'
+    }
+
+    testCompile 'junit:junit:4.9'
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile 'cglib:cglib-nodep:3.1'
+}
+
+jar {
+    from {
+        //noinspection GroovyAssignabilityCheck
+        configurations.fatjar.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+        //noinspection GroovyAssignabilityCheck
+        configurations.fatjar.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+task it(type: Test) {
+    description = "Run integration tests in src/itTests/groovy"
+    testClassesDir = sourceSets.itTests.output.classesDir
+    classpath = sourceSets.itTests.runtimeClasspath
+}
+
+task distPrepare(type: Copy) {
+
+    from 'src/main/install'
+    from 'src/main/resources'
+    from 'build/libs'
+    from 'README.md'
+    from 'README.html'
+
+    into {
+        file("build/dist/${rootProject.name}-${version}")
+    }
+}
+
+task dist(type: Zip, dependsOn: ['distPrepare']) {
+    from 'build/dist'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}

@@ -1,0 +1,181 @@
+
+/*
+Copyright (c) 2014, Health and Human Services - Web Communications (ASPA) 
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ */
+
+package com.ctacorp.syndication.dashboard
+
+import com.ctacorp.syndication.Audio
+import com.ctacorp.syndication.Html
+import com.ctacorp.syndication.Image
+import com.ctacorp.syndication.Infographic
+import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.MediaItemSubscriber
+import com.ctacorp.syndication.SocialMedia
+import com.ctacorp.syndication.Source
+import com.ctacorp.syndication.Video
+import com.ctacorp.syndication.Widget
+import com.ctacorp.syndication.audit.SystemEvent
+import com.ctacorp.syndication.authentication.UserRole
+import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
+import grails.transaction.Transactional
+
+@Secured(["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_USER", "ROLE_BASIC", "ROLE_STATS", "ROLE_PUBLISHER"])
+@Transactional(readOnly = true)
+class DashboardController {
+    def systemEventService
+    def springSecurityService
+    def tagService
+
+    def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id}
+
+    static defaultAction = "syndDash"
+
+    def syndDash() {
+        def mediaList
+        params.max = 10
+        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
+            mediaList = MediaItem.facetedSearch([restrictToSet:publisherItems().join(","),sort:"-id"]).list([max:10])
+        } else {
+            mediaList = MediaItem.facetedSearch([sort:"-id"]).list([max:10])
+        }
+
+
+        def timelineEvents = []
+        mediaList.each{ mi ->
+            timelineEvents << [
+                title:mi.name,
+                type:mi.getClass().simpleName.toLowerCase(),
+                message:mi.description,
+                timestamp:mi.dateSyndicationCaptured
+            ]
+        }
+
+        def recentEvents = systemEventService.listRecentEvents(10)
+        if(!tagService.status()) {
+            flash.error = message(code: "tag.failure.UNREACHABLE")
+        }
+        [timelineEvents:timelineEvents.sort{it.timestamp}.reverse(), events:recentEvents]
+    }
+
+    def listEvents(){
+        [eventInstanceList:systemEventService.listEvents(params), total:SystemEvent.count()]
+    }
+
+    def contentTypeDistributionDonut(){
+        def data = [
+            [label:"Html", value:Html.count()],
+            [label:"Video", value:Video.count()],
+            [label:"Image", value:Image.count()],
+            [label:"Infographic", value:Infographic.count()],
+            [label:"Collection", value:com.ctacorp.syndication.Collection.count()],
+            [label:"Audio", value:Audio.count()],
+            [label:"Widget",value:Widget.count()],
+            [label:"Social Media", value:SocialMedia.count()]
+        ]
+
+        render data as JSON
+    }
+
+    def contentByAgencyDonut() {
+        def data = []
+
+        def sources = Source.list()
+        sources.each { Source source ->
+            data << [
+                label: source.acronym,
+                value: MediaItem.countBySource(source)
+            ]
+        }
+        render data as JSON
+    }
+
+    def contentByAgencyAreaChart(String whichDate) {
+        def data = [
+            data:[],
+            xkey:"month",
+            ykeys:Source.list()*.acronym,
+            labels:Source.list()*.acronym
+        ]
+
+        def dates = getDateRangesForLast12Months()
+        def sources = Source.list()
+
+        dates.eachWithIndex{ date, index ->
+            def monthData = [month:"${date.date}"]
+            data.data << monthData
+            sources.each{ Source source ->
+                def items = null
+                switch(whichDate) {
+                    case "areaDateSelectorSyndicationCaptured": items   = MediaItem.countBySourceAndDateSyndicationCapturedBetween(source, date.firstDay, date.lastDay); break;
+                    case "areaDateSelectorSyndicationUpdated": items    = MediaItem.countBySourceAndDateSyndicationUpdatedBetween(source, date.firstDay, date.lastDay); break;
+                    case "areaDateSelectorContentAuthored": items       = MediaItem.countBySourceAndDateContentAuthoredBetween(source, date.firstDay, date.lastDay); break;
+                    case "areaDateSelectorContentUpdated": items        = MediaItem.countBySourceAndDateContentUpdatedBetween(source, date.firstDay, date.lastDay); break;
+                    case "areaDateSelectorContentPublished": items      = MediaItem.countBySourceAndDateContentPublishedBetween(source, date.firstDay, date.lastDay); break;
+                    case "areaDateSelectorContentReviewed": items       = MediaItem.countBySourceAndDateContentReviewedBetween(source, date.firstDay, date.lastDay); break;
+                    default: items                                      = MediaItem.countBySourceAndDateSyndicationCapturedBetween(source, date.firstDay, date.lastDay);
+                }
+                monthData << [
+                    "${source.acronym}":items
+                ]
+            }
+        }
+
+        render data as JSON
+    }
+
+    private Collection getDateRangesForLast12Months(){
+        def dates = []
+        (0..12).each{ month ->
+            Calendar cal = new GregorianCalendar()
+            cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - month)
+            cal.set(Calendar.DATE, 1)
+            Date firstDay = cal.getTime().clearTime()
+            cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE))
+            Date lastDay = cal.getTime().clearTime()
+            String date = lastDay.format("yyyy-MM-dd")
+
+            dates << [
+                firstDay:firstDay,
+                lastDay:lastDay,
+                date:date
+            ]
+        }
+        dates.reverse()
+    }
+
+//    def index() {}
+//
+//    def flot() {}
+//
+//    def morris() {}
+//
+//    def tables() {}
+//
+//    def forms() {}
+//
+//    def panelsAndWells() {}
+//
+//    def buttons() {}
+//
+//    def notifications() {}
+//
+//    def typography() {}
+//
+//    def grid() {}
+//
+//    def blank() {}
+//
+//    def login() {}
+}

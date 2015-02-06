@@ -1,0 +1,45 @@
+def projectName = 'syndication-delivery-handler'
+def projectGroup = 'com.ctacorp.syndication'
+def projectVersion = '0.2.5'
+
+def sourceLevel = JavaVersion.VERSION_1_6
+def targetLevel = JavaVersion.VERSION_1_6
+
+def gradleWrapperVersion = '2.1'
+
+// DO NOT MODIFY
+
+rootProject.name = projectName
+
+gradle.beforeProject { Project project ->
+
+    println "JAVA_HOME is ${System.getenv('JAVA_HOME')}"
+
+    project.version = projectVersion
+    project.group = projectGroup
+    project['ext']['archivesBaseName'] = projectName
+    project['ext']['gradleWrapperVersion'] = gradleWrapperVersion
+
+    project.tasks.withType(AbstractCompile) {
+
+        sourceCompatibility = sourceLevel
+        targetCompatibility = targetLevel
+
+        it.doFirst {
+            println ""
+            println "\tsourceCompatibility: ${it.sourceCompatibility}"
+            println "\ttargetCompatibility: ${it.targetCompatibility}"
+            println ""
+        }
+    }
+
+    project.tasks.withType(Zip) {
+        it.doFirst {
+            println ""
+            println "\tgroupId:    ${project.group}"
+            println "\tartifactId: ${project['ext']['archivesBaseName']}"
+            println "\tversion:    ${project.version}"
+            println ""
+        }
+    }
+}
