@@ -15,13 +15,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.rest
 
+import com.ctacorp.syndication.media.MediaItem
 import grails.transaction.Transactional
-import com.ctacorp.syndication.*
+import com.ctacorp.syndication.Campaign
 
 @Transactional(readOnly = true)
 class CampaignsService {
-    def apiResponseBuilderService
-    def errorHandlingService
     def mediaService
 
     def listCampaigns(params) {

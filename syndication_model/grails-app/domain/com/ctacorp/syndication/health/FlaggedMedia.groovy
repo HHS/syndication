@@ -1,6 +1,6 @@
 package com.ctacorp.syndication.health
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 
 class FlaggedMedia {
     MediaItem mediaItem
@@ -18,7 +18,12 @@ class FlaggedMedia {
     }
 
     static enum FailureType {
-        UNREACHABLE("Unreachable"), SERVER_ERROR("Server Error"), UNEXTRACTABLE("Unextractable"), NO_CONTENT("No Content"), SHORT_CONTENT("Short Content")
+        UNREACHABLE("Unreachable"),
+        SERVER_ERROR("Server Error"),
+        UNEXTRACTABLE("Unextractable"),
+        NO_CONTENT("No Content"),
+        SHORT_CONTENT("Short Content"),
+        NO_PREVIEW_THUMBNAIL("No Preview or Thumbnail")
 
         String prettyName
         String description

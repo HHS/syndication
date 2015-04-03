@@ -13,12 +13,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.tag
 
+import com.ctacorp.syndication.media.MediaItem
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import grails.util.Holders
-import com.ctacorp.syndication.*
 
 import javax.annotation.PostConstruct
 
@@ -65,8 +65,7 @@ class TagsService {
 
     @Transactional(readOnly = true)
     def tagMedia(Long mediaId, tagIds) {
-        println "tagMedia called"
-        MediaItem instance = MediaItem.get(mediaId)
+        MediaItem instance = MediaItem.read(mediaId)
         String body = [syndicationId:instance.id,
                        url:instance.sourceUrl,
                        tagIds:tagIds] as JSON
@@ -80,26 +79,31 @@ class TagsService {
         tagMediaItemByName(params.long('mediaId'), params.tagName, params.long('typeId'), params.isoCode)
     }
 
+    @NotTransactional
+    def tagMediaItemByNames(Long mediaId, Collection tagDetails){
+        tagDetails.each{ tag ->
+            tagMediaItemByName(mediaId, tag, 1, 1)
+        }
+    }
+
+    @NotTransactional
+    def tagMediaItemByNamesAndLanguageAndType(Long mediaId, Collection tagDetails){
+        tagDetails.each{ tag ->
+            tagMediaItemByName(mediaId, tag.name, tag.typeId, tag.languageId)
+        }
+    }
+
     @Transactional(readOnly = true)
     def tagMediaItemByName(Long mediaId, String tagName, Long typeId = 1, Long languageId = 1) {
-        MediaItem mi = MediaItem.load(mediaId)
+        MediaItem mi = MediaItem.read(mediaId)
 
-        try {
-            def resp = rest.post("${serverAddress}/tags/tagSyndicatedItemByTagName") {
-                accept "application/json"
-                contentType "application/x-www-form-urlencoded"
-
-                syndicationId       = ''+mi.id
-                url                 = ''+mi.sourceUrl
-                tagName             = ''+tagName
-                languageId          = ''+languageId
-                typeId              = ''+typeId
-            }
-            return [resp.json]
-        } catch (e) {
-            e.printStackTrace()
-            log.error "Tag Service could not be reached."
-        }
+        String body = [syndicationId:mi.id,
+                       url:mi.sourceUrl,
+                       tagName:tagName,
+                       languageId:languageId,
+                       typeId:typeId] as JSON
+        def resp = authorizationService.post(body.toString(), "${serverAddress}/tags/tagSyndicatedItemByTagName")
+        resp
     }
 
     @NotTransactional
@@ -166,7 +170,8 @@ class TagsService {
     def getMediaItemsFromRest(response, params) {
         String  idString = response.join(',')
         params['restrictToSet'] = idString
-
+        params.id = params.long("id")
+        
         def pag = [max:params.max, offset:params.offset]
         def results = MediaItem.facetedSearch(params).list(pag)
 

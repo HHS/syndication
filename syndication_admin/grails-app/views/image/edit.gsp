@@ -1,4 +1,3 @@
-
 %{--
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -13,8 +12,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Image" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.media.Image" %>
 <html>
 	<head>
 		<meta name="layout" content="main">
@@ -27,7 +27,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<synd:message/>
 			<synd:errors/>
 			<synd:error/>
-			<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+			<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_USER, ROLE_PUBLISHER">
 				<div class="row">
 					<div class="col-md-8">
 						<g:form class="form-horizontal" url="[resource:imageInstance, action:'update']" method="PUT" >
@@ -40,6 +40,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 								<g:link class="button" id="${imageInstance.id}" resource="${imageInstance}" action="show">
 									<button type="button" class="btn">Cancel</button>
 								</g:link>
+                                <g:link controller="mediaPreviewThumbnail" id="${imageInstance?.id}" action="flush">
+                                    <button type="button" class="btn btn-warning pull-right">Regenerate Thumbnail & Preview</button>
+                                </g:link>
 							</fieldset>
 						</g:form>
 					</div>

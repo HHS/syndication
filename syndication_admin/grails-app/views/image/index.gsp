@@ -1,4 +1,3 @@
-
 %{--
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -13,8 +12,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Image" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.media.Image" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -59,7 +59,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                                 <td><g:link action="show" id="${imageInstance.id}"><span class="limited-width-md ellipse">${fieldValue(bean: imageInstance, field: "name")}</span></g:link></td>
 
-                                <td><span class="limited-width-lg ellipse">${fieldValue(bean: imageInstance, field: "description")}</span></td>
+                                <td><span class="limited-width-lg ellipse abv60">${fieldValue(bean: imageInstance, field: "description")}</span></td>
 
                                 <td><span class="limited-width-lg ellipse break-url">${fieldValue(bean: imageInstance, field: "sourceUrl")}</span></td>
 
@@ -71,13 +71,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         </g:each>
                         </tbody>
                     </table>
-                    <g:if test="${imageInstanceCount > params.max}">
-                        <div class="pagination">
-                            <g:paginate total="${imageInstanceCount ?: 0}"/>
-                        </div>
-                    </g:if>
                 </div>
             </div>
+
+            <g:if test="${imageInstanceCount > params.max}">
+                <div class="pagination">
+                    <g:paginate total="${imageInstanceCount ?: 0}"/>
+                </div>
+            </g:if>
+            
         </div>
     </div>
 </div>

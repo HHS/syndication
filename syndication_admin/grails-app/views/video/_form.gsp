@@ -12,7 +12,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Video" %>
+<%@ page import="com.ctacorp.syndication.media.Video" %>
 
 
 
@@ -35,7 +35,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <!-- Text input-->
 <div class="form-group">
     <label class="col-md-4 control-label" for="sourceUrl">Source Url<span class="required-indicator">*</span></label>
-    <div class="col-md-8">
+    <div class="col-md-6">
         <input id="sourceUrl" name="sourceUrl" maxlength="2000" required="" value="${videoInstance?.sourceUrl}" type="url" placeholder="source url" class="form-control input-md">
     </div>
 </div>
@@ -53,6 +53,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <label class="col-md-4 control-label" for="customThumbnailUrl">Custom Thumbnail Url</label>
     <div class="col-md-8">
         <input id="customThumbnailUrl" name="customThumbnailUrl" maxlength="2000" value="${videoInstance?.customThumbnailUrl}" type="url" placeholder="thumbnail url" class="form-control input-md">
+    </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+    <label class="col-md-4 control-label" for="customThumbnailUrl">Custom Preview Url</label>
+    <div class="col-md-8">
+        <input id="customPreviewUrl" name="customPreviewUrl" maxlength="2000" value="${videoInstance?.customPreviewUrl}" type="url" placeholder="preview url" class="form-control input-md">
     </div>
 </div>
 
@@ -126,7 +134,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="language">Language<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <g:select from="${com.ctacorp.syndication.Language.findAllByIsActive(true, [sort: "name"])}" name="language.id" id="language" optionKey="id" optionValue="name" value="${videoInstance?.language?.id}" class="form-control"/>
+        <g:select from="${com.ctacorp.syndication.Language.findAllByIsActive(true, [sort: "name"])}" name="language.id" id="language" optionKey="id" optionValue="name" value="${videoInstance?.language?.id}" class="form-control" noSelection="${['null':'-Choose a Language-']}"/>
     </div>
 </div>
 
@@ -189,14 +197,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <label class="col-md-4 control-label" for="externalGuid">External Guid</label>
     <div class="col-md-8">
         <input id="externalGuid" name="externalGuid" value="${videoInstance?.externalGuid}" placeholder="guid" class="form-control input-md">
-    </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="hash">Hash</label>
-    <div class="col-md-8">
-        <input id="hash" name="hash" value="${videoInstance?.hash}" class="form-control input-md">
     </div>
 </div>
 

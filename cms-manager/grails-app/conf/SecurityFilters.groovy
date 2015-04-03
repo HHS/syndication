@@ -50,7 +50,7 @@ class SecurityFilters {
 
                     } catch (e) {
 
-                        def errorMessage = loggingService.logError('Unexpected error occured when trying to authorize request', e)
+                        def errorMessage = loggingService.logError('Unexpected error occurred when trying to authorize request', e)
                         def json = ([message: errorMessage] as JSON).toString(true)
                         render status: 500, contentType: 'application/json', text: json, encoding: "UTF-8"
                         return false
@@ -69,7 +69,15 @@ class SecurityFilters {
             before = {
 
                 setSubscriberRequestAttribute(request)
-                return true
+                String senderPublicKey = request.getAttribute('senderPublicKey')
+
+                if (senderPublicKey == Holders.config.cmsManager.publicKey) {
+                    return true
+                } else {
+                    render status: 401, text: ([message: "Unauthorized: the sender's public key is not valid"] as JSON).toString(), encoding: "UTF-8", contentType: 'application/json'
+                    return false
+                }
+
             }
         }
     }

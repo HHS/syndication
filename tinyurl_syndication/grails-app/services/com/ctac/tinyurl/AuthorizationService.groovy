@@ -1,6 +1,6 @@
 package com.ctac.tinyurl
 
-import com.ctacorp.api.key.utils.AuthorizationHeaderGenerator
+import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
@@ -33,7 +33,6 @@ class AuthorizationService {
             keyAgreement.setSecret(secret)
 
             generator = new AuthorizationHeaderGenerator("syndication_api_key", keyAgreement)
-            generator.log = false
         }
     }
 
@@ -67,7 +66,6 @@ class AuthorizationService {
     boolean amIAuthorized() {
         String date = new Date().toString()
         String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.selfAuthPath
-        println requestUrl
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([date: date], requestUrl, "GET", null)
         def resp = rest.get(requestUrl) {
             header 'Date', date

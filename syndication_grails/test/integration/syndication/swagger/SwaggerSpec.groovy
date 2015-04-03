@@ -15,9 +15,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.swagger
 
+import com.ctacorp.swagger.SwaggerController
 import grails.test.mixin.TestFor
 import grails.util.Holders
-import spock.lang.*
+import spock.lang.Specification
 
 /**
  *
@@ -51,14 +52,15 @@ class SwaggerSpec extends Specification {
         then: "there should be a specific set of entry points listed"
         def actualEntryPoints = json.apis*.path
         def expectedEntryPoints = [
-            "/swaggerData/campaigns",
-            "/swaggerData/languages",
-            "/swaggerData/media",
-            "/swaggerData/mediaTypes",
-            "/swaggerData/requests",
-            "/swaggerData/tags",
-            "/swaggerData/sources",
-            "/swaggerData/resources"
+            "/campaigns",
+            "/languages",
+            "/media",
+            "/mediaTypes",
+            "/resources",
+            "/tags",
+            "/sources",
+            "/resources",
+            "/userMediaLists"
         ]
 
         actualEntryPoints.containsAll(expectedEntryPoints)
@@ -75,12 +77,9 @@ class SwaggerSpec extends Specification {
         def json = controller.response.json
 
         then: "the declared version should be what we expect"
-        json.apiVersion == "v2"
-
-        and: "the basePath should match our context"
-        config.grails.serverURL == json.basePath
+        json.apiVersion == "2"
 
         and: "the swagger version should be what we expect"
-        json.swaggerVersion == "1.1"
+        json.swaggerVersion == "1.2"
     }
 }

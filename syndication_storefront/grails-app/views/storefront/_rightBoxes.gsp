@@ -57,6 +57,7 @@
             <li><g:link controller="storefront" action="reportAProblem" class="popup-form">Report a Problem with a Syndicated Page</g:link></li>
             <li><g:link controller="storefront" action="requestSyndication" class="popup-form">Request a Page to be Syndicated</g:link></li>
             <li><g:link controller="syndicateThis" action="badgeSnippet">Get the Syndicate This button</g:link></li>
+            <li><g:link controller="storefront" action="releaseInfo">Release Notes</g:link></li>
         </ul>
     </div>
 

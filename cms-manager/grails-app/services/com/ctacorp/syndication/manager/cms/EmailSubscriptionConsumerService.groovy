@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -25,47 +24,85 @@ class EmailSubscriptionConsumerService implements RabbitMqConsumerService {
     def emailSubscriptionUpdateService
     def queueService
 
-    @Override
     void handleMessage(Message message, String rabbitQueue) {
 
         int attempts = message.meta?.attempts ?: 0
 
-        def mediaId = message.mediaId as String
-        def subscriptionId = MqUtils.getSubscriptionId(message)
-        def messageType = message.messageType
+        String mediaId = message.mediaId
+        MessageType messageType = message.messageType
+        Long subscriptionId = MqUtils.getSubscriptionId(message)
 
-        if(mediaId && messageType == MessageType.UPDATE) {
+        log.info("'${messageType.prettyName()}' message received on the '${rabbitQueue}' for mediaId '${mediaId}' and subscription '${subscriptionId}'")
 
-            log.info("Received an update message on the '${rabbitQueue}' queue for mediaId '${mediaId}'")
-
-            def failedUpdates = emailSubscriptionUpdateService.updateEmailSubscriptions(mediaId)
-            failedUpdates.each { emailSubscription ->
-                queueService.sendToEmailErrorQueue(MessageType.UPDATE, emailSubscription.id as Long, mediaId, attempts)
-            }
-
-        } else if (subscriptionId && messageType == MessageType.IMPORT) {
-
-            log.info("Received a create message on the '${rabbitQueue}' queue for subscription '${subscriptionId}'")
-
-            if(!emailSubscriptionUpdateService.importEmailSubscription(subscriptionId)) {
-                queueService.sendToEmailErrorQueue(MessageType.IMPORT, subscriptionId, mediaId, attempts)
-            } else{
-                def emailSub = EmailSubscription.get(subscriptionId)
-                emailSub.isPending = false
-                emailSub.save(flush: true)
-            }
-
-        }  else if (mediaId && messageType == MessageType.DELETE) {
-
-            log.info("Received a delete message on the '${rabbitQueue}' for mediaId '${mediaId}'")
-
-            def failedUpdates = emailSubscriptionUpdateService.deleteEmailSubscription(mediaId)
-            failedUpdates.each { EmailSubscription emailSubscription ->
-                queueService.sendToEmailErrorQueue(MessageType.DELETE, emailSubscription.id as long, mediaId, attempts)
-            }
-
+        if (subscriptionId && messageType == MessageType.IMPORT) {
+            importSubscription(subscriptionId, attempts)
         } else {
-            log.warn("Received an malformed message '${message.toJsonString()}' on the '${rabbitQueue}' queue")
+
+            if (subscriptionId) {
+
+                def subscription = EmailSubscription.findById(subscriptionId)
+                if (!subscription) {
+                    log.warn("Could not find emailSubscription '${subscriptionId}'")
+                    return
+                }
+
+                if (messageType == MessageType.UPDATE) {
+                    updateSubscription(subscription, attempts)
+                } else if (messageType == MessageType.DELETE) {
+                    deleteSubscription(subscription, attempts)
+                }
+
+            } else if (mediaId) {
+                queueSubscriptions(mediaId, messageType, rabbitQueue)
+            } else {
+                log.warn("Received an malformed message '${message.toJsonString()}' on the '${rabbitQueue}' queue")
+            }
+        }
+    }
+
+    void queueSubscriptions(String mediaId, MessageType messageType, String rabbitQueue) {
+
+        def subscription = Subscription.findByMediaId(mediaId)
+        if (!subscription) {
+            log.info("No subscriptions found for mediaId '${mediaId}'")
+            return
+        }
+
+        def emailSubscriptions = EmailSubscription.findAllBySubscription(subscription)
+        if (!emailSubscriptions) {
+            log.info("No emailSubscriptions found for mediaId '${mediaId}'")
+            return
+        }
+
+        emailSubscriptions.each { emailSubscription ->
+            log.info("Queuing a message of type '${messageType}' on the '${rabbitQueue}' for emailSubscription '${emailSubscription.id}'")
+            queueService.sendToEmailUpdateQueue(messageType, emailSubscription.id)
+        }
+    }
+
+    void deleteSubscription(EmailSubscription emailSubscription, int attempts) {
+
+        def success = emailSubscriptionUpdateService.deleteEmailSubscription(emailSubscription)
+        if(!success) {
+            queueService.sendToEmailErrorQueue(MessageType.DELETE, emailSubscription.id, null, attempts)
+        }
+    }
+
+    void importSubscription(long emailSubscriptionId, int attempts) {
+
+        def success = emailSubscriptionUpdateService.importEmailSubscription(emailSubscriptionId)
+
+        if (!success) {
+            queueService.sendToEmailErrorQueue(MessageType.IMPORT, emailSubscriptionId, null, attempts)
+        }
+    }
+
+    void updateSubscription(EmailSubscription emailSubscription, int attempts) {
+
+        def success = emailSubscriptionUpdateService.updateEmailSubscription(emailSubscription)
+        if (!success) {
+            log.error("Update of emailSubscription '${emailSubscription.id}' was unsuccessful")
+            queueService.sendToEmailErrorQueue(MessageType.UPDATE, emailSubscription.id, null, attempts)
         }
     }
 }

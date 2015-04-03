@@ -1,15 +1,15 @@
 package com.ctacorp.syndication.tag
 
-import com.ctacorp.syndication.Audio
-import com.ctacorp.syndication.Html
-import com.ctacorp.syndication.Collection
-import com.ctacorp.syndication.Image
-import com.ctacorp.syndication.Infographic
-import com.ctacorp.syndication.MediaItem
-import com.ctacorp.syndication.Periodical
-import com.ctacorp.syndication.SocialMedia
-import com.ctacorp.syndication.Video
-import com.ctacorp.syndication.Widget
+import com.ctacorp.syndication.media.Audio
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.Collection
+import com.ctacorp.syndication.media.Image
+import com.ctacorp.syndication.media.Infographic
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.media.Periodical
+import com.ctacorp.syndication.media.SocialMedia
+import com.ctacorp.syndication.media.Video
+import com.ctacorp.syndication.media.Widget
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
@@ -145,11 +145,10 @@ class TagController {
         def  currentTags = tagService.getTagsForSyndicationId(mediaId)
         def successfullyTaggedItem = tagService.setTags(tagIds, mediaId, params)
         MediaItem mi = MediaItem.load(successfullyTaggedItem.syndicationId)
-        if (!currentTags && tagIds.isEmpty()) {
-            //messsage should not show
-        } else {
+        if (currentTags || !tagIds.isEmpty()) {
             flash.message = "Tags have been updated"
-        }
+        } 
+        
         switch(mi) {
             case Audio:       redirect controller: "audio",       action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
             case Collection:  redirect controller: "collection",  action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break

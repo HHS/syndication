@@ -1,7 +1,7 @@
 package com.ctacorp.syndication.jobs
 
 import grails.plugins.rest.client.RestBuilder
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 
 class UpdateSolrIndexJob {
     def group = "Solr"

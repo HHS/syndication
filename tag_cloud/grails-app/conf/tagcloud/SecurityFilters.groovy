@@ -36,8 +36,6 @@ class SecurityFilters {
                         render text:([authorized:false] as JSON), contentType: "application/json", status: 403
                         return false
                     }
-
-                    log.info("Authentication succeeded for request on (${dateHeader})")
                 }
 
                 return true

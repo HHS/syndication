@@ -1,8 +1,10 @@
 package com.ctacorp.syndication
 
 import com.ctacorp.syndication.crud.SocialMediaController
-import grails.test.mixin.*
-import spock.lang.*
+import com.ctacorp.syndication.media.SocialMedia
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 @TestFor(SocialMediaController)
 @Mock(SocialMedia)

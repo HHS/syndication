@@ -1,6 +1,5 @@
 package com.ctacorp.tagcloud.service
 
-import com.ctacorp.tagcloud.SyndicationService
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 import com.ctacorp.tagcloud.SyndicationService

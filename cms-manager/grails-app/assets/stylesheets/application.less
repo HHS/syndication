@@ -218,14 +218,6 @@ table.dataTable thead:first-child th {
   padding-right: 0;
 }
 
-.plus-sign{
-  color: #428BCA;
-}
-
-.subtract-sign{
-  color: #D9534F;
-}
-
 table.dataTable thead > tr > th {
   padding-left: 8px;
   padding-right: 18px;
@@ -233,4 +225,44 @@ table.dataTable thead > tr > th {
 
 .syndication-thumbnail {
   background: url('spinner.gif') no-repeat;
+}
+
+.dl-horizontal dt {
+  width: 270px;
+}
+
+/* PAGINATION */
+
+.pagination {
+  border-top: 0;
+  margin: 0;
+  padding: 0.3em 0.2em;
+  text-align: center;
+  background-color: #EFEFEF;
+}
+
+.pagination a,
+.pagination .currentStep {
+  color: #666666;
+  display: inline-block;
+  margin: 0 0.1em;
+  padding: 0.25em 0.7em;
+  text-decoration: none;
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  border-radius: 0.3em;
+}
+
+.pagination a:hover, .pagination a:focus,
+.pagination .currentStep {
+  background-color: #999999;
+  color: #ffffff;
+  outline: none;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+#keyAgreement-panel {
+  width: 85%;
+  margin-left: 7.5%;
+  margin-top: 20px;
 }

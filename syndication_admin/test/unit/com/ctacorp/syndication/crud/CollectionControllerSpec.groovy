@@ -15,11 +15,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
-import grails.test.mixin.*
-import spock.lang.*
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 @TestFor(CollectionController)
-@Mock(com.ctacorp.syndication.Collection)
+@Mock(com.ctacorp.syndication.media.Collection)
 class CollectionControllerSpec extends Specification {
 
     def populateValidParams(params) {
@@ -49,7 +50,7 @@ class CollectionControllerSpec extends Specification {
     void "Test the save action correctly persists an instance"() {
 
         when: "The save action is executed with an invalid instance"
-            def collection = new com.ctacorp.syndication.Collection()
+            def collection = new com.ctacorp.syndication.media.Collection()
             collection.validate()
             controller.save(collection)
 
@@ -60,14 +61,14 @@ class CollectionControllerSpec extends Specification {
         when: "The save action is executed with a valid instance"
             response.reset()
             populateValidParams(params)
-            collection = new com.ctacorp.syndication.Collection(params)
+            collection = new com.ctacorp.syndication.media.Collection(params)
 
             controller.save(collection)
 
         then: "A redirect is issued to the show action"
             response.redirectedUrl == '/collection/show/1'
             controller.flash.message != null
-            com.ctacorp.syndication.Collection.count() == 1
+            com.ctacorp.syndication.media.Collection.count() == 1
     }
 
     void "Test that the show action returns the correct model"() {
@@ -79,7 +80,7 @@ class CollectionControllerSpec extends Specification {
 
         when: "A domain instance is passed to the show action"
             populateValidParams(params)
-            def collection = new com.ctacorp.syndication.Collection(params)
+            def collection = new com.ctacorp.syndication.media.Collection(params)
             controller.show(collection)
 
         then: "A model is populated containing the domain instance"
@@ -95,7 +96,7 @@ class CollectionControllerSpec extends Specification {
 
         when: "A domain instance is passed to the edit action"
             populateValidParams(params)
-            def collection = new com.ctacorp.syndication.Collection(params)
+            def collection = new com.ctacorp.syndication.media.Collection(params)
             controller.edit(collection)
 
         then: "A model is populated containing the domain instance"
@@ -113,7 +114,7 @@ class CollectionControllerSpec extends Specification {
 
         when: "An invalid domain instance is passed to the update action"
             response.reset()
-            def collection = new com.ctacorp.syndication.Collection()
+            def collection = new com.ctacorp.syndication.media.Collection()
             collection.validate()
             controller.update(collection)
 
@@ -124,7 +125,7 @@ class CollectionControllerSpec extends Specification {
         when: "A valid domain instance is passed to the update action"
             response.reset()
             populateValidParams(params)
-            collection = new com.ctacorp.syndication.Collection(params).save(flush: true)
+            collection = new com.ctacorp.syndication.media.Collection(params).save(flush: true)
             controller.update(collection)
 
         then: "A redirect is issues to the show action"
@@ -143,16 +144,16 @@ class CollectionControllerSpec extends Specification {
         when: "A domain instance is created"
             response.reset()
             populateValidParams(params)
-            def collection = new com.ctacorp.syndication.Collection(params).save(flush: true)
+            def collection = new com.ctacorp.syndication.media.Collection(params).save(flush: true)
 
         then: "It exists"
-            com.ctacorp.syndication.Collection.count() == 1
+            com.ctacorp.syndication.media.Collection.count() == 1
 
         when: "The domain instance is passed to the delete action"
             controller.delete(collection)
 
         then: "The instance is deleted"
-            com.ctacorp.syndication.Collection.count() == 0
+            com.ctacorp.syndication.media.Collection.count() == 0
             response.redirectedUrl == '/collection/index'
             flash.message != null
     }

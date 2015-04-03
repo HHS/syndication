@@ -1,4 +1,3 @@
-
 %{--
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -14,6 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 --}%
 
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 	<head>
 		<meta name="layout" content="main">
@@ -26,6 +26,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<synd:message/>
 			<synd:errors/>
 			<synd:error/>
+
+            <fieldset class="buttons">
+               <button type="button" class="btn btn-warning pull-left" data-toggle="modal" data-target="#urlModal" title="Import Video MetaData" onclick="return false;">
+                   <i class="fa fa-arrow-circle-down"></i> Import
+               </button>
+            </fieldset>
 
 			<div class="row">
 				<div class="col-md-10">
@@ -42,7 +48,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 					</g:form>
 				</div>
 			</div>
-
 		</div>
+        <g:render template="importVideo"/>
 	</body>
 </html>

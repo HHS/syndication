@@ -1,4 +1,5 @@
-<!doctype html>
+<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->

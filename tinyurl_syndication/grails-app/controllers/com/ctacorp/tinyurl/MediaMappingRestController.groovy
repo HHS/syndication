@@ -25,13 +25,22 @@ class MediaMappingRestController {
 
     @Transactional
     def save(MediaMapping mediaMappingInstance) {
-        println mediaMappingInstance.targetUrl
+        println "Mapping save for ${params}"
         if (mediaMappingInstance == null) {
             notFound()
             return
         }
 
+        if(mediaMappingInstance.guid) {
+            def existing = MediaMapping.findByGuid(mediaMappingInstance.guid)
+            if(existing){
+                respond existing, [status: CREATED]
+                return
+            }
+        }
+
         if (mediaMappingInstance.hasErrors()) {
+            log.error mediaMappingInstance.errors
             respond mediaMappingInstance.errors, view:'create'
             return
         }

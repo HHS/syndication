@@ -16,20 +16,42 @@ $(document).ready(function()
     var usersLink = document.getElementById('users-link');
 
     if ( $( "#subscribers-link" ).length ) {
-        subscribersLink.addEventListener('click', function() {
-            activate('subscribers-nav');
+
+        if (subscribersLink.addEventListener) {
+            subscribersLink.addEventListener('click', function() {
+                activate('subscribers-nav');
+            });
+        }
+        else { //IE 8 specific code to support event
+            subscribersLink.attachEvent('onclick', function () {
+                activate('subscribers-nav');
+            });
+        }
+    }
+
+    if (subscriptionsLink.addEventListener) {
+        subscriptionsLink.addEventListener('click', function() {
+            activate('subscriptions-nav');
+        });
+    }
+    else { //IE 8 specific code to support event
+        subscriptionsLink.attachEvent('onclick', function () {
+            activate('subscriptions-nav');
         });
     }
 
 
-    subscriptionsLink.addEventListener('click', function() {
-        activate('subscriptions-nav');
-    });
-
     if ( $( "#users-link" ).length ) {
-        usersLink.addEventListener('click', function() {
-            activate('users-nav');
-        });
+        if (usersLink.addEventListener) {
+            usersLink.addEventListener('click', function() {
+                activate('users-nav');
+            });
+        }
+        else { //IE 8 specific code to support event
+            usersLink.attachEvent('onclick', function () {
+                activate('users-nav');
+            });
+        }
     }
 });
 
@@ -65,7 +87,7 @@ function useAutoPublish(autoPublish) {
 }
 
 function confirmDelete(entityName) {
-    if (confirm('Are you sure you want to delete the ' + entityName.toLowerCase() + '?')) {
-        return document.forms[0].submit();
+    if (confirm('Are you sure you want to delete this ' + entityName.toLowerCase() + '?')) {
+        return document.forms[2].submit();
     }
 }

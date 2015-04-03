@@ -17,7 +17,7 @@ package com.ctacorp.syndication.tools
 
 import com.ctacorp.syndication.Campaign
 import com.ctacorp.syndication.CampaignSubscriber
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.authentication.UserRole

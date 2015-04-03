@@ -41,6 +41,10 @@ class MediaTypesController {
     static allowedMethods = [ list: 'GET']
     static defaultAction = "list"
 
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
+
     @APIResource(path = "/resources/mediaTypes.{format}", description = "Information about media types", operations = [
         @Operation(httpMethod = "GET", notes="Returns the list of available MediaTypes.", nickname="getMediaTypes", type = "MediaTypes", summary = "Get MediaTypes", responseMessages = [
             @ResponseMessage(code = 500, description = "Internal Server Error")
@@ -58,7 +62,7 @@ class MediaTypesController {
         def mediaTypes = []
 
         Holders.grailsApplication.domainClasses.each {
-            if (it.clazz.superclass.name == "com.ctacorp.syndication.MediaItem") {
+            if (it.clazz.superclass.name == "com.ctacorp.syndication.media.MediaItem") {
                 mediaTypes << new MediaTypeHolder(name:it.clazz.simpleName, description: g.message(code: "syndication.mediaType.${it.clazz.simpleName}.description"))
             }
         }

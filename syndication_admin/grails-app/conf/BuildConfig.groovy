@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -80,8 +79,13 @@ grails.project.dependency.resolution = {
 
         compile "com.google.guava:guava:18.0"           //in memory cache
 
+        compile 'com.google.api-client:google-api-client:1.19.1'
+        compile 'com.google.apis:google-api-services-analytics:v3-rev109-1.19.1'
+        compile 'com.google.oauth-client:google-oauth-client-java6:1.19.0'
+        compile 'com.google.oauth-client:google-oauth-client-jetty:1.19.0'
+
         compile 'com.ctacorp.commons:multi-read-servlet-filter:1.0.0'
-        compile('com.ctacorp.commons:api-key-utils:1.5.0') {
+        compile('com.ctacorp.commons:api-key-utils:1.5.1') {
             excludes 'groovy'
         }
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
@@ -89,9 +93,9 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the compile step ----------------------------------------------------
-        compile "org.grails.plugins:syndication-model:1.5.4"      //Syndication domain classes
-        compile "org.grails.plugins:content-extraction-services:1.1.2"   //syndication content extraction tools
-        compile "org.grails.plugins:solr-operations:1.0.9"        //syndication solr stuff
+        compile "org.grails.plugins:syndication-model:1.7.4"      //Syndication domain classes
+        compile "org.grails.plugins:content-extraction-services:1.3.2"   //syndication content extraction tools
+        compile "org.grails.plugins:solr-operations:1.2"        //syndication solr stuff
 
         //plugins for the compile step
         compile ":scaffolding:2.1.2"
@@ -144,3 +148,12 @@ grails.project.repos.default = "myRepo"
 grails.project.repos.myRepo.url = config.artifactory.deploymentAddress
 grails.project.repos.myRepo.username = config.artifactory.username
 grails.project.repos.myRepo.password = config.artifactory.password
+
+//codenarc
+codenarc.properties = {
+    EmptyIfStatement.priority = 1
+
+    EmptyMethod.enabled = false
+    GrailsMassAssignment.enabled = false
+    GrailsDomainHasEquals.enabled = false
+}

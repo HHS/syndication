@@ -21,19 +21,43 @@ class WebUtilService {
     def contentCacheService
 
     String getPage(String url) {
+//        System.setProperty("jsse.enableSNIExtension", "false"); //ignore ssl errors - these bomb on certain partners
         String content
 
         try{
-            content = new URL(url).text
+            content = getContentFromUrl(url)
         }catch (e){
-            CachedContent cached = contentCacheService.loadLastGood(url)
+            CachedContent cached = contentCacheService.get(url)
             if(!cached){
                 throw new ContentUnretrievableException("Could not load content located at ${url} from original location or cache.")
-                log.error("Site is unreachable: ${url}")
-                return null
             }
             return cached.content
         }
         content
+    }
+
+    private String getContentFromUrl(String url, int depth = 0){
+        if(depth >= 10){
+            log.error("Too many redirects, stopping on ${url}")
+            return null
+        }
+
+        HttpURLConnection con = (HttpURLConnection) (new URL(url).openConnection());
+        con.connect();
+        int status = con.getResponseCode();
+        boolean redirected = false
+        if (status != HttpURLConnection.HTTP_OK) {
+            if (status == HttpURLConnection.HTTP_MOVED_TEMP
+                    || status == HttpURLConnection.HTTP_MOVED_PERM
+                    || status == HttpURLConnection.HTTP_SEE_OTHER)
+                redirected = true;
+        }
+        if(redirected){
+            String newUrl = con.getHeaderField("Location");
+            return getContentFromUrl(newUrl, depth+1)
+        }
+
+        BufferedReader buff = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        buff.text
     }
 }

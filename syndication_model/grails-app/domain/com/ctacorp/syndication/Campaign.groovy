@@ -15,6 +15,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication
 
 import com.ctacorp.grails.swagger.annotations.*
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.metric.CampaignMetric
 
 @Model(id = "Campaign", properties = [
     @ModelProperty(propertyName = "id",             attributes = [@PropertyAttribute(type = "integer", format = "int64",      required = true)]),

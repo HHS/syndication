@@ -39,7 +39,7 @@ class TagTypeController {
     }
 
     def delete(Long id){
-        def r = tagService.deleteTagType(id)
+        tagService.deleteTagType(id)
         flash.message = "Tag Type [${params.name}] deleted."
         redirect action:"index"
     }

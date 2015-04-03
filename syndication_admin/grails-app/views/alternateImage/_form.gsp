@@ -58,10 +58,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </label>
     <div class="col-md-4">
         <sec:ifAnyGranted roles="ROLE_PUBLISHER">
-            <g:select from="${com.ctacorp.syndication.MediaItem.findAllByIdInList(MediaItemSubscriber?.findAllBySubscriberId(user.subscriberId)?.mediaItem?.id)}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${alternateImageInstance?.mediaItem?.id}"/>
+            <g:select from="${com.ctacorp.syndication.media.MediaItem.findAllByIdInList(MediaItemSubscriber?.findAllBySubscriberId(user.subscriberId)?.mediaItem?.id)}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${alternateImageInstance?.mediaItem?.id}"/>
         </sec:ifAnyGranted>
         <sec:ifNotGranted roles="ROLE_PUBLISHER">
-            <g:select from="${com.ctacorp.syndication.MediaItem.list()}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${alternateImageInstance?.mediaItem?.id}"/>
+            <g:select from="${com.ctacorp.syndication.media.MediaItem.list()}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${alternateImageInstance?.mediaItem?.id}"/>
         </sec:ifNotGranted>
         
     </div>

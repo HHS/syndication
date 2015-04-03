@@ -13,6 +13,6 @@ Redistribution and use in source and binary forms, with or without modification,
 --%>
 <g:sortableColumn property="id" title="${message(code: 'restSubscription.label')}" />
 <g:sortableColumn property="subscription.mediaId" title="${message(code: 'subscription.mediaId.label')}" />
-<g:sortableColumn property="restSubscriber.subscriber.name" title="${message(code: 'restSubscription.restSubscriber.subscriber.name')}" />
+<g:sortableColumn property="restSubscriber" title="${message(code: 'restSubscription.restSubscriber.deliveryEndpoint.label')}" />
 <g:sortableColumn property="deliveryFailureLogId" title="${message(code: 'subscription.delivery.status.label')}" />
 <g:sortableColumn property="deliveryFailureLogId" title="${message(code: 'subscription.delivery.error.id.label')}" />

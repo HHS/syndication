@@ -1,6 +1,7 @@
 package com.ctacorp.syndication
 
 import com.ctacorp.syndication.commons.util.Util
+import com.ctacorp.syndication.media.MediaItem
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional

@@ -38,10 +38,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <label class="col-md-4 control-label" for="mediaItem">Media Item<span class="required-indicator">*</span></label>
     <div class="col-md-6">
         <sec:ifAnyGranted roles="ROLE_PUBLISHER">
-            <g:select from="${com.ctacorp.syndication.MediaItem.findAllByIdInList(MediaItemSubscriber?.findAllBySubscriberId(user.subscriberId)?.mediaItem?.id)}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${extendedAttributeInstance?.mediaItem?.id}"/>
+            <g:select from="${com.ctacorp.syndication.media.MediaItem.findAllByIdInList(MediaItemSubscriber?.findAllBySubscriberId(user.subscriberId)?.mediaItem?.id)}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${extendedAttributeInstance?.mediaItem?.id}"/>
         </sec:ifAnyGranted>
         <sec:ifNotGranted roles="ROLE_PUBLISHER">
-            <g:select from="${com.ctacorp.syndication.MediaItem.list()}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${extendedAttributeInstance?.mediaItem?.id}"/>
+            <g:select from="${com.ctacorp.syndication.media.MediaItem.list()}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${extendedAttributeInstance?.mediaItem?.id}"/>
         </sec:ifNotGranted>
     </div>
 </div>
@@ -68,6 +68,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 		%{--<g:message code="extendedAttribute.mediaItem.label" default="Media Item" />--}%
 		%{--<span class="required-indicator">*</span>--}%
 	%{--</label>--}%
-	%{--<g:select id="mediaItem" name="mediaItem.id" from="${com.ctacorp.syndication.MediaItem.list()}" optionValue="${{it.id + ' ' + it.name}}" optionKey="id" required="" value="${extendedAttributeInstance?.mediaItem?.id}" class="many-to-one"/>--}%
+	%{--<g:select id="mediaItem" name="mediaItem.id" from="${com.ctacorp.syndication.media.MediaItem.list()}" optionValue="${{it.id + ' ' + it.name}}" optionKey="id" required="" value="${extendedAttributeInstance?.mediaItem?.id}" class="many-to-one"/>--}%
 %{--</div>--}%
 

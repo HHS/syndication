@@ -15,9 +15,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
-import com.ctacorp.syndication.Widget
-import grails.test.mixin.*
-import spock.lang.*
+import com.ctacorp.syndication.media.Widget
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 @TestFor(WidgetController)
 @Mock(Widget)

@@ -18,6 +18,7 @@ import com.ctacorp.syndication.commons.mq.MessageType
 import com.ctacorp.syndication.manager.cms.QueueService
 import com.ctacorp.syndication.manager.cms.RhythmyxSubscription
 import com.ctacorp.syndication.manager.cms.Subscription
+import com.ctacorp.syndication.manager.cms.utils.mq.SubscriptionType
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -136,7 +137,7 @@ class QueueServiceSpec extends Specification {
 
         when: "pushing the message to the rhythmyx update queue"
 
-        service.sendToErrorQueue(messageType, subscriptionId, null, 'nutjobQueue', 1, QueueService.SUBSCRIPTION_TYPE_RHYTHMYX)
+        service.sendToErrorQueue(messageType, subscriptionId, null, 'nutjobQueue', 1, SubscriptionType.RHYTHMYX)
 
         then: "don't send the message to the error queue"
 

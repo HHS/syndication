@@ -1,5 +1,6 @@
 package com.ctacorp.syndication
 
+import com.ctacorp.syndication.media.MediaItem
 import grails.transaction.Transactional
 
 @Transactional

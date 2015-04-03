@@ -12,8 +12,9 @@ Redistribution and use in source and binary forms, with or without modification,
 
 */
 package com.ctacorp.syndication.manager.cms
+
 import com.ctacorp.syndication.commons.mq.MessageType
-import com.ctacorp.syndication.swagger.rest.client.model.SyndicatedMediaItem
+import com.ctacorp.syndication.manager.cms.utils.mq.RabbitDelayJobScheduler
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
@@ -29,6 +30,7 @@ class EmailSubscriptionController {
     def emailSubscriptionMailService
     def subscriptionService
     def queueService
+    def rabbitDelayJobScheduler = new RabbitDelayJobScheduler()
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -64,48 +66,35 @@ class EmailSubscriptionController {
         }
 
         //noinspection GroovyUnusedAssignment
-        def mediaId = null
-        try {
-            mediaId = getMediaId(sourceUrl) as String
-        } catch (Exception e) {
-            flash.errors = [loggingService.logError("Error occurred when fetching the media item for source url '${sourceUrl}'", e)]
-            redirect action: "index", method: "GET"
-            return
-        }
 
-        if (!mediaId) {
-            flash.errors = [message(code: 'emailSubscription.sourceUrl.not.syndicated', args: [sourceUrl])]
-            redirect action: "index", method: "GET"
-            return
-        }
-
-        SyndicatedMediaItem mediaItem
+        def mediaItem = null
 
         try {
-            mediaItem = contentExtractionService.extractSyndicatedContent(mediaId)
-        } catch(e) {
-            flash.errors = [loggingService.logError("Error occurred when extracting the content for media id '${mediaId}'", e)]
+            mediaItem = contentExtractionService.getMediaItemBySourceUrl(sourceUrl)
+            if (!mediaItem) {
+                flash.errors = [message(code: 'emailSubscription.sourceUrl.not.syndicated', args: [sourceUrl])]
+                redirect action: "index", method: "GET"
+                return
+            }
+        } catch (e) {
+            flash.errors = [loggingService.logError("An error occurred when trying to get the media item associated with sourceUrl '${sourceUrl}'", e)]
             redirect action: "index", method: "GET"
             return
         }
 
-        emailSubscription.title = mediaItem.name
-
-        def existingSubscription = Subscription.findByMediaId(mediaId)
+        def existingSubscription = Subscription.findByMediaId(mediaItem.id as String)
         def emailSubscriber = emailSubscription.emailSubscriber
 
         if (!existingSubscription) {
 
-            def subscription = new Subscription(mediaId: mediaId)
+            def subscription = new Subscription(mediaId: mediaItem.id)
 
             if (!subscription.validate()) {
                 respond subscription.errors, view: 'create'
                 return
             }
 
-            emailSubscription.isPending = true
             subscription.save(flush: true)
-
             emailSubscription.subscription = subscription
 
         } else {
@@ -113,7 +102,7 @@ class EmailSubscriptionController {
             def existingEmailSubscription = EmailSubscription.findBySubscriptionAndEmailSubscriber(existingSubscription, emailSubscriber)
 
             if (existingEmailSubscription) {
-                flash.errors = [message(code: 'emailSubscription.already.subscribed.message', args: [emailSubscriber.email, mediaId])]
+                flash.errors = [message(code: 'emailSubscription.already.subscribed.message', args: [emailSubscriber.email, mediaItem.id])]
                 redirect action: "index", method: "GET"
                 return
             }
@@ -121,14 +110,29 @@ class EmailSubscriptionController {
             emailSubscription.subscription = existingSubscription
         }
 
+        emailSubscription.title = mediaItem.name
+        emailSubscription.isPending = true
         emailSubscription.save(flush: true)
 
         if (emailSubscription.hasErrors()) {
             respond emailSubscription.errors, view: 'create'
         } else {
-            queueService.sendToEmailUpdateQueue(MessageType.IMPORT, emailSubscription.id)
+            rabbitDelayJobScheduler.schedule(MessageType.IMPORT, emailSubscription)
             showInstance(emailSubscription, 'default.created.message')
         }
+    }
+
+    def deliver(EmailSubscription emailSubscription) {
+        try {
+            if(!emailSubscription.deliveryFailureLogId && emailSubscription.isPending){
+                flash.message = "Please wait to redeliver until the subscription is no longer pending."
+            } else {
+                flash.message = "The Email Subscription id:${emailSubscription.id} has been delivered."
+                queueService.sendToEmailUpdateQueue(MessageType.UPDATE, emailSubscription.id)
+            }
+        } catch (ignore) {
+        }
+        redirect(action: "index", method: "GET")
     }
 
     @Transactional
@@ -139,25 +143,17 @@ class EmailSubscriptionController {
             return
         }
 
-        def subscription = emailSubscription.subscription
+        def emailSubscriptionId = emailSubscription.id
 
         try {
             emailSubscriptionMailService.sendSubscriptionDelete(emailSubscription)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'emailSubscription.label'), emailSubscriptionId])
         } catch (e) {
-            log.error("Unable to send deleted subscription notification for email subscription '${emailSubscription.id}'", e)
+            flash.errors = [loggingService.logError("Error occurred when queuing a delete message for emailSubscription '${emailSubscriptionId}'", e)]
         }
 
         subscriptionService.deleteChildSubscription(emailSubscription)
-
-        flash.message = message(code: 'default.deleted.message', args: [message(code: 'emailSubscription.label'), subscription.mediaUri])
         redirect action: "index", method: "GET"
-    }
-
-    private def getMediaId(String sourceUrl) {
-        log.info("looking up mediaId for sourceUrl=${sourceUrl}")
-        def mediaId = contentExtractionService.getMediaId(sourceUrl)
-        log.info("mediaId for sourceUrl=${sourceUrl} is ${mediaId}")
-        return mediaId
     }
 
     def notFound() {

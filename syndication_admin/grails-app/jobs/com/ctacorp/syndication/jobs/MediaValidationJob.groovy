@@ -2,6 +2,7 @@ package com.ctacorp.syndication.jobs
 
 import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.health.FlaggedMedia
+import grails.util.Holders
 
 /**
  * Created by nburk on 11/18/14.
@@ -9,7 +10,6 @@ import com.ctacorp.syndication.health.FlaggedMedia
 class MediaValidationJob {
     static triggers = {
         cron name: 'mediaValidationTrigger', cronExpression: "0 0 0 ? * SAT" //Every Saturday
-//        simple name: 'mediaValidationTrigger', startDelay: 2000, repeatInterval: 60000
     }
 
     def group = "MediaValidation"
@@ -20,6 +20,9 @@ class MediaValidationJob {
     def grailsApplication
 
     def execute(context){
+        if(Holders.config.syndication.disableHealthReportEmail){ //disable health report emails in staging
+            return
+        }
         def mailRecipiants = null
         def subscriberId = context.mergedJobDataMap.get('subscriberId')
         def flaggedItems = null
@@ -27,7 +30,7 @@ class MediaValidationJob {
         if(subscriberId){
             mediaValidationService.fullHealthScan(subscriberId)
             mailRecipiants =  User.findAllBySubscriberId(subscriberId as Long).username
-            flaggedItems =mediaValidationService.getPublisherFlaggedMedia(subscriberId)
+            flaggedItems = mediaValidationService.getPublisherFlaggedMedia(subscriberId)
         } else {
             mediaValidationService.fullHealthScan()
             mailRecipiants = grailsApplication.config.SyndicationAdmin.healthReportEmailAddresses ?: "syndication@ctacorp.com"

@@ -1,5 +1,6 @@
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="com.ctacorp.syndication.MediaItem" %>
+<%@ page import="com.ctacorp.syndication.media.MediaItem" %>
 
 <html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>

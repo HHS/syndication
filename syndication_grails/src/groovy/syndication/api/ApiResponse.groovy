@@ -16,7 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.api
 
 import com.ctacorp.grails.swagger.annotations.*
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
 
 @Model(id = "ApiResponse", properties = [

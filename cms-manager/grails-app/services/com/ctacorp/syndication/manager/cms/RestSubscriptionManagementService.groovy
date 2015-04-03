@@ -123,7 +123,7 @@ class RestSubscriptionManagementService {
             }
         } else {
             try {
-                mediaId = contentExtractionService.getMediaId(sourceUrl)
+                mediaId = contentExtractionService.getMediaItemBySourceUrl(sourceUrl)
                 if(!mediaId) {
                     return invalidSourceUrl(sourceUrl)
                 }

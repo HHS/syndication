@@ -17,19 +17,12 @@ package syndication.marshal
 
 import com.ctacorp.syndication.AlternateImage
 import grails.converters.JSON
-import syndication.preview.ThumbnailService
-import syndication.rest.MediaService
-import syndication.tag.TagsService
-import syndication.tinyurl.TinyUrlService
 
 /**
  * Created by esommers on 2/6/14.
  */
 class AlternateImageMarshaller {
-    ThumbnailService thumbnailService
-    TinyUrlService tinyUrlService
-    TagsService tagsService
-    MediaService mediaService
+    def services
 
     AlternateImageMarshaller() {
         JSON.registerObjectMarshaller(AlternateImage) { AlternateImage a ->

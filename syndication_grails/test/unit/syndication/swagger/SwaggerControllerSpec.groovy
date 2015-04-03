@@ -17,7 +17,7 @@ package syndication.swagger
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
-
+import com.ctacorp.swagger.SwaggerController
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */

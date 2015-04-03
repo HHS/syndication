@@ -1,8 +1,10 @@
 package com.ctacorp.syndication
 
 import com.ctacorp.syndication.crud.HtmlController
-import grails.test.mixin.*
-import spock.lang.*
+import com.ctacorp.syndication.media.Html
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 @TestFor(HtmlController)
 @Mock(Html)

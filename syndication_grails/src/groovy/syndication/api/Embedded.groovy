@@ -27,4 +27,5 @@ class Embedded {
     String description
     String mediaType
     String content
+    String sourceUrl
 }

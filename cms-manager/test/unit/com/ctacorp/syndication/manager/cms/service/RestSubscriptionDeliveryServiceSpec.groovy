@@ -116,7 +116,7 @@ class RestSubscriptionDeliveryServiceSpec extends Specification {
 
         and: "throw an exception when trying to post the content"
 
-        1 * restClient.post([headers: headers, body: content, query: [media_id: restSubscription.subscription.mediaId], requestContentType: 'application/json']) >> {
+        1 * restClient.post([headers: headers, body: content, query: [media_id: restSubscription.subscription.mediaId], requestContentType: 'text/html']) >> {
             throw exception
         }
 
@@ -150,7 +150,7 @@ class RestSubscriptionDeliveryServiceSpec extends Specification {
 
         and: "throw a http response exception with a 410 status code"
 
-        1 * restClient.post([headers: headers, body: content, query: [media_id: restSubscription.subscription.mediaId], requestContentType: 'application/json']) >> {
+        1 * restClient.post([headers: headers, body: content, query: [media_id: restSubscription.subscription.mediaId], requestContentType: 'text/html']) >> {
             throw exception
         }
 
@@ -184,7 +184,7 @@ class RestSubscriptionDeliveryServiceSpec extends Specification {
 
         and: "throw an exception when trying to post the content"
 
-        1 * restClient.post([headers: headers, body: content, query: [media_id: restSubscription.subscription.mediaId], requestContentType: 'application/json']) >> [status:200]
+        1 * restClient.post([headers: headers, body: content, query: [media_id: restSubscription.subscription.mediaId], requestContentType: 'text/html']) >> [status:200]
 
         and: "don't throw an exception"
 
@@ -244,7 +244,7 @@ class RestSubscriptionDeliveryServiceSpec extends Specification {
 
         and: "throw a http response exception with a 410 status code"
 
-        1 * restClient.post([headers: headers, body: content, query: [media_id: restSubscription.subscription.mediaId], requestContentType: 'application/json']) >> {
+        1 * restClient.post([headers: headers, body: content, query: [media_id: restSubscription.subscription.mediaId], requestContentType: 'text/html']) >> {
             throw exception
         }
 

@@ -14,10 +14,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.metrics
 
-import com.ctacorp.syndication.*
-import grails.transaction.NotTransactional
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.metric.MediaMetric
 import grails.transaction.Transactional
-import org.springframework.transaction.annotation.Propagation
 
 @Transactional(readOnly = true)
 class MediaMetricService {

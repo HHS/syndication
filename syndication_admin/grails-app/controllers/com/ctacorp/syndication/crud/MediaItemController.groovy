@@ -12,18 +12,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.Audio
-import com.ctacorp.syndication.Collection
-import com.ctacorp.syndication.Html
-import com.ctacorp.syndication.Image
-import com.ctacorp.syndication.Infographic
-import com.ctacorp.syndication.Periodical
-import com.ctacorp.syndication.SocialMedia
-import com.ctacorp.syndication.Video
-import com.ctacorp.syndication.Widget
+import com.ctacorp.syndication.media.Audio
+import com.ctacorp.syndication.media.Collection
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.Image
+import com.ctacorp.syndication.media.Infographic
+import com.ctacorp.syndication.media.Periodical
+import com.ctacorp.syndication.media.SocialMedia
+import com.ctacorp.syndication.media.Video
+import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.authentication.UserRole
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
@@ -73,19 +73,21 @@ class MediaItemController {
     // for token input searches
     def tokenMediaSearch(String q){
         response.contentType = "application/json"
+        params.active = params.active ?: ""
+        params.visibleInStorefront = params.visibleInStorefront ?: ""
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
             if(q.isInteger() && publisherItems().contains(q.toInteger() as Long)){
                 render MediaItem.findAllByIdLikeOrNameIlike(q.toInteger(), "%${q}%", [max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
                 return
             } else {
-                render MediaItem.facetedSearch([restrictToSet:publisherItems().join(","), nameContains: "${q}"]).list([max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
+                render MediaItem.facetedSearch([restrictToSet:publisherItems().join(","), nameContains: "${q}", active:params.active, visibleInStorefront:params.visibleInStorefront]).list([max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
                 return
             }
         }
         if(q.isInteger()){
             render MediaItem.findAllByIdLikeOrNameIlike(q.toInteger(), "%${q}%", [max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
         } else {
-            render MediaItem.findAllByNameIlike("%${q}%", [max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
+            render MediaItem.facetedSearch([nameContains: "${q}", active:params.active, visibleInStorefront:params.visibleInStorefront]).list([max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
         }
     }
 

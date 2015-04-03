@@ -46,17 +46,25 @@ grails.project.dependency.resolution = {
         runtime 'org.jsoup:jsoup:1.8.1'                 //html extraction/manipulation
         runtime 'com.ctacorp:syndication-commons:1.1.7',
                 'com.google.guava:guava:18.0'
+        //Misc http
+        runtime('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
+            excludes 'xalan'
+            excludes 'xml-apis'
+            excludes 'groovy'
+        }
     }
 
     plugins {
-        runtime ("org.grails.plugins:syndication-model:1.5.0_SNAPSHOT4"){
+        runtime ("org.grails.plugins:syndication-model:1.7.2"){
             export = false
         }
 
-        build(":release:3.0.1",
+        compile(":release:3.0.1",
               ":rest-client-builder:1.0.3") {
             export = false
         }
+
+        compile ":codenarc:0.23"
 
         test(":hibernate4:4.3.5.4"){
             export = false

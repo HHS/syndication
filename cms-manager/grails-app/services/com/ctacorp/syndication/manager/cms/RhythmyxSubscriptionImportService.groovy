@@ -31,7 +31,6 @@ class RhythmyxSubscriptionImportService {
     def rhythmyxIngestionService
     def queueService
     def loggingService
-    def subscriptionFactory = new SubscriptionFactory()
 
     @PostConstruct()
     def init() {
@@ -45,14 +44,14 @@ class RhythmyxSubscriptionImportService {
         log.info("Importing rhythmyxSubscription '${rhythmyxSubscriptionId}'")
 
         def rhythmyxSubscription = RhythmyxSubscription.findById(rhythmyxSubscriptionId)
-        if(!rhythmyxSubscription) {
-            log.warn("Could not find rhythmyxSubscription '${rhythmyxSubscription?.id}'")
+        if (!rhythmyxSubscription) {
+            log.warn("Could not find rhythmyxSubscription '${rhythmyxSubscriptionId}'")
             return false
         }
 
         try {
             return importRhythmyxSubscription(rhythmyxSubscription)
-        } catch(e) {
+        } catch (e) {
             log.error("An unexpected error occured when importing the content item for rhythmyxSubscription '${rhythmyxSubscriptionId}'", e)
             return false
         }
@@ -60,22 +59,25 @@ class RhythmyxSubscriptionImportService {
 
     boolean importRhythmyxSubscription(RhythmyxSubscription rhythmyxSubscription) {
 
-        def sourceUrl = rhythmyxSubscription.sourceUrl
-        def mediaId = getMediaId(sourceUrl)
-        if(!mediaId) {
-            log.error("Could not find a mediaItem associated with sourceUrl '${sourceUrl}' for rhythmyxSubscription '${rhythmyxSubscription.id}'")
+        def mediaId = rhythmyxSubscription.subscription.mediaId
+
+        SyndicatedMediaItem syndicatedMediaItem
+
+        try {
+            syndicatedMediaItem = contentExtractionService.getMediaSyndicate(mediaId)
+        } catch (e) {
+            log.error("Error occurred when extracting the content for mediaId '${mediaId}'", e)
             return false
         }
 
-        def mediaItem = getMediaItem(mediaId)
-        if(!mediaItem) {
-            log.error("Could not find a mediaItem associated with sourceUrl '${sourceUrl}' for rhythmyxSubscription '${rhythmyxSubscription.id}'")
+        if (syndicatedMediaItem?.content == null) {
+            log.error("The content for mediaId '${mediaId}' was null")
             return false
         }
 
-        String systemTitle = mediaItem.name
-        String content = mediaItem.content
-        String contentId = importMediaItem(rhythmyxSubscription, content, mediaId, systemTitle)
+        String systemTitle = syndicatedMediaItem.name
+        String content = syndicatedMediaItem.content
+        String contentId = importMediaItem(rhythmyxSubscription, content, systemTitle)
 
         if (!contentId) {
             return false
@@ -83,59 +85,22 @@ class RhythmyxSubscriptionImportService {
 
         rhythmyxSubscription.contentId = contentId
         rhythmyxSubscription.systemTitle = systemTitle
+        rhythmyxSubscription.deliveryFailureLogId = null
 
-        def existingSubscription = Subscription.findByMediaId(mediaId)
-        if(!existingSubscription) {
-
-            def mediaUri = mediaContentUrl.replace("{mediaId}", mediaId)
-            def subscription = subscriptionFactory.newSubscription(mediaId, mediaUri)
-            subscription.save(flush:true)
-
-            if(subscription.hasErrors()) {
-                loggingService.logDomainErrors(subscription.errors)
-                return false
-            }
-
-            rhythmyxSubscription.subscription = subscription
-
-        } else {
-            rhythmyxSubscription.subscription = existingSubscription
-        }
-
-        rhythmyxSubscription.save(flush:true, failOnError:true)
+        rhythmyxSubscription.save(flush: true)
     }
 
-    static class SubscriptionFactory {
+    private String importMediaItem(RhythmyxSubscription rhythmyxSubscription, String content, String systemTitle) {
 
-        @SuppressWarnings("GrMethodMayBeStatic")
-        Subscription newSubscription(mediaId, mediaUri) {
-            return new Subscription(mediaId: mediaId, mediaUri: mediaUri)
-        }
-    }
-
-    private String importMediaItem(RhythmyxSubscription rhythmyxSubscription, String content, String mediaId, String systemTitle) {
-        log.info("Importing the content item for mediaId=${mediaId}")
         log.debug("Content is:\n ${content}")
+
         def contentId = rhythmyxIngestionService.importMediaItem(rhythmyxSubscription, content, systemTitle)
-        if(contentId) {
-            log.info("Successfully imported the content item (contentId = ${contentId}) for rhythmyxSubscription '${rhythmyxSubscription.id}'")
+        if (contentId) {
+            log.info("Successfully imported rhythmyxSubscription '${rhythmyxSubscription.id}'")
         } else {
             log.error("Error occurred when importing the content item for rhythmyxSubscription '${rhythmyxSubscription.id}'")
         }
-        return contentId
-    }
 
-    private SyndicatedMediaItem getMediaItem(String mediaId) {
-        log.info("Getting content for mediaId=${mediaId}")
-        def content = contentExtractionService.extractSyndicatedContent(mediaId)
-        log.debug("The content for mediaId=${mediaId} is:\n${content}")
-        return content
-    }
-
-    private String getMediaId(String sourceUrl) {
-        log.info("Getting mediaId for sourceUrl=${sourceUrl}")
-        def mediaId = contentExtractionService.getMediaId(sourceUrl)
-        log.debug("The mediaId for sourceUrl=${sourceUrl} is:\n${mediaId}")
-        return mediaId
+        contentId
     }
 }

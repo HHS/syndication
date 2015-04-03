@@ -15,21 +15,22 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.dashboard
 
-import com.ctacorp.syndication.Audio
-import com.ctacorp.syndication.Html
-import com.ctacorp.syndication.Image
-import com.ctacorp.syndication.Infographic
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.Audio
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.Image
+import com.ctacorp.syndication.media.Infographic
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
-import com.ctacorp.syndication.SocialMedia
+import com.ctacorp.syndication.media.SocialMedia
 import com.ctacorp.syndication.Source
-import com.ctacorp.syndication.Video
-import com.ctacorp.syndication.Widget
+import com.ctacorp.syndication.media.Video
+import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.audit.SystemEvent
 import com.ctacorp.syndication.authentication.UserRole
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
+import org.apache.commons.lang.RandomStringUtils
 
 @Secured(["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_USER", "ROLE_BASIC", "ROLE_STATS", "ROLE_PUBLISHER"])
 @Transactional(readOnly = true)
@@ -79,7 +80,7 @@ class DashboardController {
             [label:"Video", value:Video.count()],
             [label:"Image", value:Image.count()],
             [label:"Infographic", value:Infographic.count()],
-            [label:"Collection", value:com.ctacorp.syndication.Collection.count()],
+            [label:"Collection", value:com.ctacorp.syndication.media.Collection.count()],
             [label:"Audio", value:Audio.count()],
             [label:"Widget",value:Widget.count()],
             [label:"Social Media", value:SocialMedia.count()]
@@ -133,6 +134,12 @@ class DashboardController {
         }
 
         render data as JSON
+    }
+    
+    def error500(){
+        def errorCode = RandomStringUtils.randomAlphabetic(10).toUpperCase()
+        log.error(errorCode)
+        render view:'/error', model:[errorCode:errorCode]
     }
 
     private Collection getDateRangesForLast12Months(){

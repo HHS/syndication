@@ -14,9 +14,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.authentication
 
-import grails.transaction.*
-import static org.springframework.http.HttpStatus.*
-import com.ctacorp.syndication.authentication.*
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.NOT_FOUND
+
+import grails.transaction.Transactional
+
+import com.ctacorp.syndication.authentication.User
 
 @Transactional(readOnly = true)
 class UserController {

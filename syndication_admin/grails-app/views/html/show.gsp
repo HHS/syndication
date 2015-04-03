@@ -12,8 +12,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Html" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.media.Html" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -52,15 +53,26 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <dd class="word_wrap"><a target="_blank" href="${htmlInstance?.sourceUrl}"><g:fieldValue bean="${htmlInstance}" field="sourceUrl"/></a></dd>
                 </g:if>
 
+                <g:if test="${htmlInstance?.active && htmlInstance?.visibleInStorefront}">
+                    <dt id="storefrontLink-label" class="word_wrap"><g:message code="html.storefrontLink.label" default="Storefront Link"/></dt>
+                    <dd class="word_wrap"><a target="_blank" href="${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${htmlInstance?.id}">${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${htmlInstance?.id}</a></dd>
+                </g:if>
+
                 <g:if test="${htmlInstance?.targetUrl}">
                     <dt id="targetUrl-label" class="word_wrap"><g:message code="html.targetUrl.label" default="Target Url"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${htmlInstance}" field="targetUrl"/></dd>
+                    <dd class="word_wrap"><a target="_blank" href="${htmlInstance?.targetUrl}"><g:fieldValue bean="${htmlInstance}" field="targetUrl"/></a></dd>
                 </g:if>
 
                 <g:if test="${htmlInstance?.customThumbnailUrl}">
                     <dt id="customThumbnailUrl-label" class="word_wrap"><g:message code="html.customThumbnailUrl.label" default="Custom Thumbnail Url"/></dt>
                     <dd class="word_wrap"><g:fieldValue bean="${htmlInstance}" field="customThumbnailUrl"/></dd>
                 </g:if>
+
+                <g:if test="${htmlInstance?.customPreviewUrl}">
+                    <dt id="customPreviewUrl-label" class="word_wrap"><g:message code="html.customPreviewUrl.label" default="Custom Preview Url"/></dt>
+                    <dd class="word_wrap"><g:fieldValue bean="${htmlInstance}" field="customPreviewUrl"/></dd>
+                </g:if>
+
                 <g:if test="${htmlInstance?.language}">
                     <dt id="language-label" class="word_wrap"><g:message code="html.language.label" default="Language"/></dt>
                     <dd class="word_wrap">${htmlInstance?.language?.encodeAsHTML()}</dd>
@@ -81,10 +93,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <dd class="word_wrap"><g:formatDate date="${htmlInstance?.dateSyndicationCaptured}"/></dd>
                 </g:if>
 
-                %{--<g:if test="${htmlInstance?.dateSyndicationVisible}">--}%
-                    %{--<dt id="dateSyndicationVisible-label" class="word_wrap"><g:message code="html.dateSyndicationVisible.label" default="Syndication Visible"/></dt>--}%
-                    %{--<dd class="word_wrap"><g:formatDate date="${htmlInstance?.dateSyndicationVisible}"/></dd>--}%
-                %{--</g:if>--}%
+                <g:if test="${htmlInstance?.dateSyndicationVisible}">
+                    <dt id="dateSyndicationVisible-label" class="word_wrap"><g:message code="html.dateSyndicationVisible.label" default="Syndication Visible"/></dt>
+                    <dd class="word_wrap"><g:formatDate date="${htmlInstance?.dateSyndicationVisible}"/></dd>
+                </g:if>
 
                 <g:if test="${htmlInstance?.dateContentUpdated}">
                     <dt id="dateContentUpdated-label" class="word_wrap"><g:message code="html.dateContentUpdated.label" default="Content Updated"/></dt>
@@ -162,11 +174,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <fieldset class="buttons">
         <g:form url="[resource:htmlInstance, action:'edit']">
             <a href="${apiBaseUrl + '/resources/media/'+ htmlInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
-            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER, ROLE_USER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
-            </sec:ifAnyGranted>
-            <sec:ifAnyGranted roles="ROLE_USER">
-                <g:actionSubmit class="btn btn-warning" value="Alternate/Extended Attributes" action="edit"/>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-danger" action="delete" onclick="return confirm('Are you sure?');" value="Delete"/>

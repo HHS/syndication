@@ -13,6 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 --}%
 
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
@@ -26,8 +27,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
     <asset:javascript src="application.js"/>
     <asset:stylesheet src="sb-admin.css"/>
+    <asset:stylesheet src="application.css"/>
 
     <g:layoutHead/>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
 
 <body>
@@ -49,20 +56,20 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     </nav>
                 </g:if>
             </sec:ifAnyGranted>
-        <sec:ifAnyGranted roles="ROLE_PUBLISHER">
-            <g:if test="${!params.controller.equals("metricReport") && !params.controller.equals("extendedAttribute") && !params.controller.equals("alternateImage") && !params.controller.equals("publisher")}">
-                <nav class="navbar navbar-default" role="navigation">
-                    <div class="container-fluid">
-                        <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
-                        <g:if test="${params.controller.equals("campaign")}">
-                            <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
-                        </g:if>
-                    </div>
-                </nav>
-            </g:if>
-        </sec:ifAnyGranted>
+            <sec:ifAnyGranted roles="ROLE_PUBLISHER">
+                <g:if test="${!params.controller.equals("metricReport") && !params.controller.equals("extendedAttribute") && !params.controller.equals("alternateImage") && !params.controller.equals("publisher") || params.controller.equals('audio') || params.controller.equals('collection') || params.controller.equals('html') || params.controller.equals('image') || params.controller.equals('infographic') || params.controller.equals('periodical') || params.controller.equals('socialMedia') || params.controller.equals('video') || params.controller.equals('widget')}">
+                    <nav class="navbar navbar-default" role="navigation">
+                        <div class="container-fluid">
+                            <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
+                            <g:if test="${params.controller.equals("campaign") || params.controller.equals('audio') || params.controller.equals('collection') || params.controller.equals('html') || params.controller.equals('image') || params.controller.equals('infographic') || params.controller.equals('periodical') || params.controller.equals('socialMedia') || params.controller.equals('video') || params.controller.equals('widget')}">
+                                <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                            </g:if>
+                        </div>
+                    </nav>
+                </g:if>
+            </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_MANAGER">
-                <g:if test="${params.controller.equals('alternateImage') || params.controller.equals('campaign') || params.controller.equals('language') || params.controller.equals('extendedAttribute') || params.controller.equals('source') || params.controller.equals('user')}">
+                <g:if test="${params.controller.equals('alternateImage') || params.controller.equals('campaign') || params.controller.equals('language') || params.controller.equals('extendedAttribute') || params.controller.equals('source') || params.controller.equals('user') || params.controller.equals('audio') || params.controller.equals('collection') || params.controller.equals('html') || params.controller.equals('image') || params.controller.equals('infographic') || params.controller.equals('periodical') || params.controller.equals('socialMedia') || params.controller.equals('video') || params.controller.equals('widget')}">
                 <nav class="navbar navbar-default" role="navigation">
                     <div class="container-fluid">
                         <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
@@ -70,6 +77,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     </div>
                 </nav>
             </g:if>
+            </sec:ifAnyGranted>
+            <sec:ifAnyGranted roles="ROLE_USER">
+                <g:if test="${params.controller.equals('campaign') || params.controller.equals('source') || params.controller.equals('audio') || params.controller.equals('collection') || params.controller.equals('html') || params.controller.equals('image') || params.controller.equals('infographic') || params.controller.equals('periodical') || params.controller.equals('socialMedia') || params.controller.equals('video') || params.controller.equals('widget')}">
+                    <nav class="navbar navbar-default" role="navigation">
+                        <div class="container-fluid">
+                            <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
+                            <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                        </div>
+                    </nav>
+                </g:if>
             </sec:ifAnyGranted>
 
             <g:layoutBody/>

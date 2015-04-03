@@ -24,6 +24,10 @@ class AlternateImagesController {
 
     def alternateImagesService
 
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
+
     def saveAlternateImage(AlternateImage alternateImageInstance) {
         def result = alternateImagesService.save(alternateImageInstance,params.long("mediaId"))
         if (result.id) {

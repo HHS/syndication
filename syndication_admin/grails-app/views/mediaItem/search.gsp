@@ -5,6 +5,7 @@
   Time: 8:23 AM
 --%>
 
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>

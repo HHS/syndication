@@ -13,14 +13,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 */
 package com.ctacorp.syndication.manager.cms.service
 
-import com.ctacorp.syndication.manager.cms.ContentExtractionService
-import com.ctacorp.syndication.manager.cms.RestSubscriber
-import com.ctacorp.syndication.manager.cms.RestSubscription
-import com.ctacorp.syndication.manager.cms.RestSubscriptionDeliveryService
-import com.ctacorp.syndication.manager.cms.RestSubscriptionUpdateService
-import com.ctacorp.syndication.manager.cms.Subscriber
-import com.ctacorp.syndication.manager.cms.Subscription
+import com.ctacorp.syndication.manager.cms.*
 import com.ctacorp.syndication.manager.cms.utils.exception.ServiceException
+import com.ctacorp.syndication.swagger.rest.client.model.MediaItem
 import com.ctacorp.syndication.swagger.rest.client.model.SyndicatedMediaItem
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestFor
@@ -31,6 +26,7 @@ import spock.lang.Specification
 class RestSubscriptionUpdateServiceSpec extends Specification {
 
     def contentExtractionService = Mock(ContentExtractionService)
+    def subscriptionService = Mock(SubscriptionService)
     def restSubscriptionDeliveryService = Mock(RestSubscriptionDeliveryService)
     def syndicatedMediaItem = new SyndicatedMediaItem(content: "Only the best mon")
 
@@ -43,42 +39,17 @@ class RestSubscriptionUpdateServiceSpec extends Specification {
     def setup() {
 
         subscriber = Subscriber.build()
-        subscription = Subscription.build()
+        subscription = Subscription.build(mediaId: '1234')
         restSubscriber = RestSubscriber.build(deliveryEndpoint: "http://cookiesforthehomeless.gov/donate/now.asp", subscriber: subscriber)
         restSubscription = RestSubscription.build(sourceUrl: "http://double.stuffed.com/good/cookies.html", deliveryFailureLogId: "AEDASDASD", restSubscriber: restSubscriber, subscription: subscription)
         restSubscription2 = RestSubscription.build(sourceUrl: "http://heartless.hangovers.gov/bad/morning.do", deliveryFailureLogId: "AEDASDASD", restSubscriber: restSubscriber, subscription: subscription)
 
+        service.subscriptionService = subscriptionService
         service.contentExtractionService = contentExtractionService
         service.restSubscriptionDeliveryService = restSubscriptionDeliveryService
     }
 
-    void "update subscriptions correctly handles when the media id doesn't match any subscriptions"() {
-
-        when: "updating subscriptions for an unknown media id"
-
-        def failedUpdates = service.updateSubscriptions("9999")
-
-        then: "return an empty list of failed updates"
-
-        failedUpdates.size() == 0
-    }
-
-    void "update subscriptions correctly handles when the media id doesn't match any rest subscriptions"() {
-
-        given: "a subscription that has no existing rest subscriptions"
-
-        Subscription.build(mediaId:9999)
-
-        when: "updating subscriptions for an unknown media id"
-
-        def failedUpdates = service.updateSubscriptions("9999")
-
-        then: "return an empty list of failed updates"
-
-        failedUpdates.size() == 0
-    }
-
-    void "update subscriptions correctly handles when the extraction service throws an exception"() {
+    void "update subscription correctly handles when the extraction service throws an exception"() {
 
         given: "the exception to throw"
 
@@ -86,37 +57,43 @@ class RestSubscriptionUpdateServiceSpec extends Specification {
 
         when: "updating subscriptions"
 
-        def failedUpdates = service.updateSubscriptions(subscription.mediaId as String)
+        boolean success = service.updateSubscription(restSubscription)
 
-        then: "throw an exception from the extraction service"
+        then: "get the source url from the extraction service"
 
-        1 * contentExtractionService.extractSyndicatedContent(subscription.mediaId as String) >> {
+        1 * contentExtractionService.getMediaItem(subscription.mediaId) >> new MediaItem(sourceUrl: "http://hamAndCheese.gov/please.html")
+
+        and: "throw an exception from the extraction service"
+
+        1 * contentExtractionService.getMediaSyndicate(subscription.mediaId) >> {
             throw exception
         }
 
-        and: "return the list of failed updates"
+        and: "return a failed status"
 
-        failedUpdates.size() == 2
-        failedUpdates.get(0) == restSubscription
+        !success
     }
 
-    void "update subscriptions correctly handles when the extraction service returns null"() {
+    void "update subscription correctly handles when the extraction service returns null"() {
 
         when: "updating subscriptions"
 
-        def failedUpdates = service.updateSubscriptions(subscription.mediaId as String)
+        boolean success = service.updateSubscription(restSubscription)
 
-        then: "return null from the extraction service"
+        then: "get the source url from the extraction service"
 
-        1 * contentExtractionService.extractSyndicatedContent(subscription.mediaId as String) >> null
+        1 * contentExtractionService.getMediaItem(subscription.mediaId) >> new MediaItem(sourceUrl: "http://hamAndCheese.gov/please.html")
 
-        and: "return the list of failed updates"
+        and: "return null from the extraction service"
 
-        failedUpdates.size() == 2
-        failedUpdates.get(0) == restSubscription
+        1 * contentExtractionService.getMediaSyndicate(subscription.mediaId) >> null
+
+        and: "return a failed status"
+
+        !success
     }
 
-    void "update subscriptions correctly handles when the rest delivery service throws an exception"() {
+    void "update subscription correctly handles when the rest delivery service throws an exception"() {
 
         given: "the exception to throw"
 
@@ -124,15 +101,15 @@ class RestSubscriptionUpdateServiceSpec extends Specification {
 
         when: "updating subscriptions"
 
-        def failedUpdates = service.updateSubscriptions(subscription.mediaId as String)
-
-        then: "get the media item from the extraction service"
-
-        1 * contentExtractionService.extractSyndicatedContent(subscription.mediaId as String) >> syndicatedMediaItem
+        def success = service.updateSubscription(restSubscription)
 
         then: "get the source url from the extraction service"
 
-        1 * contentExtractionService.getMediaItem(subscription.mediaId as String) >> [sourceUrl: "http://hamAndCheese.gov/please.html"]
+        1 * contentExtractionService.getMediaItem(subscription.mediaId) >> new MediaItem(sourceUrl: "http://hamAndCheese.gov/please.html")
+
+        then: "get the media item from the extraction service"
+
+        1 * contentExtractionService.getMediaSyndicate(subscription.mediaId) >> syndicatedMediaItem
 
         and: "throw an exception from the rest delivery service"
 
@@ -140,24 +117,23 @@ class RestSubscriptionUpdateServiceSpec extends Specification {
             throw exception
         }
 
-        and: "return the list of failed updates"
+        and: "return a failed status"
 
-        failedUpdates.size() == 1
-        failedUpdates.get(0) == restSubscription
+        !success
     }
 
-    void "import subscriptions correctly handles an unknown subscription id"() {
+    void "import subscription correctly handles an unknown subscription id"() {
 
         when: "importing a subscription"
 
         def success = service.importSubscription(9999)
 
-        then: "the import should fail"
+        then: "return a failed status"
 
         !success
     }
 
-    void "import subscriptions correctly handles when the content extraction service throws an exception"() {
+    void "import subscription correctly handles when the content extraction service throws an exception"() {
 
         given: "the exception to throw"
 
@@ -167,90 +143,107 @@ class RestSubscriptionUpdateServiceSpec extends Specification {
 
         def success = service.importSubscription(restSubscription.id)
 
-        then: "throw an exception when extracting the content"
+        then: "get the source url from the extraction service"
 
-        contentExtractionService.extractSyndicatedContent(subscription.mediaId as String) >> {
+        1 * contentExtractionService.getMediaItem(subscription.mediaId) >> new MediaItem(sourceUrl: "http://hamAndCheese.gov/please.html")
+
+        and: "throw an exception when extracting the content"
+
+        contentExtractionService.getMediaSyndicate(subscription.mediaId as String) >> {
             throw exception
         }
 
-        and: "the import should fail"
+        and: "return a failed status"
 
         !success
     }
 
-    void "import subscriptions correctly handles when the content extraction service fails to return any content"() {
+    void "import subscription correctly handles when the content extraction service fails to return any content"() {
 
         when: "importing a subscription"
 
         def success = service.importSubscription(restSubscription.id)
 
+        then: "get the source url from the extraction service"
+
+        1 * contentExtractionService.getMediaItem(subscription.mediaId) >> new MediaItem(sourceUrl: "http://hamAndCheese.gov/please.html")
+
         then: "return null from the extraction service"
 
-        contentExtractionService.extractSyndicatedContent(subscription.mediaId as String) >> null
+        contentExtractionService.getMediaSyndicate(subscription.mediaId as String) >> null
 
-        and: "the import should fail"
+        and: "return a failed status"
 
         !success
     }
 
-    void "import subscriptions successfully imports a rest subscription"() {
+    void "import subscription successfully imports a rest subscription"() {
 
         when: "importing a subscription"
 
         def success = service.importSubscription(restSubscription.id)
 
-        then: "return null from the extraction service"
+        then: "get the source url from the extraction service"
 
-        contentExtractionService.extractSyndicatedContent(subscription.mediaId as String) >> syndicatedMediaItem
+        1 * contentExtractionService.getMediaItem(subscription.mediaId) >> new MediaItem(sourceUrl: "http://hamAndCheese.gov/please.html")
+
+        and: "return null from the extraction service"
+
+        contentExtractionService.getMediaSyndicate(subscription.mediaId as String) >> syndicatedMediaItem
 
         and: "deliver the rest subscription"
 
         1 * restSubscriptionDeliveryService.deliver(restSubscription, syndicatedMediaItem.content)
 
-        and: "the import should succeed"
+        and: "clear the is pending and log failure id"
+
+        !restSubscription.deliveryFailureLogId
+        !restSubscription.isPending
+
+        and: "return a success status"
 
         success
     }
 
-    void "update subscriptions successfully updates multiple rest subscriptions"() {
+    void "update subscription successfully updates a rest subscription"() {
 
-        when: "updating subscriptions"
+        when: "updating a subscription"
 
-        def failedUpdates = service.updateSubscriptions(subscription.mediaId as String)
-
-        then: "return the syndication media item from the extraction service"
-
-        1 * contentExtractionService.extractSyndicatedContent(subscription.mediaId as String) >> syndicatedMediaItem
+        def success = service.updateSubscription(restSubscription)
 
         then: "get the source url from the extraction service"
 
-        1 * contentExtractionService.getMediaItem(subscription.mediaId as String) >> [sourceUrl: "http://hamAndCheese.gov/please.html"]
+        1 * contentExtractionService.getMediaItem(subscription.mediaId) >> new MediaItem(sourceUrl: "http://hamAndCheese.gov/please.html")
 
-        and: "deliver the first rest subscription"
+        then: "return the syndication media item from the extraction service"
+
+        1 * contentExtractionService.getMediaSyndicate(subscription.mediaId as String) >> syndicatedMediaItem
+
+        and: "deliver the rest subscription"
 
         1 * restSubscriptionDeliveryService.deliver(restSubscription, syndicatedMediaItem.content)
 
-        and: "deliver the first rest subscription"
+        and: "return a success status"
 
-        1 * restSubscriptionDeliveryService.deliver(restSubscription2, syndicatedMediaItem.content)
+        success
+    }
 
-        and: "return the list of failed updates"
+    void "delete subscription successfully updates a rest subscription"() {
 
-        failedUpdates.size() == 0
+        when: "updating a subscription"
 
-        and: "the source url has been updated"
+        def success = service.deleteSubscription(restSubscription)
 
-        restSubscription.sourceUrl == "http://hamAndCheese.gov/please.html"
-        restSubscription2.sourceUrl == "http://hamAndCheese.gov/please.html"
+        then: "deliver the delete message"
 
-        and: "the delivery failure log id is null"
+        1 * restSubscriptionDeliveryService.deliverDelete(restSubscription)
 
-        !restSubscription.deliveryFailureLogId
-        !restSubscription2.deliveryFailureLogId
+        and: "delete the subscription"
 
-        and: "is pending is false"
+        subscriptionService.deleteChildSubscription(restSubscription)
 
-        !restSubscription.isPending
-        !restSubscription2.isPending
+        and: "return a success status"
+
+        success
     }
 }

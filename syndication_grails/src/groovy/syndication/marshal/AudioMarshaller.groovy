@@ -1,29 +1,20 @@
 package syndication.marshal
 
 import clover.com.lowagie.text.html.HtmlEncoder
-import com.ctacorp.syndication.Audio
+import com.ctacorp.syndication.media.Audio
 import com.ctacorp.syndication.ExtendedAttribute
 import grails.converters.JSON
-import syndication.preview.ThumbnailService
-import syndication.rest.MediaService
-import syndication.tag.TagsService
-import syndication.tinyurl.TinyUrlService
-import syndication.youtube.YoutubeService
 
 /**
  * Created by sgates on 8/19/14.
  */
 class AudioMarshaller {
-    ThumbnailService thumbnailService
-    TinyUrlService tinyUrlService
-    TagsService tagsService
-    MediaService mediaService
-    YoutubeService youtubeService
+    def services
 
     AudioMarshaller() {
         JSON.registerObjectMarshaller(Audio) { Audio a ->
-            def tinyInfo = mediaService.getTinyUrlInfoForMediaItemForAPIResponse(a)
-            def campaigns = mediaService.getCampaignsForAPIResponse(a)
+            def tinyInfo = services.mediaService.getTinyUrlInfoForMediaItemForAPIResponse(a)
+            def campaigns = services.mediaService.getCampaignsForAPIResponse(a)
 
             def attr = HtmlEncoder.encode("<div id='hhsAttribution'>Content provided and maintained by <a href='${a.source.websiteUrl}' target='_blank'>Health and Human Services</a> (HHS). Please see our system <a href='http:syndication.hhs.gov' target='_blank'>usage guidelines and disclaimer</a>.</div>")
 
@@ -34,7 +25,6 @@ class AudioMarshaller {
                     description:            a.description,
                     sourceUrl:              a.sourceUrl,
                     targetUrl:              a.targetUrl,
-                    customThumbnailUrl:      a.customThumbnailUrl,
                     dateContentAuthored:    a.dateContentAuthored,
                     dateContentUpdated:     a.dateContentUpdated,
                     dateContentPublished:   a.dateContentPublished,
@@ -48,10 +38,11 @@ class AudioMarshaller {
                     source:                 a.source,
                     alternateImages:        a.alternateImages,
                     campaigns:              campaigns,
-                    tags:                   mediaService.getTagsForMediaItemForAPIResponse(a),
+                    tags:                   services.mediaService.getTagsForMediaItemForAPIResponse(a),
                     tinyUrl:                tinyInfo.tinyUrl,
                     tinyToken:              tinyInfo.tinyUrlToken,
-                    thumbnailUrl:           thumbnailService.getThumbnailUrl(a.id),
+                    thumbnailUrl:           services.urlService.getThumbnailUrl(a.id),
+                    previewlUrl:            services.urlService.getPreviewUrl(a.id),
                     attribution:            attr,
                     extendedAttributes:     marshalDescriptor(a.extendedAttributes)
             ]

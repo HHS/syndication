@@ -1,6 +1,6 @@
 package com.ctacorp.syndication.storefront
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.authentication.User
 
 class UserMediaList {

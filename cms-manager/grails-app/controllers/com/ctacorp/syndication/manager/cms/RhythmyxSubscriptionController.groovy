@@ -12,8 +12,8 @@ Redistribution and use in source and binary forms, with or without modification,
 
   */
 package com.ctacorp.syndication.manager.cms
-
 import com.ctacorp.syndication.commons.mq.MessageType
+import com.ctacorp.syndication.manager.cms.utils.mq.RabbitDelayJobScheduler
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
@@ -26,10 +26,13 @@ class RhythmyxSubscriptionController {
     static responseFormats = ["html"]
 
     def rhythmyxIngestionService
+    def contentExtractionService
     def loggingService
     def queueService
     def subscriptionService
     def rhythmyxSubscriptionTransitionService
+    def userSubscriberService
+    def rabbitDelayJobScheduler = new RabbitDelayJobScheduler()
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -47,23 +50,13 @@ class RhythmyxSubscriptionController {
 
         params.max = Math.min(max ?: 10, 100)
 
-        def rhythmyxSubscriptions = RhythmyxSubscription.list(params)
-        if(params.sort == 'subscription.mediaId') {
+        def rhythmyxSubscriptions = userSubscriberService.listRhythmyxSubscriptions(params)
+        def count = userSubscriberService.rhythmyxSubscriptionCount()
 
-            def pendingOrFailedSubscriptions = RhythmyxSubscription.findAllBySubscriptionIsNull()
-
-            if(params.order == 'asc') {
-                rhythmyxSubscriptions.addAll(0, pendingOrFailedSubscriptions)
-            } else {
-                rhythmyxSubscriptions.addAll(pendingOrFailedSubscriptions)
-            }
-        }
-
-        respond rhythmyxSubscriptions, model: [instanceCount: RhythmyxSubscription.count()], view: 'index'
+        respond rhythmyxSubscriptions, model: [instanceCount: count], view: 'index'
     }
 
     def show(RhythmyxSubscription rhythmyxSubscription) {
-
         if (!rhythmyxSubscription) {
             return notFound()
         }
@@ -73,24 +66,32 @@ class RhythmyxSubscriptionController {
 
     def create() {
 
+        def rhythmyxSubscribers = userSubscriberService.listRhythmyxSubscribers()
+        if(!rhythmyxSubscribers) {
+            flash.errors = [message(code: 'rhythmyxSubscription.noAssociatedRhythmyxSubscribers')]
+            redirect(action: "index", method: "GET")
+            return
+        }
+
         def targetFolder = params.sys_folderid
         def instanceName = params.instance as String
 
-        def rhythmyxSubscriber = RhythmyxSubscriber.findByInstanceName(instanceName)
-
+        def rhythmyxSubscriber = rhythmyxSubscribers.find { instanceName == it.instanceName}
         if (rhythmyxSubscriber) {
             try {
                 flash.contentTypes = rhythmyxIngestionService.getContentTypes(rhythmyxSubscriber)
             } catch (e) {
-                flash.errors = [loggingService.logError("Error occurred when fetching the content types for rhythmyxSubscriber=${rhythmyxSubscriber.instanceName}", e)]
+                flash.errors = [loggingService.logError("Error occurred when fetching the content types for rhythmyxSubscriber '${rhythmyxSubscriber.instanceName}'", e)]
                 redirect action: "index", method: "GET"
                 return
             }
         }
 
+        flash.rhythmyxSubscribers = rhythmyxSubscribers
+
         def rhythmyxWorkflow = rhythmyxSubscriber?.rhythmyxWorkflow ?: new RhythmyxWorkflow()
 
-        respond new RhythmyxSubscription(targetFolder: targetFolder, rhythmyxSubscriber: rhythmyxSubscriber, rhythmyxWorkflow: rhythmyxWorkflow, subscription: new Subscription()), view: 'create'
+        respond new RhythmyxSubscription(targetFolder: targetFolder, rhythmyxSubscriber: rhythmyxSubscriber, rhythmyxWorkflow: rhythmyxWorkflow, subscription: new Subscription()), view:'create'
     }
 
     @Transactional
@@ -100,34 +101,71 @@ class RhythmyxSubscriptionController {
             return notFound()
         }
 
+        def sourceUrl = rhythmyxSubscription.sourceUrl
         def rhythmyxSubscriber = rhythmyxSubscription.rhythmyxSubscriber
 
-        if(!rhythmyxSubscriber) {
+        if(!sourceUrl || !rhythmyxSubscriber) {
             rhythmyxSubscription.validate()
+            flash.rhythmyxSubscribers = userSubscriberService.listRhythmyxSubscribers()
             respond rhythmyxSubscription.errors, view: 'create'
             return
         }
 
-        def useAsDefaultWorkflow = rhythmyxSubscription.useAsDefaultWorkflow
+        if(!userSubscriberService.hasAccess(rhythmyxSubscriber)) {
+            flash.errors = [message(code: 'rhythmyxSubscription.accessDeniedToRhythmyxSubscriber')]
+            redirect(action: "index", method: "GET")
+            return
+        }
 
-        rhythmyxSubscription.save(flush: true)
+        //noinspection GroovyUnusedAssignment
+        def mediaItem = null
+
+        try {
+            mediaItem = contentExtractionService.getMediaItemBySourceUrl(sourceUrl)
+            if (!mediaItem) {
+                flash.errors = [message(code: 'rhythmyxSubscription.sourceUrl.not.syndicated', args: [sourceUrl])]
+                redirect action: "index", method: "GET"
+                return
+            }
+        } catch (e) {
+            flash.errors = [loggingService.logError("An error occurred when trying to get the media item associated with sourceUrl '${sourceUrl}'", e)]
+            redirect action: "index", method: "GET"
+            return
+        }
+
+        def existingSubscription = Subscription.findByMediaId(mediaItem.id as String)
+        if (!existingSubscription) {
+
+            def subscription = new Subscription(mediaId: mediaItem.id)
+            subscription.save(flush: true)
+            rhythmyxSubscription.subscription = subscription
+
+        } else {
+
+            def existingRhythmyxSubscription = RhythmyxSubscription.findBySubscriptionAndRhythmyxSubscriber(existingSubscription, rhythmyxSubscriber)
+
+            if (existingRhythmyxSubscription) {
+                flash.errors = [message(code: 'rhythmyxSubscription.already.subscribed.message', args: [rhythmyxSubscriber.instanceName, mediaItem.id])]
+                redirect action: "index", method: "GET"
+                return
+            }
+
+            rhythmyxSubscription.subscription = existingSubscription
+        }
 
         if (params.useAsDefaultWorkflow) {
             rhythmyxSubscriber.rhythmyxWorkflow = rhythmyxSubscription.rhythmyxWorkflow
             rhythmyxSubscriber.save(flush: true)
         }
 
+        rhythmyxSubscription.systemTitle = mediaItem.name
+        rhythmyxSubscription.save(flush: true)
+
+
         if (rhythmyxSubscription.hasErrors()) {
             respond rhythmyxSubscription.errors, view: 'create'
         } else {
-            try {
-                queueService.sendToRhythmyxUpdateQueue(MessageType.IMPORT, rhythmyxSubscription.id)
-            } catch (e) {
-                flash.contentTypes = flash.contentTypes
-                flash.errors = [loggingService.logError("Error occurred when saving the rhythmyxSubscription with sourceUrl=${rhythmyxSubscription.sourceUrl}", e)]
-                respond rhythmyxSubscription, view: 'create'
-                return
-            }
+            rabbitDelayJobScheduler.schedule(MessageType.IMPORT, rhythmyxSubscription)
             showInstance(rhythmyxSubscription, 'default.created.message')
         }
     }
@@ -144,7 +182,7 @@ class RhythmyxSubscriptionController {
     @Transactional
     def update(RhythmyxSubscription rhythmyxSubscription) {
 
-        if (rhythmyxSubscription == null) {
+        if (!rhythmyxSubscription) {
             return notFound()
         }
 
@@ -158,21 +196,41 @@ class RhythmyxSubscriptionController {
         showInstance(rhythmyxSubscription, 'default.updated.message')
     }
 
+    def deliver(RhythmyxSubscription rhythmyxSubscription) {
+
+        try {
+            if( !rhythmyxSubscription.deliveryFailureLogId && rhythmyxSubscription.contentId){
+            flash.message = "Please wait to redeliver until the subscription is no longer pending."
+        }
+            queueService.sendToRhythmyxUpdateQueue(MessageType.UPDATE, rhythmyxSubscription.id)
+        } catch (ignore) {
+        }
+        redirect(action: "index", method: "GET")
+    }
+
     @Transactional
     def delete(RhythmyxSubscription rhythmyxSubscription) {
 
         if (!rhythmyxSubscription) {
-            notFound()
+            return notFound()
+        }
+
+        def rhythmyxSubscriber = rhythmyxSubscription.rhythmyxSubscriber
+        if(!userSubscriberService.hasAccess(rhythmyxSubscriber)) {
+            flash.errors = [message(code: 'rhythmyxSubscription.accessDeniedToRhythmyxSubscriber')]
+            redirect(action: "index", method: "GET")
             return
         }
 
-        rhythmyxSubscriptionTransitionService.doDeleteTransitions([rhythmyxSubscription])
+        def rhythmyxSubscriptionId = rhythmyxSubscription.id
 
-        def sourceUrl = rhythmyxSubscription.sourceUrl
+        try {
+            rabbitDelayJobScheduler.schedule(MessageType.DELETE, rhythmyxSubscription)
+            flash.message = message(code: 'rhythmyxSubscription.delete.queued.message', args: [rhythmyxSubscriptionId])
+        } catch (e) {
+            flash.errors = [loggingService.logError("Error occurred when queuing a delete message for rhythmyxSubscription '${rhythmyxSubscriptionId}'", e)]
+        }
 
-        subscriptionService.deleteChildSubscription(rhythmyxSubscription)
-
-        flash.message = message(code: 'default.deleted.message', args: [message(code: 'rhythmyxSubscription.label'), sourceUrl])
         redirect(action: "index", method: "GET")
     }
 

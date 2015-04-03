@@ -14,14 +14,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
-import com.ctacorp.syndication.Collection
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.NOT_FOUND
+
+import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.FeaturedMedia
 import com.ctacorp.syndication.MediaItemSubscriber
-import com.ctacorp.syndication.authentication.UserRole
 
-import static org.springframework.http.HttpStatus.*
-
-import com.ctacorp.syndication.SocialMedia
+import com.ctacorp.syndication.media.SocialMedia
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
@@ -58,13 +60,13 @@ class SocialMediaController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond new SocialMedia(params), model: [subscribers:subscribers]
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(SocialMedia socialMediaInstance) {
         if (socialMediaInstance == null) {
@@ -75,7 +77,7 @@ class SocialMediaController {
         def status =  mediaItemsService.updateItemAndSubscriber(socialMediaInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action: 'create', params:params
+            respond socialMediaInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
 
@@ -95,7 +97,7 @@ class SocialMediaController {
         respond socialMediaInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(socialMediaInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(SocialMedia socialMediaInstance) {
         if (socialMediaInstance == null) {
@@ -133,7 +135,7 @@ class SocialMediaController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(socialMediaInstance)
+        mediaItemsService.removeMediaItemsFromUserMediaLists(socialMediaInstance, true)
         solrIndexingService.removeMediaItem(socialMediaInstance)
         mediaItemsService.delete(socialMediaInstance.id)
 

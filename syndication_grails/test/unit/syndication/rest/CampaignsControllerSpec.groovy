@@ -16,12 +16,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.rest
 
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
-import com.ctacorp.syndication.*
+import com.ctacorp.syndication.Campaign
 
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
@@ -31,9 +30,7 @@ import com.ctacorp.syndication.*
 @Build(Campaign)
 class CampaignsControllerSpec extends Specification {
     def setup() {
-//        def arbs = new ApiResponseBuilderService(errorHandlingService: ehs)
         def cs = [listCampaigns:{params->[]}, getTotal:{params->0}]
-//        controller.apiResponseBuilderService = arbs
         controller.campaignsService = cs
     }
 
@@ -49,10 +46,10 @@ class CampaignsControllerSpec extends Specification {
             response.json != null
         and: "the error should have the required fields"
             response.json.meta != null
-            response.json.meta.message != null
-            response.json.meta.message.errorMessage != null
+            response.json.meta.messages != null
+            response.json.meta.messages.errorMessage != null
         and: "the status should be 400"
-            response.json.meta.message.status == 400
+            response.json.meta.status == 400
     }
 
     void "show action should return the correct record when requested"(){
@@ -65,7 +62,7 @@ class CampaignsControllerSpec extends Specification {
             response.json != null
             println response.json
         and: "the status should also be 200"
-            response.json.meta.message.status == 200
+            response.json.meta.status == 200
         and: "the response body should have data with the correct id"
             response.json.results != null
             response.json.results[0] != null

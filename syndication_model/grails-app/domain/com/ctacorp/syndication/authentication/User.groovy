@@ -13,7 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 package com.ctacorp.syndication.authentication
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.storefront.UserMediaList
 
 class User {

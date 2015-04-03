@@ -2,11 +2,13 @@ package com.ctacorp.syndication
 
 import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.authentication.UserRole
-import com.ctacorp.syndication.MediaItemSubscriber
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.health.FlaggedMedia
+import com.ctacorp.syndication.media.Periodical
 import com.ctacorp.syndication.storefront.UserMediaList
-import org.springframework.transaction.interceptor.TransactionAspectSupport
+import grails.util.Environment
 import grails.transaction.Transactional
 
 @Transactional
@@ -15,6 +17,10 @@ class MediaItemsService {
     def extendedAttributeService
     def grailsApplication
     def springSecurityService
+    def cmsManagerKeyService
+    def contentRetrievalService
+    def solrIndexingService
+    def remoteCacheService
 
     def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id}
 
@@ -27,7 +33,7 @@ class MediaItemsService {
             campaign.removeFromMediaItems(mi)
         }
 
-        def collections = com.ctacorp.syndication.Collection.where{
+        def collections = com.ctacorp.syndication.media.Collection.where{
             mediaItems{
                 id == mi.id
             }
@@ -93,11 +99,17 @@ class MediaItemsService {
     }
 
     //removes mediaItems from user media lists if active or visibleInStorefront went from true to false
-    void removeMediaItemsFromUserMediaLists(MediaItem mediaItem){
+    void removeMediaItemsFromUserMediaLists(MediaItem mediaItem, deleting = false){
         if(MediaItem.get(mediaItem.id)?.getPersistentValue("visibleInStorefront") && !mediaItem.visibleInStorefront ||
                 MediaItem.get(mediaItem.id)?.getPersistentValue("active") && !mediaItem.active){
 
            List<UserMediaList> userMedia = UserMediaList.containsMediaItem(mediaItem).list() ?: []
+            userMedia.each{
+                it.mediaItems.remove(mediaItem)
+            }
+        }
+        if(deleting){
+            List<UserMediaList> userMedia = UserMediaList.containsMediaItem(mediaItem).list() ?: []
             userMedia.each{
                 it.mediaItems.remove(mediaItem)
             }
@@ -127,7 +139,7 @@ class MediaItemsService {
     def getMediaTypes() {
         def mediaTypes = []
         grailsApplication.domainClasses.each {
-            if (it.clazz.superclass.name == "com.ctacorp.syndication.MediaItem") {
+            if (it.clazz.superclass.name == "com.ctacorp.syndication.media.MediaItem") {
                 def simpleName = it.clazz.simpleName
                 if(simpleName == "SocialMedia"){
                     mediaTypes << "Social Media"
@@ -148,48 +160,100 @@ class MediaItemsService {
 
     def updateItemAndSubscriber(MediaItem mediaItem, Long subscriberId){
         def errors = []
+        def mediaItemSubscriber = null
         mediaItem.validate()
         if (mediaItem.hasErrors()) {
             def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib');
-            errors = mediaItem.errors.allErrors.collect{[message:g.message([error : it])]}
+            errors = mediaItem.errors.allErrors.collect { [message: g.message([error: it])] }
             return errors
         }
         
-        removeMediaItemsFromUserMediaLists(mediaItem)
-        mediaItem.save(flush:true)
-
-        def mediaItemSubscriber = MediaItemSubscriber.findByMediaItem(mediaItem)
-        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
-            if(!springSecurityService.currentUser.subscriberId){
-                errors << [message:"You do not have a valid subscriber. For help contact " + grailsApplication.config.grails.mail.default.from]
-                log.error("The publisher " + springSecurityService.currentUser.name)
-            }
-            if(mediaItemSubscriber){
-                mediaItemSubscriber.subscriberId = springSecurityService.currentUser.subscriberId
-            } else {
-                mediaItemSubscriber = new MediaItemSubscriber([mediaItem:mediaItem,subscriberId:springSecurityService.currentUser.subscriberId])
-            }
-            mediaItemSubscriber.save(flush: true)
-        } else if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_ADMIN") {
-            if(!subscriberId){
-                errors << [message:"You did not select a valid subscriber."]
-                log.error("The publisher " + springSecurityService.currentUser.name)
-                transactionStatus.setRollbackOnly()
+        if(mediaItem instanceof Html || mediaItem instanceof Periodical){
+            def extractedContent
+            try {
+                def contentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mediaItem.sourceUrl)
+                extractedContent = contentAndHash.content
+                mediaItem.hash = contentAndHash.hash
+                if(!extractedContent){
+                    errors = [[message:  "The system could not find syndication markup at the provided URL. Please verify the media source to ensure it contains at least one <div> element containing the 'syndicate' class."]]
+                    return errors
+                }
+            } catch(e){
+                errors = [[message:  "The provided URL doesn't appear to be accessible, perhaps it's invalid? Please make " +
+                        "sure it is fully qualified and correct."]]
                 return errors
             }
-            else if(mediaItemSubscriber){
-                mediaItemSubscriber.subscriberId = subscriberId
-            } else {
-                mediaItemSubscriber = new MediaItemSubscriber([mediaItem:mediaItem,subscriberId:subscriberId])
-            }
-            mediaItemSubscriber.save(flush: true)
         }
 
+        mediaItem.manuallyManaged = true
+        //TODO this needs to be renamed, it makes it sound like it removes this item from all user media lists
+        removeMediaItemsFromUserMediaLists(mediaItem)
+
+        if(Environment.current != Environment.DEVELOPMENT || (Environment.current == Environment.DEVELOPMENT && cmsManagerKeyService.listSubscribers()) || UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
+
+            if(mediaItem.id){
+                mediaItemSubscriber = MediaItemSubscriber.findByMediaItem(mediaItem)
+            }
+            if (UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
+                if (!springSecurityService.currentUser.subscriberId) {
+                    errors << [message: "You do not have a valid subscriber. For help contact " + grailsApplication.config.grails.mail.default.from]
+                    log.error("The publisher " + springSecurityService.currentUser.name)
+                }
+                if (mediaItemSubscriber) {
+                    mediaItemSubscriber.subscriberId = springSecurityService.currentUser.subscriberId
+                } else {
+                    mediaItemSubscriber = new MediaItemSubscriber([mediaItem: mediaItem, subscriberId: springSecurityService.currentUser.subscriberId])
+                }
+            } else if (["ROLE_ADMIN","ROLE_USER","ROLE_MANAGER"].contains(UserRole.findByUser(springSecurityService.currentUser).role.authority)) {
+                if (!subscriberId) {
+                    errors << [message: "You did not select a valid subscriber."]
+                    log.error("The publisher " + springSecurityService.currentUser.name)
+                } else if (mediaItemSubscriber) {
+                    mediaItemSubscriber.subscriberId = subscriberId as Long
+                } else {
+                    mediaItemSubscriber = new MediaItemSubscriber([mediaItem: mediaItem, subscriberId: subscriberId as Long])
+                }
+            }
+        }
+        
         if(errors != []){
             transactionStatus.setRollbackOnly()
             return errors
         }
+        
+        mediaItem.save(flush: true)
+        mediaItemSubscriber?.save(flush: true)
 
         return null
     }
+
+    @Transactional
+    def scanContentForUpdates() {
+        log.info "Daily Periodical Scan initiated"
+        //Update happens at midnight server time
+        def periodicals = Periodical.findAllByManuallyManaged(true)
+        updateAndNotify(periodicals)
+
+        log.info "Daily Html Scan initiated"
+        def htmlItems = Html.findAllByManuallyManaged(true)
+        updateAndNotify(htmlItems)
+    }
+
+    private updateAndNotify(mediaItems){
+        
+        mediaItems.each { MediaItem mediaItem ->
+            try {
+                Map freshExtraction = contentRetrievalService.getContentAndMd5Hashcode(mediaItem.sourceUrl)
+                if (freshExtraction.hash != mediaItem.hash) {
+                    mediaItem.hash = freshExtraction.hash
+                    mediaItem.save(flush: true)
+                    solrIndexingService.inputMediaItem(mediaItem, freshExtraction.content)
+                }
+            }catch(e) {
+                log.error("Could not extract content, page was found but not marked up at url: ${mediaItem.sourceUrl}")
+            }
+        }
+        //remote cache flushed in syndication model MediaItemChangeListener
+    }
+    
 }

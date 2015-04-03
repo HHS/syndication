@@ -22,15 +22,19 @@ Redistribution and use in source and binary forms, with or without modification,
 </g:else>
 <td>${fieldValue(bean: instance, field: "targetFolder").replaceAll(',', '')}</td>
 <td>${fieldValue(bean: instance, field: "contentType")}</td>
-<g:if test="${instance.deliveryFailureLogId}">
-    <td class="delivery-failed danger">${message(code: 'subscription.delivery.status.failure')}</td>
+<g:if test="${instance.deliveryFailureLogId && instance.contentId}">
+    <td class="delivery-failed danger">${message(code: 'subscription.delivery.status.updateFailed')}</td>
     <td>${fieldValue(bean: instance, field: "deliveryFailureLogId")}</td>
 </g:if>
-<g:elseif test="${!instance.deliveryFailureLogId && !instance.subscription}">
+<g:elseif test="${instance.deliveryFailureLogId && !instance.contentId}">
+    <td class="delivery-failed danger">${message(code: 'subscription.delivery.status.failed')}</td>
+    <td>${fieldValue(bean: instance, field: "deliveryFailureLogId")}</td>
+</g:elseif>
+<g:elseif test="${!instance.deliveryFailureLogId && !instance.contentId}">
     <td class="delivery-pending warning">${message(code: 'subscription.delivery.status.pending')}</td>
     <td></td>
 </g:elseif>
 <g:else>
-    <td class="delivery-success success">${message(code: 'subscription.delivery.status.success')}</td>
+    <td class="delivery-success success">${message(code: 'subscription.delivery.status.updated')}</td>
     <td></td>
 </g:else>

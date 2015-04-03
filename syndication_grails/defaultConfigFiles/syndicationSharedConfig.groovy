@@ -13,7 +13,6 @@ swagger{
 }
 
 tagCloud.serverAddress = "http://localhost:8084/TagCloud"
-
 storefront.serverAddress = "http://localhost:8084/SyndicationStorefront"
 
 cmsManager.serverUrl = "http://localhost:9090/CmsManager"
@@ -137,6 +136,13 @@ syndication.dataLocation =      "${System.getProperty('user.home')}/dataDump.jso
 syndication.htmlRenderingEngine = "cutycapt"
 imageMagick.location = "/usr/local/bin"
 cutycapt.location = "/usr/local/bin"
+syndication.scratch.root = "${System.getProperty('user.home')}/.syndication"
+syndication.contentExtraction.cssClassName = "syndicate"
+
+//_____________________
+// Syndication Admin   \_________________________________________________________________
+//_______________________________________________________________________________________
+google.analytics.profileId = "Your profile id"
 
 //___________________________
 // Syndication Solr Search   \___________________________________________________________

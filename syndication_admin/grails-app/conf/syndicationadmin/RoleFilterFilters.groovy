@@ -1,6 +1,6 @@
 package syndicationadmin
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.authentication.User

@@ -23,85 +23,51 @@ class RhythmyxSubscriptionUpdateService {
     def rhythmyxIngestionService
     def queueService
 
-    Map updateRhythmyxSubscriptions(String mediaId) {
+    boolean updateSubscription(RhythmyxSubscription rhythmyxSubscription) {
 
-        log.info("Updating rhythmyx subscriptions for mediaId '${mediaId}'")
-
-        try {
-            return updateSubscriptions(mediaId)
-        } catch(e) {
-            log.error("An unexpected error occured when updating the rhythmyx subscriptions associated with mediaId '${mediaId}'", e)
-            return [failedUpdates:[],successfulUpdates:[]]
-        }
-    }
-
-    Map updateSubscriptions(String mediaId) {
-
-        def failedUpdates = []
-        def successfulUpdates = []
-
-        def subscription = Subscription.findByMediaId(mediaId)
-
-        if(!subscription) {
-            log.info("No subscriptions found for mediaId '${mediaId}'")
-            return updates(failedUpdates, successfulUpdates)
-        }
-
-        def existingSubscriptions = RhythmyxSubscription.findAllBySubscription(subscription)
-        if(!existingSubscriptions) {
-            log.info("No rhythmyx subscriptions found for subscription '${subscription.id}'")
-            return updates(failedUpdates, successfulUpdates)
-        }
-
-        SyndicatedMediaItem syndicatedMediaItem
-
-        try {
-            syndicatedMediaItem = contentExtractionService.extractSyndicatedContent(mediaId)
-        } catch (e) {
-            log.error("Error occurred when extracting the content for mediaId '${mediaId}'", e)
-            failedUpdates.addAll(existingSubscriptions)
-            return updates(failedUpdates, successfulUpdates)
-        }
+        def mediaId = rhythmyxSubscription.subscription.mediaId
 
         def sourceUrl
         try {
             sourceUrl = contentExtractionService.getMediaItem(mediaId)?.sourceUrl
         } catch (e) {
             log.error("Error occurred when getting the sourceUrl for mediaId '${mediaId}'", e)
-            failedUpdates.addAll(existingSubscriptions)
-            return updates(failedUpdates, successfulUpdates)
+            return false
         }
 
-        if(sourceUrl==null) {
+        if (sourceUrl == null) {
             log.error("The sourceUrl for mediaId '${mediaId}' was null")
-            return updates(failedUpdates, successfulUpdates)
+            return false
         }
 
-        existingSubscriptions.each { rhythmyxSubscription ->
-            try {
+        SyndicatedMediaItem syndicatedMediaItem
 
-                if(rhythmyxIngestionService.updateContentItem(rhythmyxSubscription, syndicatedMediaItem)) {
+        try {
+            syndicatedMediaItem = contentExtractionService.getMediaSyndicate(mediaId)
+        } catch (e) {
+            log.error("Error occurred when extracting the content for mediaId '${mediaId}'", e)
+            return false
+        }
 
-                    successfulUpdates.add(rhythmyxSubscription)
-                    rhythmyxSubscription.systemTitle = syndicatedMediaItem.name
-                    rhythmyxSubscription.sourceUrl = sourceUrl
-                    rhythmyxSubscription.save(flush:true)
+        if (syndicatedMediaItem?.content == null) {
+            log.error("The content for mediaId '${mediaId}' was null")
+            return false
+        }
 
-                    log.info("Successfully updated rhythmyxSubscription '${rhythmyxSubscription.id}'")
-
-                } else {
-                    failedUpdates.add(rhythmyxSubscription)
-                }
-            } catch (e) {
-                failedUpdates.add(rhythmyxSubscription)
-                log.error("Error occurred when updating rhythmyxSubscription '${rhythmyxSubscription.id}'", e)
+        try {
+            def success = rhythmyxIngestionService.updateContentItem(rhythmyxSubscription, syndicatedMediaItem)
+            if (success) {
+                rhythmyxSubscription.systemTitle = syndicatedMediaItem.name
+                rhythmyxSubscription.sourceUrl = sourceUrl
+                rhythmyxSubscription.deliveryFailureLogId = null
+                rhythmyxSubscription.save(flush: true)
+                log.info("Successfully updated rhythmyxSubscription '${rhythmyxSubscription.id}'")
+                return true
             }
+        } catch (e) {
+            log.error("Error occurred when updating rhythmyxSubscription '${rhythmyxSubscription.id}'", e)
         }
 
-        return updates(failedUpdates, successfulUpdates)
-    }
-
-    private static LinkedHashMap<String, ArrayList> updates(ArrayList failedUpdates, ArrayList successfulUpdates) {
-        [failedUpdates: failedUpdates, successfulUpdates: successfulUpdates]
+        false
     }
 }

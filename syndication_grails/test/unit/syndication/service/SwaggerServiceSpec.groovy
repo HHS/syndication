@@ -17,7 +17,7 @@ package syndication.service
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
-import syndication.swagger.SwaggerService
+import com.ctacorp.swagger.SwaggerService
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions

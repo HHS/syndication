@@ -46,11 +46,11 @@ class SubscriberMailService {
         emailService.sendMessageWithAttachment(subscriber.email, subject, body, attachmentName, 'application/json', attachment.bytes)
     }
 
-    void sendSubscriberDelete(Subscriber subscriber) {
+    void sendSubscriberDelete(String email) {
 
         def subject = messageSource.getMessage('email.send.subscriber.delete.subject', [serverUrl] as String[], LocaleContextHolder.locale)
         def body = messageSource.getMessage('email.send.subscriber.delete.body', [accountHelpEmail] as String[], LocaleContextHolder.locale)
 
-        emailService.sendMessage(subscriber.email, subject, body)
+        emailService.sendMessage(email, subject, body)
     }
 }

@@ -17,10 +17,6 @@ package syndication.marshal
 
 import grails.converters.JSON
 import com.ctacorp.syndication.*
-import syndication.preview.ThumbnailService
-import syndication.rest.MediaService
-import syndication.tag.TagsService
-import syndication.tinyurl.TinyUrlService
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,10 +25,7 @@ import syndication.tinyurl.TinyUrlService
  * Time: 2:21 PM
  */
 class MediaTypeHolderMarshaller {
-    ThumbnailService thumbnailService
-    TinyUrlService tinyUrlService
-    TagsService tagsService
-    MediaService mediaService
+    def services
 
     MediaTypeHolderMarshaller(){
         JSON.registerObjectMarshaller(MediaTypeHolder){ MediaTypeHolder mth ->

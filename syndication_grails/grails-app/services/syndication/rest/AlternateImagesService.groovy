@@ -15,10 +15,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.rest
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import grails.transaction.Transactional
 import com.ctacorp.syndication.AlternateImage
-import syndication.api.ApiResponse
 
 @Transactional
 class AlternateImagesService {

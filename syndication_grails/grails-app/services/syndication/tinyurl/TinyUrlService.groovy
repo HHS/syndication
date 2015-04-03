@@ -47,7 +47,7 @@ class TinyUrlService {
         try {
             def code = rest.get("${grailsApplication.config.tinyUrl.serverAddress}/statusCheck").status
             switch (code) {
-                case 200: return true; break;
+                case 200: return true;
                 default: return false;
             }
         } catch (e) {

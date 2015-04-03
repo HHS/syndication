@@ -29,7 +29,7 @@ class DeliverIntegrationTest extends Specification {
 
         and: "get the referenceId from the delivery item"
 
-        deliveryItem.getReferenceId() >> 54321
+        deliveryItem.getReferenceId() >> 23456
 
         and: "get the content id from the delivery id"
 
@@ -37,7 +37,7 @@ class DeliverIntegrationTest extends Specification {
 
         and: "get the (long) value from the guid"
 
-        guid.longValue() >> 98765
+        guid.longValue() >> 56789
 
         and: "get the content stream"
 
@@ -47,7 +47,7 @@ class DeliverIntegrationTest extends Specification {
 
         and: 'get the delivery path from the delivery item'
 
-        deliveryItem.getDeliveryPath() >> '/features/KidsSafety/index.html'
+        deliveryItem.getDeliveryPath() >> '/news/sgr50.html'
 
         expect: "the delivery result will be a success"
 

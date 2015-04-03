@@ -24,6 +24,14 @@ class UrlService {
         "${grailsApplication.config.grails.serverURL}/api/v2/resources/media/$id/content"
     }
 
+    def getThumbnailUrl(Long id){
+        "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${id}/thumbnail.jpg"
+    }
+
+    def getPreviewUrl(Long id){
+        "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${id}/preview.jpg"
+    }
+
     def String aggregateSupportedCommands(Map params){
         String paramString = ""
         def supportedParams = grailsApplication.config.syndication.contentExtraction.supportedParams

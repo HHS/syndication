@@ -42,4 +42,8 @@ class RhythmyxSubscription {
         rhythmyxWorkflow(nullable: true)
         deliveryFailureLogId(nullable: true, blank: false)
     }
+
+    static mapping = {
+        sort(id: 'desc')
+    }
 }

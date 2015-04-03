@@ -1,8 +1,10 @@
 package com.ctacorp.syndication
 
 import com.ctacorp.syndication.crud.PeriodicalController
-import grails.test.mixin.*
-import spock.lang.*
+import com.ctacorp.syndication.media.Periodical
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 @TestFor(PeriodicalController)
 @Mock(Periodical)

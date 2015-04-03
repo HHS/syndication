@@ -14,6 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 --}%
 
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 	<head>
 		<meta name="layout" content="main">
@@ -35,22 +36,36 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<synd:message/>
 			<synd:errors/>
 			<synd:error/>
-			<g:form class="form-horizontal" url="[resource:campaignInstance, action:'save']" >
-				<fieldset class="form">
-					<g:render template="form"/>
-				</fieldset>
-				<fieldset class="buttons">
-                    <div class="form-group">
-                        <label class="col-md-4 control-label" for="create"></label>
-                        <div class="col-md-8">
-                        <g:submitButton name="create" class="btn btn-success" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-                        <g:link class="button" action="index">
-                            <button type="button" class="btn">Cancel</button>
-                        </g:link>
-                        </div>
-                    </div>
-				</fieldset>
-			</g:form>
+			<div class="row">
+				<div class="col-md-8">
+					<g:form class="form-horizontal" url="[resource:campaignInstance, action:'save']" >
+						<fieldset class="form">
+							<g:render template="form"/>
+						</fieldset>
+						<fieldset class="buttons">
+							<div class="form-group">
+								<label class="col-md-5 control-label" for="create"></label>
+								<div class="col-md-7">
+									<g:submitButton name="create" class="btn btn-success" value="${message(code: 'default.button.create.label', default: 'Create')}" />
+									<g:link class="button" action="index">
+										<button type="button" class="btn">Cancel</button>
+									</g:link>
+								</div>
+							</div>
+						</fieldset>
+					</g:form>
+				</div>
+				<div class="col-md-4">
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">MediaItem Selection</h3>
+						</div>
+						<div class="panel-body">
+							If this Campaign belongs to a Subscriber then only MediaItems owned by that subscriber will be saved.
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>

@@ -21,13 +21,8 @@ class ServiceException extends Exception {
     static def log = LogFactory.getLog(this)
     String message
 
-    ServiceException(Closure closure) {
-        message = closure()
-    }
-
-    ServiceException(String url) {
-        message = "the expected body is missing from the response for ${url}"
-        log.error(message)
+    ServiceException(String message) {
+        this.message = message
     }
 
     ServiceException(String url, Integer statusCode) {

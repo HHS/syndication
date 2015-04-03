@@ -1,13 +1,13 @@
 package com.ctacorp.syndication.storefront
 
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.MediaItem
-import com.ctacorp.syndication.SocialMedia
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.authentication.User
+import com.ctacorp.syndication.jobs.DelayedMetricAddJob
+import com.ctacorp.syndication.jobs.DelayedQueryLogJob
 import grails.plugin.springsecurity.annotation.Secured
-
-import java.util.regex.Pattern
+import grails.transaction.Transactional
 
 @Secured(['permitAll'])
 class StorefrontController {
@@ -18,29 +18,29 @@ class StorefrontController {
     def likeService
     def mediaListService
 
-    def index(){
+    def index() {
         mediaTagHelper()
     }
 
-    def listMediaForTag(Long id){
-        params.max = params.max ? Math.min(params.int('max'), 100): 15
+    def listMediaForTag(Long id) {
+        params.max = params.max ? Math.min(params.int('max'), 100) : 15
         def mediaItemInstanceList = tagService.getMediaForTagId(id, params)
         def tagsForMedia = [:]
-        mediaItemInstanceList.each{
+        mediaItemInstanceList.each {
             def allTags = tagService.getTagsForMediaId(it.id)
-            tagsForMedia[it.id] = allTags.collect{ [name:it.name, id:it.id] }
+            tagsForMedia[it.id] = allTags.collect { [name: it.name, id: it.id] }
         }
         [
                 mediaItemInstanceList: mediaItemInstanceList,
-                tagsForMedia:tagsForMedia,
-                tagName:params.tagName,
-                likeInfo:likeService.getAllMediaLikeInfo(mediaItemInstanceList)
+                tagsForMedia         : tagsForMedia,
+                tagName              : params.tagName,
+                likeInfo             : likeService.getAllMediaLikeInfo(mediaItemInstanceList)
         ]
     }
 
-    def ajaxLike(Long id){
+    def ajaxLike(Long id) {
         User currentUser = springSecurityService.currentUser as User
-        if(currentUser) {
+        if (currentUser) {
             likeService.likeMedia(id)
         }
         int likeCount = likeService.getLikeCount(id)
@@ -48,9 +48,9 @@ class StorefrontController {
         render "&nbsp; ${likeCount} Users liked this content."
     }
 
-    def ajaxUndoLike(Long id){
+    def ajaxUndoLike(Long id) {
         User currentUser = springSecurityService.currentUser as User
-        if(currentUser) {
+        if (currentUser) {
             likeService.undoLikeMedia(id)
         }
         int likeCount = likeService.getLikeCount(id)
@@ -58,26 +58,32 @@ class StorefrontController {
         render "&nbsp; ${likeCount} Users liked this content."
     }
 
-    def like(Long id){
+    def like(Long id) {
         likeService.likeMedia(id)
-        redirect action:'showContent', id:id
+        redirect action: 'showContent', id: id
     }
 
-    def usageGuidelines(){}
-
-    def roadMap(){}
-
-    def faq(){}
-
-    def qa(){}
-
-    def reportAProblem(){
-        render template:"reportAProblem"
+    def usageGuidelines() {
+        render view: 'usageGuidelines', model: [syndicationEmail: grailsApplication.config.grails.mail.default.from]
     }
 
-    def sendProblemReport(){
+    def roadMap() {}
+
+    def faq() {}
+
+    def qa() {
+        def adminEmail = grailsApplication.config.grails.mail.default.from
+
+        [adminEmail:adminEmail]
+    }
+
+    def reportAProblem() {
+        render template: "reportAProblem"
+    }
+
+    def sendProblemReport() {
         flash.message = "Report has been filed."
-        
+
         sendMail {
             to grailsApplication.config.SyndicationStorefront.mail.syndicate.to
             subject "Issue Report: ${new Date()}"
@@ -92,10 +98,10 @@ class StorefrontController {
             """
         }
 
-        render view:"thankyou"
+        render view: "thankyou"
     }
 
-    def sendSyndicationRequest(){
+    def sendSyndicationRequest() {
         flash.message = "request has been sent."
 
         sendMail {
@@ -112,16 +118,16 @@ class StorefrontController {
             """
         }
 
-        render view:"thankyou"
+        render view: "thankyou"
     }
 
-    def requestSyndication(){
-        render template:"requestSyndication"
+    def requestSyndication() {
+        render template: "requestSyndication"
     }
 
-    def browse(String selectedMediaType){
-        params.max = params.max ? Math.min(params.int('max'), 100): 15
-        if(!selectedMediaType){
+    def browse(String selectedMediaType) {
+        params.max = params.max ? Math.min(params.int('max'), 100) : 15
+        if (!selectedMediaType) {
             selectedMediaType = "Html"
         }
         params.mediaTypes = selectedMediaType
@@ -130,65 +136,79 @@ class StorefrontController {
         def mediaList = MediaItem.facetedSearch(params).list(params)
 
         [
-          selectedMediaType:selectedMediaType,
-          mediaTypes:allMediaTypes,
-          apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
-          mediaItemInstanceList:mediaList,
-          tagsForMedia:getTagsForMedia(mediaList),
-          total:mediaList.totalCount
+                selectedMediaType    : selectedMediaType,
+                mediaTypes           : allMediaTypes,
+                apiBaseUrl           : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                mediaItemInstanceList: mediaList,
+                tagsForMedia         : getTagsForMediaItems(mediaList),
+                total                : mediaList.totalCount
         ]
     }
 
-    def showContent(MediaItem mediaItemInstance){
+    def showContent(MediaItem mediaItemInstance) {
         User currentUser = springSecurityService.currentUser as User
         boolean alreadyLiked = false
-        if(currentUser) {
+        if (currentUser) {
             alreadyLiked = currentUser.likes.contains(mediaItemInstance)
         }
         int likeCount = likeService.getLikeCount(mediaItemInstance?.id)
         def userMediaLists = UserMediaList.findAllByUser(currentUser)
 
-        if(mediaItemInstance == null || !mediaItemInstance?.active || !mediaItemInstance?.visibleInStorefront){
+        if (mediaItemInstance == null || !mediaItemInstance?.active || !mediaItemInstance?.visibleInStorefront) {
             log.error("Trying to show media that doesn't exist or is inactive: ${mediaItemInstance?.id}\nActive:${mediaItemInstance?.active}\nVisible in Storefront:${mediaItemInstance?.visibleInStorefront}")
             response.sendError(404)
+        } else {
+            DelayedMetricAddJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId: mediaItemInstance.id])
         }
 
         [
-            userMediaLists:userMediaLists,
-            alreadyLiked:alreadyLiked,
-            likeCount:likeCount,
-            mediaItemInstance:mediaItemInstance,
-            apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+                tags             : getTagsForMediaItem(mediaItemInstance),
+                userMediaLists   : userMediaLists,
+                alreadyLiked     : alreadyLiked,
+                likeCount        : likeCount,
+                mediaItemInstance: mediaItemInstance,
+                apiBaseUrl       : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
         ]
     }
 
-    def addMediaToUserMediaList(Long mediaId, Long mediaList){
-        def success = mediaListService.addMediaToMediaList(mediaId, mediaList)
-        if(success){
-            flash.message = "This item has been added to your list."
-        } else{
-            flash.error = "There was a problem adding this item to your list, please try again."
-        }
-        redirect action: "showContent", id:mediaId
+    def storefrontPreviewMetricHit() {
+        DelayedMetricAddJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId: params.long('id')])
+        render {}
     }
 
-    def showCampaign(){}
+    def addMediaToUserMediaList(Long mediaId, Long mediaList) {
+        def success = mediaListService.addMediaToMediaList(mediaId, mediaList)
+        if (success) {
+            flash.message = "This item has been added to your list."
+        } else {
+            flash.error = "There was a problem adding this item to your list, please try again."
+        }
+        redirect action: "showContent", id: mediaId
+    }
 
-    def showAgency(){}
+    def releaseInfo(){}
 
-    private getTagsForMedia(mediaItemInstanceList){
+    def showCampaign() {}
+
+    def showAgency() {}
+
+    private getTagsForMediaItem(MediaItem mediaItemInstance) {
+        tagService.getTagsForMediaId(mediaItemInstance.id).groupBy{ it.language.isoCode }
+    }
+
+    private getTagsForMediaItems(Collection mediaItemInstanceList) {
         def tagsForMedia = [:]
 
-        mediaItemInstanceList.each{
+        mediaItemInstanceList.each {
             def allTags = tagService.getTagsForMediaId(it.id)
-            tagsForMedia[it.id] = allTags.collect{ [name:it.name, id:it.id] }
+            tagsForMedia[it.id] = allTags.collect { [name: it.name, id: it.id] }
         }
 
         tagsForMedia
     }
-
-    def Map mediaTagHelper(){
-        params.max = params.max ? Math.min(params.int('max'), 100): 15
+@Transactional
+    def Map mediaTagHelper() {
+        params.max = params.max ? Math.min(params.int('max'), 100) : 15
         def mediaItemInstanceList = mediaService.listNewestMedia(params)
         def total = mediaItemInstanceList.totalCount
         String searchQuery = ""
@@ -198,7 +218,8 @@ class StorefrontController {
         Map likeInfo = likeService.getAllMediaLikeInfo(mediaItemInstanceList)
 
         //used if basic search is submitted
-        if(params.searchQuery){
+        if (params.searchQuery) {
+            DelayedQueryLogJob.schedule(new Date(System.currentTimeMillis() + 10000), [queryString:params.searchQuery])
             searchQuery = params.searchQuery
             mediaItemInstanceList = mediaService.mediaItemSolrSearch(searchQuery, params)
             total = mediaItemInstanceList?.totalCount
@@ -208,8 +229,11 @@ class StorefrontController {
         }
 
         //used if advanced search is submitted
-        else if(params.advancedSearch){
-            params.topicItems = tagService.getMediaForTagId((params?.topic ?: 0)as Long, params).id.toListString() - '[' - ']'
+        else if (params.advancedSearch) {
+            if(params.title){
+                DelayedQueryLogJob.schedule(new Date(System.currentTimeMillis() + 10000), [queryString: params.title])
+            }
+            params.topicItems = tagService.getMediaForTagId((params?.topic ?: 0) as Long, params).id.toListString() - '[' - ']'
             mediaItemInstanceList = mediaService.findMediaByAll(params)
             total = mediaItemInstanceList?.totalCount
             searchType = "advanced"
@@ -220,36 +244,36 @@ class StorefrontController {
 
         User currentUser = springSecurityService.currentUser as User
         [
-                mediaItemInstanceList:mediaItemInstanceList,
-                total:total,
-                apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
-                tagsForMedia:getTagsForMedia(mediaItemInstanceList),
-                featuredMedia: mediaService.getFeaturedMedia(max:20),
-                userMediaLists: UserMediaList.findAllByUser(currentUser),
-                contentTitle:contentTitle,
-                searchQuery: searchQuery,
-                title: params.title,
-                language: params.language,
-                languageList: Language.findAllByIsActive(true),
-                domain: params.domain,
-                mediaType: params.mediaType,
-                searchType: searchType,
-                sourceList: Source.list(),
-                source: params.source,
-                topic:params.topic,
-                topicList:tagService.getTagsByType('topic'),
-                mediaTypes: mediaService.getMediaTypes(),
-                advancedSearch: advanced,
-                likeInfo: likeInfo
+                mediaItemInstanceList: mediaItemInstanceList,
+                total                : total,
+                apiBaseUrl           : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                tagsForMedia         : getTagsForMediaItems(mediaItemInstanceList),
+                featuredMedia        : mediaService.getFeaturedMedia(max: 20),
+                userMediaLists       : UserMediaList.findAllByUser(currentUser),
+                contentTitle         : contentTitle,
+                searchQuery          : searchQuery,
+                title                : params.title,
+                language             : params.language,
+                languageList         : Language.findAllByIsActive(true),
+                domain               : params.domain,
+                mediaType            : params.mediaType,
+                searchType           : searchType,
+                sourceList           : Source.list(),
+                source               : params.source,
+                topic                : params.topic,
+                topicList            : tagService.getTagsByType('topic'),
+                mediaTypes           : mediaService.getMediaTypes(),
+                advancedSearch       : advanced,
+                likeInfo             : likeInfo
 
         ]
     }
 
-    def otherLookupOptions(){
-        render template:'otherLookupOptions', model:[topicList:tagService.getTagsByType('topic'), sourceList:Source.list(), mediaTypes: mediaService.getMediaTypes(), languageList:Language.findAllByIsActive(true)]
+    def otherLookupOptions() {
+        render template: 'otherLookupOptions', model: [topicList: tagService.getTagsByType('topic'), sourceList: Source.list(), mediaTypes: mediaService.getMediaTypes(), languageList: Language.findAllByIsActive(true)]
     }
 
-    def basicSearch(){
+    def basicSearch() {
         render template: 'basicSearch'
     }
 }

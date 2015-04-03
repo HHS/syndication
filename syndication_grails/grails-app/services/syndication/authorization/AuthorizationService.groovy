@@ -17,6 +17,7 @@ package syndication.authorization
 import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
+import org.apache.maven.wagon.authorization.AuthorizationException
 
 import javax.annotation.PostConstruct
 
@@ -44,7 +45,7 @@ class AuthorizationService {
             keyAgreement.setSecret(secret)
 
             generator = new AuthorizationHeaderGenerator("syndication_api_key", keyAgreement)
-            generator.printToConsole = true
+            generator.printToConsole = false
         } else{
             log.error("Keys were left undefined!!! Verify config files. public: ${publicKey} private: ${privateKey} secret: ${secret}")
         }
@@ -99,15 +100,20 @@ class AuthorizationService {
             }
 
         }catch(e){
-            log.error("Couldn't post to server - maybe the server isn't running?")
+            log.error("Couldn't post to server - maybe the server isn't running? ${e}")
+//            StringWriter sw = new StringWriter()
+//            PrintWriter pw = new PrintWriter(sw)
+//            e.printStackTrace(pw)
+//            log.error sw.toString()
             return null
         }
 
         switch(resp?.status){
             case 200: return resp.json
             case 204: return resp
+            case 201: return [success:true] as JSON
             default:
-                log.error "The response status from the authentication service was ${resp.status} - (It should be 200, or 204)"
+                log.error "The response status from the authentication service was ${resp.status} - (It should be 200, or 204)\n--------------------------------------------------\nThe post that failed was to: ${url}\nand the body was: ${body}\n--------------------------------------------------"
                 return [success:false] as JSON
         }
     }
@@ -155,7 +161,7 @@ class AuthorizationService {
 
 
         if (resp?.status == 403) {
-            throw new Exception("Access Denied - Your authorization keys have been denied.")
+            throw new AuthorizationException("Access Denied - Your authorization keys have been denied.")
         }
 
         resp.json

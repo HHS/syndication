@@ -15,8 +15,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.authentication
 
+import com.ctacorp.syndication.authentication.User
 import grails.buildtestdata.mixin.Build
-import grails.test.mixin.TestMixin
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin

@@ -16,12 +16,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.marshal
 
 import clover.com.lowagie.text.html.HtmlEncoder
+import com.ctacorp.syndication.ExtendedAttribute
+import com.ctacorp.syndication.media.Html
 import grails.converters.JSON
-import com.ctacorp.syndication.*
-import syndication.rest.MediaService
-import syndication.tag.TagsService
-import syndication.preview.ThumbnailService
-import syndication.tinyurl.TinyUrlService
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,15 +28,12 @@ import syndication.tinyurl.TinyUrlService
  *
  */
 class HtmlMarshaller {
-    ThumbnailService thumbnailService
-    TinyUrlService tinyUrlService
-    TagsService tagsService
-    MediaService mediaService
+    def services
 
     HtmlMarshaller(){
         JSON.registerObjectMarshaller(Html){ Html h ->
-            def tinyInfo = mediaService.getTinyUrlInfoForMediaItemForAPIResponse(h)
-            def campaigns = mediaService.getCampaignsForAPIResponse(h)
+            def tinyInfo = services.mediaService.getTinyUrlInfoForMediaItemForAPIResponse(h)
+            def campaigns = services.mediaService.getCampaignsForAPIResponse(h)
 
             def attr = HtmlEncoder.encode("<div id='hhsAttribution'>Content provided and maintained by <a href='${h.source.websiteUrl}' target='_blank'>Health and Human Services</a> (HHS). Please see our system <a href='http:syndication.hhs.gov' target='_blank'>usage guidelines and disclaimer</a>.</div>")
             return [
@@ -49,7 +43,6 @@ class HtmlMarshaller {
                 description:            h.description,
                 sourceUrl:              h.sourceUrl,
                 targetUrl:              h.targetUrl,
-                customThumbnailUrl:      h.customThumbnailUrl,
                 dateContentAuthored:    h.dateContentAuthored,
                 dateContentUpdated:     h.dateContentUpdated,
                 dateContentPublished:   h.dateContentPublished,
@@ -62,10 +55,11 @@ class HtmlMarshaller {
                 contentHash:            h.hash,
                 source:                 h.source,
                 campaigns:              campaigns,
-                tags:                   mediaService.getTagsForMediaItemForAPIResponse(h),
+                tags:                   services.mediaService.getTagsForMediaItemForAPIResponse(h),
                 tinyUrl:                tinyInfo.tinyUrl,
                 tinyToken:              tinyInfo.tinyUrlToken,
-                thumbnailUrl:           thumbnailService.getThumbnailUrl(h.id),
+                thumbnailUrl:           services.urlService.getThumbnailUrl(h.id),
+                previewlUrl:            services.urlService.getPreviewUrl(h.id),
                 alternateImages:        h.alternateImages,
                 attribution:            attr,
                 extendedAttributes:     marshalDescriptor(h.extendedAttributes)

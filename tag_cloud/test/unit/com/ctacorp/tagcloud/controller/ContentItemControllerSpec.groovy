@@ -16,8 +16,9 @@ package com.ctacorp.tagcloud.controller
 
 import tagcloud.ContentItemController
 import tagcloud.domain.ContentItem
-import grails.test.mixin.*
-import spock.lang.*
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 @TestFor(ContentItemController)
 @Mock(ContentItem)

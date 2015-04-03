@@ -1,7 +1,7 @@
 package com.ctacorp.syndication.tools
 
-import com.ctacorp.syndication.Html
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.health.FlaggedMedia
 import grails.plugin.springsecurity.annotation.Secured
@@ -11,6 +11,7 @@ class TestController {
     def mediaValidationService
     def contentRetrievalService
     def contentCacheService
+    def previewService
 
     def index() {}
 
@@ -47,6 +48,12 @@ class TestController {
         }
         render view: "index", model:[healthReports:reports]
     }
+
+    def generate(MediaItem m) {
+        previewService.generate(m)
+        render m
+    }
+
 
     def cacheSomeData(){
 //        render "<ul>"

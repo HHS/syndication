@@ -67,7 +67,7 @@ grails.project.dependency.resolution = {
 
     plugins {
         compile ":rest-client-builder:2.0.1"
-        compile "org.grails.plugins:syndication-model:1.5.4"
+        compile "org.grails.plugins:syndication-model:1.7.6"
 
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
         compile ":recaptcha:0.6.9"
@@ -76,6 +76,7 @@ grails.project.dependency.resolution = {
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.7'
         compile ':asset-pipeline:1.9.9'
+        compile ":quartz:1.0.2"
 
         compile ":spring-security-core:2.0-RC4"
         compile ":rest-client-builder:2.0.1"
@@ -102,6 +103,12 @@ grails.project.dependency.resolution = {
         //compile ":less-asset-pipeline:1.10.0"
         //compile ":coffee-asset-pipeline:1.8.0"
         //compile ":handlebars-asset-pipeline:1.3.0.3"
+
+        //Testing ---------------------------------------------------------------
+        test ":build-test-data:2.2.2"
+        test ":codenarc:0.23"
+        test ":code-coverage:2.0.3-3"
+        test ":auto-test:1.0.1"
     }
 }
 
@@ -115,3 +122,15 @@ grails.project.repos.default = "myRepo"
 grails.project.repos.myRepo.url = config.artifactory.deploymentAddress
 grails.project.repos.myRepo.username = config.artifactory.username
 grails.project.repos.myRepo.password = config.artifactory.password
+
+
+//codenarc
+codenarc.properties = {
+    EmptyIfStatement.priority = 1
+
+    EmptyMethod.enabled = false
+    GrailsMassAssignment.enabled = false
+    GrailsDomainHasEquals.enabled = false
+
+
+}

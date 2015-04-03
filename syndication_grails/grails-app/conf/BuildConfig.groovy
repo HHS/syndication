@@ -96,7 +96,7 @@ grails.project.dependency.resolution = {
         runtime 'com.ctacorp:grails-swagger-annotations:0.8.6'
 
         compile 'com.ctacorp.commons:multi-read-servlet-filter:1.0.0'
-        compile('com.ctacorp.commons:api-key-utils:1.5.0'){
+        compile('com.ctacorp.commons:api-key-utils:1.5.1'){
             excludes 'groovy'
         }
 
@@ -111,8 +111,8 @@ grails.project.dependency.resolution = {
         }
 
         // plugins for the compile step --------------------------------------------------------------------------------
-        compile "org.grails.plugins:syndication-model:1.5.4"   //syndication domain models
-        compile "org.grails.plugins:content-extraction-services:1.1.2"   //syndication content extraction tools
+        compile "org.grails.plugins:syndication-model:1.7.4"   //syndication domain models
+        compile "org.grails.plugins:content-extraction-services:1.3.2"   //syndication content extraction tools
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
         compile ":asset-pipeline:1.9.9"
@@ -137,7 +137,7 @@ grails.project.dependency.resolution = {
         // Solr --------------------------------------------------------------------------------------------------------
         // |  Leave this at the bottom, moving it causes dependency problems at the moment                             |
         // -------------------------------------------------------------------------------------------------------------
-        compile ":solr-operations:1.0.8"      //syndication solr stuff
+        compile ":solr-operations:1.2"      //syndication solr stuff
 
         // uncomment these to enable additional asset-pipeline capabilities
         //compile ":sass-asset-pipeline:1.5.5"
@@ -159,12 +159,16 @@ coverage {
 codenarc.properties = {
     GrailsPublicControllerMethod.enabled = false
     EmptyIfStatement.priority = 1
+
+    EmptyMethod.enabled = false
+    GrailsMassAssignment.enabled = false
+    GrailsDomainHasEquals.enabled = false
 }
 
 //_____________________
 // Release plugin info \_________________________________________________________________
 //
-// | to release, just run 'grails maven-deploy'
+// | to release, just run 'grails prod maven-deploy'
 // | to install locally, run 'grails maven-install'
 //_______________________________________________________________________________________
 grails.project.repos.default = "myRepo"

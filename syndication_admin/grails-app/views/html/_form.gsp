@@ -12,7 +12,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Html" %>
+<%@ page import="com.ctacorp.syndication.media.Html" %>
 
 <!-- Text input-->
 <div class="form-group" xmlns="http://www.w3.org/1999/html">
@@ -33,8 +33,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <!-- Text input-->
 <div class="form-group">
     <label class="col-md-4 control-label" for="sourceUrl">Source Url<span class="required-indicator">*</span></label>
-    <div class="col-md-8">
+    <div class="col-md-6">
         <input id="sourceUrl" name="sourceUrl" maxlength="2000" required="" value="${htmlInstance?.sourceUrl}" type="url" placeholder="source url" class="form-control input-md">
+    </div>
+    <div class="col-md-2">
+        <button type="button" id="urlModal" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+            urlTest
+        </button>
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <g:render template="../mediaTestPreview/testModal"/>
+        </div>
     </div>
 </div>
 
@@ -51,6 +59,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <label class="col-md-4 control-label" for="customThumbnailUrl">Custom Thumbnail Url</label>
     <div class="col-md-8">
         <input id="customThumbnailUrl" name="customThumbnailUrl" maxlength="2000" value="${htmlInstance?.customThumbnailUrl}" type="url" placeholder="thumbnail url" class="form-control input-md">
+    </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+    <label class="col-md-4 control-label" for="customPreviewUrl">Custom Preview Url</label>
+    <div class="col-md-8">
+        <input id="customPreviewUrl" name="customPreviewUrl" maxlength="2000" value="${htmlInstance?.customPreviewUrl}" type="url" placeholder="preview url" class="form-control input-md">
     </div>
 </div>
 
@@ -124,7 +140,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="language">Language<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <g:select from="${com.ctacorp.syndication.Language.findAllByIsActive(true, [sort: "name"])}" name="language.id" id="language" optionKey="id" optionValue="name" value="${htmlInstance?.language?.id}" class="form-control"/>
+        <g:select from="${com.ctacorp.syndication.Language.findAllByIsActive(true, [sort: "name"])}" name="language.id" id="language" optionKey="id" optionValue="name" value="${htmlInstance?.language?.id}" class="form-control" noSelection="${['null':'-Choose a Language-']}"/>
     </div>
 </div>
 
@@ -187,14 +203,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <label class="col-md-4 control-label" for="externalGuid">External Guid</label>
     <div class="col-md-8">
         <input id="externalGuid" name="externalGuid" value="${htmlInstance?.externalGuid}" placeholder="guid" class="form-control input-md">
-    </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="hash">Hash</label>
-    <div class="col-md-8">
-        <input id="hash" name="hash" value="${htmlInstance?.hash}" class="form-control input-md">
     </div>
 </div>
 

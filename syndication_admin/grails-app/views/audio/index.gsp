@@ -12,8 +12,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Audio" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -70,13 +70,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         </g:each>
                         </tbody>
                     </table>
-                    <g:if test="${audioInstanceCount > params.max}">
-                        <div class="pagination">
-                            <g:paginate total="${audioInstanceCount ?: 0}"/>
-                        </div>
-                    </g:if>
                 </div>
             </div>
+            
+            <g:if test="${audioInstanceCount > params.max}">
+                <div class="pagination">
+                    <g:paginate total="${audioInstanceCount ?: 0}"/>
+                </div>
+            </g:if>
+            
         </div>
     </div>
 </div>

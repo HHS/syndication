@@ -1,4 +1,3 @@
-
 %{--
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -13,26 +12,19 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.MediaMetric" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.metric.MediaMetric" %>
 <html>
 <head>
     <meta name="layout" content="main">
-    <g:set var="entityName" value="${message(code: 'mediaViewMetric.label', default: 'Metrics Report')}"/>
+    <g:set var="entityName" value="Dates"/>
     <title><g:message code="default.list.label" args="[entityName]"/></title>
 </head>
 
 <body>
 <div id="list-mediaMetric" class="content scaffold-list" role="main">
-    <div class="row">
-        <div class="col-md-6">
-            <h1>${entityName}</h1>
-        </div>
-        <div class="hidden-sm hidden-xs"><br></div>
-        <div class="col-md-6">
-            <g:render template="pills" model="[active: active]"/>
-        </div>
-    </div>
+    <g:render template="header"/>
 
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>

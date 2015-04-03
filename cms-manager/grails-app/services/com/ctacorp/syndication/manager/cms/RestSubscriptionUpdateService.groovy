@@ -13,6 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 */
 package com.ctacorp.syndication.manager.cms
 
+import com.ctacorp.syndication.swagger.rest.client.model.SyndicatedMediaItem
 import grails.transaction.Transactional
 
 @Transactional
@@ -22,140 +23,104 @@ class RestSubscriptionUpdateService {
     def restSubscriptionDeliveryService
     def subscriptionService
 
-    List updateSubscriptions(String mediaId) {
+    boolean updateSubscription(RestSubscription restSubscription) {
 
-        log.info("Updating rest subscriptions for mediaId '${mediaId}'")
+        def mediaId = restSubscription.subscription.mediaId
 
-        def failedUpdates = []
-
-        def subscription = Subscription.findByMediaId(mediaId)
-        if (!subscription) {
-            log.info("No subscriptions found for media '${mediaId}'")
-            return failedUpdates
+        def sourceUrl = getSourceUrl(mediaId)
+        if (sourceUrl == null) {
+            log.error("The sourceUrl for mediaId '${mediaId}' was null")
+            return false
         }
 
-        def restSubscriptions = RestSubscription.findAllBySubscription(subscription)
-        if (!restSubscriptions) {
-            log.info("No rest subscriptions found for media '${mediaId}'")
-            return failedUpdates
+        SyndicatedMediaItem syndicatedMediaItem = getSyndicatedMediaItem(mediaId)
+        if (syndicatedMediaItem == null) {
+            log.error("The syndicatedMediaItem for mediaId '${mediaId}' was null")
+            return false
         }
 
-        def content
-        def syndicatedMediaItem
         try {
-            syndicatedMediaItem = contentExtractionService.extractSyndicatedContent(mediaId)
-            content = syndicatedMediaItem?.content
+            deliver(restSubscription, syndicatedMediaItem, sourceUrl)
+            log.info("Successfully updated restSubscription '${restSubscription.id}'")
+            return true
         } catch (e) {
-            log.error("Error occurred when extracting the content for mediaId '${mediaId}'", e)
-            return restSubscriptions
+            log.error("Error occurred when updating restSubscription '${restSubscription.id}'", e)
+            return false
         }
+    }
 
-        if(!content) {
-            log.error("The content for mediaId '${mediaId}' was null")
-            return restSubscriptions
-        }
-
-        def sourceUrl
+    String getSourceUrl(String mediaId) {
         try {
-            sourceUrl = contentExtractionService.getMediaItem(mediaId)?.sourceUrl
+            return contentExtractionService.getMediaItem(mediaId)?.sourceUrl
         } catch (e) {
             log.error("Error occurred when getting the sourceUrl for mediaId '${mediaId}'", e)
-            return restSubscriptions
+            return null
         }
+    }
 
-        if(sourceUrl==null) {
-            log.error("The sourceUrl for mediaId '${mediaId}' was null")
-            return restSubscriptions
+    SyndicatedMediaItem getSyndicatedMediaItem(String mediaId) {
+        try {
+            return contentExtractionService.getMediaSyndicate(mediaId)
+        } catch (e) {
+            log.error("Error occurred when getting the syndicated content for mediaId '${mediaId}'", e)
+            return null
         }
-
-        restSubscriptions.each { RestSubscription restSubscription ->
-            if (content) {
-                try {
-                    restSubscriptionDeliveryService.deliver(restSubscription, content as String)
-                    restSubscription.title = syndicatedMediaItem.name
-                    restSubscription.sourceUrl = sourceUrl
-                    restSubscription.deliveryFailureLogId = null
-                    restSubscription.isPending = false
-                    restSubscription.save(flush:true)
-                } catch (e) {
-                    log.error("Error occurred when sending the subscription update for mediaId '${mediaId}' to '${restSubscription.restSubscriber.deliveryEndpoint}'", e)
-                    failedUpdates.add(restSubscription)
-                }
-
-                //set logErrorId to null
-            }
-        }
-
-        return failedUpdates
     }
 
     boolean importSubscription(long subscriptionId) {
 
-        log.info("Importing restSubscription '${subscriptionId}'")
-
         def restSubscription = RestSubscription.findById(subscriptionId)
 
-        if(!restSubscription) {
+        if (!restSubscription) {
             log.warn("Could not find restSubscription '${subscriptionId}'")
             return false
         }
 
         def mediaId = restSubscription.subscription.mediaId
 
-        def content
+        def sourceUrl = getSourceUrl(mediaId)
+        if (sourceUrl == null) {
+            log.error("The sourceUrl for mediaId '${mediaId}' was null")
+            return false
+        }
+
+        SyndicatedMediaItem syndicatedMediaItem = getSyndicatedMediaItem(mediaId)
+        if (syndicatedMediaItem == null) {
+            log.error("The syndicatedMediaItem for mediaId '${mediaId}' was null")
+            return false
+        }
+
         try {
-            content = contentExtractionService.extractSyndicatedContent(mediaId)?.content
+            deliver(restSubscription, syndicatedMediaItem, sourceUrl)
+            log.info("Successfully imported restSubscription '${restSubscription.id}'")
+            return true
         } catch (e) {
-            log.error("Error occurred when extracting the content for mediaId '${mediaId}'", e)
+            log.error("Error occurred when importing restSubscription '${restSubscription.id}'", e)
+            return false
         }
-
-        if (content) {
-            try {
-                restSubscriptionDeliveryService.deliver(restSubscription, content as String)
-                return true
-            } catch (e) {
-                log.error("Error occurred when sending the subscription create for mediaId '${mediaId}' to '${restSubscription.restSubscriber.deliveryEndpoint}'", e)
-            }
-        }
-
-        return false
     }
 
-    List deleteSubscriptions(String mediaId) {
+    private void deliver(RestSubscription restSubscription, SyndicatedMediaItem syndicatedMediaItem, String sourceUrl) {
 
-        log.info("Deleteing rest subscriptions for mediaId '${mediaId}'")
+        restSubscriptionDeliveryService.deliver(restSubscription, syndicatedMediaItem.content)
 
-        def failedUpdates = []
+        restSubscription.title = syndicatedMediaItem.name
+        restSubscription.sourceUrl = sourceUrl
+        restSubscription.deliveryFailureLogId = null
+        restSubscription.isPending = false
+        restSubscription.save(flush: true)
+    }
 
-        def subscription = Subscription.findByMediaId(mediaId)
-        if (!subscription) {
-            log.info("No subscriptions found for media '${mediaId}'")
-            return failedUpdates
+    boolean deleteSubscription(RestSubscription restSubscription) {
+
+        try {
+            restSubscriptionDeliveryService.deliverDelete(restSubscription)
+            subscriptionService.deleteChildSubscription(restSubscription)
+            log.info("Successfully deleted restSubscription '${restSubscription.id}'")
+            return true
+        } catch (e) {
+            log.error("Error occurred when importing restSubscription '${restSubscription.id}'", e)
+            return false
         }
-
-        def restSubscriptions = RestSubscription.findAllBySubscription(subscription)
-        if (!restSubscriptions) {
-            log.info("No rest subscriptions found for media '${mediaId}'")
-            return failedUpdates
-        }
-
-        restSubscriptions.each { RestSubscription restSubscription ->
-
-            try {
-
-                String content = "<div>MediaItem has been removed from storefront mediaId:${subscription.mediaId}</div>"
-
-                restSubscription.notificationOnly = true
-                restSubscription.save(flush:true)
-                restSubscriptionDeliveryService.deliverDelete(restSubscription, content, true)
-                subscriptionService.deleteChildSubscription(restSubscription)
-
-            } catch (e) {
-                log.error("Error occurred when sending the subscription delete for mediaId '${mediaId}' to '${restSubscription.restSubscriber.deliveryEndpoint}'", e)
-                failedUpdates.add(restSubscription)
-            }
-        }
-
-        return failedUpdates
     }
 }

@@ -14,10 +14,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
-import static org.springframework.http.HttpStatus.*
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.NOT_FOUND
 
-import com.ctacorp.syndication.MediaMetric
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.metric.MediaMetric
+import com.ctacorp.syndication.media.MediaItem
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 

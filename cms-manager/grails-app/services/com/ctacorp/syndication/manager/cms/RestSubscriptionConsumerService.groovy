@@ -27,46 +27,81 @@ class RestSubscriptionConsumerService implements RabbitMqConsumerService {
 
         int attempts = message.meta?.attempts ?: 0
 
-        def mediaId = message.mediaId as String
-        def messageType = message.messageType
-        def subscriptionId = MqUtils.getSubscriptionId(message)
+        String mediaId = message.mediaId
+        MessageType messageType = message.messageType
+        Long subscriptionId = MqUtils.getSubscriptionId(message)
 
-        if(mediaId && messageType == MessageType.UPDATE) {
+        log.info("'${messageType.prettyName()}' message received on the '${rabbitQueue}' for mediaId '${mediaId}' and subscription '${subscriptionId}'")
 
-            log.info("Received an update message on the '${rabbitQueue}' queue for mediaId '${mediaId}'")
-
-            def failedUpdates = restSubscriptionUpdateService.updateSubscriptions(mediaId)
-            failedUpdates.each { restSubscription ->
-                queueService.sendToRestErrorQueue(MessageType.UPDATE, restSubscription.id as Long, mediaId, attempts)
-            }
-
-        } else if (subscriptionId && messageType == MessageType.IMPORT) {
-
-            log.info("Received a create message on the '${rabbitQueue}' queue for subscription '${subscriptionId}'")
-
-            if(!restSubscriptionUpdateService.importSubscription(subscriptionId)) {
-                queueService.sendToRestErrorQueue(MessageType.IMPORT, subscriptionId, mediaId, attempts)
-            } else{
-                def restSub = RestSubscription.get(subscriptionId)
-                if(!restSub) {
-                    log.warn("Could not clear 'is pending' status on rest subscription '${subscriptionId}' because it could not be found")
-                } else {
-                    restSub.isPending = false
-                    restSub.save(flush: true)
-                }
-            }
-
-        } else if (mediaId && messageType == MessageType.DELETE) {
-
-            log.info("Received a delete message on the '${rabbitQueue}' for mediaId '${mediaId}'")
-
-            def failedUpdates = restSubscriptionUpdateService.deleteSubscriptions(mediaId)
-            failedUpdates.each { RestSubscription restSubscription ->
-                queueService.sendToRestErrorQueue(MessageType.DELETE, restSubscription.id as Long, mediaId, attempts)
-            }
-
+        if (subscriptionId && messageType == MessageType.IMPORT) {
+            importSubscription(subscriptionId, attempts)
         } else {
-            log.warn("Received an malformed message '${message.toJsonString()}' on the '${rabbitQueue}' queue")
+
+            if (subscriptionId) {
+
+                def subscription = RestSubscription.findById(subscriptionId)
+                if (!subscription) {
+                    log.warn("Could not find restSubscription '${subscriptionId}'")
+                    return
+                }
+
+                if (messageType == MessageType.UPDATE) {
+                    updateSubscription(subscription, attempts)
+                } else if (messageType == MessageType.DELETE) {
+                    deleteSubscription(subscription, attempts)
+                }
+
+            } else if (mediaId) {
+                queueSubscriptions(mediaId, messageType, rabbitQueue)
+            } else {
+                log.warn("Received an malformed message '${message.toJsonString()}' on the '${rabbitQueue}' queue")
+            }
+        }
+    }
+
+    void deleteSubscription(RestSubscription restSubscription, int attempts) {
+
+        def success = restSubscriptionUpdateService.deleteSubscription(restSubscription)
+        if(!success) {
+            queueService.sendToRestErrorQueue(MessageType.DELETE, restSubscription.id, null, attempts)
+        }
+    }
+
+    void queueSubscriptions(String mediaId, MessageType messageType, String rabbitQueue) {
+
+        def subscription = Subscription.findByMediaId(mediaId)
+        if (!subscription) {
+            log.info("No subscriptions found for mediaId '${mediaId}'")
+            return
+        }
+
+        def restSubscriptions = RestSubscription.findAllBySubscription(subscription)
+        if (!restSubscriptions) {
+            log.info("No restSubscriptions found for mediaId '${mediaId}'")
+            return
+        }
+
+        restSubscriptions.each { restSubscription ->
+            log.info("Queuing a message of type '${messageType}' on the '${rabbitQueue}' for restSubscription '${restSubscription.id}'")
+            queueService.sendToRestUpdateQueue(messageType, restSubscription.id)
+        }
+    }
+
+    void updateSubscription(RestSubscription restSubscription, int attempts) {
+
+        def success = restSubscriptionUpdateService.updateSubscription(restSubscription)
+        if (!success) {
+            log.error("Update of restSubscription '${restSubscription.id}' was unsuccessful")
+            queueService.sendToRestErrorQueue(MessageType.UPDATE, restSubscription.id, null, attempts)
+        }
+    }
+
+    void importSubscription(long restSubscriptionId, int attempts) {
+
+        def success = restSubscriptionUpdateService.importSubscription(restSubscriptionId)
+
+        if (!success) {
+            queueService.sendToRestErrorQueue(MessageType.IMPORT, restSubscriptionId, null, attempts)
         }
     }
 }

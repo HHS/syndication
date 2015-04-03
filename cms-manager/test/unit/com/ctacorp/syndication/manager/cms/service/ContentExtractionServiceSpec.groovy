@@ -28,7 +28,6 @@ import spock.lang.Specification
 @TestFor(ContentExtractionService)
 class ContentExtractionServiceSpec extends Specification {
 
-    def response = [:]
     def sourceUrl = 'http://nerds4birds.net/lookup/by/nerd.json'
     def apiBaseUrl = 'http://blind-wombats.org/easier-to-catch/just-as-hard-to-eat/api'
     def resourcesApi = Mock(ResourcesApi)
@@ -51,7 +50,7 @@ class ContentExtractionServiceSpec extends Specification {
 
         when: 'getting the media id associated with a source url'
 
-        service.getMediaId(sourceUrl)
+        service.getMediaItemBySourceUrl(sourceUrl)
 
         then: "create a new get media request"
 
@@ -81,7 +80,7 @@ class ContentExtractionServiceSpec extends Specification {
 
         when: 'getting the media id associated with a source url'
 
-        service.getMediaId(sourceUrl)
+        service.getMediaItemBySourceUrl(sourceUrl)
 
         then: "create a new get media request"
 
@@ -111,7 +110,7 @@ class ContentExtractionServiceSpec extends Specification {
 
         when: 'getting the media id associated with a source url'
 
-        def mediaId = service.getMediaId(sourceUrl)
+        def mediaId = service.getMediaItemBySourceUrl(sourceUrl)
 
         then: "create a new get media request"
 
@@ -140,7 +139,7 @@ class ContentExtractionServiceSpec extends Specification {
 
         when: 'getting the media item associated with a source url'
 
-        def mediaId = service.getMediaId(sourceUrl)
+        def mediaId = service.getMediaItemBySourceUrl(sourceUrl)
 
         then: "create a new get media request"
 
@@ -166,11 +165,11 @@ class ContentExtractionServiceSpec extends Specification {
         item.id = 1234
 
         def items = new MediaItems()
-        items.results = [item]
+        items.results = [new MediaItem(id: 1234)]
 
         when: 'getting the media item associated with a source url'
 
-        def mediaId = service.getMediaId(sourceUrl)
+        def mediaItem = service.getMediaItemBySourceUrl(sourceUrl)
 
         then: "create a new get media request"
 
@@ -182,7 +181,7 @@ class ContentExtractionServiceSpec extends Specification {
 
         and: 'expect the returned media item have non empty properties'
 
-        mediaId == 1234
+        mediaItem.id == 1234l
     }
 
     void "get media item throws an api exception with a 400 status code"() {
@@ -219,7 +218,7 @@ class ContentExtractionServiceSpec extends Specification {
 
         when: "extracting the content for a given media id"
 
-        service.extractSyndicatedContent('1234')
+        service.getMediaSyndicate('1234')
 
         then: "throw an exception from the resources api"
 
@@ -240,7 +239,7 @@ class ContentExtractionServiceSpec extends Specification {
 
         when: "extracting the content for a given media id"
 
-        service.extractSyndicatedContent('1234')
+        service.getMediaSyndicate('1234')
 
         then: "throw an exception from the resources api"
 
@@ -261,7 +260,7 @@ class ContentExtractionServiceSpec extends Specification {
 
         when: "extracting the content for a given media id"
 
-        def mediaItem = service.extractSyndicatedContent('1234')
+        def mediaItem = service.getMediaSyndicate('1234')
 
         then: "throw an exception from the resources api"
 
@@ -282,7 +281,7 @@ class ContentExtractionServiceSpec extends Specification {
 
         when: "extracting the content for a given media id"
 
-        def content = service.extractSyndicatedContent('1234')
+        def content = service.getMediaSyndicate('1234')
 
         then: "return the extracted content from the resources api"
 

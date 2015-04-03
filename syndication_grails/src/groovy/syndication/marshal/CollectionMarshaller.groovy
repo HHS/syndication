@@ -16,12 +16,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.marshal
 
 import clover.com.lowagie.text.html.HtmlEncoder
+import com.ctacorp.syndication.ExtendedAttribute
 import grails.converters.JSON
-import com.ctacorp.syndication.*
-import syndication.preview.ThumbnailService
-import syndication.rest.MediaService
-import syndication.tag.TagsService
-import syndication.tinyurl.TinyUrlService
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,15 +27,12 @@ import syndication.tinyurl.TinyUrlService
  *
  */
 class CollectionMarshaller {
-    ThumbnailService thumbnailService
-    TinyUrlService tinyUrlService
-    TagsService tagsService
-    MediaService mediaService
+    def services
 
     CollectionMarshaller(){
-        JSON.registerObjectMarshaller(com.ctacorp.syndication.Collection){ com.ctacorp.syndication.Collection c ->
-            def campaigns = mediaService.getCampaignsForAPIResponse(c)
-            def mediaItems = mediaService.getCollectionMediaItemsForAPIResponse(c)
+        JSON.registerObjectMarshaller(com.ctacorp.syndication.media.Collection){ com.ctacorp.syndication.media.Collection c ->
+            def campaigns = services.mediaService.getCampaignsForAPIResponse(c)
+            def mediaItems = services.mediaService.getCollectionMediaItemsForAPIResponse(c)
 
             def attr = HtmlEncoder.encode("<div id='hhsAttribution'>Content provided and maintained by <a href='${c.source.websiteUrl}' target='_blank'>Health and Human Services</a> (HHS). Please see our system <a href='http:syndication.hhs.gov' target='_blank'>usage guidelines and disclaimer</a>.</div>")
 
@@ -50,7 +43,6 @@ class CollectionMarshaller {
                     description:            c.description,
                     sourceUrl:              c.sourceUrl,
                     targetUrl:              c.targetUrl,
-                    customThumbnailUrl:      c.customThumbnailUrl,
                     dateContentAuthored:    c.dateContentAuthored,
                     dateContentUpdated:     c.dateContentUpdated,
                     dateContentPublished:   c.dateContentPublished,
@@ -63,12 +55,13 @@ class CollectionMarshaller {
                     contentHash:            c.hash,
                     source:                 c.source,
                     campaigns:              campaigns,
-                    tags:                   mediaService.getTagsForMediaItemForAPIResponse(c),
+                    tags:                   services.mediaService.getTagsForMediaItemForAPIResponse(c),
                     alternateImages:        c.alternateImages,
                     mediaItems:             mediaItems,
+                    thumbnailUrl:           services.urlService.getThumbnailUrl(c.id),
+                    previewlUrl:            services.urlService.getPreviewUrl(c.id),
                     attribution:            attr,
                     extendedAttributes:     marshalDescriptor(c.extendedAttributes),
-                    thumbnailUrl:           thumbnailService.getDefaultCollectionThumbnail()
             ]
         }
     }

@@ -17,7 +17,7 @@ package syndication.rest
 import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.ExtendedAttribute
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Source
 import grails.transaction.NotTransactional
 import syndication.api.ApiResponse
@@ -70,6 +70,10 @@ class TagsController {
     static responseFormats = ['json']
 
     def tagsService
+
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
 
     @APIResource(path="/resources/tags/{id}.{format}", description = "Information about a specific tag", operations = [
         @Operation(httpMethod="GET", notes="Returns the Tag identified by the 'id' in the specified 'format'.", nickname="getTagById", type = "Tags", summary = "Get Tag by ID", responseMessages = [

@@ -14,8 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.metrics
 
-import com.ctacorp.syndication.MediaItem
-import grails.transaction.Transactional
+import com.ctacorp.syndication.media.MediaItem
 
 class AnalyticsService {
     static transactional = false
@@ -23,6 +22,20 @@ class AnalyticsService {
     def grailsApplication
 
     String getGoogleAnalyticsString(MediaItem mi){
-        """<img src="http://www.google-analytics.com/collect?v=1&tid=UA-28750072-6&cid=1&t=pageview&cs=${mi?.source?.acronym}&cm=${mi?.name?.encodeAsURL()}&cn=${mi?.id}&z=${System.nanoTime()}&dl=${grailsApplication.config.grails.serverURL}"/>"""
+        String analyticsBlock = """\
+<!-- Google Tag Manager -->
+<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-PCQMPL" title="hhsgoogletagmanager"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PCQMPL');</script>
+<!-- End Google Tag Manager -->"""
+
+        //Old image based beacon
+//        """<img src="http://www.google-analytics.com/collect?v=1&tid=UA-28750072-6&cid=1&t=pageview&cs=${mi?.source?.acronym}&cm=${mi?.name?.encodeAsURL()}&cn=${mi?.id}&z=${System.nanoTime()}&dl=${grailsApplication.config.grails.serverURL}"/>"""
+
+        analyticsBlock
     }
 }

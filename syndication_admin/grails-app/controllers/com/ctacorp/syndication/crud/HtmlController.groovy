@@ -13,16 +13,19 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
-import com.ctacorp.syndication.Collection
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.NOT_FOUND
+
+import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.FeaturedMedia
-import com.ctacorp.syndication.Html
+import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.jobs.UpdateSolrIndexJob
 import grails.plugins.rest.client.RestBuilder
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
-
-import static org.springframework.http.HttpStatus.*
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_STATS', 'ROLE_PUBLISHER'])
 @Transactional(readOnly = true)
@@ -60,13 +63,17 @@ class HtmlController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN'])
-    def create() {
-        def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Html(params), model: [subscribers:subscribers]
+    def urlTest(String sourceUrl){
+        redirect controller: "mediaTestPreview", action: "index", params:[sourceUrl:sourceUrl]
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    def create() {
+        def subscribers = cmsManagerKeyService.listSubscribers()
+        respond new Html(), model: [subscribers:subscribers]
+    }
+
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(Html htmlInstance) {
         if (htmlInstance == null) {
@@ -77,7 +84,7 @@ class HtmlController {
         def status =  mediaItemsService.updateItemAndSubscriber(htmlInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action:'create'
+            respond htmlInstance, view:'create', model: [subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
 
@@ -103,7 +110,7 @@ class HtmlController {
         respond htmlInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(htmlInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Html htmlInstance) {
         if (htmlInstance == null) {
@@ -143,7 +150,7 @@ class HtmlController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(htmlInstance)
+        mediaItemsService.removeMediaItemsFromUserMediaLists(htmlInstance, true)
         solrIndexingService.removeMediaItem(htmlInstance)
         mediaItemsService.delete(htmlInstance.id)
 

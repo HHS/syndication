@@ -272,6 +272,8 @@ swagger{
 
 grails.plugin.springsecurity.useSecurityEventListener = true
 
+syndication.contentExtraction.cssClassName = "syndicate"
+
 bruteforcedefender {
     time = 15
     allowedNumberOfAttempts = 5

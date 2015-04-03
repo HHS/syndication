@@ -30,6 +30,7 @@ class SubscriberController {
     def subscriberMailService
     def loggingService
     def subscriptionService
+    def subscriberService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -51,7 +52,7 @@ class SubscriberController {
     }
 
     def edit(Subscriber subscriber) {
-        subscriber.sendKeyAgreement = false
+//        subscriber.sendKeyAgreement = false
         respond subscriber, view: 'edit'
     }
 
@@ -74,11 +75,9 @@ class SubscriberController {
             subscriber.keyAgreement = keyAgreement
         }
 
-        makeOnlyPrivilegedSubscriber(subscriber)
-
         subscriber.save(flush: true)
 
-        if (subscriber.sendKeyAgreement) {
+        if (params.sendKeyAgreement) {
             try {
                 subscriberMailService.sendSubscriberKeyAgreement(subscriber)
             } catch (Exception e) {
@@ -98,40 +97,19 @@ class SubscriberController {
             return notFound()
         }
 
-        RhythmyxSubscriber.findAllBySubscriber(subscriber).each { rhythmyxSubscriber ->
-            RhythmyxSubscription.findAllByRhythmyxSubscriber(rhythmyxSubscriber).each { rhythmyxSubscription ->
-                subscriptionService.deleteChildSubscription(rhythmyxSubscription)
-            }
-            rhythmyxSubscriber.delete(flush: true)
-        }
-
-        EmailSubscriber.findAllBySubscriber(subscriber).each { emailSubscriber ->
-            EmailSubscription.findAllByEmailSubscriber(emailSubscriber).each { emailSubscription ->
-                subscriptionService.deleteChildSubscription(emailSubscription)
-            }
-            emailSubscriber.delete(flush: true)
-        }
-
-        RestSubscriber.findAllBySubscriber(subscriber).each { restSubscriber ->
-            RestSubscription.findAllByRestSubscriber(restSubscriber).each { restSubscription ->
-                subscriptionService.deleteChildSubscription(restSubscription)
-            }
-            restSubscriber.delete(flush: true)
-        }
-
+        def email = subscriber.email
         def name = subscriber.name
 
-        def keyAgreement = subscriber.keyAgreement
-        subscriber.delete(flush: true)
-        keyAgreement?.delete(flush: true)
+        subscriberService.deleteSubscriber(subscriber)
+
+        flash.message = message(code: 'default.deleted.message', args: [message(code: 'subscriber.label'), name])
 
         try {
-            subscriberMailService.sendSubscriberDelete(subscriber)
+            subscriberMailService.sendSubscriberDelete(email)
         } catch (e) {
             return emailError(subscriber, 'subscriber.delete.email.send.error', e, true)
         }
 
-        flash.message = message(code: 'default.deleted.message', args: [message(code: 'subscriber.label'), name])
         redirect(action: "index", method: "GET")
     }
 
@@ -141,11 +119,9 @@ class SubscriberController {
     }
 
     @Transactional
-    def save() {
+    def save(Subscriber subscriber) {
 
         flash.clear()
-
-        def subscriber = new Subscriber(params)
 
         if (!subscriber.validate()) {
             respond subscriber.errors, view: 'create'
@@ -155,11 +131,9 @@ class SubscriberController {
         KeyAgreement keyAgreement = newKeyAgreement(subscriber)
         subscriber.keyAgreement = keyAgreement
 
-        makeOnlyPrivilegedSubscriber(subscriber)
-
         subscriber.save(flush: true)
 
-        if (subscriber.sendKeyAgreement) {
+        if (params.sendKeyAgreement) {
             try {
                 subscriberMailService.sendSubscriberKeyAgreement(subscriber)
             } catch (e) {
@@ -170,28 +144,17 @@ class SubscriberController {
         showInstance(subscriber, 'default.created.message')
     }
 
-    @SuppressWarnings("GrMethodMayBeStatic")
-    private void makeOnlyPrivilegedSubscriber(Subscriber subscriber) {
-        def isPrivileged = subscriber.isPrivileged
-        if (isPrivileged) {
-            Subscriber.list().each {
-                it.isPrivileged = false
-                it.save(flush: true)
-            }
-        }
-        subscriber.setIsPrivileged(isPrivileged)
-    }
-
-    private static KeyAgreement newKeyAgreement(Subscriber subscriber) {
+    static KeyAgreement newKeyAgreement(Subscriber subscriber) {
         def agreement = ApiKeyUtils.newKeyAgreement(entityName, subscriber.name)
         def keyAgreement = new KeyAgreement(agreement).save(failOnError: true)
         keyAgreement
     }
 
-    def emailError(Subscriber subscriber, messageKey, e, boolean isDelete) {
-        def errorMessage = message(code: messageKey)
-        //noinspection GroovyAssignabilityCheck
-        flash.errors = [loggingService.logError(errorMessage, e), errorMessage]
+    def emailError(Subscriber subscriber, messageKey, Throwable t, boolean isDelete) {
+
+        String errorMessage = message(code: messageKey)
+        flash.errors = [loggingService.logError(errorMessage, t), errorMessage]
+
         if(isDelete) {
             redirect(action: "index", method: "GET")
         } else {

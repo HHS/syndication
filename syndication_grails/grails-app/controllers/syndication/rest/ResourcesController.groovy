@@ -16,7 +16,7 @@ package syndication.rest
 
 import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Source
 import syndication.api.ApiResponse
 import syndication.api.Message
@@ -57,6 +57,10 @@ class ResourcesController {
     def resourcesService
 
     static responseFormats = ['json']
+
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
 
     @APIResource(path="/resources.json", description = "Global search", operations = [
         @Operation(httpMethod="GET", notes="Returns the list of Resources matching the search query 'q'.<p>The search query 'q' is a Lucene query.<br>The syntax for a Lucene query can be found <a href=\"http://lucene.apache.org/core/2_9_4/queryparsersyntax.html\">here</a>.", nickname="getResources", type = "Resources", summary = "Get Resources by search query", responseMessages=[

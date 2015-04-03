@@ -13,8 +13,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Campaign" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -74,13 +74,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         </g:each>
                         </tbody>
                     </table>
-                    <g:if test="${campaignInstanceCount > params.max}">
-                        <div class="pagination">
-                            <g:paginate total="${campaignInstanceCount ?: 0}"/>
-                        </div>
-                    </g:if>
                 </div>
             </div>
+
+            <g:if test="${campaignInstanceCount > params.max}">
+                <div class="pagination">
+                    <g:paginate total="${campaignInstanceCount ?: 0}"/>
+                </div>
+            </g:if>
+            
         </div>
     </div>
 </div>

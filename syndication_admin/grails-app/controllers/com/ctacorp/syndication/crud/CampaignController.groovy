@@ -11,13 +11,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 package com.ctacorp.syndication.crud
 
-import com.ctacorp.syndication.MediaItem
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.NOT_FOUND
+
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.CampaignSubscriber
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.authentication.UserRole
 import grails.converters.JSON
-
-import static org.springframework.http.HttpStatus.*
 
 import com.ctacorp.syndication.Campaign
 import grails.plugin.springsecurity.annotation.Secured
@@ -65,25 +68,24 @@ class CampaignController {
             notFound()
             return
         }
-        
-        def mediaItems = params.mediaItems ?:  ","
-        params.remove("mediaItems")
-        campaignInstance.properties = new Campaign(params).properties
+
+        def mediaItems = params.mediaItemsToAdd ?:  ","
+        params.remove("mediaItemsToAdd")
         mediaItems.split(",").collect{ it as Long }.each{ mediaId ->
-            if(!params.subscriberId || MediaItemSubscriber.findAllByMediaItem(MediaItem.get(mediaId)).subscriberId.contains(params.long("subscriberId"))){
+            if(!params.subscriberId || MediaItemSubscriber.findAllByMediaItem(MediaItem.get(mediaId as Long)).subscriberId.contains(params.long("subscriberId"))){
                 campaignInstance?.addToMediaItems(MediaItem.load(mediaId))
             }
-                
         }
         
         def status =  campaignService.updateCampaignAndSubscriber(campaignInstance, params.subscriberId)
         if (status) {
             flash.errors = status
-            redirect action: 'create', params:params
+            def featuredMedia = campaignInstance?.mediaItems
+            String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
+            respond campaignInstance, view:'create', model:[featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput, subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
 
-        campaignInstance.save flush: true
         solrIndexingService.inputCampaign(campaignInstance)
 
         request.withFormat {
@@ -112,22 +114,12 @@ class CampaignController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER', 'ROLE_PUBLISHER'])
     @Transactional
-    def update(Long id) {
-        Campaign campaignInstance = Campaign.get(id)
-        def mediaItems = params.mediaItems ?:  ","
+    def update(Campaign campaignInstance) {
+        def mediaItems = params.mediaItemsToAdd ?:  ","
 
         if (campaignInstance == null) {
             notFound()
             return
-        }
-
-        //deletes and adds the media items back in one at a time because of Gorm issue not being able to query
-        // all at once on a many-to-many relationship.
-        params.remove("mediaItems")
-        campaignInstance.properties = new Campaign(params).properties
-        mediaItems.split(",").collect{ it as Long }.each{ mediaId ->
-            if(campaignService.mediaItemBelongsToSubscriber(campaignInstance,mediaId))
-                campaignInstance?.addToMediaItems(MediaItem.load(mediaId))
         }
 
         campaignInstance.validate()
@@ -136,6 +128,15 @@ class CampaignController {
             flash.errors = status
             redirect action: 'edit', id: campaignInstance.id
             return
+        }
+        
+        //deletes and adds the media items back in one at a time because of Gorm issue not being able to query
+        // all at once on a many-to-many relationship.
+        params.remove("mediaItemsToAdd")
+        campaignInstance.properties = new Campaign(params).properties
+        mediaItems.split(",").collect{ it as Long }.each{ mediaId ->
+            if(campaignService.mediaItemBelongsToSubscriber(campaignInstance,mediaId))
+                campaignInstance?.addToMediaItems(MediaItem.load(mediaId))
         }
 
         campaignInstance.save flush: true
@@ -185,7 +186,7 @@ class CampaignController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def addMediaItem(Campaign campaign){
-        if (campaign == null) {
+        if (!campaign.id) {
             flash.message = "Could not find the campaign."
             redirect controller:'mediaItem', action:'show', id: params.mediaItem
             return
@@ -196,7 +197,7 @@ class CampaignController {
         } else {
             campaign.mediaItems.add(MediaItem.get(params.mediaItem))
             campaign.save(flush: true)
-            flash.message = "The media item has been added to your campaign."
+            flash.message = "The media item has been added to the '${campaign.name}' campaign."
         }
 
         redirect controller:'mediaItem', action:'show', id: params.mediaItem

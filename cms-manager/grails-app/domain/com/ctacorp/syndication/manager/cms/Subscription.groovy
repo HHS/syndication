@@ -18,7 +18,7 @@ import grails.util.Holders
 
 class Subscription {
 
-    static syndicationMediaUri = (Holders.config.syndication.serverUrl +  Holders.config.syndication.apiPath + Holders.config.syndication.mediaPath) as String
+    static String syndicationMediaUri = Holders.config.syndication.serverUrl +  Holders.config.syndication.apiPath + Holders.config.syndication.mediaPath
 
     String mediaId
     Date dateCreated

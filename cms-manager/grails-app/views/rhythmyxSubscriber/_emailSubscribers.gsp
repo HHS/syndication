@@ -1,0 +1,1 @@
+<g:select class="form-control" id="emailSubscribers" name="emailSubscriber" from="${emailSubscribers}" optionKey="id" required="required" optionValue="email" />

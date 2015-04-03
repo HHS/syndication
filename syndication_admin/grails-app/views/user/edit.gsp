@@ -1,4 +1,3 @@
-
 %{--
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -13,8 +12,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.authentication.User" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.authentication.User" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -94,7 +94,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                     <tr><td>View Dashboard</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
                                     <tr><td>Search for Media</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
                                     <tr><td>View Media</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Create Media</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+                                    <tr><td>Create Media</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
                                     <tr><td>Preview Media</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
                                     <tr><td>Edit Media</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td></tr>
                                     <tr><td>Delete Media</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>&nbsp;</td></tr>

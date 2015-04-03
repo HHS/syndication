@@ -93,9 +93,8 @@ class RhythmyxSubscriberController {
 
         def instanceName = rhythmyxSubscriber.instanceName
 
-        def subscriptions = RhythmyxSubscription.findByRhythmyxSubscriber(rhythmyxSubscriber)
-        subscriptions.each {
-            it.delete(flush:true)
+        RhythmyxSubscription.findAllByRhythmyxSubscriber(rhythmyxSubscriber).each { rhythmyxSubscription ->
+            rhythmyxSubscription.delete(flush:true)
         }
         rhythmyxSubscriber.delete(flush: true)
 
@@ -111,5 +110,11 @@ class RhythmyxSubscriberController {
     def showInstance(rhythmyxSubscriber, code) {
         flash.message = message(code: code, args: [message(code: 'rhythmyxSubscriber.label'), rhythmyxSubscriber.instanceName])
         redirect(action: "show", id: rhythmyxSubscriber.id)
+    }
+
+    def getEmailSubscribersWithSameSubscriber(){
+        def emailSubscribers = RhythmyxSubscriber.get(params.rhythmyxSubscriberId as Long).getEmailSubscribersWithSameSubscriber()
+        render template:"emailSubscribers", model:[emailSubscribers:emailSubscribers]
+        
     }
 }

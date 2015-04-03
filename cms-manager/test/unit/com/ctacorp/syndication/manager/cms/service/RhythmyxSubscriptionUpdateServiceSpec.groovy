@@ -13,13 +13,8 @@ Redistribution and use in source and binary forms, with or without modification,
   */
 package com.ctacorp.syndication.manager.cms.service
 
-import com.ctacorp.syndication.commons.mq.MessageType
-import com.ctacorp.syndication.manager.cms.ContentExtractionService
-import com.ctacorp.syndication.manager.cms.QueueService
-import com.ctacorp.syndication.manager.cms.RhythmyxIngestionService
-import com.ctacorp.syndication.manager.cms.RhythmyxSubscription
-import com.ctacorp.syndication.manager.cms.RhythmyxSubscriptionUpdateService
-import com.ctacorp.syndication.manager.cms.Subscription
+import com.ctacorp.syndication.manager.cms.*
+import com.ctacorp.syndication.swagger.rest.client.model.MediaItem
 import com.ctacorp.syndication.swagger.rest.client.model.SyndicatedMediaItem
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestFor
@@ -50,127 +45,107 @@ class RhythmyxSubscriptionUpdateServiceSpec extends Specification {
         service.queueService = queueService
         service.rhythmyxIngestionService = rhythmyxIngestionService
 
-        subscription = Subscription.build(mediaId: 9876)
+        subscription = Subscription.build(mediaId: '9876')
     }
 
-    void "update rhythmyx subscriptions correctly handles a non existing subscription"() {
+    void "update rhythmyx subscription correctly handles an unexpected exception"() {
+
+        given: "a rhythmyx subscription"
+
+        def rhythymyxSubscription = RhythmyxSubscription.build(subscription: subscription, deliveryFailureLogId: "3213123")
 
         when: "updating a subscription that is not associated with a rhythmyx subscription"
 
-        def updatedSubscriptions = service.updateSubscriptions('9876')
-
-        then: "the udpated rhythmyx subscription list will be empty"
-
-        updatedSubscriptions == [failedUpdates: [], successfulUpdates: []]
-    }
-
-    void "update rhythmyx subscriptions correctly handles an unexpected exception"() {
-
-        given: "the rhythmyx subscriptions to update"
-
-        def rhythymyxSubscription = RhythmyxSubscription.build(subscription: subscription)
-
-        when: "updating a subscription that is not associated with a rhythmyx subscription"
-
-        def updatedSubscriptions = service.updateSubscriptions('9876')
-
-        then: "extract the content for the media id"
-
-        contentExtractionService.extractSyndicatedContent('9876') >> syndicatedMediaItem
-
-        and: "update the rhythmyx content item"
-
-        rhythmyxIngestionService.updateContentItem(rhythymyxSubscription, syndicatedMediaItem) >> {
-            throw new RuntimeException("Whats a pederass Walter?")
-        }
-
-        and: "the udpated rhythmyx subscription list will be empty"
-
-        updatedSubscriptions == [failedUpdates: [], successfulUpdates: []]
-    }
-
-    void "update rhythmyx subscriptions using a bad mediaId"() {
-
-        given: "the rhythmyx subscriptions to update"
-
-        RhythmyxSubscription.build(subscription: subscription)
-
-        when: "updating a subscription that is not associated with a rhythmyx subscription"
-
-        service.updateSubscriptions('9875')
-
-        then: "the udpated rhythmyx subscription list will be empty"
-
-        [failedUpdates: [], successfulUpdates: []]
-    }
-
-    void "update rhythmyx subscriptions successfully processes two existing subscriptions"() {
-
-        given: "the rhythmyx subscriptions to update"
-
-        def rhythymyxSubscription1 = RhythmyxSubscription.build(subscription: subscription)
-        def rhythymyxSubscription2 = RhythmyxSubscription.build(subscription: subscription)
-
-        when: "updating a subscription that is not associated with a rhythmyx subscription"
-
-        def updatedSubscriptions = service.updateSubscriptions('9876')
-
-        then: "extract the content for the media id"
-
-        contentExtractionService.extractSyndicatedContent('9876') >> syndicatedMediaItem
+        def success = service.updateSubscription(rhythymyxSubscription)
 
         then: "get the source url for the media id"
 
-        contentExtractionService.getMediaItem('9876') >> [sourceUrl: "http://hambone.gov/makes/a/good/bean/soup.asp"]
-
-        and: "update the rhythmyx content items"
-
-        rhythmyxIngestionService.updateContentItem(rhythymyxSubscription1, syndicatedMediaItem) >> true
-        rhythmyxIngestionService.updateContentItem(rhythymyxSubscription2, syndicatedMediaItem) >> true
-
-        and: "the udpated rhythmyx subscription list will contain both subscriptions"
-
-        updatedSubscriptions == [failedUpdates: [], successfulUpdates: [rhythymyxSubscription1, rhythymyxSubscription2]]
-
-        and: "the updated subscriptions have the correct sourceUrl"
-
-        rhythymyxSubscription1.sourceUrl == "http://hambone.gov/makes/a/good/bean/soup.asp"
-        rhythymyxSubscription2.sourceUrl == "http://hambone.gov/makes/a/good/bean/soup.asp"
-    }
-
-    void "update rhythmyx subscriptions correctly handles a failed update successfully processes another"() {
-
-        given: "the rhythmyx subscriptions to update"
-
-        def rhythymyxSubscription1 = RhythmyxSubscription.build(subscription: subscription)
-        def rhythymyxSubscription2 = RhythmyxSubscription.build(subscription: subscription)
-
-        when: "updating a subscription that is not associated with a rhythmyx subscription"
-
-        def updatedSubscriptions = service.updateSubscriptions('9876')
-
-        then: "update the rhythmyx content items"
-
-        contentExtractionService.extractSyndicatedContent('9876') >> syndicatedMediaItem
-
-        then: "get the source url for the media id"
-
-        contentExtractionService.getMediaItem('9876') >> [sourceUrl: "http://hambone.gov/makes/a/good/bean/soup.asp"]
+        1 * contentExtractionService.getMediaItem(subscription.mediaId) >> new MediaItem(id: subscription.id, sourceUrl: "http://hamburgertownusa.gov/with/cheese")
 
         and: "extract the content for the media id"
 
-        rhythmyxIngestionService.updateContentItem(rhythymyxSubscription1, syndicatedMediaItem) >> false
+        1* contentExtractionService.getMediaSyndicate(subscription.mediaId) >> syndicatedMediaItem
 
-        and: "throw an exception on second update"
+        and: "update the rhythmyx content item"
 
-        rhythmyxIngestionService.updateContentItem(rhythymyxSubscription2, syndicatedMediaItem) >> true
+        1* rhythmyxIngestionService.updateContentItem(rhythymyxSubscription, syndicatedMediaItem) >> {
+            throw new RuntimeException("Whats a pederass Walter?")
+        }
 
-        and: "expect an update error is pushed to the error queue"
+        and: "don't clear the delivery failure status"
 
-        queueService.sendToRhythmyxErrorQueue(MessageType.UPDATE, rhythymyxSubscription2.id, '9876', 0)
+        rhythymyxSubscription.deliveryFailureLogId == "3213123"
 
-        then: "the udpated rhythmyx subscription list will contain the successfully updated rhythmyx subscription"
+        and: "return a failure status"
 
-        updatedSubscriptions == [failedUpdates: [rhythymyxSubscription1], successfulUpdates: [rhythymyxSubscription2]]
+        !success
+    }
+
+    void "update rhythmyx subscription correctly handles a failed update"() {
+
+        given: "the rhythmyx subscriptions to update"
+
+        def rhythymyxSubscription = RhythmyxSubscription.build(subscription: subscription, deliveryFailureLogId: "fxfxzf")
+
+        when: "updating a subscription that is not associated with a rhythmyx subscription"
+
+        def success = service.updateSubscription(rhythymyxSubscription)
+
+        then: "get the source url for the media id"
+
+        1 * contentExtractionService.getMediaItem(subscription.mediaId) >> new MediaItem(id: subscription.id, sourceUrl: "http://hamburgertownusa.gov/with/cheese")
+
+        and: "extract the content for the media id"
+
+        1* contentExtractionService.getMediaSyndicate(subscription.mediaId) >> syndicatedMediaItem
+
+        and: "extract the content for the media id"
+
+        rhythmyxIngestionService.updateContentItem(rhythymyxSubscription, syndicatedMediaItem) >> false
+
+        and: "don't clear the delivery failure status"
+
+        rhythymyxSubscription.deliveryFailureLogId == "fxfxzf"
+
+        and: "return a failure status"
+
+        !success
+    }
+
+    void "successfully update a rhythmyx subscription"() {
+
+        given: "the rhythmyx subscriptions to update"
+
+        def rhythymyxSubscription = RhythmyxSubscription.build(subscription: subscription, deliveryFailureLogId: "fxfxzf")
+
+        and: "a changed syndicated media item name"
+
+        syndicatedMediaItem.name = "Hamburger Town USA"
+
+        when: "updating a subscription that is not associated with a rhythmyx subscription"
+
+        def success = service.updateSubscription(rhythymyxSubscription)
+
+        then: "get the source url for the media id"
+
+        1 * contentExtractionService.getMediaItem(subscription.mediaId) >> new MediaItem(id: subscription.id, sourceUrl: "http://hamburgertownusa.gov/with/cheese")
+
+        and: "extract the content for the media id"
+
+        1 * contentExtractionService.getMediaSyndicate(subscription.mediaId) >> syndicatedMediaItem
+
+        and: "extract the content for the media id"
+
+        rhythmyxIngestionService.updateContentItem(rhythymyxSubscription, syndicatedMediaItem) >> true
+
+        and: "clear the delivery failure status and update the source url and system title"
+
+        !rhythymyxSubscription.deliveryFailureLogId
+        rhythymyxSubscription.sourceUrl == "http://hamburgertownusa.gov/with/cheese"
+        rhythymyxSubscription.systemTitle == "Hamburger Town USA"
+
+        and: "return a success status"
+
+        success
     }
 }

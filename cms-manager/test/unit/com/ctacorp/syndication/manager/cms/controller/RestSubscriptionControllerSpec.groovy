@@ -15,7 +15,8 @@ package com.ctacorp.syndication.manager.cms.controller
 import com.ctacorp.syndication.commons.mq.MessageType
 import com.ctacorp.syndication.manager.cms.*
 import com.ctacorp.syndication.manager.cms.utils.exception.ServiceException
-import com.ctacorp.syndication.swagger.rest.client.model.SyndicatedMediaItem
+import com.ctacorp.syndication.manager.cms.utils.mq.RabbitDelayJobScheduler
+import com.ctacorp.syndication.swagger.rest.client.model.MediaItem
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -28,6 +29,7 @@ class RestSubscriptionControllerSpec extends Specification {
     def queueService = Mock(QueueService)
     def loggingService = Mock(LoggingService)
     def subscriptionService = Mock(SubscriptionService)
+    def rabbitDelayJobScheduler = Mock(RabbitDelayJobScheduler)
 
     Subscriber subscriber
     Subscription subscription
@@ -37,14 +39,15 @@ class RestSubscriptionControllerSpec extends Specification {
     def setup() {
 
         subscriber = Subscriber.build()
-        subscription = Subscription.build()
-        restSubscriber = RestSubscriber.build(deliveryEndpoint: "htatp://cookiesforthehomeless.gov/donate/now.asp", subscriber: subscriber)
+        subscription = Subscription.build(mediaId: "1")
+        restSubscriber = RestSubscriber.build(deliveryEndpoint: "http://cookiesforthehomeless.gov/donate/now.asp", subscriber: subscriber)
         restSubscription = RestSubscription.build(sourceUrl: "http://double.stuffed.com/good/cookies.html", restSubscriber: restSubscriber, subscription: subscription)
 
         controller.loggingService = loggingService
         controller.contentExtractionService = contentExtractionService
         controller.queueService = queueService
         controller.subscriptionService = subscriptionService
+        controller.rabbitDelayJobScheduler = rabbitDelayJobScheduler
     }
 
     void "show action correctly handles a null instance"() {
@@ -131,15 +134,15 @@ class RestSubscriptionControllerSpec extends Specification {
         request.method = "POST"
         controller.save(restSubscription)
 
-        then: "throw an exception from the content extraction service"
+        then: "throw an exception when trying to get the media item for the source url"
 
-        contentExtractionService.getMediaId(restSubscription.sourceUrl) >> {
+        contentExtractionService.getMediaItemBySourceUrl(restSubscription.sourceUrl) >> {
             throw serviceException
         }
 
         and: "log the exception"
 
-        1 * loggingService.logError("Error occurred when fetching the media item for sourceUrl=http://double.stuffed.com/good/cookies.html", serviceException) >> {
+        1 * loggingService.logError("An error occurred when trying to get the media item associated with sourceUrl 'http://double.stuffed.com/good/cookies.html'", serviceException) >> {
             return "whats the word homie!"
         }
 
@@ -158,7 +161,7 @@ class RestSubscriptionControllerSpec extends Specification {
 
         then: "return a null mediaId from the content extraction service"
 
-        contentExtractionService.getMediaId(restSubscription.sourceUrl) >> null
+        contentExtractionService.getMediaItemBySourceUrl(restSubscription.sourceUrl) >> null
 
         and: "redirect to the index view with a nice error message"
 
@@ -177,27 +180,33 @@ class RestSubscriptionControllerSpec extends Specification {
         request.method = "POST"
         controller.save(restSubscription)
 
-        then: "return a null mediaId from the content extraction service"
+        then: "get the media item for the source url"
 
-        contentExtractionService.getMediaId(restSubscription.sourceUrl) >> 123456
+        contentExtractionService.getMediaItemBySourceUrl(restSubscription.sourceUrl) >> new MediaItem(id: 123456, name: "The Greatest Media Item in the World")
 
-        and: "extract the content"
+        and: "schedule a new rabbit import job"
 
-        contentExtractionService.extractSyndicatedContent("123456") >> {
-            return new SyndicatedMediaItem(name:"The greatest media item")
-        }
+        1 * rabbitDelayJobScheduler.schedule(MessageType.IMPORT, restSubscription)
+
+        and: "set the title"
+
+        restSubscription.title == "The Greatest Media Item in the World"
+
+        and: "set the status to pending"
+
+        restSubscription.isPending
 
         and: "create a new subscription for the media id"
 
         Subscription.count == 2
 
+        and: "set it on the rest subscription"
+
+        restSubscription.subscription.mediaId == "123456"
+
         and: "save the rest subscription"
 
         RestSubscription.count == 2
-
-        and: "put an import message on the rest update queue"
-
-        1 * queueService.sendToRestUpdateQueue(MessageType.IMPORT, 2)
 
         and: "redirect to the index view with a nice error message"
 
@@ -206,7 +215,7 @@ class RestSubscriptionControllerSpec extends Specification {
     }
 
     @SuppressWarnings("GroovyAssignabilityCheck")
-    void "save action successfully creates a existing subscription and new rest subscription"() {
+    void "save action successfully creates a new rest subscription"() {
 
         given: "an unsaved rest subscription"
 
@@ -217,27 +226,33 @@ class RestSubscriptionControllerSpec extends Specification {
         request.method = "POST"
         controller.save(restSubscription)
 
-        then: "return a mediaId from the content extraction service that matches an existing subscription"
+        then: "get the media item for the source url"
 
-        contentExtractionService.getMediaId(restSubscription.sourceUrl) >> subscription.mediaId
+        contentExtractionService.getMediaItemBySourceUrl(restSubscription.sourceUrl) >> new MediaItem(id: new Long(subscription.mediaId), name: "The Best Media Item According to Someone")
 
-        and: "extract the content"
+        and: "set the title"
 
-        1 * contentExtractionService.extractSyndicatedContent(subscription.mediaId) >> {
-            return new SyndicatedMediaItem(name:"The greatest media item")
-        }
+        restSubscription.title == "The Best Media Item According to Someone"
+
+        and: "set the status to pending"
+
+        restSubscription.isPending
 
         and: "create a new subscription for the media id"
 
         Subscription.count == 1
 
+        and: "set it on the rest subscription"
+
+        restSubscription.subscription == subscription
+
+        and: "schedule a new rabbit import job"
+
+        1 * rabbitDelayJobScheduler.schedule(MessageType.IMPORT, restSubscription)
+
         and: "save the rest subscription"
 
         RestSubscription.count == 2
-
-        and: "put an import message on the rest update queue"
-
-        1 * queueService.sendToRestUpdateQueue(MessageType.IMPORT, 2)
 
         and: "redirect to the index view with a nice error message"
 
@@ -245,33 +260,57 @@ class RestSubscriptionControllerSpec extends Specification {
         flash.message == "default.created.message"
     }
 
-    void "delete action correctly handles a null instance"() {
+    void "delete action queues a delete message"() {
 
-        when: "calling the action with a null instance"
+        given: "a rest subscription instance"
 
-        request.method = "DELETE"
-        controller.delete(null)
+        def restSubscription = RestSubscription.build().save(flush: true)
+        RestSubscription.count == 1
 
-        then: "redirect to the index view with a not found message"
+        when: "calling the delete action with a valid instance"
 
-        response.redirectUrl == "/restSubscription/index"
-        flash.errors == ["default.not.found.message"]
-    }
-
-    void "delete action correctly deletes the instance and all rest subscriptions"() {
-
-        when: "calling the action with a valid instance"
-
-        request.method = "DELETE"
+        request.method = 'DELETE'
         controller.delete(restSubscription)
 
-        then: "delete the rest subscription"
+        then: "schedule a new rabbit delete job"
 
-        1 * subscriptionService.deleteChildSubscription(restSubscription)
+        1 * rabbitDelayJobScheduler.schedule(MessageType.DELETE, restSubscription)
 
         and: "redirect to the index view with a deleted message"
 
-        response.redirectUrl == "/restSubscription/index"
-        flash.message == "default.deleted.message"
+        response.redirectUrl == "/index" || response.redirectUrl == "/restSubscription/index"
+        flash.message == "restSubscription.delete.queued.message"
+    }
+
+    void "delete action handles when the job scheduler throws"() {
+
+        given: "a rest subscription instance"
+
+        def restSubscription = RestSubscription.build().save(flush: true)
+        RestSubscription.count == 1
+
+        and: "the exception to throw"
+
+        def exception = new RuntimeException()
+
+        when: "calling the delete action with a valid instance"
+
+        request.method = 'DELETE'
+        controller.delete(restSubscription)
+
+        then: "schedule a new rabbit delete job"
+
+        1 * rabbitDelayJobScheduler.schedule(MessageType.DELETE, restSubscription) >> {
+            throw exception
+        }
+
+        and: "log the exception and create a clean message"
+
+        1 * loggingService.logError("Error occurred when queuing a delete message for restSubscription '${restSubscription.id}'", exception) >> "A better message"
+
+        and: "redirect to the index view with a deleted message"
+
+        response.redirectUrl == "/index" || response.redirectUrl == "/restSubscription/index"
+        flash.errors == ["A better message"]
     }
 }

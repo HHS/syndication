@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -10,17 +9,17 @@ Redistribution and use in source and binary forms, with or without modification,
 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+*/
 
 
 package syndication.testdata
 
 import com.ctacorp.syndication.social.SocialMediaAccount
 import com.ctacorp.syndication.*
+import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.authentication.*
-import org.codehaus.groovy.grails.commons.ApplicationAttributes
 import syndication.tinyurl.TinyUrlService
-import syndication.youtube.YoutubeService
+import com.ctacorp.syndication.contentextraction.YoutubeService
 import groovy.util.logging.*
 
 /**
@@ -41,13 +40,13 @@ class TestDataPopulator {
     private seedHealthReportTestsData(){
         Language english = Language.findByIsoCode("eng")
         Source hhs = Source.findByAcronym("HHS")
-
-        saveMedia(new Html(sourceUrl:"http://www.example.com", name:"Valid URL, No Markup", language: english, source:hhs))   //bad markup
-        saveMedia(new Html(sourceUrl:"http://www.example.com/jhgfjkfgyt", name:"Bad URL", language: english, source:hhs))      //404
-        saveMedia(new Video(sourceUrl:"http://www.youtube.com/watch?v=jhgvsdkashj", name:"Bad YoutubeVideo", language: english, source:hhs, duration:500))      //bad youtube
-        saveMedia(new Html(sourceUrl:"http://localdev.com:8080/Syndication/test/threeOTwo", name:"Redirect, should work", language: english, source:hhs))      //302
-        saveMedia(new Html(sourceUrl:"http://localdev.com:8080/Syndication/test/fiveHundred", name:"500 error", language: english, source:hhs))      //500
-        saveMedia(new Html(sourceUrl:"http://localdev.com:8080/Syndication/test/shortContent", name:"short content", language: english, source:hhs))     //short content
+//
+//        saveMedia(new Html(sourceUrl:"http://www.example.com", name:"Valid URL, No Markup", language: english, source:hhs))   //bad markup
+//        saveMedia(new Html(sourceUrl:"http://www.example.com/jhgfjkfgyt", name:"Bad URL", language: english, source:hhs))      //404
+//        saveMedia(new Video(sourceUrl:"http://www.youtube.com/watch?v=jhgvsdkashj", name:"Bad YoutubeVideo", language: english, source:hhs, duration:500))      //bad youtube
+//        saveMedia(new Html(sourceUrl:"http://localdev.com:8080/Syndication/test/threeOTwo", name:"Redirect, should work", language: english, source:hhs))      //302
+//        saveMedia(new Html(sourceUrl:"http://localdev.com:8080/Syndication/test/fiveHundred", name:"500 error", language: english, source:hhs))      //500
+//        saveMedia(new Html(sourceUrl:"http://localdev.com:8080/Syndication/test/shortContent", name:"short content", language: english, source:hhs))     //short content
     }
 
     private saveMedia(MediaItem mi){
@@ -62,16 +61,16 @@ class TestDataPopulator {
     }
 
     def seedMetrics(){
-        def today = new Date()
-        Random randomViewCount = new Random()
-        def batch = []
-
-        Html.list().each { html ->
-            0.step(300, 5) { days ->
-               batch << new MediaMetric([media: html, day: today - days, apiViewCount: randomViewCount.nextInt(150) + 1, storefrontViewCount: randomViewCount.nextInt(100) + 1])
-            }
-        }
-        batchSaver(MediaMetric, batch)
+//        def today = new Date()
+//        Random randomViewCount = new Random()
+//        def batch = []
+//
+//        Html.list().each { html ->
+//            0.step(300, 5) { days ->
+//               batch << new MediaMetric([media: html, day: today - days, apiViewCount: randomViewCount.nextInt(150) + 1, storefrontViewCount: randomViewCount.nextInt(100) + 1])
+//            }
+//        }
+//        batchSaver(MediaMetric, batch)
     }
 
     def seedRealExamples() {
@@ -101,11 +100,17 @@ class TestDataPopulator {
             [title: "Newborn Screening", url: "http://www.cdc.gov/features/newbornscreening50years/index.html", description: "This year marks 50 years of saving lives through newborn screening. How much do you know about newborn screening? Take our quiz to find out."],
             [title: "September Is World Alzheimer's Month", url: "http://www.cdc.gov/features/worldalzheimersday/index.html", description: "Learn more about Alzheimer's disease and efforts to address the nation's sixth leading cause of death."],
             [title: "Childhood Obesity Awareness", url: "http://www.cdc.gov/features/childhoodobesity/index.html", description: "Fruits and vegetables are important in promoting good health, including helping to lose or manage weight."],
-            [title: "Alcohol Screening", url: "http://www.cdc.gov/features/AlcoholScreening/index.html", description: "Whooping cough is very contagious and can cause serious illness―especially in babies too young to be fully vaccinated. Protect babies from whooping cough by getting your vaccine and making sure your baby gets his vaccines."],
             [title: "Vaccinate against Flu", url: "http://www.cdc.gov/features/flu/index.html", description: "Everyone 6 months and older should get an annual flu vaccine. It takes about two weeks after vaccination for your body to develop an immune response. Get vaccinated now so you will be protected all season long!"],
             [title: "High blood pressure education.", url: "http://www.cdc.gov/Features/HighBloodPressure/index.html", description: "May is High Blood Pressure Education Month. Have you talked about a goal for your blood pressure with your health care provider? If not, do it at your next visit."],
             [title: "Asthma Awareness", url: "http://www.cdc.gov/Features/AsthmaAwareness/index.html", description: "Successful asthma management includes knowing the warning signs of an attack, avoiding things that may trigger an attack, and following the advice of your healthcare provider."],
-            [title: "Seasonal Flu", url: "http://www.flu.gov/about_the_flu/seasonal/index.html", description: "Seasonal flu is a contagious respiratory illness caused by flu viruses. Approximately 5-20% of U.S. residents get the flu each year.", hash: "1234abcd"]
+            [title: "Seasonal Flu", url: "http://www.flu.gov/about_the_flu/seasonal/index.html", description: "Seasonal flu is a contagious respiratory illness caused by flu viruses. Approximately 5-20% of U.S. residents get the flu each year.", hash: "1234abcd"],
+            [title: "Ebola Outbreak 2014 - 2015: Information Resources", url: "http://sis.nlm.nih.gov/dimrc/ebola_2014.html", description: "This list of authoritative resources supports the medical response to the 2014-2015 Ebola outbreak. This list is compiled and maintained by the U.S. National Library of Medicine, Disaster Information Management Research Center."],
+            [title: "Flu Season Is Here- Vaccinate to Protect You and Your Loved Ones from Flu", url: "http://t.cdc.gov/synd.aspx?js=0&rid=cs_797&url=http://t.cdc.gov/BWJ", description: "Everyone 6 months and older should get an annual flu vaccine. It takes about two weeks after vaccination for your body to develop full protection against the flu. Get vaccinated by October to protect yourself and your loved ones!."],
+            [title: "Ebola Viral Disease Outbreak — West Africa, 2014", url: "http://www.cdc.gov/mmwr/preview/mmwrhtml/mm6325a4.htm", description: "On June 24, 2014, this report was posted as an MMWR Early Release on the MMWR website (http://www.cdc.gov/mmwr)."],
+            [title: "Take Caution When Bats Are Near - CDC Features", url: "http://www.cdc.gov/Features/Bats/index.html", description: "Bats play an important role in our ecosystem. However, they are also associated with diseases deadly to humans. Learn how you can stay safe when bats are near."],
+            [title: "Symptoms", url: "http://www.flu.gov/symptoms-treatment/symptoms/index.html", description: "Find a list of flu symptoms, a comparison of flu and cold symptoms, and guidance on when to seek emergency medical assistance on Flu.gov."],
+            [title: "Trends in Foodborne Illness in the United States, 2012 - Bar Graph - CDC Features", url: "http://www.cdc.gov/Features/dsfoodnet2012/figure1.html", description: "Documenting trends—which illnesses are decreasing and increasing—is essential for monitoring our progress in reducing foodborne illness."]
+
         ]
 
         def batch = []
@@ -289,11 +294,11 @@ class TestDataPopulator {
 
         def allItems = MediaItem.list()
 
-        (ran.nextInt(10) + 5).times {
+        (ran.nextInt(10) + 10).times {
             randomCollection.addToMediaItems(allItems[ran.nextInt(allItems.size())])
         }
 
-        println "${MediaItem.where { eq 'class', 'com.ctacorp.syndication.Collection' }.count()} Collections created."
+        println "${MediaItem.where { eq 'class', 'com.ctacorp.syndication.media.Collection' }.count()} Collections created."
 
         // Facebook users -----------------------------------
         def fbUser = new SocialMediaAccount(accountName: "steffen.gates.94", accountType: "facebook")
@@ -388,14 +393,15 @@ class TestDataPopulator {
         Random ran = new Random()
 
         campaigns.each { campaign ->
-            ran.nextInt(10).times {
+            (ran.nextInt(10)+5).times {
                 def med = media[ran.nextInt(media.size())]
                 campaign.addToMediaItems(med)
             }
         }
     }
 
-    def seedCampaigns() {
+    def 
+    seedCampaigns() {
         def diseases = ["Achondroplasia",
             "Acne",
             "AIDS",
@@ -437,6 +443,40 @@ class TestDataPopulator {
                 endDate: new Date() + it.size(),
                 source:Source.findByAcronym("HHS"))
         }
+        
+        //custom campaigns
+        batch << new Campaign(
+                name:"Ebola",
+                description:"Ebola News",
+                startDate: new Date(),
+                endDate: new Date() + 10,
+                source:Source.findByAcronym("CDC"),
+                mediaItems: MediaItem.findAllByNameInList(["Ebola Outbreak 2014 - 2015: Information Resources","Ebola Viral Disease Outbreak — West Africa, 2014",""])
+        )
+        
+        batch << new Campaign(
+                name:"Disease",
+                description:"Recent Disease out breaks and preventative measures.",
+                startDate: new Date(),
+                endDate: new Date() + 10,
+                source:Source.findByAcronym("CDC"),
+                mediaItems: MediaItem.findAllByNameInList(["Flu Season Is Here- Vaccinate to Protect You and Your Loved Ones from Flu", "Trends in Foodborne Illness in the United States, 2012 - Bar Graph - CDC Features", "Symptoms", "Hand, Foot, and Mouth Disease"])
+        )
+        
+        batch << new Campaign(
+                name:"Real Cost Videos",
+                description:"A couple of videos",
+                startDate: new Date(),
+                endDate: new Date() + 10,
+                source:Source.findByAcronym("HHS"),
+                mediaItems: MediaItem.findAllBySourceUrlInList(["http://www.youtube.com/watch?v=zhbXENhrkTA", "http://www.youtube.com/watch?v=asarKLMCvdo", "http://www.youtube.com/watch?v=a_M9tTwLb9A","http://www.youtube.com/watch?v=mcteRv08Aco"])
+        )
+        //Real Cost videos
+//        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=zhbXENhrkTA", english, fda)
+//        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=asarKLMCvdo", english, fda)
+//        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=a_M9tTwLb9A", english, fda)
+//        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=mcteRv08Aco", english, fda)
+        
         batchSaver(Campaign, batch)
     }
 

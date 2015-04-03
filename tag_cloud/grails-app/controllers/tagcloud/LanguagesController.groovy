@@ -1,15 +1,9 @@
 package tagcloud
 
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.commons.util.Util
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
-import tagcloud.domain.Tag
-
-import static org.springframework.http.HttpStatus.NOT_FOUND
-import static org.springframework.http.HttpStatus.NOT_MODIFIED
-import static org.springframework.http.HttpStatus.OK
 
 @Secured(['permitAll'])
 class LanguagesController {

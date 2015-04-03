@@ -27,11 +27,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         </div>
         <div class="panel-footer">
             <a style="margin-right: .5em" class="btn btn-default" href="${createLink(action: 'index')}" role="button">List</a>
+            <g:if test="${['emailSubscription','restSubscription','rhythmyxSubscription'].contains(params.controller)}">
+                <a style="margin-right: .5em" class="btn btn-warning" href="${createLink(action: 'deliver', id: instance.id)}" role="button">Force Deliver</a>
+            </g:if>
+
             <g:if test="${allowEdit}">
                 <button style="margin-right: .5em" class="btn btn-success" type="submit" onclick="return document.forms[1].submit();">Edit</button>
             </g:if>
             <g:if test="${allowDelete}">
-                <button class="btn btn-danger" type="submit" onclick="return document.forms[2].submit();">Delete</button>
+                <button class="btn btn-danger" type="submit" onclick="return confirmDelete('${entityName}');">Delete</button>
             </g:if>
         </div>
     </div>

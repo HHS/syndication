@@ -1,6 +1,5 @@
 package com.ctacorp.syndication.authentication
 
-import com.ctacorp.syndication.authentication.CustomAuthenticationException
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService

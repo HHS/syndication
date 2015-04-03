@@ -23,17 +23,16 @@ class Subscriber {
     KeyAgreement keyAgreement
     Date dateCreated
     Date lastUpdated
-    boolean isPrivileged
-
+    // TODO: We should remove this field...its not really used
+    Boolean isPrivileged = false
     String subscriberId
-    boolean sendKeyAgreement = true
-    static transients = ['sendKeyAgreement']
 
     static constraints = {
         name nullable: false, blank: false, unique: true
         email nullable:false, email:true
         keyAgreement nullable: true, unique: true
         subscriberId nullable: true, blank: false
+        isPrivileged nullable: true
     }
 
     def beforeInsert() {

@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <head>
 <meta name='layout' content='storefront' />
 <title><g:message code="springSecurity.denied.title" /></title>

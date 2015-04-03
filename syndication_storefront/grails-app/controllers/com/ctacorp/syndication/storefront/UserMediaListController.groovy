@@ -1,11 +1,15 @@
 package com.ctacorp.syndication.storefront
 
-import com.ctacorp.syndication.MediaItem
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.NOT_FOUND
+
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.authentication.User
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
-import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 
 @Transactional(readOnly = true)
@@ -18,7 +22,6 @@ class UserMediaListController {
     def mediaService
 
     def index(Integer max) {
-        User currentUser = springSecurityService.getCurrentUser() as User
         params.max = Math.min(max ?: 10, 100)
 
         def userMediaLists = UserMediaList.where{
@@ -38,7 +41,7 @@ class UserMediaListController {
 
     def mediaSearch(String q){
         response.contentType = "application/json"
-        render MediaItem.facetedSearch([nameContains:q, active:true, visibleInStorefront:true]).list([max:15]).collect{ [name:"${it.id} - ${it.name}", id:it.id] } as JSON
+        render MediaItem.facetedSearch([nameContains:q, active:true, visibleInStorefront:true,syndicationVisibleBeforeDate:new Date()]).list([max:15]).collect{ [name:"${it.id} - ${it.name}", id:it.id] } as JSON
     }
 
     def selectUserMediaList(){
@@ -52,12 +55,8 @@ class UserMediaListController {
             return
         }
 
-        userMediaListInstance.user = springSecurityService.currentUser as User
-        if(!params.mediaItemIds.isEmpty()){
-            params.mediaItemIds.split(",").collect{ it as Long }.each{
-                userMediaListInstance.addToMediaItems(MediaItem.load(it))
-            }
-        }
+        userMediaListInstance.user = springSecurityService.getCurrentUser() as User
+        addMediaItems(userMediaListInstance)
 
         userMediaListInstance.validate()
         if (userMediaListInstance.hasErrors()) {
@@ -78,23 +77,28 @@ class UserMediaListController {
     }
 
     def edit(UserMediaList userMediaListInstance) {
+        if(!userMediaListInstance){
+            notFound()
+            return
+        }
+
         String mediaItemList = userMediaListInstance.mediaItems?.collect{ [id:it.id, name:"${it.id} - ${it.name}"] } as JSON
         respond userMediaListInstance, model:[mediaItemList:mediaItemList, featuredMedia: mediaService.getFeaturedMedia(max:20)]
     }
 
     @Transactional
     def update(UserMediaList userMediaListInstance) {
-        if (userMediaListInstance == null) {
+        if (!userMediaListInstance) {
             notFound()
             return
         }
 
-        userMediaListInstance.mediaItems.clear()
-        if(!params.mediaItemIds.isEmpty()){
-            params.mediaItemIds.split(",").collect{ it as Long }.each{
-                userMediaListInstance.addToMediaItems(MediaItem.load(it))
-            }
+        if(userMediaListInstance.user != springSecurityService.getCurrentUser() as User){
+            userMediaListInstance.errors.reject("invalid.ownership", "You tried to update a media list you don't own, has your login expired?")
+            respond userMediaListInstance.errors, view: 'edit'
+            return
         }
+        addMediaItems(userMediaListInstance)
 
         userMediaListInstance.validate()
         if (userMediaListInstance.hasErrors()) {
@@ -115,7 +119,6 @@ class UserMediaListController {
 
     @Transactional
     def delete(UserMediaList userMediaListInstance) {
-
         if (userMediaListInstance == null) {
             notFound()
             return
@@ -139,6 +142,15 @@ class UserMediaListController {
                 redirect action: "index", method: "GET"
             }
             '*' { render status: NOT_FOUND }
+        }
+    }
+
+    protected addMediaItems(UserMediaList userMediaListInstance){
+        userMediaListInstance?.mediaItems?.clear()
+        if(params.mediaItemIds){
+            params.mediaItemIds.split(",").collect{ it as Long }.each{
+                userMediaListInstance.addToMediaItems(MediaItem.load(it))
+            }
         }
     }
 }

@@ -17,13 +17,8 @@ package syndication.marshal
 
 import clover.com.lowagie.text.html.HtmlEncoder
 import com.ctacorp.syndication.ExtendedAttribute
-import com.ctacorp.syndication.SocialMedia
+import com.ctacorp.syndication.media.SocialMedia
 import grails.converters.JSON
-import syndication.preview.ThumbnailService
-import syndication.rest.MediaService
-import syndication.tag.TagsService
-import syndication.tinyurl.TinyUrlService
-
 /**
  * Created with IntelliJ IDEA.
  * User: Steffen Gates
@@ -31,15 +26,12 @@ import syndication.tinyurl.TinyUrlService
  * Time: 4:22 PM
  */
 class SocialMediaMarshaller {
-    ThumbnailService thumbnailService
-    TinyUrlService tinyUrlService
-    TagsService tagsService
-    MediaService mediaService
+    def services
 
     SocialMediaMarshaller() {
         JSON.registerObjectMarshaller(SocialMedia) { SocialMedia sm ->
-            def tinyInfo = mediaService.getTinyUrlInfoForMediaItemForAPIResponse(sm)
-            def campaigns = mediaService.getCampaignsForAPIResponse(sm)
+            def tinyInfo = services.mediaService.getTinyUrlInfoForMediaItemForAPIResponse(sm)
+            def campaigns = services.mediaService.getCampaignsForAPIResponse(sm)
 
             def attr = HtmlEncoder.encode("<div id='hhsAttribution'>Content provided and maintained by <a href='${sm.source.websiteUrl}' target='_blank'>Health and Human Services</a> (HHS). Please see our system <a href='http:syndication.hhs.gov' target='_blank'>usage guidelines and disclaimer</a>.</div>")
 
@@ -50,7 +42,6 @@ class SocialMediaMarshaller {
                     description:            sm.description,
                     sourceUrl:              sm.sourceUrl,
                     targetUrl:              sm.targetUrl,
-                    customThumbnailUrl:      sm.customThumbnailUrl,
                     dateContentAuthored:    sm.dateContentAuthored,
                     dateContentUpdated:     sm.dateContentUpdated,
                     dateContentPublished:   sm.dateContentPublished,
@@ -64,10 +55,11 @@ class SocialMediaMarshaller {
                     source:                 sm.source,
                     alternateImages:        sm.alternateImages,
                     campaigns:              campaigns,
-                    tags:                   mediaService.getTagsForMediaItemForAPIResponse(sm),
+                    tags:                   services.mediaService.getTagsForMediaItemForAPIResponse(sm),
                     tinyUrl:                tinyInfo.tinyUrl,
                     tinyToken:              tinyInfo.tinyUrlToken,
-                    thumbnailUrl:           thumbnailService.getDefaultSocialThumbnail(),
+                    thumbnailUrl:           services.urlService.getThumbnailUrl(sm.id),
+                    previewlUrl:            services.urlService.getPreviewUrl(sm.id),
                     attribution:            attr,
                     extendedAttributes:     marshalDescriptor(sm.extendedAttributes)
             ]

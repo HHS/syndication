@@ -17,6 +17,7 @@ package com.ctacorp.syndication
 import com.ctacorp.grails.swagger.annotations.Model
 import com.ctacorp.grails.swagger.annotations.ModelProperty
 import com.ctacorp.grails.swagger.annotations.PropertyAttribute
+import com.ctacorp.syndication.media.MediaItem
 
 @Model(id = "AlternateImage", properties = [
     @ModelProperty(propertyName = "id",     attributes = [@PropertyAttribute(type = "integer", format = "int64",       required = true)]),

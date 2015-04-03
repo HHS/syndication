@@ -12,22 +12,36 @@ Redistribution and use in source and binary forms, with or without modification,
 
 --%>
 <%@ page import="org.springframework.validation.FieldError" %>
-<g:hasErrors bean="${instance}">
+
+<g:if test="${flash.errors}">
+    %{--<div class="alert alert-error" style="display: block">${flash.errors}</div>--}%
     <div class="container-fluid">
-        <g:eachError bean="${instance}" var="error">
-            <g:if test="${!((
-                error.field == 'title' ||
-                error.field == 'subscription'
-            ) && (
-                controllerName == 'emailSubscription' ||
-                controllerName == 'restSubscription'
-            ))}">
-                <div class="alert alert-danger" role="alert">
-                    <g:if test="${error in FieldError}">
-                        <g:message error="${error}"/>
-                    </g:if>
-                </div>
-            </g:if>
-        </g:eachError>
+        <div class="row"><div class="alert alert-danger alert-dismissable break-word">
+        <g:each in="${flash.errors}" var="error">
+            <div class="" role="alert">${error.message}</div>
+        </g:each>
+        </ul></div></div>
     </div>
-</g:hasErrors>
+</g:if>
+<g:else>
+
+    <g:hasErrors bean="${instance}">
+        <div class="container-fluid">
+            <g:eachError bean="${instance}" var="error">
+                <g:if test="${!((
+                        error.field == 'title' ||
+                                error.field == 'subscription'
+                ) && (
+                        controllerName == 'emailSubscription' ||
+                                controllerName == 'restSubscription'
+                ))}">
+                    <div class="alert alert-danger" role="alert">
+                        <g:if test="${error in FieldError}">
+                            <g:message error="${error}"/>
+                        </g:if>
+                    </div>
+                </g:if>
+            </g:eachError>
+        </div>
+    </g:hasErrors>
+</g:else>

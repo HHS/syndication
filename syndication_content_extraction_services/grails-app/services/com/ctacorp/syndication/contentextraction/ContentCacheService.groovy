@@ -14,7 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.contentextraction
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.cache.CachedContent
 import grails.transaction.Transactional
 
@@ -47,8 +47,17 @@ class ContentCacheService {
 
     @Transactional(readOnly = true)
     CachedContent get(MediaItem media){
-        CachedContent cached = CachedContent.findByMediaItem(media)
-        return cached
+        CachedContent.findByMediaItem(media)
+    }
+
+    @Transactional(readOnly = true)
+    CachedContent get(String url){
+        CachedContent cached = CachedContent.where{
+            mediaItem{
+                sourceUrl == url
+            }
+        }.find()
+        cached
     }
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

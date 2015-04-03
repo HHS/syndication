@@ -1,4 +1,3 @@
-
 %{--
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -14,6 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 --}%
 
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 	<head>
 		<title>
@@ -26,7 +26,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 	</head>
 	<body>
 		<g:if env="development">
-			<g:renderException exception="${exception}" />
+			<g:renderException exception="${exception}"/>
 		</g:if>
 		<g:if env="production" test="${grailsApplication.config.showDetailedErrorMessagesInProduction}">
 			<g:renderException exception="${exception}" />
@@ -34,7 +34,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 		<g:elseif env="production">
 			<ul class="errors">
 				<li>An error has occurred</li>
-				<li>Please notify an administrator, and provide some details about what your were trying to do.</li>
+				<li>Please notify an administrator, and provide some details about what your were trying to do along with the error code '${errorCode}'.</li>
 				<li>The current time is ${new Date()}</li>
 			</ul>
 		</g:elseif>

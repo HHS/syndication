@@ -3,7 +3,6 @@ package com.ctacorp.tagcloud.service
 import com.ctacorp.syndication.Language
 import tagcloud.domain.ContentItem
 import tagcloud.domain.Tag
-import grails.test.spock.IntegrationSpec
 import spock.lang.Specification
 import tagcloud.domain.TagType
 

@@ -1,5 +1,31 @@
+
 <script>
+
+    //determines the active tab
+    $(function() {
+        //for bootstrap 3 use 'shown.bs.tab' instead of 'shown' in the next line
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            //save the latest tab; use cookies if you like 'em better:
+            localStorage.setItem('lastTab', $(e.target).attr('id'));
+        });
+
+        //go to the latest tab, if it exists:
+        console.log(localStorage.getItem('lastTab'));
+        var lastTab = localStorage.getItem('lastTab');
+        if (lastTab) {
+            $('#'+lastTab).tab('show');
+        }
+    });
+    
+    
+    %{--Single MediaItems--}%
     $(document).ready(function(){
+        if(localStorage.getItem('lastTab') == "singleMediaItem"){
+            initLineChart();
+            initDayDonut();
+            initWeekDonut();
+        }
+        
         $("#singleMediaApi").click(function(){
             var labelText = $(this).text();
             $("#lineChartLabel").html("'" + labelText + "' Views Per Month");
@@ -119,9 +145,11 @@
 <script>
 
     $(document).ready(function(){
-        initTopTenLineChart();
-        initStorefrontDonut();
-        initApiDonut();
+        %{--if(${secondTabActive == null}){--}%
+            initTopTenLineChart();
+            initStorefrontDonut();
+            initApiDonut();
+//        }
         $(".topTenDateSelector").click(function(){
             var labelText = $(this).text();
             $("#topTenDonutLabel").html("Views '" + labelText + "'");
@@ -129,7 +157,7 @@
         });
         $(".topTenViewSelector").click(function(){
             var labelText = $(this).text();
-            $("#topTenLineLabel").html("'" + labelText + "' Views Per Month")
+            $("#topTenLineLabel").html("'" + labelText + "' Views Per Month");
             $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/getTopTen.json?extra=555&typeGraph=line&range=365&whichData=' + $(this).attr("id"), function (data) {
                 $("div#topTenGraph").html('');
                 lineTopTen(data,"topTenGraph");
@@ -187,7 +215,7 @@
 
     function initTopTenLineChart(){
         $("div#topTenGraph").text("");
-        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/getTopTen.json?range=365&whichData=storefrontViewCount&typeGraph=line', function (data) {
+        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/getTopTen.json?range=365&whichData=apiViewCount&typeGraph=line', function (data) {
             lineTopTen(data, "topTenGraph");
         });
     }
@@ -236,15 +264,20 @@
             initAgencyApiTopTenDonut($(this).attr("id"));
             initAgencyStorefrontTopTenDonut($(this).attr("id"));
         });
+        if(localStorage.getItem('lastTab') == "singleAgencyTab"){
+            initAgencyTopTenLineChart("apiViewCount");
+            initAgencyStorefrontTopTenDonut(1);
+            initAgencyApiTopTenDonut(1);
+        }
     });
 
     function getAgencyTopTen(){
-        initAgencyTopTenLineChart("storefrontViewCount");
+        initAgencyTopTenLineChart("apiViewCount");
         initAgencyStorefrontTopTenDonut(1);
         initAgencyApiTopTenDonut(1);
     }
     $("#singleAgencyTab").click(function(){
-        initAgencyTopTenLineChart("storefrontViewCount");
+        initAgencyTopTenLineChart("apiViewCount");
         initAgencyStorefrontTopTenDonut(1);
         initAgencyApiTopTenDonut(1);
     });
@@ -360,6 +393,12 @@
             });
         }
 
+        if(localStorage.getItem('lastTab') == "agencyTab"){
+            initAgencyLineChart();
+            initAgencyStorefrontDonut();
+            initAgencyApiDonut();
+        }
+        
         $("#agencyTab").click(function(){
             initAgencyLineChart();
             initAgencyStorefrontDonut();
@@ -415,7 +454,7 @@
     function initAgencyLineChart(){
 
         $("div#agencyGraph").html('<div id="spinnerDiv" style="width:50px;" class="center-block"><asset:image src="spinner.gif"/></div>');
-        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/getAgencyViews.json?range=365&whichData=storefrontViewCount&graphType=line', function (data) {
+        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/getAgencyViews.json?range=365&whichData=apiViewCount&graphType=line', function (data) {
             $("#spinnerDiv").fadeOut("fast",function(){
                 $("div#agencyGraph").html('');
                 agencyLine(data, "agencyGraph");

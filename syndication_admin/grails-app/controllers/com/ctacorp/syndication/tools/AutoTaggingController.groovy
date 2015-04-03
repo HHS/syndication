@@ -1,7 +1,7 @@
 package com.ctacorp.syndication.tools
 
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.authentication.UserRole
 import grails.plugin.springsecurity.annotation.Secured
@@ -70,7 +70,13 @@ class AutoTaggingController {
         def mediaCount = 0
         def tagCount = 0
         Language mediaLanguage = Language.get(languageId)
-        def tagLanguage = tagService.getAllActiveTagLanguages().find{ it.isoCode == mediaLanguage.isoCode }.id
+        def tagLanguage = tagService.getAllActiveTagLanguages().find{ it.isoCode == mediaLanguage.isoCode }?.id
+        if(!tagLanguage) {
+            flash.message = "Tag Cloud does not currently support the language '${mediaLanguage}'"
+            redirect action:'suggestedTags', params: [lastIndex:params.long("lastIndex"), languageId:params.long('languageId')]
+            return
+        }
+        
         for(mediaItem in mediaItems){
             if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
                 if(MediaItemSubscriber.findByMediaItem(mediaItem).subscriberId != springSecurityService.currentUser.subscriberId){
@@ -95,7 +101,7 @@ class AutoTaggingController {
             tagService.tag(tagIds.join(","), mediaItem.id)
         }
         flash.message = "$mediaCount media items were tagged with $tagCount tags."
-        redirect action:'suggestedTags', params: [lastIndex:params.long("lastIndex")]
+        redirect action:'suggestedTags', params: [lastIndex:params.long("lastIndex"), languageId:params.long('languageId')]
     }
 
     def tagSingle(Long mediaId, Long languageId){
@@ -107,7 +113,13 @@ class AutoTaggingController {
         }
         def tags = params.tags
         Language mediaLanguage = Language.get(languageId)
-        def tagLanguage = tagService.getAllActiveTagLanguages().find{ it.isoCode == mediaLanguage.isoCode }.id
+        def tagLanguage = tagService.getAllActiveTagLanguages().find{ it.isoCode == mediaLanguage.isoCode }?.id
+        if(!tagLanguage) {
+            flash.message = "Tag Cloud does not currently support this language '${mediaLanguage}'"
+            redirect action:'suggestedTags', params: [languageId:params.long('languageId'), lastIndex:params.long('firstIndex')]
+            return
+        }
+        
         def tagIds = []
 
         if(tags.getClass().isArray()) {

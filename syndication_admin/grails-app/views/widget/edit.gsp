@@ -1,4 +1,3 @@
-
 %{--
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -13,8 +12,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Widget" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.media.Widget" %>
 <html>
 	<head>
 		<meta name="layout" content="main">
@@ -27,7 +27,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<synd:message/>
 			<synd:errors/>
 			<synd:error/>
-			<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+			<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_USER, ROLE_PUBLISHER">
 				<div class="row">
 					<div class="col-md-8">
 						<g:form class="form-horizontal" url="[resource:widgetInstance, action:'update']" method="PUT" >

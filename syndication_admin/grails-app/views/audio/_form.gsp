@@ -12,7 +12,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Audio" %>
+<%@ page import="com.ctacorp.syndication.media.Audio" %>
 
 
 <!-- Text input-->
@@ -55,7 +55,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: audio, field: 'dateSyndicationCaptured', 'error')} required">
+<!-- Text input-->
+<div class="form-group">
+    <label class="col-md-4 control-label" for="customPreviewUrl">Custom Preview Url</label>
+    <div class="col-md-8">
+        <input id="customPreviewUrl" name="customPreviewUrl" maxlength="2000" value="${audioInstance?.customPreviewUrl}" type="url" placeholder="preview url" class="form-control input-md">
+    </div>
+</div>
+
+<div class="form-group ${hasErrors(bean: audioInstance, field: 'dateSyndicationCaptured', 'error')} required">
     <label class="col-md-4 control-label" for="dateSyndicationCaptured">
         <g:message code="audio.dateSyndicationCaptured.label" default="Date Syndication Captured"/>
         <span class="required-indicator">*</span>
@@ -65,7 +73,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: audio, field: 'dateSyndicationUpdated', 'error')} required">
+<div class="form-group ${hasErrors(bean: audioInstance, field: 'dateSyndicationUpdated', 'error')} required">
     <label class="col-md-4 control-label" for="dateSyndicationUpdated">
         <g:message code="audio.dateSyndicationUpdated.label" default="Date Syndication Updated"/>
         <span class="required-indicator">*</span>
@@ -75,7 +83,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: audio, field: 'dateSyndicationVisible', 'error')} required">
+<div class="form-group ${hasErrors(bean: audioInstance, field: 'dateSyndicationVisible', 'error')} required">
     <label class="col-md-4 control-label" for="dateSyndicationVisible">
         <g:message code="audio.dateSyndicationVisible.label" default="Date Syndication Visible"/>
         <span class="required-indicator">*</span>
@@ -85,7 +93,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: audio, field: 'dateContentAuthored', 'error')} ">
+<div class="form-group ${hasErrors(bean: audioInstance, field: 'dateContentAuthored', 'error')} ">
     <label class="col-md-4 control-label" for="dateContentAuthored">
         <g:message code="audio.dateContentAuthored.label" default="Date Content Authored"/>
     </label>
@@ -94,7 +102,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: audio, field: 'dateContentUpdated', 'error')} ">
+<div class="form-group ${hasErrors(bean: audioInstance, field: 'dateContentUpdated', 'error')} ">
     <label class="col-md-4 control-label" for="dateContentUpdated">
         <g:message code="audio.dateContentUpdated.label" default="Date Content Updated"/>
     </label>
@@ -103,7 +111,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: audio, field: 'dateContentPublished', 'error')} ">
+<div class="form-group ${hasErrors(bean: audioInstance, field: 'dateContentPublished', 'error')} ">
     <label class="col-md-4 control-label" for="dateContentPublished">
         <g:message code="audio.dateContentPublished.label" default="Date Content Published"/>
     </label>
@@ -112,7 +120,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: audio, field: 'dateContentReviewed', 'error')} ">
+<div class="form-group ${hasErrors(bean: audioInstance, field: 'dateContentReviewed', 'error')} ">
     <label class="col-md-4 control-label" for="dateContentReviewed">
         <g:message code="audio.dateContentReviewed.label" default="Date Content Reviewed"/>
     </label>
@@ -122,10 +130,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 </div>
 
 <!-- Select Basic -->
-<div class="form-group">
+<div class="form-group ${hasErrors(bean: audioInstance, field: 'dateContentReviewed', 'error')} ">
     <label class="col-md-4 control-label" for="language">Language<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <g:select from="${com.ctacorp.syndication.Language.findAllByIsActive(true, [sort: "name"])}" name="language.id" id="language" optionKey="id" optionValue="name" value="${audioInstance?.language?.id}" class="form-control"/>
+        <g:select from="${com.ctacorp.syndication.Language.findAllByIsActive(true, [sort: "name"])}" name="language.id" id="language" optionKey="id" optionValue="name" value="${audioInstance?.language?.id}" class="form-control" noSelection="${['null':'-Choose a Language-']}"/>
     </div>
 </div>
 
@@ -188,14 +196,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <label class="col-md-4 control-label" for="externalGuid">External Guid</label>
     <div class="col-md-8">
         <input id="externalGuid" name="externalGuid" value="${audioInstance?.externalGuid}" placeholder="guid" class="form-control input-md">
-    </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="hash">Hash</label>
-    <div class="col-md-8">
-        <input id="hash" name="hash" value="${audioInstance?.hash}" class="form-control input-md">
     </div>
 </div>
 

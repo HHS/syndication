@@ -16,7 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.rest
 
 import grails.transaction.Transactional
-import com.ctacorp.syndication.*
+import com.ctacorp.syndication.Language
 
 @Transactional(readOnly = true)
 class LanguagesService {

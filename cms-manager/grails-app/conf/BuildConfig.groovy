@@ -78,13 +78,13 @@ grails.project.dependency.resolution = {
 
         compile 'org.springframework:spring-web:4.0.6.RELEASE'
         compile 'org.bouncycastle:bcprov-jdk16:1.46'
-        compile 'com.ctacorp.commons:api-key-utils:1.5.0'
+        compile 'com.ctacorp.commons:api-key-utils:1.5.1'
         compile 'com.ctacorp:syndication-commons:1.1.7'
         compile ('com.ctacorp.syndication:rsrw:0.1.2') {
             excludes "jboss-common"
         }
-        compile 'com.ctacorp.syndication:syndication-java-sdk-v2:0.1.5'
-        compile 'com.ctacorp.syndication:syndication-swagger-rest-client-v2:0.1.5'
+        compile 'com.ctacorp.syndication:syndication-java-sdk-v2:0.1.6'
+        compile 'com.ctacorp.syndication:syndication-swagger-rest-client-v2:0.1.6'
         compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
     }
 
@@ -98,7 +98,7 @@ grails.project.dependency.resolution = {
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
         compile ":spring-security-core:2.0-RC4"
-        compile ":quartz:1.0.1"
+        compile ":quartz:1.0.2"
         compile ":mail:1.0.7"
         compile ":rest-client-builder:2.0.1"
         compile ":asset-pipeline:1.9.9"
@@ -113,7 +113,6 @@ grails.project.dependency.resolution = {
         runtime ":jquery:1.11.1"
         runtime ":twitter-bootstrap:3.3.1"
 
-        test ":auto-test:1.0.1"
         test ":build-test-data:2.2.2"
     }
 }

@@ -1,6 +1,6 @@
 package com.ctacorp.syndication.storefront
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 /**
  * The logic for the syndicate this page widget
  *

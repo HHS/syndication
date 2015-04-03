@@ -16,12 +16,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.marshal
 
 import clover.com.lowagie.text.html.HtmlEncoder
+import com.ctacorp.syndication.ExtendedAttribute
+import com.ctacorp.syndication.media.Infographic
 import grails.converters.JSON
-import com.ctacorp.syndication.*
-import syndication.rest.MediaService
-import syndication.tag.TagsService
-import syndication.preview.ThumbnailService
-import syndication.tinyurl.TinyUrlService
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,15 +28,12 @@ import syndication.tinyurl.TinyUrlService
  *
  */
 class InfographicMarshaller {
-    ThumbnailService thumbnailService
-    TinyUrlService tinyUrlService
-    TagsService tagsService
-    MediaService mediaService
+    def services
 
     InfographicMarshaller(){
         JSON.registerObjectMarshaller(Infographic){ Infographic ig ->
-            def tinyInfo = mediaService.getTinyUrlInfoForMediaItemForAPIResponse(ig)
-            def campaigns = mediaService.getCampaignsForAPIResponse(ig)
+            def tinyInfo = services.mediaService.getTinyUrlInfoForMediaItemForAPIResponse(ig)
+            def campaigns = services.mediaService.getCampaignsForAPIResponse(ig)
 
             def attr = HtmlEncoder.encode("<div id='hhsAttribution'>Content provided and maintained by <a href='${ig.source.websiteUrl}' target='_blank'>Health and Human Services</a> (HHS). Please see our system <a href='http:syndication.hhs.gov' target='_blank'>usage guidelines and disclaimer</a>.</div>")
 
@@ -50,7 +44,6 @@ class InfographicMarshaller {
                 description:            ig.description,
                 sourceUrl:              ig.sourceUrl,
                 targetUrl:              ig.targetUrl,
-                customThumbnailUrl:      ig.customThumbnailUrl,
                 width:                  ig.width,
                 height:                 ig.height,
                 dateContentAuthored:    ig.dateContentAuthored,
@@ -63,13 +56,14 @@ class InfographicMarshaller {
                 language:               ig.language,
                 externalGuid:           ig.externalGuid,
                 contentHash:            ig.hash,
-                tags:                   mediaService.getTagsForMediaItemForAPIResponse(ig),
+                tags:                   services.mediaService.getTagsForMediaItemForAPIResponse(ig),
                 source:                 ig.source,
                 alternateImages:        ig.alternateImages,
                 campaigns:              campaigns,
                 tinyUrl:                tinyInfo.tinyUrl,
                 tinyToken:              tinyInfo.tinyUrlToken,
-                thumbnailUrl :          thumbnailService.getThumbnailUrl(ig.id),
+                thumbnailUrl:           services.urlService.getThumbnailUrl(ig.id),
+                previewlUrl:            services.urlService.getPreviewUrl(ig.id),
                 attribution:            attr,
                 extendedAttributes:     marshalDescriptor(ig.extendedAttributes)
             ]

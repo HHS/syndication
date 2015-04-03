@@ -1,4 +1,4 @@
-<%@ page import="com.ctacorp.syndication.manager.cms.UserRole; org.apache.commons.lang3.RandomStringUtils" %>
+<%@ page import="com.ctacorp.syndication.manager.cms.UserSubscriber; com.ctacorp.syndication.manager.cms.UserRole; org.apache.commons.lang3.RandomStringUtils" %>
 <%--
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -22,10 +22,21 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <dd>${RandomStringUtils.random(20,'•')}</dd>
 </g:if>
 
-<dt><g:message code="role.label" default="Role" /></dt>
+<dt><g:message code="role.label" /></dt>
 <dd>
     <g:set var="role" value="${UserRole.findByUser(instance)?.role}"/>
     <g:link controller="role" action="show" id="${role?.id}">${role?.authority}</g:link>
+</dd>
+
+<dt><g:message code="user.subscribers.label" /></dt>
+<dd>
+    <g:set var="subscribers" value="${UserSubscriber.findAllByUser(instance)*.subscriber}"/>
+    <g:set var="subscriberIndex" value="${0}"/>
+    <div>
+        <g:each in="${subscribers}" var="subscriber">
+            <g:link controller="subscriber" action="show" id="${subscriber.id}">${subscriber.name}</g:link><g:if test="${++subscriberIndex < subscribers.size()}">,</g:if>
+        </g:each>
+    </div>
 </dd>
 
 <dt><g:message code="user.accountExpired.label" default="Account Expired" /></dt>

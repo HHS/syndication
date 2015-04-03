@@ -14,7 +14,6 @@ Redistribution and use in source and binary forms, with or without modification,
 <%@ page import="com.ctacorp.syndication.manager.cms.RhythmyxSubscriber; com.ctacorp.syndication.manager.cms.RhythmyxSubscription" %>
 
 <g:render template="../mediaItems/datatables"/>
-
 <div class="form-group ${hasErrors(bean: instance, field: 'targetFolder', 'has-error')} ">
     <label class="control-label col-sm-3" for="targetFolder">
         <g:message code="rhythmyxSubscription.targetFolder.label" />
@@ -45,9 +44,10 @@ Redistribution and use in source and binary forms, with or without modification,
 <div class="form-group ${hasErrors(bean: instance, field: 'rhythmyxSubscriber', 'error')}">
     <label class="control-label col-sm-3" for="rhythmyxSubscriber">
         <g:message code="rhythmyxSubscription.rhythmyxSubscriber.label" />
+        <i class="fa fa-asterisk"></i>
     </label>
     <div class="controls col-sm-6">
-        <g:select class="form-control" id="rhythmyxSubscriber" name="rhythmyxSubscriber" from="${RhythmyxSubscriber.list()}" optionKey="id" required="required" optionValue="instanceName" value="${instance?.rhythmyxSubscriber?.id}" />
+        <g:select class="form-control" id="rhythmyxSubscriber" name="rhythmyxSubscriber" from="${flash.rhythmyxSubscribers}" optionKey="id" required="required" optionValue="instanceName" value="${instance?.rhythmyxSubscriber?.id}" />
     </div>
 </div>
 

@@ -5,7 +5,8 @@
   Time: 8:14 AM
 --%>
 
-<%@ page contentType="text/html" %>
+<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="grails.util.Holders; com.ctacorp.syndication.health.FlaggedMedia" %>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -18,10 +19,23 @@
     font-family:Arial;
   }
 
-  .banner{
-    font-size:48px;
-    padding-left:10px;
-    color:#3b3137;
+  @media (min-width:725px){
+    .banner{
+      font-size:48px;
+      padding-left:10px;
+      color:#3b3137;
+    }
+  }
+
+  @media (max-width: 724px) {
+    .banner {
+      font-size: 33px;
+      padding-left:10px;
+      color:#3b3137;
+    }
+    h1{
+      font-size:1.1em;
+    }
   }
 
   .banner span{

@@ -16,6 +16,7 @@ package com.ctacorp.syndication.manager.cms
 import com.budjb.rabbitmq.RabbitMessageBuilder
 import com.ctacorp.syndication.commons.mq.Message
 import com.ctacorp.syndication.commons.mq.MessageType
+import com.ctacorp.syndication.manager.cms.utils.mq.SubscriptionType
 import grails.transaction.Transactional
 import grails.util.Holders
 import org.apache.commons.lang.RandomStringUtils
@@ -24,10 +25,6 @@ import javax.annotation.PostConstruct
 
 @Transactional
 class QueueService {
-
-    static final String SUBSCRIPTION_TYPE_RHYTHMYX = 'rhythmyx'
-    static final String SUBSCRIPTION_TYPE_EMAIL = 'email'
-    static final String SUBSCRIPTION_TYPE_REST = 'rest'
 
     Integer maxAttempts
 
@@ -39,15 +36,15 @@ class QueueService {
     }
 
     void sendToRhythmyxErrorQueue(MessageType messageType, long subscriptionId, String mediaId, int attempts) {
-        sendToErrorQueue(messageType, subscriptionId, mediaId, 'rhythmyxErrorDelayQueue', attempts, SUBSCRIPTION_TYPE_RHYTHMYX)
+        sendToErrorQueue(messageType, subscriptionId, mediaId, 'rhythmyxErrorDelayQueue', attempts, SubscriptionType.RHYTHMYX)
     }
 
     void sendToEmailErrorQueue(MessageType messageType, long subscriptionId, String mediaId, int attempts) {
-        sendToErrorQueue(messageType, subscriptionId, mediaId, 'emailErrorDelayQueue', attempts, SUBSCRIPTION_TYPE_EMAIL)
+        sendToErrorQueue(messageType, subscriptionId, mediaId, 'emailErrorDelayQueue', attempts, SubscriptionType.EMAIL)
     }
 
     void sendToRestErrorQueue(MessageType messageType, long subscriptionId, String mediaId, int attempts) {
-        sendToErrorQueue(messageType, subscriptionId, mediaId, 'restErrorDelayQueue', attempts, SUBSCRIPTION_TYPE_REST)
+        sendToErrorQueue(messageType, subscriptionId, mediaId, 'restErrorDelayQueue', attempts, SubscriptionType.REST)
     }
 
     void sendToRhythmyxUpdateQueue(MessageType messageType, long subscriptionId) {
@@ -66,7 +63,8 @@ class QueueService {
         sendToQueue(queueName, new Message(messageType: messageType, subscriptionId: subscriptionId).toJsonString())
     }
 
-    void sendToErrorQueue(MessageType messageType, long subscriptionId, String mediaId, String queueName, int attempts, String subscriptionType) {
+    void sendToErrorQueue(MessageType messageType, long subscriptionId, String mediaId, String queueName, int attempts, SubscriptionType subscriptionType) {
+
         def message = new Message(messageType: messageType, subscriptionId: subscriptionId, mediaId: mediaId, meta: [attempts: ++attempts])
         def jsonString = message.toJsonString()
 
@@ -77,35 +75,28 @@ class QueueService {
             log.error("Gave up requeuing the message: \n${jsonString} on the '${queueName}'")
             log.error("Failure log ID: ${errorCode}")
 
-            def ignoreHibernateOptimisticLockingFailureException = { domainInstance ->
-                try {
-                    domainInstance.deliveryFailureLogId = errorCode
-                    domainInstance.save(flush: true)
-                } catch (ignored) {
-                    log.warn("Could not save the ${subscriptionType} subscription with id '${domainInstance.id}'. Perhaps it was deleted.")
-                }
+            def cleanup = { domainInstance ->
+                handleOtherWiseHorribleErrors(messageType, domainInstance, subscriptionType, attempts, errorCode)
             }
 
             switch (subscriptionType) {
 
-                case SUBSCRIPTION_TYPE_RHYTHMYX:
+                case SubscriptionType.RHYTHMYX:
                     def rhythmyxSubscription = RhythmyxSubscription.findById(subscriptionId)
-                    ignoreHibernateOptimisticLockingFailureException(rhythmyxSubscription)
+                    cleanup(rhythmyxSubscription)
                     break
 
-                case SUBSCRIPTION_TYPE_REST:
+                case SubscriptionType.REST:
                     def restSubscription = RestSubscription.findById(subscriptionId)
                     if(restSubscription) {
-                        restSubscription.isPending = false
-                        ignoreHibernateOptimisticLockingFailureException(restSubscription)
+                        cleanup(restSubscription)
                     }
                     break
 
-                case SUBSCRIPTION_TYPE_EMAIL:
+                case SubscriptionType.EMAIL:
                     def emailSubscription = EmailSubscription.findById(subscriptionId)
                     if(emailSubscription) {
-                        emailSubscription.isPending = false
-                        ignoreHibernateOptimisticLockingFailureException(emailSubscription)
+                        cleanup(emailSubscription)
                     }
                     break
 
@@ -114,8 +105,25 @@ class QueueService {
             }
 
         } else {
-            log.warn("Requeuing the message: \n${jsonString} on the '${queueName}'")
+            if(attempts > 1) {
+                log.warn("Requeuing the message: \n${jsonString} on the '${queueName}'")
+            }
             sendToQueue(queueName, jsonString)
+        }
+    }
+
+    void handleOtherWiseHorribleErrors(MessageType messageType, domainInstance, SubscriptionType subscriptionType, int attempts, String errorCode) {
+
+        try {
+            if (messageType == messageType.DELETE) {
+                log.warn("Forcefully deleting '${subscriptionType}' subscription '${domainInstance?.id}' because ${attempts - 1} attempts have been made to delete it normally.")
+                domainInstance.delete(flush: true)
+            } else {
+                domainInstance.deliveryFailureLogId = errorCode
+                domainInstance.save(flush: true)
+            }
+        } catch (ignored) {
+            log.warn("Could not save '${subscriptionType}' subscription '${domainInstance?.id}'. Perhaps it was deleted.")
         }
     }
 

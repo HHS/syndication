@@ -30,6 +30,7 @@ class RhythmyxSubscriber {
 
     RhythmyxWorkflow rhythmyxWorkflow
     static embedded = ['rhythmyxWorkflow']
+    static transients = ['emailNotificationsEnabled']
 
     static constraints = {
         instanceName(nullable: false, blank: false, unique: true)
@@ -39,5 +40,19 @@ class RhythmyxSubscriber {
         rhythmyxPassword(nullable: false, blank: false)
         rhythmyxCommunity(nullable: false, blank: false)
         rhythmyxWorkflow(nullable: true)
+    }
+
+    boolean getEmailNotificationsEnabled(sourceUrl) {
+        def emailSubscribers = EmailSubscriber.findAllBySubscriber(this.subscriber)
+        emailSubscribers.each { EmailSubscriber emailSubscriber ->
+            if(EmailSubscription.findByEmailSubscriberAndSourceUrl(emailSubscriber, sourceUrl)) {
+                return true
+            }
+        }
+        false
+    }
+    
+    def getEmailSubscribersWithSameSubscriber(){
+        EmailSubscriber.findAllBySubscriber(this.subscriber)
     }
 }

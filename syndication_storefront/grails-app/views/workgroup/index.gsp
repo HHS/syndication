@@ -1,10 +1,6 @@
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%--
-  Created by IntelliJ IDEA.
-  User: sgates
-  Date: 11/20/14
-  Time: 4:05 PM
---%>
+
 <!--[if lt IE 7]>
 <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>

@@ -18,7 +18,6 @@ import com.ctacorp.syndication.commons.mq.MessageType
 import com.ctacorp.syndication.manager.cms.utils.mq.MqUtils
 import com.ctacorp.syndication.manager.cms.utils.mq.RabbitMqConsumerService
 
-@SuppressWarnings("GroovyUnusedDeclaration")
 class RhythmyxSubscriptionConsumerService implements RabbitMqConsumerService {
 
     def rhythmyxSubscriptionUpdateService
@@ -33,61 +32,91 @@ class RhythmyxSubscriptionConsumerService implements RabbitMqConsumerService {
 
         String mediaId = message.mediaId
         MessageType messageType = message.messageType
-        Long rhythmyxSubscriptionId = MqUtils.getSubscriptionId(message)
+        Long subscriptionId = MqUtils.getSubscriptionId(message)
 
-        if (rhythmyxSubscriptionId && messageType == MessageType.IMPORT) {
+        log.info("'${messageType.prettyName()}' message received on the '${rabbitQueue}' for mediaId '${mediaId}' and subscription '${subscriptionId}'")
 
-            log.info("Received an import message on the '${rabbitQueue}' for rhythmyxSubscription '${rhythmyxSubscriptionId}'")
-
-            def success = rhythmyxSubscriptionImportService.importRhythmyxSubscription(rhythmyxSubscriptionId)
-            if (!success) {
-
-                log.error("Import of rhythmyxSubscription '${rhythmyxSubscriptionId}' was unsuccessful")
-                queueService.sendToRhythmyxErrorQueue(MessageType.IMPORT, rhythmyxSubscriptionId, mediaId, attempts)
-
-            } else {
-
-                def rhythmyxSubscription = RhythmyxSubscription.findById(rhythmyxSubscriptionId)
-                if(rhythmyxSubscription) {
-                    rhythmyxSubscriptionTransitionService.doImportTransitions(rhythmyxSubscription)
-                }
-            }
-
-        } else if (mediaId && messageType == MessageType.UPDATE) {
-
-            log.info("Received an update message on the '${rabbitQueue}' for mediaId '${mediaId}'")
-
-            def subscriptions = rhythmyxSubscriptionUpdateService.updateRhythmyxSubscriptions(mediaId)
-
-            List<RhythmyxSubscription> successfulUpdates = subscriptions.successfullUpdates
-            List<RhythmyxSubscription> failedUpdates = subscriptions.failedUpdates
-
-            successfulUpdates.each { rhythmyxSubscription ->
-                rhythmyxSubscription.deliveryFailureLogId = null
-                rhythmyxSubscription.save(flush: true)
-            }
-
-            rhythmyxSubscriptionTransitionService.doUpdateTransitions(successfulUpdates)
-
-            failedUpdates.each { RhythmyxSubscription rhythmyxSubscription ->
-                queueService.sendToRhythmyxErrorQueue(MessageType.UPDATE, rhythmyxSubscription.id, mediaId, attempts)
-            }
-
-        } else if (mediaId && messageType == MessageType.DELETE) {
-
-            log.info("Received a delete message on the '${rabbitQueue}' for mediaId '${mediaId}'")
-
-            def subscription = Subscription.findByMediaId(mediaId)
-            def existingSubscriptions = RhythmyxSubscription.findAllBySubscription(subscription)
-
-            rhythmyxSubscriptionTransitionService.doDeleteTransitions(existingSubscriptions)
-
-            existingSubscriptions.each {
-                subscriptionService.deleteChildSubscription(it)
-            }
-
+        if (subscriptionId && messageType == MessageType.IMPORT) {
+            importSubscription(subscriptionId, attempts)
         } else {
-            log.warn("Received an malformed message '${message.toJsonString()}' on the '${rabbitQueue}' queue")
+
+            if (subscriptionId) {
+
+                def subscription = RhythmyxSubscription.findById(subscriptionId)
+                if (!subscription) {
+                    log.warn("Could not find rhythmyxSubscription '${subscriptionId}'")
+                    return
+                }
+
+                if (messageType == MessageType.UPDATE) {
+                    updateSubscription(subscription, attempts)
+                } else if (messageType == MessageType.DELETE) {
+                    deleteSubscription(subscription)
+                }
+
+            } else if (mediaId) {
+                queueSubscriptions(mediaId, messageType, rabbitQueue)
+            } else {
+                log.warn("Received an malformed message '${message.toJsonString()}' on the '${rabbitQueue}' queue")
+            }
+        }
+    }
+
+    void deleteSubscription(RhythmyxSubscription rhythmyxSubscription) {
+
+        rhythmyxSubscriptionTransitionService.doDeleteTransitions(rhythmyxSubscription)
+
+        def rhythmyxSubscriptionId = rhythmyxSubscription.id
+        subscriptionService.deleteChildSubscription(rhythmyxSubscription)
+
+        log.info("Successfully deleted rhythmyxSubscription '${rhythmyxSubscriptionId}'")
+    }
+
+    void updateSubscription(RhythmyxSubscription rhythmyxSubscription, int attempts) {
+
+        def success = rhythmyxSubscriptionUpdateService.updateSubscription(rhythmyxSubscription)
+
+        if (success) {
+            rhythmyxSubscriptionTransitionService.doUpdateTransitions(rhythmyxSubscription)
+        } else {
+            log.error("Update of rhythmyxSubscription '${rhythmyxSubscription.id}' was unsuccessful")
+            queueService.sendToRhythmyxErrorQueue(MessageType.UPDATE, rhythmyxSubscription.id, null, attempts)
+        }
+    }
+
+    void queueSubscriptions(String mediaId, MessageType messageType, String rabbitQueue) {
+
+        def subscription = Subscription.findByMediaId(mediaId)
+        if (!subscription) {
+            log.info("No subscriptions found for mediaId '${mediaId}'")
+            return
+        }
+
+        def rhythmyxSubscriptions = RhythmyxSubscription.findAllBySubscription(subscription)
+        if (!rhythmyxSubscriptions) {
+            log.info("No rhythmyxSubscriptions found for mediaId '${mediaId}'")
+            return
+        }
+
+        rhythmyxSubscriptions.each { rhythmyxSubscription ->
+            log.info("Queuing a message of type '${messageType}' on the '${rabbitQueue}' for rhythmyxSubscription '${rhythmyxSubscription.id}'")
+            queueService.sendToRhythmyxUpdateQueue(messageType, rhythmyxSubscription.id)
+        }
+    }
+
+    void importSubscription(long rhythmyxSubscriptionId, int attempts) {
+
+        def success = rhythmyxSubscriptionImportService.importRhythmyxSubscription(rhythmyxSubscriptionId)
+
+        if (!success) {
+            log.error("Import of rhythmyxSubscription '${rhythmyxSubscriptionId}' was unsuccessful")
+            queueService.sendToRhythmyxErrorQueue(MessageType.IMPORT, rhythmyxSubscriptionId, null, attempts)
+        } else {
+
+            def rhythmyxSubscription = RhythmyxSubscription.findById(rhythmyxSubscriptionId)
+            if (rhythmyxSubscription) {
+                rhythmyxSubscriptionTransitionService.doImportTransitions(rhythmyxSubscription)
+            }
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.ctacorp.syndication
 
-import grails.plugins.rest.client.RestBuilder
-
 /**
  * Created by nburk on 11/26/14.
  */
@@ -9,10 +7,14 @@ class CmsManagerKeyService {
 
     def grailsApplication
     def authorizationService
-    private RestBuilder rest
 
     def getSubscriberById(subscriberId){
-        authorizationService.getRest(grailsApplication.config.cmsManager.serverUrl + "/api/v1/subscriber.json?id=${subscriberId}")
+        try{
+            authorizationService.getRest(grailsApplication.config.cmsManager.serverUrl + "/api/v1/subscriber.json?id=${subscriberId}")
+        } catch (e) {
+            log.error("Can't connect to CMS Manager!")
+            return []
+        }
     }
 
     def listSubscribers(){

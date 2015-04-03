@@ -26,12 +26,15 @@ class BootStrap {
     def config = Holders.config
     def testConfig = Holders.config.test
     def env = Environment.current
-    def adminUsername = config.springsecurity.cmsManager.adminUsername
-    def defaultPassword = config.springsecurity.cmsManager.defaultPassword
-    def createTestDataInProductionMode = config.cmsManager.createTestDataInProductionMode
-    def serverUrl = config.grails.serverURL
+
+    String adminUsername = config.springsecurity.cmsManager.adminUsername
+    String defaultPassword = config.springsecurity.cmsManager.defaultPassword
+    String serverUrl = config.grails.serverURL
+    boolean createTestDataInProductionMode = config.cmsManager.createTestDataInProductionMode
+
     def loggingService
     def subscriptionService
+    def userSubscriberService
 
     def init = { servletContext ->
         log.info ("*** CMS Manager is running in --> ${Environment.current} <-- mode. ***")
@@ -222,6 +225,15 @@ class BootStrap {
                 subscriber.save(flush: true, failOnError: true)
 
                 log.info("Created the test Subscriber and key agreement for '${entityName}'")
+
+                def rhythmyxUser = User.findByUsername('rhythmyx')
+                def adminUser = User.findByUsername(adminUsername)
+
+                userSubscriberService.associateUserWithSubscriber(subscriber, rhythmyxUser)
+                log.info("Associated user 'rhythmyx' with subscriber '${entityName}'")
+
+                userSubscriberService.associateUserWithSubscriber(subscriber, adminUser)
+                log.info("Associated user '${adminUser.username}' with subscriber '${entityName}'")
             }
         } else {
             log.info("Skipping creation of the Subscriber and KeyAgreement for '${entityName}' as it already exists")
@@ -265,6 +277,7 @@ class BootStrap {
     }
 
     private printReadyMessage(){
+
         log.info("==========================================")
         log.info("| -> CMS Manager Ready.                  |")
         log.info("==========================================")

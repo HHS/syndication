@@ -59,7 +59,14 @@ class EmailSubscriptionMailService {
         if (emailSubscription.attachContent) {
 
             def attachmentName = "${emailSubscription.title}.html"
-            def body = messageSource.getMessage(messageBodyKey, [attachmentName, emailSubscription.sourceUrl] as Object[], LocaleContextHolder.locale)
+
+            def body = {
+                if(subject.contains('delete')) {
+                    messageSource.getMessage(messageBodyKey, [emailSubscription.sourceUrl] as Object[], LocaleContextHolder.locale)
+                } else {
+                    messageSource.getMessage(messageBodyKey, [attachmentName, emailSubscription.sourceUrl] as Object[], LocaleContextHolder.locale)
+                }
+            }()
 
             if(content) {
                 emailService.sendMessageWithAttachment(emailSubscription.emailSubscriber.email, subject, body, attachmentName, 'text/html', content.bytes)

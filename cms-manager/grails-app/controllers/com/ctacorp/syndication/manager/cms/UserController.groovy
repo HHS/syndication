@@ -26,6 +26,7 @@ class UserController {
 
     def loggingService
     def springSecurityService
+    def userSubscriberService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -58,30 +59,29 @@ class UserController {
 
         flash.clear()
 
-        def roleId = params.role as Long
-
         if (!user) {
             return notFound()
         }
 
         user.validate()
+
         if (user.hasErrors()) {
-
             respond user.errors, view: 'edit'
-
         } else {
 
             user.save(flush:true)
 
-            def role = Role.findById(roleId)
+            def subscribers = {
+                Subscriber.findAllByIdInList(params.subscribers as List)
+            }()
+
+            userSubscriberService.disassociateUserFromSubscribers(user)
+            userSubscriberService.associateUserWithSubscribers(subscribers, user)
+
+            def role = Role.findById(params.role as Long)
             if(role) {
-
-                def userRole = UserRole.findByUser(user)
-                if(userRole.role != role) {
-
-                    userRole.delete(flush:true)
-                    UserRole.create(user, role, true)
-                }
+                UserRole.findByUser(user).delete()
+                UserRole.create(user, role, true)
             }
 
             flash.message = message(code: 'default.updated.message', args: [message(code: 'user.label'), user.username])
@@ -102,9 +102,8 @@ class UserController {
 
         if(User.findById(user.id)) {
 
-            UserRole.findAllByUser(user).each {userRole ->
-                userRole.delete(flush:true)
-            }
+            UserRole.findByUser(user)?.delete()
+            userSubscriberService.disassociateUserFromSubscribers(user)
 
             user.delete(flush:true)
         }
@@ -114,33 +113,30 @@ class UserController {
     }
 
     @Transactional
-    def save() {
+    def save(User user) {
 
         flash.clear()
 
-        def roleId = params.role as Long
-        def username = params.username as String
-
-        if(User.findByUsername(username)) {
-
-            flash.message = message(code: 'default.exists.message', args: [message(code: 'user.label'), username])
+        if(User.findByUsername(user.username)) {
+            flash.errors = [message(code: 'default.exists.message', args: [message(code: 'user.label'), user.username])]
             redirect(action: "index", method: "GET")
-
         } else {
-
-            def user = new User(params)
 
             user.validate()
 
             if(user.hasErrors()) {
-
                 respond user.errors, view: 'create'
-
             } else {
 
                 user.save(flush:true)
 
-                def role = Role.findById(roleId)
+                def subscribers = {
+                    Subscriber.findAllByIdInList(params.subscribers as List)
+                }()
+
+                userSubscriberService.associateUserWithSubscribers(subscribers, user)
+
+                def role = Role.findById(params.role as Long)
                 if(role) {
                     UserRole.create(user, role, true)
                 }

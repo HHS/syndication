@@ -14,7 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package tagcloud.domain
 
-class ContentItem {
+class ContentItem{
     String url
     String externalUID
     Long syndicationId

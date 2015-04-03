@@ -12,6 +12,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 */
 package com.ctacorp.syndication.manager.cms
+
 import com.ctacorp.syndication.client.sdk.GetMediaRequest
 import com.ctacorp.syndication.client.sdk.ResourcesApi
 import com.ctacorp.syndication.manager.cms.utils.exception.ServiceException
@@ -36,11 +37,14 @@ class ContentExtractionService {
         getMediaRequestFactory = new GetMediaRequestFactory()
     }
 
-    def getMediaId(String sourceUrl) {
+    MediaItem getMediaItemBySourceUrl(String sourceUrl) {
+
+        log.info("Getting the media item for sourceUrl '${sourceUrl}'")
 
         def serviceException = { Exception e ->
-            def message = "Error occured when fetching media for sourceUrl = '${sourceUrl}'. The exception message was ${e.message}"
-            throw new ServiceException({message})
+            def message = "Error occured when fetching the media item for sourceUrl '${sourceUrl}'"
+            log.error(message, e)
+            throw new ServiceException(message)
         }
 
         def mediaItems = {
@@ -50,39 +54,7 @@ class ContentExtractionService {
             try {
                 return resourcesApi.getMedia(request)?.results
             } catch (ApiException e) {
-                if(e.code == 400) {
-                    return null
-                } else {
-                    serviceException(e)
-                }
-            } catch (e) {
-                serviceException(e)
-            }
-        }()
-
-        if (mediaItems) {
-            return mediaItems.get(0)?.id
-        } else {
-            log.error("The 'results' property is empty or missing from the get media response")
-        }
-
-        null
-    }
-
-    MediaItem getMediaItem(String mediaId) {
-
-        def serviceException = { Exception e ->
-            def message = "Error occured when fetching media for mediaId = '${mediaId}'"
-            log.error(message, e)
-            return null
-        }
-
-        def mediaItems = {
-
-            try {
-                return resourcesApi.getMediaById(mediaId as Long)?.results
-            } catch (ApiException e) {
-                if(e.code == 400) {
+                if (e.code == 400) {
                     return null
                 } else {
                     serviceException(e)
@@ -94,23 +66,61 @@ class ContentExtractionService {
 
         if (mediaItems) {
             return mediaItems.get(0)
+        } else {
+            log.error("No 'results' found in the response")
+        }
+
+        null
+    }
+
+    MediaItem getMediaItem(String mediaId) {
+
+        log.info("Getting the media item for mediaId '${mediaId}'")
+
+        def serviceException = { Exception e ->
+            def message = "Error occured when fetching the media item for mediaId '${mediaId}'"
+            log.error(message, e)
+            throw new ServiceException(message);
+        }
+
+        def mediaItems = {
+
+            try {
+                return resourcesApi.getMediaById(mediaId as Long)?.results
+            } catch (ApiException e) {
+                if (e.code == 400) {
+                    return null
+                } else {
+                    serviceException(e)
+                }
+            } catch (e) {
+                serviceException(e)
+            }
+        }()
+
+        if (mediaItems) {
+            return mediaItems.get(0)
+        } else {
+            log.error("No 'results' found in the response")
         }
 
         return null
     }
 
-    SyndicatedMediaItem extractSyndicatedContent(String mediaId) {
+    SyndicatedMediaItem getMediaSyndicate(String mediaId) {
+
+        log.info("Getting the syndicated media for mediaId '${mediaId}'")
 
         def serviceException = { Exception e ->
-            def message = "Error occured when extracting the syndicated media for mediaId = '${mediaId}'"
+            def message = "Error occured when getting the syndicated media for mediaId '${mediaId}'"
             log.error(message, e)
-            throw new ServiceException({message})
+            throw new ServiceException(message)
         }
 
         try {
             return resourcesApi.getMediaSyndicateById(mediaId as Long)?.results?.get(0)
         } catch (ApiException e) {
-            if(e.code == 400) {
+            if (e.code == 400) {
                 return null
             } else {
                 serviceException(e)

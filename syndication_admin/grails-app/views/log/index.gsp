@@ -12,8 +12,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 --%>
 
 
-<%@ page contentType="text/html;charset=UTF-8" %>
-<html>
+<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %><html>
 <head>
     <title>System Log Viewer</title>
     <meta name="layout" content="dashboard"/>

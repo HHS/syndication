@@ -12,8 +12,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Html" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.media.Html" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -54,12 +55,22 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                 <g:if test="${periodicalInstance?.targetUrl}">
                     <dt id="targetUrl-label" class="word_wrap"><g:message code="periodical.targetUrl.label" default="Target Url"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${periodicalInstance}" field="targetUrl"/></dd>
+                    <dd class="word_wrap"><a target="_blank" href="${periodicalInstance?.targetUrl}"><g:fieldValue bean="${periodicalInstance}" field="targetUrl"/></a></dd>
+                </g:if>
+
+                <g:if test="${periodicalInstance?.active && periodicalInstance?.visibleInStorefront}">
+                    <dt id="storefrontLink-label" class="word_wrap"><g:message code="html.storefrontLink.label" default="Storefront Link"/></dt>
+                    <dd class="word_wrap"><a target="_blank" href="${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${periodicalInstance?.id}">${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${periodicalInstance?.id}</a></dd>
                 </g:if>
 
                 <g:if test="${periodicalInstance?.customThumbnailUrl}">
                     <dt id="customThumbnailUrl-label" class="word_wrap"><g:message code="periodical.customThumbnailUrl.label" default="Custom Thumbnail Url"/></dt>
                     <dd class="word_wrap"><g:fieldValue bean="${periodicalInstance}" field="customThumbnailUrl"/></dd>
+                </g:if>
+
+                <g:if test="${periodicalInstance?.customPreviewUrl}">
+                    <dt id="customPreviewUrl-label" class="word_wrap"><g:message code="periodical.customPreviewUrl.label" default="Custom Preview Url"/></dt>
+                    <dd class="word_wrap"><g:fieldValue bean="${periodicalInstance}" field="customPreviewUrl"/></dd>
                 </g:if>
 
                 <dt id="period-label" class="word_wrap"><g:message code="periodical.period.label" default="Period"/></dt>
@@ -156,11 +167,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <fieldset class="buttons">
         <g:form url="[resource:periodicalInstance, action:'delete']">
             <a href="${apiBaseUrl + '/resources/media/'+ periodicalInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
-            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER, ROLE_USER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
-            </sec:ifAnyGranted>
-            <sec:ifAnyGranted roles="ROLE_USER">
-                <g:actionSubmit class="btn btn-warning" value="Alternate/Extended Attributes" action="edit"/>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-danger" action="delete" onclick="return confirm('Are you sure?');" value="Delete"/>

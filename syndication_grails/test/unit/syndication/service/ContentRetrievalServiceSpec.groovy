@@ -17,7 +17,7 @@ package syndication.service
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
-import syndication.contentextraction.ContentRetrievalService
+import com.ctacorp.syndication.contentextraction.ContentRetrievalService
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions

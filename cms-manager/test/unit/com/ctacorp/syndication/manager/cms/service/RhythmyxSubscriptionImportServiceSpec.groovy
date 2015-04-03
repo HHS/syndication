@@ -17,6 +17,7 @@ package com.ctacorp.syndication.manager.cms.service
 import com.ctacorp.syndication.commons.mq.MessageType
 import com.ctacorp.syndication.manager.cms.*
 import com.ctacorp.syndication.manager.cms.utils.exception.RhythmyxIngestionException
+import com.ctacorp.syndication.swagger.rest.client.model.MediaItem
 import com.ctacorp.syndication.swagger.rest.client.model.SyndicatedMediaItem
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestFor
@@ -31,7 +32,6 @@ class RhythmyxSubscriptionImportServiceSpec extends Specification {
     def rhythmyxIngestionService = Mock(RhythmyxIngestionService)
     def queueService = Mock(QueueService)
     def loggingService = Mock(LoggingService)
-    def subscriptionFactory = Mock(RhythmyxSubscriptionImportService.SubscriptionFactory)
 
     String sourceUrl = 'http://buttered.nail.clippers.com/extra/butter.asp'
     String systemTitle = 'Buttered Nail Clippers'
@@ -55,7 +55,6 @@ class RhythmyxSubscriptionImportServiceSpec extends Specification {
         service.rhythmyxIngestionService = rhythmyxIngestionService
         service.queueService = queueService
         service.loggingService = loggingService
-        service.subscriptionFactory = subscriptionFactory
 
         subscriber = Subscriber.build()
         rhythmyxSubscriber = RhythmyxSubscriber.build(subscriber:subscriber)
@@ -107,7 +106,7 @@ class RhythmyxSubscriptionImportServiceSpec extends Specification {
 
         then: "try to fetch the media item"
 
-        contentExtractionService.getMediaId(sourceUrl) >> null
+        contentExtractionService.getMediaItemBySourceUrl(sourceUrl) >> null
 
         and: "don't throw any any exceptions"
 
@@ -122,11 +121,11 @@ class RhythmyxSubscriptionImportServiceSpec extends Specification {
 
         then: "fetch the media item"
 
-        contentExtractionService.getMediaId(sourceUrl) >> 9876
+        contentExtractionService.getMediaItemBySourceUrl(sourceUrl) >> 9876
 
         and: "extract the content"
 
-        contentExtractionService.extractSyndicatedContent('9876') >> syndicatedMediaItem
+        contentExtractionService.getMediaSyndicate('9876') >> syndicatedMediaItem
 
         and: "try to ingest the item into rhythmyx"
 
@@ -149,11 +148,11 @@ class RhythmyxSubscriptionImportServiceSpec extends Specification {
 
         then: "check that the media item exists"
 
-        contentExtractionService.getMediaId(sourceUrl) >> 9876
+        contentExtractionService.getMediaItemBySourceUrl(sourceUrl) >> new MediaItem(id: 9876, name: 'Buttered Nail Clippers')
 
         and: "extract the content"
 
-        contentExtractionService.extractSyndicatedContent('9876') >> syndicatedMediaItem
+        contentExtractionService.getMediaSyndicate('9876') >> syndicatedMediaItem
 
         and: "import the content into the rhythmyx instance"
 
@@ -162,39 +161,5 @@ class RhythmyxSubscriptionImportServiceSpec extends Specification {
         and: "attach the base subscription to the rhythmyx subscription"
 
         RhythmyxSubscription.count == 1
-        rhythmyxSubscription.subscription == subscription
-    }
-
-    void "import subscription for a subscription that does not yet exist"() {
-
-        given: "a rhythmyx subscription not yet imported"
-
-        def rhythmyxSubscription = RhythmyxSubscription.build(sourceUrl:'http://legolas.of.com/the/lego/realm.html',rhythmyxSubscriber:rhythmyxSubscriber)
-
-        when: "importing the subscription"
-
-        service.importRhythmyxSubscription(rhythmyxSubscription.id)
-
-        then: "check that the media item exists"
-
-        contentExtractionService.getMediaId('http://legolas.of.com/the/lego/realm.html') >> 5432
-
-        and: "extract the content"
-
-        contentExtractionService.extractSyndicatedContent('5432') >> syndicatedMediaItem
-
-        and: "import the content into the rhythmyx instance"
-
-        rhythmyxIngestionService.importMediaItem(rhythmyxSubscription, content, 'Buttered Nail Clippers') >> 1234
-
-        and: "create the new base subscription instance"
-
-        subscriptionFactory.newSubscription('5432', "http://syndication.api.gov/5432") >> Subscription.buildWithoutSave(mediaId:5432)
-
-        and: "attach the base subscription to the rhythmyx subscription"
-
-        Subscription.getCount() == 2
-        RhythmyxSubscription.count == 2
-        rhythmyxSubscription.subscription.mediaId == '5432'
     }
 }

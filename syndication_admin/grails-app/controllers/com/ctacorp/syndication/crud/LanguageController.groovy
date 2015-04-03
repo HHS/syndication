@@ -13,10 +13,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
+import static org.springframework.http.HttpStatus.NOT_FOUND
+
 import com.ctacorp.syndication.Language
 import grails.plugin.springsecurity.annotation.Secured
-
-import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
@@ -78,6 +78,7 @@ class LanguageController {
                 flash.message = message(code: 'default.not.found.message', args: [message(code: 'language.label', default: 'Language'), params.id])
                 redirect action: "index", method: "GET"
             }
+            '*'{ render status: NOT_FOUND }
         }
     }
 

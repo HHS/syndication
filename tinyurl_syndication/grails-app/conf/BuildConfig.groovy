@@ -61,7 +61,9 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
         runtime 'mysql:mysql-connector-java:5.1.27'
         //CMS Manager security libs
-        runtime 'com.ctacorp.commons:api-key-utils:1.4'
+        compile('com.ctacorp.commons:api-key-utils:1.5.1'){
+            excludes 'groovy'
+        }
         compile "com.google.guava:guava:12.0"
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
     }

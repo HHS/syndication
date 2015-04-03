@@ -14,6 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 
 import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
+import com.icegreen.greenmail.imap.AuthorizationException
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 
@@ -26,7 +27,7 @@ class AuthorizationService {
 
     private AuthorizationHeaderGenerator generator
     private AuthorizationHeaderGenerator.KeyAgreement keyAgreement
-    private RestBuilder rest
+    private RestBuilder rest= new RestBuilder()
 
     @PostConstruct
     void init() {
@@ -34,7 +35,7 @@ class AuthorizationService {
         String publicKey = grailsApplication.config.cmsManager.publicKey
         String secret = grailsApplication.config.cmsManager.secret
         if (privateKey && publicKey && secret) {
-            rest = new RestBuilder()
+            rest
             keyAgreement = new AuthorizationHeaderGenerator.KeyAgreement()
 
             keyAgreement.setPrivateKey(privateKey)
@@ -81,8 +82,6 @@ class AuthorizationService {
         if (body) {
             requestHeaders['Content-Type'] = "application/json"
             requestHeaders['Content-Length'] = body.bytes.size() as String
-        } else{
-            requestHeaders['Content-Length'] = "0"
         }
 
         log.info "Making authorized request -------------------"
@@ -124,7 +123,7 @@ class AuthorizationService {
         if (resp?.status == 403) {
             String responseDetails = "Status code:${resp.status}\nJsonBody: ${resp.json}"
             log.error(responseDetails)
-            throw new Exception("Access Denied - Your authorization keys have been denied.")
+            throw new AuthorizationException("Access Denied - Your authorization keys have been denied.")
         }
 
         resp.json

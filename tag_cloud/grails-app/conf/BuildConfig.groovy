@@ -75,12 +75,12 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
         runtime 'mysql:mysql-connector-java:5.1.29'
-        runtime 'com.ctacorp:syndication-commons:0.4'
+        runtime 'com.ctacorp:syndication-commons:1.1.7'
 
         compile "com.google.guava:guava:12.0"
 
         runtime 'com.ctacorp.commons:multi-read-servlet-filter:1.0.0'
-        compile('com.ctacorp.commons:api-key-utils:1.4.3') {
+        compile('com.ctacorp.commons:api-key-utils:1.5.1') {
             excludes 'groovy'
         }
 
@@ -89,7 +89,7 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the compile step -----------------------------------------------------
-        compile "org.grails.plugins:syndication-model:1.5.0"
+        compile "org.grails.plugins:syndication-model:1.7.0"
 
         //plugins for the compile step -----------------------------------------------------
         compile ":scaffolding:2.1.2"
@@ -101,6 +101,8 @@ grails.project.dependency.resolution = {
         compile ":rest-client-builder:2.0.1"
         compile ":spring-security-core:2.0-RC4"
         compile ":marshallers:0.6"  //Object Marshalling
+
+        compile ":codenarc:0.23"
 
         // plugins needed at runtime but not for compilation --------------------------------
         runtime ":hibernate4:4.3.6.1"
@@ -119,7 +121,7 @@ grails.project.dependency.resolution = {
         test ":build-test-data:2.1.2"
 
         //Leave this at the bottom - moving it breaks codeCoverage, probably because of a dependency conflict
-        compile ("org.grails.plugins:solr-operations:1.0.8")
+        compile ("org.grails.plugins:solr-operations:1.2")
     }
 }
 
@@ -145,4 +147,15 @@ coverage {
         "**/TestController*",
         "**/domain/*"
     ]
+}
+
+//codenarc
+codenarc.properties = {
+    EmptyIfStatement.priority = 1
+    
+    EmptyMethod.enabled = false
+    GrailsMassAssignment.enabled = false
+    GrailsDomainHasEquals.enabled = false
+    
+    
 }

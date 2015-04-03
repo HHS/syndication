@@ -14,14 +14,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
-import com.ctacorp.syndication.Collection
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.NOT_FOUND
+
+import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.FeaturedMedia
 import com.ctacorp.syndication.MediaItemSubscriber
-import com.ctacorp.syndication.authentication.UserRole
 
-import static org.springframework.http.HttpStatus.*
-
-import com.ctacorp.syndication.Audio
+import com.ctacorp.syndication.media.Audio
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
@@ -59,13 +61,13 @@ class AudioController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Audio(params), model: [subscribers:subscribers]
+        respond new Audio(), model: [subscribers:subscribers]
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(Audio audioInstance) {
         if (audioInstance == null) {
@@ -76,7 +78,7 @@ class AudioController {
         def status =  mediaItemsService.updateItemAndSubscriber(audioInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action:'create', params:params
+            respond audioInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
 
@@ -96,7 +98,7 @@ class AudioController {
         respond audioInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(audioInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Audio audioInstance) {
         if (audioInstance == null) {
@@ -135,7 +137,7 @@ class AudioController {
             featuredItem.delete()
         }
        
-        mediaItemsService.removeMediaItemsFromUserMediaLists(audioInstance)
+        mediaItemsService.removeMediaItemsFromUserMediaLists(audioInstance, true)
        solrIndexingService.removeMediaItem(audioInstance)
        mediaItemsService.delete(audioInstance.id)
 

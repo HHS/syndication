@@ -11,6 +11,7 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --%>
 
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
@@ -52,6 +53,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         .mobile-size-360x640{
             width: 360px;
             height: 640px;
+        }
+
+        /*Temporary workaround for proper rendering in firefox*/
+        .mobile-size-320x568  .pull-right{
+            float: none !important;
+        }
+        .mobile-size-320x480 .pull-right{
+            float: none !important;
+        }
+        .mobile-size-360x640 .pull-right{
+            float: none !important;
         }
 
     </style>
@@ -127,7 +139,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <h3>320x480</h3>
                         <div class="mobile-preview mobile-size-320x480">${extractedContent.encodeAsRaw()}</div>
                         <h3>360x640</h3>
-                        <div class="mobile-preview mobile-size-360x640">${extractedContent.encodeAsRaw()}></div>
+                        <div class="mobile-preview mobile-size-360x640">${extractedContent.encodeAsRaw()}</div>
                     </div>
                     <div class="row tab-pane" id="sourceTab">
                         <div class="panel panel-default">

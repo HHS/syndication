@@ -197,14 +197,7 @@ bruteforcedefender {
     allowedNumberOfAttempts = 5
 }
 
-syndication.api.serverAddress = "http://localhost:8080/Syndication/api/v2"
-syndication.serverUrl = "http://localhost:8080/Syndication"
 syndication.apiPath = "/api/v2"
-
-tagCloud.serverUrl = "http://localhost:8084/TagCloud"
-
-tagCloud.serverAddress = "http://localhost:8084/TagCloud"
-
 grails.assets.minifyJs = false
 
 //___________________________
@@ -216,3 +209,4 @@ greenmail.ports.smtp = 3026
 
 //Content extraction
 syndication.contentExtraction.cssClassName = "syndicate"
+syndication.scratch.root = "${System.getProperty('user.home')}/.syndication"

@@ -15,7 +15,13 @@
                             <div class="form-group">
                                 <label class="col-md-4 control-label" for="addToCampaign">Pick Campaign</label>
                                 <div class="col-md-4 col-lg-6">
-                                    <g:select from="${com.ctacorp.syndication.Campaign.list()}" optionValue="name" optionKey="id" name="id" class="form-control" id="addToCampaign"/>
+                                    <sec:ifNotGranted roles="ROLE_PUBLISHER">
+                                        <g:select from="${com.ctacorp.syndication.Campaign.list()}" optionValue="name" optionKey="id" name="id" class="form-control" id="addToCampaign" noSelection="${['null':'Select A Campaign']}"/>
+                                    </sec:ifNotGranted>
+                                    <sec:ifAnyGranted roles="ROLE_PUBLISHER">
+                                        <g:set var="subscriberId" value="${com.ctacorp.syndication.authentication.User.get(sec.loggedInUserInfo(field:'id') as long).subscriberId}" />
+                                        <g:select from="${com.ctacorp.syndication.CampaignSubscriber.findAllBySubscriberId(464426002).campaign}" optionValue="name" optionKey="id" name="id" class="form-control" id="addToCampaign" noSelection="${['null':'Select A Campaign']}"/>
+                                    </sec:ifAnyGranted>
                                     <br>
                                     <g:actionSubmit controller="campaign" action="addMediaItem" class="pull-right btn btn-success" value="Add"/>
                                 </div>

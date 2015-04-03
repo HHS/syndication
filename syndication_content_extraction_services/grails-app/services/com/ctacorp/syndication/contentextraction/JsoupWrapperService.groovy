@@ -13,9 +13,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.contentextraction
 
+import com.ctacorp.syndication.commons.util.Util
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.jsoup.safety.Whitelist
 import org.jsoup.select.Elements
 
 class JsoupWrapperService {
@@ -32,23 +34,23 @@ class JsoupWrapperService {
         String newUrlBase = params.newUrlBase
 
         doc = Jsoup.parse(extractedContent)
-        if(params.stripStyles == "1" || params.stripStyles?.toLowerCase() == "true"){
+        if(Util.isTrue(params.stripStyles)){
             removeInlineStylesFromDocument(doc)
         }
 
-        if(params.stripScripts == "1" || params.stripScripts?.toLowerCase() == "true"){
+        if(Util.isTrue(params.stripScripts)){
             removeScriptsFromDocument(doc)
         }
 
-        if(params.stripImages == "1" || params.stripImages?.toLowerCase() == "true"){
+        if(Util.isTrue(params.stripImages)){
             removeImagesFromDocument(doc)
         }
 
-        if(params.stripBreaks == "1" || params.stripBreaks?.toLowerCase() == "true"){
+        if(Util.isTrue(params.stripBreaks)){
             removeBreaksFromDocument(doc)
         }
 
-        if(params.stripClasses == "1" || params.stripClasses?.toLowerCase() == "true"){
+        if(Util.isTrue(params.stripClasses)){
             removeClassesFromDocument(doc)
         }
 
@@ -58,7 +60,11 @@ class JsoupWrapperService {
 
         addAutoFocus(doc)
 
-        getElementByClassFromDocument(doc, extractionCSSClass)
+        extractedContent = getElementByClassFromDocument(doc, extractionCSSClass)
+
+        Jsoup.clean(extractedContent, Whitelist.relaxed().addAttributes(":all", "class"))
+
+        extractedContent
     }
 
     String getMetaDescription(String url){

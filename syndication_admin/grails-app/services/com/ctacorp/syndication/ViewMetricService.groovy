@@ -2,8 +2,8 @@ package com.ctacorp.syndication
 
 import com.ctacorp.syndication.authentication.UserRole
 import grails.transaction.Transactional
-import org.hibernate.FetchMode
-import com.ctacorp.syndication.MediaMetric
+import com.ctacorp.syndication.metric.MediaMetric
+import com.ctacorp.syndication.media.MediaItem
 
 /**
  * Created by nburk on 11/6/14.
@@ -105,7 +105,7 @@ class ViewMetricService {
                 noData = false
             }
         }
-        labels << [label: "Other", value:(MediaMetric.findAllByDayBetween(today - range, today)."${whichData}".sum() ?: 0) - (labels.value.sum() ?: 0)]
+//        labels << [label: "Other", value:(MediaMetric.findAllByDayBetween(today - range, today)."${whichData}".sum() ?: 0) - (labels.value.sum() ?: 0)]
         if(noData){
             labels = [[label:"No Data", value: 0]]
         }
@@ -131,7 +131,7 @@ class ViewMetricService {
                 }
                 labels << [label:"${metric[0].id + "-" + checkLength(metric[0].name)}", value:metric[1]]
             }
-            labels << [label: "other", value:(MediaMetric.findAllByDayBetween(today - params.int("range"), today)."${params.whichData}".sum() ?: 0) - (labels.value.sum() ?: 0)]
+//            labels << [label: "other", value:(MediaMetric.findAllByDayBetween(today - params.int("range"), today)."${params.whichData}".sum() ?: 0) - (labels.value.sum() ?: 0)]
             if(noData){
                 labels = [[label:"No Data", value: 0]]
             }
@@ -155,8 +155,9 @@ class ViewMetricService {
     def findAgencyTopTen(params){
         params.max = 10
         params.offset = 0
-        params.sort = params.whichData
+        params.sort = params.whichData ?: "apiViewCount"
         params.order = "desc"
+        def noData = true
         def today = new Date().clearTime() + 1
         def mediaItemsFromAgency = MediaItem.findAllBySource(Source.get(params.agency))
         def metrics = []
@@ -182,9 +183,14 @@ class ViewMetricService {
         } else {
             def labels = []
             metrics?.each{metric ->
+                noData = false
                 labels << [label:"${metric[0]}", value:metric[1]]
             }
-            labels << [label: "other", value:(MediaMetric.findAllByDayBetween(today - params.int("range"), today)."${params.whichData}".sum() ?: 0) - (labels.value.sum() ?: 0)]
+//            labels << [label: "other", value:(MediaMetric.findAllByDayBetween(today - params.int("range"), today)."${params.whichData}".sum() ?: 0) - (labels.value.sum() ?: 0)]
+            if(noData){
+                labels = [[label:"No Data", value: 0]]
+            }
+            
             return labels
         }
     }

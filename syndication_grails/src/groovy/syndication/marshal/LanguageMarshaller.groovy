@@ -15,12 +15,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.marshal
 
+import com.ctacorp.syndication.Language
 import grails.converters.JSON
-import com.ctacorp.syndication.*
-import syndication.preview.ThumbnailService
-import syndication.rest.MediaService
-import syndication.tag.TagsService
-import syndication.tinyurl.TinyUrlService
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,10 +25,7 @@ import syndication.tinyurl.TinyUrlService
  * Time: 3:15 PM
  */
 class LanguageMarshaller {
-    ThumbnailService thumbnailService
-    TinyUrlService tinyUrlService
-    TagsService tagsService
-    MediaService mediaService
+    def services
 
     LanguageMarshaller(){
         JSON.registerObjectMarshaller(Language){ Language l ->

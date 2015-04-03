@@ -12,8 +12,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.SocialMedia" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.media.SocialMedia" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -55,12 +56,22 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
             <g:if test="${socialMediaInstance?.targetUrl}">
                 <dt id="targetUrl-label" class="word_wrap"><g:message code="socialMedia.targetUrl.label" default="Target Url"/></dt>
-                <dd class="word_wrap"><g:fieldValue bean="${socialMediaInstance}" field="targetUrl"/></dd>
+                <dd class="word_wrap"><a target="_blank" href="${socialMediaInstance?.targetUrl}"><g:fieldValue bean="${socialMediaInstance}" field="targetUrl"/></a></dd>
+            </g:if>
+
+            <g:if test="${socialMediaInstance?.active && socialMediaInstance?.visibleInStorefront}">
+                <dt id="storefrontLink-label" class="word_wrap"><g:message code="html.storefrontLink.label" default="Storefront Link"/></dt>
+                <dd class="word_wrap"><a target="_blank" href="${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${socialMediaInstance?.id}">${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${socialMediaInstance?.id}</a></dd>
             </g:if>
 
             <g:if test="${socialMediaInstance?.customThumbnailUrl}">
                 <dt id="customThumbnailUrl-label" class="word_wrap"><g:message code="socialMedia.customThumbnailUrl.label" default="Custom Thumbnail Url"/></dt>
                 <dd class="word_wrap"><g:fieldValue bean="${socialMediaInstance}" field="customThumbnailUrl"/></dd>
+            </g:if>
+
+            <g:if test="${socialMediaInstance?.customPreviewUrl}">
+                <dt id="customPreviewUrl-label" class="word_wrap"><g:message code="socialMedia.customPreviewUrl.label" default="Custom Preview Url"/></dt>
+                <dd class="word_wrap"><g:fieldValue bean="${socialMediaInstance}" field="customPreviewUrl"/></dd>
             </g:if>
 
             <g:if test="${socialMediaInstance?.language}">
@@ -83,10 +94,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <dd class="word_wrap"><g:formatDate date="${socialMediaInstance?.dateSyndicationCaptured}"/></dd>
             </g:if>
 
-            %{--<g:if test="${socialMediaInstance?.dateSyndicationVisible}">--}%
-                %{--<dt id="dateSyndicationVisible-label" class="word_wrap"><g:message code="socialMedia.dateSyndicationVisible.label" default="Syndication Visible"/></dt>--}%
-                %{--<dd class="word_wrap"><g:formatDate date="${socialMediaInstance?.dateSyndicationVisible}"/></dd>--}%
-            %{--</g:if>--}%
+            <g:if test="${socialMediaInstance?.dateSyndicationVisible}">
+                <dt id="dateSyndicationVisible-label" class="word_wrap"><g:message code="socialMedia.dateSyndicationVisible.label" default="Syndication Visible"/></dt>
+                <dd class="word_wrap"><g:formatDate date="${socialMediaInstance?.dateSyndicationVisible}"/></dd>
+            </g:if>
 
             <g:if test="${socialMediaInstance?.dateContentUpdated}">
                 <dt id="dateContentUpdated-label" class="word_wrap"><g:message code="socialMedia.dateContentUpdated.label" default="Content Updated"/></dt>
@@ -163,11 +174,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <fieldset class="buttons">
         <g:form  url="[resource:socialMediaInstance, action:'edit']">
             <a href="${apiBaseUrl + '/resources/media/'+ socialInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
-            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER, ROLE_USER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
-            </sec:ifAnyGranted>
-            <sec:ifAnyGranted roles="ROLE_USER">
-                <g:actionSubmit class="btn btn-warning" value="Alternate/Extended Attributes" action="edit"/>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-danger" onclick="return confirm('Are you sure?');" value="Delete" action="delete"/>

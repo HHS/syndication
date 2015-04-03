@@ -22,7 +22,7 @@ import spock.lang.Specification
 
 @SuppressWarnings("GroovyAssignabilityCheck")
 @TestFor(RhythmyxSubscriptionConsumerService)
-@Build([RhythmyxSubscription,Subscription])
+@Build([RhythmyxSubscription, Subscription])
 class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
     def rhythmyxSubscriptionUpdateService = Mock(RhythmyxSubscriptionUpdateService)
@@ -45,7 +45,7 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
         service.queueService = queueService
         service.subscriptionService = subscriptionService
 
-        subscription = Subscription.build()
+        subscription = Subscription.build(mediaId: '123456')
         rhythmyxSubscription1 = RhythmyxSubscription.build(subscription: subscription)
         rhythmyxSubscription2 = RhythmyxSubscription.build(subscription: subscription)
     }
@@ -54,7 +54,7 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
         when: "sending an import message to the consumer without the subscription id"
 
-        service.handleMessage(new Message(messageType:MessageType.IMPORT), queueName)
+        service.handleMessage(new Message(messageType: MessageType.IMPORT), queueName)
 
         then: "expect no exceptions to be thrown"
 
@@ -65,9 +65,25 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
         when: "sending a message to the consumer without the message type"
 
-        service.handleMessage(new Message(messageType: MessageType.PUBLISH, subscriptionId:'123456'), queueName)
+        service.handleMessage(new Message(messageType: MessageType.PUBLISH, subscriptionId: '123456'), queueName)
 
         then: "expect no exceptions to be thrown"
+
+        noExceptionThrown()
+    }
+
+    void "handle message creates requeues individual update subscriptions"() {
+
+        when: "sending a message to the consumer with an update the message type a media id"
+
+        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: '123456'), queueName)
+
+        then: "requeue each individual subscription found"
+
+        1 * queueService.sendToRhythmyxUpdateQueue(MessageType.UPDATE, rhythmyxSubscription1.id)
+        1 * queueService.sendToRhythmyxUpdateQueue(MessageType.UPDATE, rhythmyxSubscription2.id)
+
+        and: "expect no exceptions to be thrown"
 
         noExceptionThrown()
     }
@@ -80,7 +96,7 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
         when: "sending a valid import message to the consumer"
 
-        service.handleMessage(new Message(subscriptionId:"${rhythmyxSubscription.id}", messageType:MessageType.IMPORT), queueName)
+        service.handleMessage(new Message(subscriptionId: "${rhythmyxSubscription.id}", messageType: MessageType.IMPORT), queueName)
 
         then: "import the media item using the rhythmyx import service"
 
@@ -95,7 +111,7 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
         when: "sending a valid import message to the consumer"
 
-        service.handleMessage(new Message(subscriptionId:'123456', messageType:MessageType.IMPORT), queueName)
+        service.handleMessage(new Message(subscriptionId: '123456', messageType: MessageType.IMPORT), queueName)
 
         then: "attempt to import the media item using the rhythmyx import service"
 
@@ -114,7 +130,7 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
         when: "sending a valid import message to the consumer"
 
-        service.handleMessage(new Message(subscriptionId:'sdfdsfdf', messageType:MessageType.IMPORT), queueName)
+        service.handleMessage(new Message(subscriptionId: 'sdfdsfdf', messageType: MessageType.IMPORT), queueName)
 
         then: "expect no exceptions to be thrown"
 
@@ -125,7 +141,7 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
         when: "sending an update message to the consumer without the media id"
 
-        service.handleMessage(new Message(messageType:MessageType.UPDATE), queueName)
+        service.handleMessage(new Message(messageType: MessageType.UPDATE), queueName)
 
         then: "expect no exceptions to be thrown"
 
@@ -140,19 +156,15 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
         when: "sending a valid update message to the consumer"
 
-        service.handleMessage(new Message(mediaId:"${rhythmyxSubscription.id}", messageType:MessageType.UPDATE), queueName)
+        service.handleMessage(new Message(subscriptionId: "${rhythmyxSubscription.id}", messageType: MessageType.UPDATE), queueName)
 
         then: "update the media item using the rhythmyx import service"
 
-        1 * rhythmyxSubscriptionUpdateService.updateRhythmyxSubscriptions("${rhythmyxSubscription.id}") >> [successfullUpdates: [rhythmyxSubscription]]
+        1 * rhythmyxSubscriptionUpdateService.updateSubscription(rhythmyxSubscription) >> true
 
         and: "transition the rhythmyx subscriptions"
 
-        1 * rhythmyxSubscriptionTransitionService.doUpdateTransitions([rhythmyxSubscription])
-
-        and: "the rhythmyx subscription's delivery failure log id should be set to null"
-
-        rhythmyxSubscription.deliveryFailureLogId == null
+        1 * rhythmyxSubscriptionTransitionService.doUpdateTransitions(rhythmyxSubscription)
     }
 
     void "handle update message correctly handles a failed update message"() {
@@ -163,11 +175,15 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
         when: "sending a valid update message to the consumer"
 
-        service.handleMessage(new Message(mediaId:"${rhythmyxSubscription.id}", messageType:MessageType.UPDATE), queueName)
+        service.handleMessage(new Message(subscriptionId: "${rhythmyxSubscription.id}", messageType: MessageType.UPDATE, meta: [attempts: 1]), queueName)
 
         then: "attempt to update the media item using the rhythmyx import service"
 
-        1 * rhythmyxSubscriptionUpdateService.updateRhythmyxSubscriptions("${rhythmyxSubscription.id}") >> [successfullUpdates: []]
+        1 * rhythmyxSubscriptionUpdateService.updateSubscription(rhythmyxSubscription) >> false
+
+        then: "requeue the message"
+
+        1 * queueService.sendToRhythmyxErrorQueue(MessageType.UPDATE, rhythmyxSubscription.id, null, 1)
 
         and: "expect no exceptions to be thrown"
 
@@ -178,7 +194,7 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
         when: "sending a delete message to the consumer without the media id"
 
-        service.handleMessage(new Message(messageType:MessageType.DELETE), queueName)
+        service.handleMessage(new Message(messageType: MessageType.DELETE), queueName)
 
         then: "expect no exceptions to be thrown"
 
@@ -193,11 +209,11 @@ class RhythmyxSubscriptionConsumerServiceSpec extends Specification {
 
         when: "sending a valid delete message to the consumer"
 
-        service.handleMessage(new Message(mediaId:'123456', messageType:MessageType.DELETE), queueName)
+        service.handleMessage(new Message(subscriptionId: rhythmyxSubscription.id, messageType: MessageType.DELETE), queueName)
 
         then: "transition the rhythmyx subscriptions"
 
-        1 * rhythmyxSubscriptionTransitionService.doDeleteTransitions([rhythmyxSubscription])
+        1 * rhythmyxSubscriptionTransitionService.doDeleteTransitions(rhythmyxSubscription)
 
         then: "delete the subscription"
 

@@ -23,7 +23,7 @@ Redistribution and use in source and binary forms, with or without modification,
 	</div>
 </div>
 
-<div class="form-group ${hasErrors(bean: instance, field: 'email', 'has-error')} ">
+<div class="form-group ${hasErrors(bean: instance, field: 'email', 'has-error')}">
 	<label class="control-label col-sm-3" for="email">
 		<g:message code="subscriber.email.label" default="Email" />
 		<i class="fa fa-asterisk"></i>
@@ -34,19 +34,10 @@ Redistribution and use in source and binary forms, with or without modification,
 </div>
 
 <div class="form-group">
-	<label class="control-label col-sm-3" for="isPrivileged">
-		<g:message code="subscriber.isPrivileged.label" />
-	</label>
-	<div class="col-sm-6" style="padding-top: .5em;">
-        <g:checkBox name="isPrivileged" id="isPrivileged" value="${instance?.isPrivileged}" />
-	</div>
-</div>
-
-<div class="form-group">
 	<label class="control-label col-sm-3" for="sendKeyAgreement">
         <g:message code="subscriber.sendKeyAgreement.label" />
     </label>
 	<div class="col-sm-6" style="padding-top: .5em;">
-        <g:checkBox name="sendKeyAgreement" id="sendKeyAgreement" value="${instance?.sendKeyAgreement}" />
+        <g:checkBox name="sendKeyAgreement" id="sendKeyAgreement" value="true"/>
 	</div>
 </div>

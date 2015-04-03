@@ -11,7 +11,7 @@ Redistribution and use in source and binary forms, with or without modification,
         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --%>
-<%@ page import="com.ctacorp.syndication.manager.cms.UserRole; com.ctacorp.syndication.manager.cms.Role; com.ctacorp.syndication.manager.cms.User" %>
+<%@ page import="com.ctacorp.syndication.manager.cms.UserSubscriber; com.ctacorp.syndication.manager.cms.Subscriber; com.ctacorp.syndication.manager.cms.UserRole; com.ctacorp.syndication.manager.cms.Role; com.ctacorp.syndication.manager.cms.User" %>
 
 <div class="form-group ${hasErrors(bean: userInstance, field: 'username', 'has-error')} ">
     <label class="control-label col-sm-3" for="username">
@@ -23,7 +23,7 @@ Redistribution and use in source and binary forms, with or without modification,
             <g:textField class="form-control" name="username" value="${userInstance?.username}" />
         </g:if>
         <g:else>
-            <sec:username/>
+            ${userInstance?.username}
         </g:else>
     </div>
 </div>
@@ -38,7 +38,51 @@ Redistribution and use in source and binary forms, with or without modification,
     </div>
 </div>
 
+<g:if test="${actionName != 'edit'}">
+
+    <div class="form-group">
+        <label class="control-label col-sm-3" for="role">
+            <g:message code="role.label" />
+            <i class="fa fa-asterisk"></i>
+        </label>
+        <div class="controls col-sm-6">
+            <g:select class="form-control" id="role" name="role" from="${Role.list()}" optionKey="id" required="required" optionValue="authority" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label col-sm-3" for="subscribers">
+            <g:message code="subscriber.label" />
+            <i class="fa fa-asterisk"></i>
+        </label>
+        <div class="controls col-sm-6">
+            <g:select class="form-control" name="subscribers" from="${Subscriber.list()}" optionValue="name" optionKey="id" multiple="true" />
+        </div>
+    </div>
+
+</g:if>
+
 <g:if test="${actionName == 'edit'}">
+
+<div class="form-group">
+    <label class="control-label col-sm-3" for="role">
+        <g:message code="role.label" />
+        <i class="fa fa-asterisk"></i>
+    </label>
+    <div class="controls col-sm-6">
+        <g:select class="form-control" id="role" name="role" from="${Role.list()}" optionKey="id" required="required" optionValue="authority" value="${UserRole.findByUser(instance)?.role?.id}" />
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="control-label col-sm-3" for="subscribers">
+        <g:message code="subscriber.label" />
+        <i class="fa fa-asterisk"></i>
+    </label>
+    <div class="controls col-sm-6">
+        <g:select class="form-control" name="subscribers" from="${Subscriber.list()}" optionValue="name" optionKey="id" value="${UserSubscriber.findAllByUser(instance)*.subscriber}" multiple="true" />
+    </div>
+</div>
 
 <div class="form-group">
     <label class="control-label col-sm-3" for="accountExpired">
@@ -76,28 +120,6 @@ Redistribution and use in source and binary forms, with or without modification,
     </div>
 </div>
 
-<div class="form-group">
-    <label class="control-label col-sm-3" for="role">
-        <g:message code="role.label" />
-        <i class="fa fa-asterisk"></i>
-    </label>
-    <div class="controls col-sm-6">
-        <g:select class="form-control" id="role" name="role" from="${Role.list()}" optionKey="id" required="required" optionValue="authority" value="${UserRole.findByUser(instance)?.role?.id}" />
-    </div>
-</div>
-
 </g:if>
 
-<g:if test="${actionName != 'edit'}">
 
-    <div class="form-group">
-        <label class="control-label col-sm-3" for="role">
-            <g:message code="role.label" />
-            <i class="fa fa-asterisk"></i>
-        </label>
-        <div class="controls col-sm-6">
-            <g:select class="form-control" id="role" name="role" from="${Role.list()}" optionKey="id" required="required" optionValue="authority" />
-        </div>
-    </div>
-
-</g:if>

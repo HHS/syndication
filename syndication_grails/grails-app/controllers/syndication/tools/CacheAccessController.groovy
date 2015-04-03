@@ -32,4 +32,16 @@ class CacheAccessController {
             render text: [msg: "There was an error flushing the cache, error code ${time}"] as JSON, status: 500, contentType: "application/json"
         }
     }
+    
+    def flushCacheByName(){
+        log.info("Flushing Guava Cache for " + params.cacheName)
+        boolean successful = guavaCacheService.flushCache(params.cacheName)
+        if(successful) {
+            render text: [msg: "Cache Flushed Successfully."] as JSON, status: 200, contentType: "application/json"
+        } else{
+            long time = System.nanoTime()
+            log.error("Cache flush failed: ${time}")
+            render text: [msg: "There was an error flushing the cache, error code ${time}"] as JSON, status: 500, contentType: "application/json"
+        }
+    }
 }

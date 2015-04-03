@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -13,6 +12,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
   */
 package com.ctacorp.syndication.manager.cms
+
 import com.ctacorp.syndication.swagger.rest.client.model.SyndicatedMediaItem
 import grails.transaction.Transactional
 
@@ -24,145 +24,107 @@ class EmailSubscriptionUpdateService {
     def queueService
     def subscriptionService
 
-    List updateEmailSubscriptions(String mediaId) {
+    boolean updateEmailSubscription(EmailSubscription emailSubscription) {
 
-        log.info("Updating email subscriptions for mediaId '${mediaId}'")
-
-        def failedUpdates = []
-
-        def subscription = Subscription.findByMediaId(mediaId)
-        if (!subscription) {
-            log.info("No subscriptions found for media '${mediaId}'")
-            return failedUpdates
-        }
-
-        def emailSubscriptions = EmailSubscription.findAllBySubscription(subscription)
-        if (!emailSubscriptions) {
-            log.info("No email subscriptions found for media '${mediaId}'")
-            return failedUpdates
-        }
-
-        SyndicatedMediaItem syndicatedMediaItem
-
-        try {
-            syndicatedMediaItem = contentExtractionService.extractSyndicatedContent(mediaId)
-        } catch (e) {
-            log.error("Error occurred when extracting the content for mediaId '${mediaId}'", e)
-            return emailSubscriptions
-        }
+        def mediaId = emailSubscription.subscription.mediaId
 
         def sourceUrl
         try {
             sourceUrl = contentExtractionService.getMediaItem(mediaId)?.sourceUrl
         } catch (e) {
             log.error("Error occurred when getting the sourceUrl for mediaId '${mediaId}'", e)
-            return emailSubscriptions
+            return false
         }
 
-        if(sourceUrl==null) {
+        if (sourceUrl == null) {
             log.error("The sourceUrl for mediaId '${mediaId}' was null")
-            return emailSubscriptions
+            return false
         }
 
-        emailSubscriptions.each { EmailSubscription emailSubscription ->
-            if (syndicatedMediaItem) {
-                try {
+        SyndicatedMediaItem syndicatedMediaItem
 
-                    try{
-                        emailSubscriptionMailService.sendSubscriptionUpdate(emailSubscription, syndicatedMediaItem.content)
-                    } catch (e) {
-                        log.error("Error occurred when sending the subscription update for mediaId '${mediaId}' to '${emailSubscription.emailSubscriber.email}'", e)
-                        failedUpdates.add(emailSubscription)
-                    }
-
-                    emailSubscription.title = syndicatedMediaItem.name
-                    emailSubscription.sourceUrl = sourceUrl
-                    emailSubscription.deliveryFailureLogId = null
-                    emailSubscription.isPending = false
-                    emailSubscription.save(flush:true)
-
-
-                } catch (e) {
-                    log.error("Error occurred when sending the subscription update for mediaId '${mediaId}' to '${emailSubscription.emailSubscriber.email}'", e)
-                    failedUpdates.add(emailSubscription)
-                }
-            }
+        try {
+            syndicatedMediaItem = contentExtractionService.getMediaSyndicate(mediaId)
+        } catch (e) {
+            log.error("Error occurred when extracting the content for mediaId '${mediaId}'", e)
+            return false
         }
 
-        return failedUpdates
+        if (syndicatedMediaItem == null) {
+            log.error("The syndicatedMediaItem for mediaId '${mediaId}' was null")
+            return false
+        }
+
+        try {
+            emailSubscriptionMailService.sendSubscriptionUpdate(emailSubscription, syndicatedMediaItem.content)
+            emailSubscription.title = syndicatedMediaItem.name
+            emailSubscription.sourceUrl = sourceUrl
+            emailSubscription.deliveryFailureLogId = null
+            emailSubscription.isPending = false
+            emailSubscription.save(flush: true)
+            log.info("Successfully updated emailSubscription '${emailSubscription.id}'")
+            return true
+        } catch (e) {
+            log.error("Error occurred when sending the subscription update for mediaId '${mediaId}' to '${emailSubscription.emailSubscriber.email}'", e)
+            return false
+        }
     }
 
     boolean importEmailSubscription(Long subscriptionId) {
 
-        log.info("Importing emailSubscription '${subscriptionId}'")
-
         def emailSubscription = EmailSubscription.findById(subscriptionId)
 
-        if(!emailSubscription) {
+        if (!emailSubscription) {
             log.warn("Could not find emailSubscription '${subscriptionId}'")
             return false
         }
 
         def mediaId = emailSubscription.subscription.mediaId
 
-        def content
+        SyndicatedMediaItem syndicatedMediaItem
+
         try {
-            content = contentExtractionService.extractSyndicatedContent(mediaId)?.content
+            syndicatedMediaItem = contentExtractionService.getMediaSyndicate(mediaId)
         } catch (e) {
             log.error("Error occurred when extracting the content for mediaId '${mediaId}'", e)
+            return false
         }
 
-         if (content) {
-            try {
-                emailSubscriptionMailService.sendSubscriptionCreate(emailSubscription, content)
-                return true
-            } catch (e) {
-                log.error("Error occurred when sending the subscription create for mediaId '${mediaId}' to '${emailSubscription.emailSubscriber.email}'", e)
-            }
+        if (syndicatedMediaItem == null) {
+            log.error("The syndicatedMediaItem for mediaId '${mediaId}' was null")
+            return false
         }
 
-        return false
+        try {
+            emailSubscriptionMailService.sendSubscriptionCreate(emailSubscription, syndicatedMediaItem.content)
+            emailSubscription.deliveryFailureLogId = null
+            emailSubscription.isPending = false
+            emailSubscription.save(flush: true)
+            log.info("Successfully imported emailSubscription '${emailSubscription.id}'")
+            return true
+        } catch (e) {
+            log.error("Error occurred when sending the subscription create for mediaId '${mediaId}' to '${emailSubscription.emailSubscriber.email}'", e)
+            false
+        }
     }
 
-    List deleteEmailSubscription(String mediaId){
+    boolean deleteEmailSubscription(EmailSubscription emailSubscription) {
 
-        log.info("Deleting email subscriptions for mediaId '${mediaId}'")
-
-        def failedUpdates = []
-
-        def subscription = Subscription.findByMediaId(mediaId)
-        if (!subscription) {
-            log.info("No subscriptions found for media '${mediaId}'")
-            return failedUpdates
+        try {
+            emailSubscriptionMailService.sendStorefrontDelete(emailSubscription)
+            subscriptionService.deleteChildSubscription(emailSubscription)
+            log.info("Successfully deleted emailSubscription '${emailSubscription.id}'")
+            return true
+        } catch (e) {
+            log.error("Error occurred when importing emailSubscription '${emailSubscription.id}'", e)
+            return false
         }
+    }
 
-        def emailSubscriptions = EmailSubscription.findAllBySubscription(subscription)
-        if (!emailSubscriptions) {
-            log.info("No email subscriptions found for media '${mediaId}'")
-            return failedUpdates
-        }
-
-        emailSubscriptions.each { EmailSubscription emailSubscription ->
-
-            try {
-                emailSubscriptionMailService.sendStorefrontDelete(emailSubscription)
-            } catch (e) {
-                log.error("Error occurred when sending the subscription delete for mediaId '${mediaId}' to '${emailSubscription.emailSubscriber.email}'", e)
-                failedUpdates.add(emailSubscription)
-            }
-
-            def emailSubscriptionId = emailSubscription.id
-
-            try {
-                subscriptionService.deleteChildSubscription(emailSubscription)
-            } catch (e) {
-                log.warn("Could not delete email subscription '${emailSubscriptionId}'", e)
-                failedUpdates.add(emailSubscription)
-            }
-
-            log.info("Successfully deleted emailSubscription '${emailSubscription}'")
-        }
-
-        return failedUpdates
+    def getMediaId(String sourceUrl) {
+        log.info("looking up mediaId for sourceUrl=${sourceUrl}")
+        def mediaId = contentExtractionService.getMediaItemBySourceUrl(sourceUrl)
+        log.info("mediaId for sourceUrl=${sourceUrl} is ${mediaId}")
+        return mediaId
     }
 }

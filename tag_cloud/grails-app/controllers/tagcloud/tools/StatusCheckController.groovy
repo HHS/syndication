@@ -28,5 +28,4 @@ class StatusCheckController {
             render ([running:"roger"] as JSON)
         }
     }
-
 }

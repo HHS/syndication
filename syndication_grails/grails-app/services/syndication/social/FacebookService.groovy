@@ -15,16 +15,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.social
 
-import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.SocialMedia
-import com.ctacorp.syndication.Source
-import com.ctacorp.syndication.social.SocialMediaAccount
-import grails.plugins.rest.client.RestBuilder
-import grails.transaction.NotTransactional
-import grails.transaction.Transactional
-
-import javax.annotation.PostConstruct
-
 //@Transactional
 class FacebookService {
 //    def grailsApplication

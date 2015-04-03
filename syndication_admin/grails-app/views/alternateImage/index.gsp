@@ -13,8 +13,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.AlternateImage" %>
 <!DOCTYPE html>
+<%@ page import="com.ctacorp.syndication.AlternateImage" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <html>
 <head>
     <meta name="layout" content="main">

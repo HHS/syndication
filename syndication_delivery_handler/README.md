@@ -1,21 +1,19 @@
-# Syndication Delivery Handler 0.2.5 Installation and Configuration Guide
+# Syndication Delivery Handler 0.2.6 Installation and Configuration Guide
 
 ## Build Number
 
-The build number associated with this release of the *Syndication Delivery Handler* is **0.2.5**. This number should be indicated when requesting support or administration of this release.
+The build number associated with this release of the *Syndication Delivery Handler* is **0.2.6**. This number should be indicated when requesting support or administration of this release.
 
 ## Nomenclature
 
-| Term                 | Description                                                                                                                                 |
-|:---------------------|:--------------------------------------------------------------------------------------------------------------------------------------------|
-| Delivery Handler     | The software described by this document that provides publishing capabilities to Syndication.                                               |
-| Syndication          | The syndication network as a whole including efforts put forth by CDC and instances deployed at various agencies such as CDC, FDA, and HHS. |
-| CMS Manager          | The web application responsible for issuing REST API security key agreements to CMS entities (i.e. hhs.gov).                                |
-| Syndication REST API | Offically known as the HHS Media Services REST API).                                                                                        |
-| Rhythmyx             | The Rhythmyx CM web application.                                                                                                            |
-| user                 | A Rhythmyx content editor (user).                                                                                                           |
-| ${USER}              | The UNIX user account that owns the Rhythmyx installation directory.                                                                        |
-| ${HOME}              | The home directory of the UNIX user account that owns the Rhythmyx installation directory.                                                  |
+- **Delivery Handler** - The software described by this document that provides publishing capabilities to Syndication.
+- **Syndication** - The syndication network as a whole including efforts put forth by CDC and instances deployed at various agencies such as CDC, FDA, and HHS.
+- **CMS Manager** - The web application responsible for issuing REST API security key agreements to CMS entities (i.e. hhs.gov).
+- **Syndication REST API** - Officially known as the HHS Media Services REST API).
+- **Rhythmyx** - The Rhythmyx CM web application.
+- **user** - A Rhythmyx content editor (user).
+- **${USER}** - The UNIX user account that owns the Rhythmyx installation directory.
+- **${HOME}** - The home directory of the UNIX user account that owns the Rhythmyx installation directory.
 
 ## About
 
@@ -23,16 +21,14 @@ The Syndication Delivery Handler is a Rhythmyx delivery handler that publishes c
 
 ## Distribution Contents
 
-The delivery handler is distributed as a zip file, *syndication-delivery-handler-0.2.5.zip*, and contains the following:
+The delivery handler is distributed as a zip file, *syndication-delivery-handler-0.2.6.zip*, and contains the following:
 
-| Filename                                   | Description                                                                                                                                 |
-|:-------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------|
-| install.sh                                 | The installer script that copies the distribution's files to their respective locations.                                                    |
-| syndication_delivery_handler_config.groovy | The configuration file for the delivery handler. See the ***Installation andConfiguration*** section for details.                           |
-| syndication_delivery_handler.xml           | The Spring XML configuration file that enables the delivery handler in Rhythmyx.                                                            |
-| publishing_template.json                   | The Velocity template used to publish content to the REST API.                                                                              |
-| key_agreement.json                         | The configuration that provides the security keys used to authenticate the delivery handler when publish requests are made to the REST API. |
-| syndication-delivery-handler-0.2.5.jar     | The JAR file containing all the required Java classes and resources needed by the delivery handler.                                         |
+- **install.sh** - The installer script that copies the distribution's files to their respective locations.
+- **syndication_delivery_handler_config.groovy** - The configuration file for the delivery handler. See the *Installation and Configuration* section for details.
+- **syndication_delivery_handler.xml** - The Spring XML configuration file that enables the delivery handler in Rhythmyx.
+- **publishing_template.json** - The Velocity template used to publish content to the REST API.
+- **key_agreement.json** - The configuration that provides the security keys used to authenticate the delivery handler when publish requests are made to the REST API.
+- **syndication-delivery-handler-0.2.6.jar** - The JAR file containing all the required Java classes and resources needed by the delivery handler.
 
 ## Installation and Configuration
 
@@ -41,22 +37,17 @@ The delivery handler is distributed as a zip file, *syndication-delivery-handler
 1. SCP or FTP the distribution ZIP file to the Rhythmyx host and put it in the ${HOME} directory and make sure the distribution ZIP is owned by ${USER}.
 
 2. Check that the *unzip* command is installed by issuing the following command:
-
-	```bash
-	if [ -f /usr/bin/unzip ]; then echo "unzip is installed"; fi
-	```
-
+```bash
+if [ -f /usr/bin/unzip ]; then echo "unzip is installed"; fi
+```
 3. If *unzip* is installed, the previous command would display "unzip is installed". If *unzip* is not currently installed, run the following command:
-
-	```bash
-	sudo apt-get install unzip
-	```
-
+```bash
+sudo apt-get install unzip
+```
 4. Unzip the distribution with the following command:
-
-	```bash
-	unzip syndication-delivery-handler-0.2.5.zip
-	```
+```bash
+unzip syndication-delivery-handler-0.2.6.zip
+```
 
 ### Configure the REST Client
 
@@ -72,11 +63,10 @@ The delivery handler is distributed as a zip file, *syndication-delivery-handler
 2. For *publish.url*, use the REST API's publishing endpoint URL. For *server.base.url*, use the Rhythmyx server's hostname and port number.
 3. When the install.sh script is run during the install process, a config file will be created at *${HOME}/syndication_delivery_handler_config.groovy*.
 4. **Optional**: To adjust the connection and socket timeout settings for the REST client, you can uncomment the following properties in the external config file *${HOME}/syndication_delivery_handler_config.groovy*.
-
-	```bash
-	http.connection.timeout = 30
-	http.socket.timeout = 30
-	```
+```bash
+http.connection.timeout = 30
+http.socket.timeout = 30
+```
 
 #### REST Authentication / API Key
 
@@ -89,17 +79,14 @@ When the install.sh is run during the install process, an encrypted version of t
 ### Install the Delivery Handler
 
 1. Run the install script in the root of the distribution by issuing the following commands:
-
-	```bash
-	cd syndication-delivery-handler-0.2.5/
-	./install.sh
-	```
-
+```bash
+cd syndication-delivery-handler-0.2.6/
+./install.sh
+```
 2. Select **'e'** at the following prompt:
-
-	```bash
-	Use the external config (e) or update the internal (i) config in the delivery handler JAR? [e/i]:
-	```
+```bash
+Use the external config (e) or update the internal (i) config in the delivery handler JAR? [e/i]:
+```
 
 ### Configure a Content Type to be Publishable
 
@@ -137,6 +124,8 @@ To make a content type publishable to the REST API, perform the following action
 
 ### Create the Velocity Publishing Template
 
+***Note:*** *This template is only used to publish content to Syndication. It is not used for site publishing.*
+
 The delivery handler uses a custom Velocity template to format the content for publishing to REST API. To create the template, perform the following actions from the Rhythmyx Workbench:
 
 1. Click the 'Assembly Design' tab from the left pane
@@ -158,32 +147,29 @@ The delivery handler uses a custom Velocity template to format the content for p
 13. Click 'Finish'
 14. Click the 'Save' button
 15. In the 'Source Tab', paste the following XML document exactly as given without any formatting:
-
-	```xml
-	    ##make sure the template is set to never publish, not default.
-	    ##also make sure not to leave space in the top line.
-	    #set ($display_title = $tools.esc.xml($sys.item.getProperty("rx:displaytitle").String))
-	    <?xml version="1.0" encoding="UTF-8"?>
-	    <json>
-	    <![CDATA[{"language":1,"source":1,"sourceUrl":"$source_url","name":"$display_title"}]]>
-	    </json>
-	```
-
+```xml
+##make sure the template is set to never publish, not default.
+##also make sure not to leave space in the top line.
+#set ($display_title = $tools.esc.xml($sys.item.getProperty("rx:displaytitle").String))
+<?xml version="1.0" encoding="UTF-8"?>
+<json>
+<![CDATA[{"language":1,"source":1,"sourceUrl":"$source_url","name":"$display_title"}]]>
+</json>
+```
 16. Click the 'General' Tab
 17. Set:
 	- Publish = Never
 18. Click the 'Save' button
 19. Restart the Rhythmyx application server for the changes to take effect.
 
-**Notes:**
+##### Marking Up Content for Publishing to Syndication
 
 Your content must be properly marked up to be processed by Syndication. Make sure that any content you wish to make available for syndication should use a HTML div with the *syndicate* class name. For example, the following HTML elements are properly marked up for publishing to Syndication:
 
-```html
+```xml
 <div class="syndicate">
 	This is syndicated content!
 </div>
-
 <div class="some-other-class-name syndicate">
 	<p>
 		This is more syndicated content!
@@ -191,11 +177,7 @@ Your content must be properly marked up to be processed by Syndication. Make sur
 <div>
 ```
 
-This template is only used to publish (push) content to Syndication. It is not used for site publishing.
-
 ### Configure the Publishing Design
-
-**Note:**
 
 These are general instructions for configuring the delivery handler and content lists and attaching the content lists to a publishing edition. Per site publishing configuration will dictate the naming of content lists and editions, and specific publishing requirements may require configuration that is out-of-scope for this document.
 
@@ -296,6 +278,6 @@ To remove the publishing contexts, perform the following actions within the Rhyt
 Run the uninstall script in the root of the distribution by issuing the following commands:
 
 ```bash
-cd syndication-delivery-handler-0.2.5/
+cd syndication-delivery-handler-0.2.6/
 ./uninstall.sh
 ```

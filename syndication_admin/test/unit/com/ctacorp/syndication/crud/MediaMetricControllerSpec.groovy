@@ -17,10 +17,11 @@ package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.MediaItem
-import com.ctacorp.syndication.MediaMetric
-import grails.test.mixin.*
-import spock.lang.*
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.metric.MediaMetric
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 @TestFor(MediaMetricController)
 @Mock([MediaMetric, MediaItem, Source, Language])

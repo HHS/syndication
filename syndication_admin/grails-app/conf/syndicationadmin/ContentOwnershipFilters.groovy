@@ -1,7 +1,7 @@
 package syndicationadmin
 
-import com.ctacorp.syndication.MediaItem
 import com.ctacorp.syndication.Campaign
+import com.ctacorp.syndication.media.MediaItem
 
 
 class ContentOwnershipFilters {

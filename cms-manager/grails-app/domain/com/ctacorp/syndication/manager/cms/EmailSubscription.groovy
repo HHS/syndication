@@ -32,4 +32,8 @@ class EmailSubscription {
         title(nullable: false, blank: false)
         deliveryFailureLogId(nullable: true, blank: false)
     }
+
+    static mapping = {
+        sort(id: 'desc')
+    }
 }

@@ -1,7 +1,11 @@
 package com.ctacorp.syndication
 
-import com.ctacorp.syndication.authentication.User
-import com.ctacorp.syndication.authentication.UserRole
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.Image
+import com.ctacorp.syndication.media.Infographic
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.media.Video
+
 import com.ctacorp.syndication.health.FlaggedMedia
 import com.ctacorp.syndication.health.HealthReport
 import grails.plugins.rest.client.RestBuilder
@@ -101,7 +105,7 @@ class MediaValidationService {
         rest = new RestBuilder()
         def sourceUrlCode = null
         try{
-            sourceUrlCode = rest.head(mi.sourceUrl).getStatus()
+            sourceUrlCode = rest.head(URI.decode(mi.sourceUrl)).getStatus()
         }catch(error){println "error thrown: " + error
             return new HealthReport(mediaId: mi.id, statusCode: 404, details:error, failureType: FlaggedMedia.FailureType.UNREACHABLE)
         }
@@ -118,9 +122,15 @@ class MediaValidationService {
                     if(!(youtubeMetaData.status in OK_STATUSES)){
                         return new HealthReport(mediaId: mi.id, statusCode: youtubeMetaData.status, FlaggedMedia.FailureType.SERVER_ERROR)
                     }
+                    if(!mi.mediaThumbnail || !mi.mediaPreview){
+                        return new HealthReport(mediaId: mi.id, failureType: FlaggedMedia.FailureType.NO_PREVIEW_THUMBNAIL)
+                    }
                     return new HealthReport(mediaId: mi.id, valid: true)
                 case Image:
                 case Infographic:
+                    if(!mi.mediaThumbnail || !mi.mediaPreview){
+                        return new HealthReport(mediaId: mi.id, failureType: FlaggedMedia.FailureType.NO_PREVIEW_THUMBNAIL)
+                    }
                     return new HealthReport(mediaId: mi.id, valid: true)
                 case Html:
                     def mediaContent = fetchContent(mi)
@@ -142,6 +152,9 @@ class MediaValidationService {
                         return new HealthReport(mediaId: mi.id, failureType: FlaggedMedia.FailureType.SHORT_CONTENT)
                     }
 
+                    if(!mi.mediaThumbnail || !mi.mediaPreview){
+                        return new HealthReport(mediaId: mi.id, failureType: FlaggedMedia.FailureType.NO_PREVIEW_THUMBNAIL)
+                    }
                     return new HealthReport(mediaId: mi.id, valid: true)
                 default:
                     return new HealthReport(mediaId: mi.id, valid: true)

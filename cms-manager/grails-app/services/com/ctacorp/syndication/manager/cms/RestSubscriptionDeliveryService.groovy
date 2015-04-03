@@ -60,7 +60,7 @@ class RestSubscriptionDeliveryService {
             if (restSubscription.notificationOnly) {
                 [headers: headers, query: [media_id: mediaId]]
             } else {
-                [headers: headers, body: content, query: [media_id: mediaId], requestContentType: 'application/json']
+                [headers: headers, body: content, query: [media_id: mediaId], requestContentType: 'text/html']
             }
         }()
 
@@ -86,17 +86,13 @@ class RestSubscriptionDeliveryService {
                 throw new RestDeliveryException("Received a status code of '${status}' when trying to POST to '${deliveryEndpoint}'")
             }
         } else {
-            log.info("Successfully updated the rest subscription for media id '${mediaId}' belonging to rest subscriber '${deliveryEndpoint}'")
+            log.info("Successfully delivered the rest subscription for media id '${mediaId}' belonging to rest subscriber '${deliveryEndpoint}'")
         }
     }
 
-    void deliverDelete(RestSubscription restSubscription, String content, boolean mediaItemDeleted){
+    void deliverDelete(RestSubscription restSubscription){
         if (!restSubscription) {
             throw new RestDeliveryException("Rest subscription was null")
-        }
-
-        if (!content) {
-            throw new RestDeliveryException("Content was null or empty")
         }
 
         def deliveryEndpoint = restSubscription.restSubscriber.deliveryEndpoint
@@ -104,15 +100,9 @@ class RestSubscriptionDeliveryService {
         def keyAgreement = restSubscription.restSubscriber.subscriber.keyAgreement
 
         def authorizationHeaderGenerator = authorizationHeaderGeneratorFactory.newAuthorizationHeaderGenerator(keyAgreement)
-        def headers = authorizationHeaderService.createAuthorizationHeaders(authorizationHeaderGenerator, deliveryEndpoint, content, "DELETE")
+        def headers = authorizationHeaderService.createAuthorizationHeaders(authorizationHeaderGenerator, deliveryEndpoint, null, "DELETE")
 
-        def args = {
-            if(mediaItemDeleted) {
-                [headers: headers, query: [media_id: mediaId]]
-            } else{
-                [headers: headers, query: [media_id: mediaId, subscriptionId: restSubscription.id]]
-            }
-        }()
+        def args = [headers: headers, query: [media_id: mediaId, subscriptionId: restSubscription.id]]
 
         def status = {
             def client = restClientFactory.newRestClient(deliveryEndpoint)
@@ -126,8 +116,6 @@ class RestSubscriptionDeliveryService {
         }()
 
         if (status != 200) {
-
-            log.debug("Content was: \n${content}")
 
             if (status == 410) {
                 log.warn("Deleting the rest subscription for media id '${mediaId}' belonging to rest subscriber '${deliveryEndpoint}'")

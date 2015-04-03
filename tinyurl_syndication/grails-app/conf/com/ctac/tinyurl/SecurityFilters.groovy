@@ -27,7 +27,7 @@ class SecurityFilters {
                     response.status = 400
                     response.contentType = "application.json"
                     render ([error:'not authorized'] as JSON)
-                    println "not authorized"
+                    log.error "not authorized"
                     return false
                 }
                 true

@@ -15,8 +15,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.tagcloud.controller
 
 import tagcloud.TagTypeController
-import grails.test.mixin.*
-import spock.lang.*
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 import tagcloud.domain.TagType
 
 @TestFor(TagTypeController)

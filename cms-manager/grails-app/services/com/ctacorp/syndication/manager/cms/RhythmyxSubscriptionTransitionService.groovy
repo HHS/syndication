@@ -29,25 +29,21 @@ class RhythmyxSubscriptionTransitionService {
         }
     }
 
-    void doUpdateTransitions(List<RhythmyxSubscription> rhythmyxSubscriptions) {
+    void doUpdateTransitions(RhythmyxSubscription rhythmyxSubscription) {
 
-        rhythmyxSubscriptions.each { RhythmyxSubscription rhythmyxSubscription ->
-            try {
-                rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription, RhythmyxIngestionService.WORKFLOW_TRANSITION_UPDATE)
-            } catch (e) {
-                log.error("the update transition failed for the content item associated with rhythmyxSubscription '${rhythmyxSubscription.id}'", e)
-            }
+        try {
+            rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription, RhythmyxIngestionService.WORKFLOW_TRANSITION_UPDATE)
+        } catch (e) {
+            log.error("the update transition failed for the content item associated with rhythmyxSubscription '${rhythmyxSubscription.id}'", e)
         }
     }
 
-    void doDeleteTransitions(List<RhythmyxSubscription> rhythmyxSubscriptions) {
+    void doDeleteTransitions(RhythmyxSubscription rhythmyxSubscription) {
 
-        rhythmyxSubscriptions.each { RhythmyxSubscription rhythmyxSubscription ->
-            try {
-                rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription, RhythmyxIngestionService.WORKFLOW_TRANSITION_DELETE)
-            } catch (e) {
-                log.error("the delete transition failed for the content item associated with rhythmyxSubscription '${rhythmyxSubscription.id}'", e)
-            }
+        try {
+            rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription, RhythmyxIngestionService.WORKFLOW_TRANSITION_DELETE)
+        } catch (e) {
+            log.error("the delete transition failed for the content item associated with rhythmyxSubscription '${rhythmyxSubscription.id}'", e)
         }
     }
 }

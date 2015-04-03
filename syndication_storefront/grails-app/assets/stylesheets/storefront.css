@@ -24,6 +24,10 @@ body {
     width: 100%;
 }
 
+strong{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 img {
     border: 0px none;
 }
@@ -1509,6 +1513,11 @@ img.btn_close {
 .footer-connect-icons .addthis_toolbox a {
     padding: 0 15px 15px 0;
     float: left;
+}
+
+.footer-connect-icons p {
+    clear:both;
+    
 }
 
 /*---------------------*/

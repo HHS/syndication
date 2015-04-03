@@ -16,7 +16,6 @@ package com.ctacorp.tagcloud
 
 import com.ctacorp.syndication.commons.util.Util
 import grails.plugins.rest.client.RestBuilder
-import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 
 @Transactional (readOnly = true)
@@ -35,7 +34,7 @@ class SyndicationService {
             return resp.json
         } catch(e){
             log.error e
-            return null
         }
+        return null
     }
 }

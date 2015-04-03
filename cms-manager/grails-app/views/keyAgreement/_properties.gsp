@@ -25,9 +25,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <dd><g:fieldValue bean="${instance}" field="entity2"/></dd>
 </g:else>
 
-<dt><g:message code="keyAgreement.jsonExport.label"/></dt>
-<dd class="diffie-hellman-key">${instance?.jsonExport}</dd>
-
 <dt><g:message code="keyAgreement.dateCreated.label"/></dt>
 <dd><g:formatDate date="${instance?.dateCreated}"/></dd>
+
+<div id="keyAgreement-panel" class="panel panel-default">
+    <div class="panel-heading">
+        <b><g:message code="keyAgreement.jsonExport.label"/></b>
+    </div>
+    <div class="panel-body">
+        <p class="diffie-hellman-key">${instance?.jsonExport}</p>
+    </div>
+</div>
 

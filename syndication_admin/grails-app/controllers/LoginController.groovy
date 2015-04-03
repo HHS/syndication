@@ -1,6 +1,4 @@
 import grails.converters.JSON
-import org.springframework.security.authentication.BadCredentialsException
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 import javax.servlet.http.HttpServletResponse
 

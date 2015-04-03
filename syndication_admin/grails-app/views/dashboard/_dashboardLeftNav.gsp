@@ -17,7 +17,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <ul class="nav" id="side-menu">
             <li>
                 <g:link controller="dashboard" action="syndDash"><i
-                        class="fa fa-dashboard fa-fw"></i> Syndication Dashboard</g:link>
+                        class="fa fa-dashboard fa-fw"></i> Dashboard</g:link>
             </li>
 
             <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER,ROLE_BASIC,ROLE_STATS,ROLE_PUBLISHER">
@@ -64,13 +64,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <a href="#"><i class="fa fa-tasks fa-fw"></i> Metrics<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         <li>
-                            <g:link controller="metricReport" action="mediaViewMetrics"><i class="fa fa-tasks fa-fw"></i> Metrics Report</g:link>
+                            <g:link controller="metricReport" action="overview"><i class="fa fa-tasks fa-fw"></i> Metrics Report</g:link>
                         </li>
                         <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER">
-                            %{--<li>--}%
-                                %{--<g:link controller="campaignMetric"><i--}%
-                                        %{--class="fa fa-tasks fa-fw"></i> Campaign Metrics</g:link>--}%
-                            %{--</li>--}%
                             <li>
                                 <g:link controller="mediaMetric"><i class="fa fa-tasks fa-fw"></i> Media Metrics</g:link>
                             </li>

@@ -31,4 +31,8 @@ class RestSubscription {
         notificationOnly(default:true)
         deliveryFailureLogId(nullable: true, blank: false)
     }
+
+    static mapping = {
+        sort(id: 'desc')
+    }
 }

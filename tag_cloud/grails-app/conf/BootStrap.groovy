@@ -37,7 +37,6 @@ class BootStrap {
 ==========================================
 | -> Tag Cloud Ready.                    |
 =========================================="""
-        println systemRunningMessage
         log.info systemRunningMessage
     }
 

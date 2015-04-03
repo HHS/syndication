@@ -115,7 +115,6 @@ bruteforcedefender {
 
 springsecurity {
     cmsManager {
-        passwordLength = 8
         account.help.email = "syndicationadmin@hhs.gov"
     }
 }
@@ -173,56 +172,25 @@ cmsManager.createTestDataInProductionMode = false
 // LOGGING                                \______________________________________________
 //_______________________________________________________________________________________
 
-log4j = {
+import org.apache.log4j.Level
 
+new File("${userHome}/syndicationLogs/api").mkdirs()
+
+log4j.main = {
     appenders {
-        rollingFile name:'file', file:"${userHome}/syndicationLogs/cms/cmsmanager.log", maxBackupIndex:10
-        rollingFile name:'apikey', file:"${userHome}/syndicationLogs/cms/cmsmanager.apikey.log", maxBackupIndex:10
-        console name: 'stdout', layout: pattern(conversionPattern: "%c{2} %m%n")
+        rollingFile name:'errorFile', maxFileSize:"10MB", file:"${System.getProperty("user.home")}/syndicationLogs/cms/errors.log", threshold: Level.WARN
+        rollingFile name:'infoFile',  maxFileSize:"10MB", file:"${System.getProperty("user.home")}/syndicationLogs/cms/details.log", threshold: Level.INFO
     }
 
-    root {
-        error 'stdout'
-        info 'file'
-        error 'access'
+    root{
+        error 'errorFile', 'infoFile', 'stdout'
     }
 
-    error additivity: false, stdout: [
-        'org.codehaus.groovy.grails.web.servlet',
-        'org.codehaus.groovy.grails.web.pages',
-        'org.codehaus.groovy.grails.web.sitemesh',
-        'org.codehaus.groovy.grails.web.mapping.filter',
-        'org.codehaus.groovy.grails.web.mapping',
-        'org.codehaus.groovy.grails.commons',
-        'org.codehaus.groovy.grails.plugins',
-        'org.codehaus.groovy.grails.orm.hibernate',
-        'org.springframework',
-        'org.hibernate',
-        'net.sf.ehcache.hibernate',
-        'grails.app'
-    ]
+    info   'grails.app', 'org.codehaus.groovy.grails.web.servlet'
 
-    error additivity: false, stdout: 'com.grygoriy.bruteforcedefender'
-    fatal additivity: false, stdout: 'org.hibernate.tool.hbm2ddl.SchemaExport'
+    fatal  'org.hibernate.tool.hbm2ddl.SchemaExport'
 
-    info additivity: false, file: [
-        'grails.app.conf',
-        'grails.app.filters',
-        'grails.app.taglib',
-        'grails.app.services',
-        'grails.app.controllers',
-        'grails.app.domain',
-        'com.ctacorp.syndication',
-        'com.ctacorp.commons'
-    ]
-
-    info additivity: false, apikey: [
-        'grails.app.controllers.com.ctacorp.syndication.manager.cms.rest.AuthorizationController',
-        'grails.app.filters.SecurityFilters',
-        'com.ctacorp.commons.api.key.utils'
-    ]
-
-    error additivity: false, apikey: 'org.apache.catalina.filters.RequestDumperFilter'
+    error stdout: 'com.sun.jersey'
 }
 
 environments {
@@ -300,6 +268,7 @@ apiKey {
 //_______________________________________________________________________________________
 
 import com.icegreen.greenmail.util.ServerSetupTest
+
 grails.mail.port = ServerSetupTest.SMTP.port
 
 //___________________________

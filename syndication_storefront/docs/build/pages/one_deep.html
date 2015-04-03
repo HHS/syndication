@@ -1,0 +1,89 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>2. One Deep - Gaiden</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/highlight.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/my.css">
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="header">
+        <i class="fa fa-bars sidebar-toggle"></i>
+        <span class="title"><a href="../index.html">Gaiden</a></span>
+      </div>
+      <div class="sidebar">
+        <ul>
+          <li class="numbered visible">
+            <a href="../index.html" data-alt-hash="hello-gaiden"><span class="number">1.</span>Hello Gaiden!</a>
+            <ul>
+              <li class="numbered visible">
+                <a href="../index.html#this-is-a-sub-title"><span class="number">1.1.</span>This is a sub title</a>
+                <ul>
+                  <li class="numbered visible">
+                    <a href="../index.html#now-some-smaller-stuff"><span class="number">1.1.1.</span>now some smaller stuff</a>
+                    <ul>
+                      <li class="numbered invisible">
+                        <a href="../index.html#how-far-will-it-go"><span class="number">1.1.1.1.</span>how far will it go</a>
+                        <ul>
+                          <li class="unnumbered invisible"><a href="../index.html#this-far">this far?</a></li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="numbered visible"><a href="one_deep.html" data-alt-hash="one-deep"><span class="number">2.</span>One Deep</a></li>
+        </ul>
+      </div>
+      <div class="content">
+        <div class="content-handle"></div>
+        <div class="content-container">
+          <div class="content-nav content-nav-top">
+            <a class="prev-page" href="../index.html">
+            <i class="fa fa-angle-left"></i>
+            <span class="number">1.</span>
+            Hello Gaiden!
+            </a>
+          </div>
+          <div class="page-toc">
+            <ul>
+              <li class="numbered visible"><a href="#one-deep"><span class="number">2.</span>One Deep</a></li>
+            </ul>
+          </div>
+          <div class="main-content">
+            <h1 id="one-deep"><span class="number">2.</span>One Deep</h1>
+            <p>asdfsdfa</p>
+          </div>
+          <div class="content-nav content-nav-bottom">
+            <a class="prev-page" href="../index.html">
+            <i class="fa fa-angle-left"></i>
+            <span class="number">1.</span>
+            Hello Gaiden!
+            </a>
+          </div>
+          <div class="footer">
+            <p class="credit text-muted">Powered by <a href="https://github.com/kobo/gaiden">Gaiden</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="../js/jquery-2.1.1.min.js"></script>
+    <script src="../js/highlight.js"></script>
+    <script src="../js/application.js"></script>
+    <script src="../js/my.js"></script>
+    <script>
+      if (window.WebSocket) {
+        var socket = new WebSocket("ws://localhost:49377/");
+        socket.onmessage = function () {
+          location.reload();
+        };
+      }
+    </script>
+  </body>
+</html>

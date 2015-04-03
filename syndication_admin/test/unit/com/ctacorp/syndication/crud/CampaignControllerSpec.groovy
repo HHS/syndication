@@ -18,9 +18,10 @@ package com.ctacorp.syndication.crud
 import com.ctacorp.syndication.CampaignSubscriber
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.Campaign
-import com.ctacorp.syndication.MediaItem
-import grails.test.mixin.*
-import spock.lang.*
+import com.ctacorp.syndication.media.MediaItem
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 @TestFor(CampaignController)
 @Mock([Campaign,CampaignSubscriber,MediaItem])

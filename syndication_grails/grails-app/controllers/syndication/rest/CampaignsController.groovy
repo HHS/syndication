@@ -16,17 +16,17 @@ package syndication.rest
 
 import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.AlternateImage
-import com.ctacorp.syndication.Audio
+import com.ctacorp.syndication.media.Audio
 import com.ctacorp.syndication.Campaign
-import com.ctacorp.syndication.Html
-import com.ctacorp.syndication.Image
-import com.ctacorp.syndication.Infographic
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.Image
+import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.MediaItem
-import com.ctacorp.syndication.SocialMedia
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.media.SocialMedia
 import com.ctacorp.syndication.Source
-import com.ctacorp.syndication.Video
-import com.ctacorp.syndication.Widget
+import com.ctacorp.syndication.media.Video
+import com.ctacorp.syndication.media.Widget
 import syndication.api.Meta
 import syndication.api.Pagination
 import syndication.api.Message
@@ -41,7 +41,7 @@ import syndication.api.ApiResponse
         AlternateImage,
         Audio,
         Campaign,
-        com.ctacorp.syndication.Collection,
+        com.ctacorp.syndication.media.Collection,
         Html,
         Image,
         Infographic,
@@ -69,6 +69,10 @@ class CampaignsController {
 
     def apiResponseBuilderService
     def campaignsService
+
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
 
     @APIResource(path = "/resources/campaigns/{id}.json", description = "Information about a specific campaign", operations = [
         @Operation(httpMethod = "GET", notes="Returns the Campaign identified by the 'id'.", nickname="getCampaignById", type = "Campaigns", summary = "Get Campaign by ID", responseMessages = [

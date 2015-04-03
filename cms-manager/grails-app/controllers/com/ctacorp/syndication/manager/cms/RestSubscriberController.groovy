@@ -102,9 +102,8 @@ class RestSubscriberController {
             return notFound()
         }
 
-        def subscriptions = RestSubscription.findByRestSubscriber(restSubscriber)
-        subscriptions.each {
-            it.delete(flush:true)
+        RestSubscription.findAllByRestSubscriber(restSubscriber).each { restSubscription ->
+            restSubscription.delete(flush:true)
         }
 
         restSubscriber.delete(flush: true)

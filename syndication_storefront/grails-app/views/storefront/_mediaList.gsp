@@ -11,7 +11,7 @@
                 <g:if test="${tagsForMedia}">
                     <span class="mediaTagListing">
                         <g:each in="${tagsForMedia[mediaItemInstance.id]}" var="tag">
-                            <a href="${createLink(action:'listMediaForTag', id:tag.id, params:[tagName:tag.name])}" class="tagLink">${tag.name}&nbsp;</a>
+                            <a href="${createLink(action:'listMediaForTag', id:tag.id, params:[tagName:tag.name])}" class="tagLink">${tag.name}</a>&nbsp;
                         </g:each>
                     </span>
                 </g:if>
@@ -21,7 +21,7 @@
                 <p>${mediaItemInstance.description}</p>
                 <div class="mediaLinkButtons" id="medialinkbuttons_${mediaItemInstance.id}">
                     <div class="mediaPreview">
-                        <a href="${apiBaseUrl + '/resources/media/'+ mediaItemInstance.id +'/syndicate.json'}" class="syndButton popup-link">Preview</a>
+                        <a href="${apiBaseUrl + '/resources/media/'+ mediaItemInstance.id +'/syndicate.json'}" onclick="addStorefrontPreviewHit(${mediaItemInstance.id})" class="syndButton popup-link">Preview</a>
                         <span>
                             <sec:ifLoggedIn>
                                 <g:if test="${!likeInfo."${mediaItemInstance.id}".alreadyLiked}">
@@ -98,4 +98,16 @@
             });
         });
     });
+    
+    function addStorefrontPreviewHit(mediaId){
+        setTimeout(function () {
+            $.ajax({
+                type: 'POST',
+                data: {id:mediaId},
+                url: '${g.createLink(controller: 'storefront', action: 'storefrontPreviewMetricHit')}',
+                success: function(response){
+                }
+            });
+        });
+    }
 </script>

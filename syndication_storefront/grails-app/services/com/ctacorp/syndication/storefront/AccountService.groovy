@@ -10,30 +10,36 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 @Transactional
 class AccountService {
-
     def grailsApplication
-    def mailService
-    def groovyPageRenderer
 
-    def passwordReset(email, renderer) throws Exception{
+    private static final PASSWORD_POLICY = [
+            "upper"  : ('A'..'Z').toList(),
+            "lower"  : ('a'..'z').toList(),
+            "numbers": ('0'..'9').toList()
+    ]
+
+    def passwordReset(email, renderer) throws Exception {
+        if(!email){
+            throw new UsernameNotFoundException("Provided username was null!")
+        }
         //Find the referenced user
         User user = User.findByUsername(email)
-        if(!user){
+        if (!user) {
             throw new UsernameNotFoundException("User ${email} not found")
         }
 
-        if (user.getAuthorities().contains(Role.findByAuthority("ROLE_ADMIN"))){
+        if (user.getAuthorities().contains(Role.findByAuthority("ROLE_ADMIN"))) {
             log.error "A password reset was attempted for an admin account ID: ${user.id}"
-            return
+            return false
         }
 
         //Generate a new random password
         def randomPassword = PasswordGenerator.randomPassword
         user.password = randomPassword
         //Update user account with new rand password
-        if(user.save(flush: true, failOnError: true)){
+        if (user.save(flush: true, failOnError: true)) {
             //if the save worked, send an email
-          sendMail {
+            sendMail {
                 async true
                 to user.username
                 subject "Your password has been reset"
@@ -50,47 +56,37 @@ class AccountService {
         boolean l = false //lowercase
         boolean n = false //number
 
-        passwd.each{ letter ->
-            if (letter in PASSWORD_POLICY.upper){
+        passwd.each { letter ->
+            if (letter in PASSWORD_POLICY.upper) {
                 u = true
             }
-            if (letter in PASSWORD_POLICY.lower){
+            if (letter in PASSWORD_POLICY.lower) {
                 l = true
             }
-            if (letter in PASSWORD_POLICY.numbers){
+            if (letter in PASSWORD_POLICY.numbers) {
                 n = true
             }
         }
-        return [valid:u && l && n, uppercaseValid:u, lowercaseValid:l, numberValid:n]
+        return [valid: u && l && n, uppercaseValid: u, lowercaseValid: l, numberValid: n]
     }
 
-    private static final PASSWORD_POLICY = [
-            "upper" : ('A'..'Z').toList(),
-            "lower" : ('a'..'z').toList(),
-            "numbers" : ('0'..'9').toList()
-    ]
-
     @Transactional
-    def accountUnlockEmail(String email, String body, String userHash){
+    def accountUnlockEmail(String email, String body, String userHash) {
+        if(!email){
+            throw new UsernameNotFoundException("Provided username was null!")
+        }
         User user = User.findByUsername(email)
-        if(!user){
+        if (!user) {
             throw new UsernameNotFoundException("User ${email} not found")
         }
 
-//        String stringToHash = email + System.nanoTime()
-//        String userHash = stringToHash.encodeAsMD5();
-//        String body = groovyPageRenderer.render(template:'/login/accountLockedEmail', model:[verification:userHash, id:user.id])
-
-        use (TimeCategory) {
-            user.codeExpirationDate = new Date() + 1.day
-        }
+        user.codeExpirationDate = new Date() + 1
         user.unlockCode = userHash
-//        user.save(flush:true)
 
         //Update user account with new rand password
-        if(user.save(flush: true, failOnError: true)){
+        if (user.save(flush: true, failOnError: true)) {
             //if the save worked, send an email
-            mailService.sendMail{
+            sendMail {
                 multipart true
                 async true
                 to user.username
@@ -100,6 +96,5 @@ class AccountService {
             return true
         }
         return false
-
     }
 }

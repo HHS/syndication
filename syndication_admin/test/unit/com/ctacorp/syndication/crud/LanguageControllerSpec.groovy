@@ -16,8 +16,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
-import grails.test.mixin.*
-import spock.lang.*
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 @TestFor(LanguageController)
 @Mock(Language)

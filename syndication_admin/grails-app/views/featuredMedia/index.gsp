@@ -5,6 +5,7 @@
   Time: 3:09 PM
 --%>
 
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
@@ -14,7 +15,7 @@
     <asset:stylesheet src="/tokenInput/token-input.css"/>
     <g:javascript>
         $(document).ready(function(){
-            $("#featuredMedia").tokenInput("${g.createLink(controller: 'mediaItem', action: 'tokenMediaSearch')}.json", {
+            $("#featuredMedia").tokenInput("${g.createLink(controller: 'mediaItem', action: 'tokenMediaSearch')}.json?active=true&visibleInStorefront=true", {
                 prePopulate:${featuredMediaForTokenInput.encodeAsRaw()}
             });
         });

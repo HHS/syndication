@@ -155,3 +155,10 @@ bruteforcedefender {
 }
 
 tagCloud.generateTestData = false
+
+//CodeNarq
+codenarc.properties = {
+    GrailsPublicControllerMethod.enabled = false
+    EmptyMethod.priority = 1
+//    EmptyMethod.enabled = false
+}

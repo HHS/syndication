@@ -1,8 +1,10 @@
 package com.ctacorp.syndication
 
 import com.ctacorp.syndication.crud.ImageController
-import grails.test.mixin.*
-import spock.lang.*
+import com.ctacorp.syndication.media.Image
+import grails.test.mixin.TestFor
+import grails.test.mixin.Mock
+import spock.lang.Specification
 
 @TestFor(ImageController)
 @Mock(Image)

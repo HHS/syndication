@@ -423,9 +423,10 @@ class TestController {
         Tag tag1 = tagService.findOrSaveTag("ABABA", Language.load(1), TagType.load(1))
         Tag tag2 = tagService.findOrSaveTag("NGNGNG", Language.load(1), TagType.load(1))
         Tag tag3 = tagService.findOrSaveTag("TUTUTU", Language.load(1), TagType.load(1))
-        ContentItem ci1 = tagService.tagSyndicatedItem(tag1.id, "http://www.example.com/${i}", i)
-        ContentItem ci2 = tagService.tagSyndicatedItem(tag2.id, "http://www.example.com/${i}", i)
-        ContentItem ci3 = tagService.tagSyndicatedItem(tag3.id, "http://www.example.com/${i}", i)
+        
+        tagService.tagSyndicatedItem(tag1.id, "http://www.example.com/${i}", i)
+        tagService.tagSyndicatedItem(tag2.id, "http://www.example.com/${i}", i)
+        tagService.tagSyndicatedItem(tag3.id, "http://www.example.com/${i}", i)
 
         def tags = tagService.getTagsForSyndicationId(i)
 
@@ -486,10 +487,14 @@ class TestController {
     }
 
     private getRelatedTagsByTagId() {
-        def message = "unchecked"
+        def message = "√"
 
         def tags = tagService.getRelatedTagsByTagId(1)
 
+        if(!tags){
+            message = "related tags were not found"
+        }
+        
         boolean success = false
         if (message == "√") {
             success = true

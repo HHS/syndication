@@ -2,7 +2,7 @@ package contentextractionservices
 
 import com.ctacorp.syndication.contentextraction.ContentCacheService
 import grails.test.spock.IntegrationSpec
-import com.ctacorp.syndication.Html
+import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.cache.CachedContent

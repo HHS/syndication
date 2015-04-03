@@ -14,14 +14,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.rest
 
-import grails.converters.JSON
-import com.ctacorp.syndication.*
+import com.ctacorp.syndication.media.MediaItem
 import syndication.api.ApiResponse
 
 class TinyUrlsController {
     def tinyUrlService
 
     static responseFormats = ['json']
+
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
 
     def sourceUrl(Long id){
         MediaItem mi = MediaItem.get(id)

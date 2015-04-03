@@ -1,6 +1,6 @@
 package com.ctacorp.syndication.storefront
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheLoader

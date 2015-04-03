@@ -13,7 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.CampaignMetric" %>
+<%@ page import="com.ctacorp.syndication.metric.CampaignMetric" %>
 
 
 

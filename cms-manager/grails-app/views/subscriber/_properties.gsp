@@ -26,17 +26,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <dd><g:fieldValue bean="${instance}" field="email"/></dd>
 </g:if>
 
-<dt><g:message code="subscriber.isPrivileged.label"/></dt>
-<dd><g:fieldValue bean="${instance}" field="isPrivileged"/></dd>
-
-<dt><g:message code="subscriber.keyAgreement.label" /></dt>
-<g:if test="${instance?.keyAgreement?.jsonExport}">
-    <dd class="diffie-hellman-key">${instance?.keyAgreement?.jsonExport}</dd>
-</g:if>
-<g:else>
-    <dd><g:link controller="keyAgreement" params="[entity2:instance?.name]" action="create" id="${instance?.keyAgreement?.id}"><g:message code="keyAgreement.create.label"/></g:link></dd>
-</g:else>
-
 <g:if test="${instance?.dateCreated}">
     <dt><g:message code="subscriber.dateCreated.label"/></dt>
     <dd><g:formatDate date="${instance?.dateCreated}"/></dd>
@@ -46,3 +35,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <dt><g:message code="subscriber.lastUpdated.label" /></dt>
     <dd><g:formatDate date="${instance?.lastUpdated}" /></dd>
 </g:if>
+
+<div id="keyAgreement-panel" class="panel panel-default">
+    <div class="panel-heading">
+        <b><g:message code="keyAgreement.jsonExport.label"/></b>
+    </div>
+    <div class="panel-body">
+        <g:if test="${instance?.keyAgreement?.jsonExport}">
+            <p class="diffie-hellman-key">${instance?.keyAgreement?.jsonExport}</p>
+        </g:if>
+        <g:else>
+            <p><g:link controller="keyAgreement" params="[entity2:instance?.name]" action="create" id="${instance?.keyAgreement?.id}"><g:message code="keyAgreement.create.label"/></g:link></p>
+        </g:else>
+    </div>
+</div>

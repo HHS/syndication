@@ -74,14 +74,17 @@ Redistribution and use in source and binary forms, with or without modification,
 </g:if>
 
 <dt>${message(code: 'subscription.delivery.status.label')}</dt>
-<g:if test="${instance.deliveryFailureLogId}">
-    <dd>${message(code: 'subscription.delivery.status.failure')}</dd>
+<g:if test="${instance.deliveryFailureLogId && instance.contentId}">
+    <dd class="property-value delivery-failed">${message(code: 'subscription.delivery.status.updateFailed')}</dd>
 </g:if>
-<g:elseif test="${!instance.deliveryFailureLogId && !instance.subscription}">
-    <dd>${message(code: 'subscription.delivery.status.pending')}</dd>
+<g:elseif test="${instance.deliveryFailureLogId && !instance.contentId}">
+    <dd class="property-value delivery-failed">${message(code: 'subscription.delivery.status.failed')}</dd>
+</g:elseif>
+<g:elseif test="${!instance.deliveryFailureLogId && !instance.contentId}">
+    <dd class="property-value delivery-pending">${message(code: 'subscription.delivery.status.pending')}</dd>
 </g:elseif>
 <g:else>
-    <dd>${message(code: 'subscription.delivery.status.success')}</dd>
+    <dd class="property-value delivery-success">${message(code: 'subscription.delivery.status.updated')}</dd>
 </g:else>
 
 <g:if test="${instance.deliveryFailureLogId}">

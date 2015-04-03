@@ -14,15 +14,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.tools
 
-import com.ctacorp.syndication.Html
-import com.ctacorp.syndication.Image
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.metric.MediaMetric
 import com.ctacorp.syndication.Source
-import com.ctacorp.syndication.Video
+import com.ctacorp.syndication.media.Video
 import grails.plugin.springsecurity.annotation.Secured
 
-//@Secured('ROLE_ADMIN')
+@Secured('ROLE_ADMIN')
 class TestController {
     def mqService
     def likeService
@@ -32,6 +33,16 @@ class TestController {
 
     def index() {
         flash.message = null
+    }
+
+    def redir(){
+        redirect action: "content"
+    }
+
+    def content(){
+        response.status = 200
+        render "<html><body><div class='syndicate'><h1>This is some syndicated content!</div></body></html>"
+        return
     }
 
     def poster(){
@@ -94,6 +105,31 @@ class TestController {
         mediaService.saveImage(imageItem)
 
         render "Published"
+    }
+
+    def storefrontViews(){
+        def today = new Date()
+        Random randomViewCount = new Random()
+        def batch = []
+
+        MediaItem.list().each { html ->
+            println html.name
+            0.step(300, 5) { days ->
+                batch << new MediaMetric([media: html, day: today - days, apiViewCount: randomViewCount.nextInt(150) + 1, storefrontViewCount: randomViewCount.nextInt(100) + 1])
+            }
+        }
+        batchSaver(MediaMetric, batch)
+    }
+
+    private batchSaver(domain, batch) {
+        domain.withTransaction {
+            batch.each {
+                if (!it.save()) {
+                    println it.errors
+                }
+            }
+        }
+        render "${batch.size()} ${domain.simpleName}s created."
     }
 
     def highest(){

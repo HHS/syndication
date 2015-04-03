@@ -13,6 +13,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 package com.ctacorp.syndication
 
+import com.ctacorp.syndication.media.MediaItem
+
 class SyndicationRequest {
     String requestedUrl
     String contactEmail

@@ -13,6 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 --}%
 
 
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>

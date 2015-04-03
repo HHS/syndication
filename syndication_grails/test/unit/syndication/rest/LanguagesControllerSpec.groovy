@@ -31,10 +31,7 @@ import spock.lang.Specification
 class LanguagesControllerSpec extends Specification {
 
     def setup() {
-        def ehs = new ErrorHandlingService(messageSource:[getMessage:{code, args, loc -> "error"}])
-//        def arbs = new ApiResponseBuilderService(errorHandlingService: ehs)
         def ls = [listLanguages:{params->[]}, getTotal:{params->0}]
-//        controller.apiResponseBuilderService = arbs
         controller.languagesService = ls
     }
 
@@ -50,10 +47,10 @@ class LanguagesControllerSpec extends Specification {
             response.json != null
         and: "the error should have the required fields"
             response.json.meta != null
-            response.json.meta.message != null
-            response.json.meta.message.errorMessage != null
+            response.json.meta.messages != null
+            response.json.meta.messages.errorMessage != null
         and: "the status should be 400"
-            response.json.meta.message.status == 400
+            response.json.meta.status == 400
     }
 
     void "show action should return the correct record when requested"(){
@@ -64,7 +61,7 @@ class LanguagesControllerSpec extends Specification {
         and: "there should be a data payload"
             response.json != null
         and: "the status should also be 200"
-            response.json.meta.message.status == 200
+            response.json.meta.status == 200
         and: "the response body should have data with the correct id"
             response.json.results != null
             response.json.results[0] != null

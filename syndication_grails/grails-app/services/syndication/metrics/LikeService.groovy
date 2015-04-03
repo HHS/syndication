@@ -14,10 +14,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.metrics
 
+import com.ctacorp.syndication.media.MediaItem
 import grails.transaction.Transactional
-import com.ctacorp.syndication.*
 import com.ctacorp.syndication.authentication.User
-import org.hibernate.type.StandardBasicTypes
 
 @Transactional
 class LikeService {

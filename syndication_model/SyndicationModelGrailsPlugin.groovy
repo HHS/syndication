@@ -1,6 +1,6 @@
 class SyndicationModelGrailsPlugin {
     // the plugin version
-    def version = "1.5.3"
+    def version = "1.7.6"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3 > *"
     // resources that are excluded from plugin packaging

@@ -1,6 +1,6 @@
 package com.ctacorp.syndication.storefront
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.authentication.User
 import grails.transaction.Transactional
 
@@ -9,7 +9,7 @@ class LikeService {
     def springSecurityService
 
     MediaItem likeMedia(Long mediaId) {
-        def user = springSecurityService.currentUser as User
+        def user = springSecurityService.getCurrentUser() as User
         MediaItem mi = MediaItem.get(mediaId)
         if(!mi){
             log.error "Tried to like media that doesn't exist: [${mediaId}]"
@@ -20,7 +20,7 @@ class LikeService {
     }
 
     MediaItem undoLikeMedia(Long mediaId){
-        def user = springSecurityService.currentUser as User
+        def user = springSecurityService.getCurrentUser() as User
         MediaItem mi = MediaItem.get(mediaId)
         if(!mi){
             log.error "Tried to like media that doesn't exist: [${mediaId}]"
@@ -32,6 +32,7 @@ class LikeService {
             return null
         }
         user.removeFromLikes(mi)
+        user.save(flush: true)
         mi
     }
 

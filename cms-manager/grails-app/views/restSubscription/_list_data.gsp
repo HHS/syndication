@@ -14,15 +14,19 @@ Redistribution and use in source and binary forms, with or without modification,
 <td><g:link action="show" id="${instance.id}">${fieldValue(bean: instance, field: "id")}</g:link></td>
 <td><g:link controller="subscription" action="show" id="${instance.subscription.id}">${fieldValue(bean: instance, field: "subscription.mediaId")}</g:link></td>
 <td><g:link controller="restSubscriber" action="show" id="${instance.restSubscriber.id}">${fieldValue(bean: instance, field: "restSubscriber.deliveryEndpoint")}</g:link></td>
-<g:if test="${instance.deliveryFailureLogId}">
-    <td class="delivery-failed danger">${message(code: 'subscription.delivery.status.failure')}</td>
+<g:if test="${instance.deliveryFailureLogId && !instance.isPending}">
+    <td class="delivery-failed danger">${message(code: 'subscription.delivery.status.updateFailed')}</td>
     <td>${fieldValue(bean: instance, field: "deliveryFailureLogId")}</td>
 </g:if>
-<g:elseif test="${instance.isPending}">
+<g:elseif test="${instance.deliveryFailureLogId && instance.isPending}">
+    <td class="delivery-failed danger">${message(code: 'subscription.delivery.status.failed')}</td>
+    <td>${fieldValue(bean: instance, field: "deliveryFailureLogId")}</td>
+</g:elseif>
+<g:elseif test="${!instance.deliveryFailureLogId && instance.isPending}">
     <td class="delivery-pending warning">${message(code: 'subscription.delivery.status.pending')}</td>
     <td></td>
 </g:elseif>
 <g:else>
-    <td class="delivery-success success">${message(code: 'subscription.delivery.status.success')}</td>
+    <td class="delivery-success success">${message(code: 'subscription.delivery.status.updated')}</td>
     <td></td>
 </g:else>

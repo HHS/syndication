@@ -28,17 +28,11 @@ class RhythmyxSubscriptionTransitionServiceSpec extends Specification {
 
     def rhythmyxIngestionService = Mock(RhythmyxIngestionService)
 
-    RhythmyxSubscription rhythmyxSubscription1
-    RhythmyxSubscription rhythmyxSubscription2
-    def rhythmyxSubscriptons = []
+    RhythmyxSubscription rhythmyxSubscription
 
     def setup() {
 
-        rhythmyxSubscription1 = RhythmyxSubscription.build()
-        rhythmyxSubscription2 = RhythmyxSubscription.build()
-
-        rhythmyxSubscriptons.add(rhythmyxSubscription1)
-        rhythmyxSubscriptons.add(rhythmyxSubscription2)
+        rhythmyxSubscription = RhythmyxSubscription.build()
 
         service.rhythmyxIngestionService = rhythmyxIngestionService
     }
@@ -58,11 +52,11 @@ class RhythmyxSubscriptionTransitionServiceSpec extends Specification {
 
         when: "doing import transitions"
 
-        service.doImportTransitions(rhythmyxSubscription1)
+        service.doImportTransitions(rhythmyxSubscription)
 
         then: "transition the first rhythmyx subscription"
 
-        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription1, RhythmyxIngestionService.WORKFLOW_TRANSITION_IMPORT) >> {
+        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription, RhythmyxIngestionService.WORKFLOW_TRANSITION_IMPORT) >> {
             throw new RhythmyxIngestionException('The Wolfman Attacks!')
         }
 
@@ -82,36 +76,17 @@ class RhythmyxSubscriptionTransitionServiceSpec extends Specification {
         noExceptionThrown()
     }
 
-    void "do update transitions correctly handles multiple rhythmyx subscriptions"() {
-
-        when: "transitioning the rhythmyx subscriptions"
-
-        service.doUpdateTransitions(rhythmyxSubscriptons)
-
-        then: "transition the first rhythmyx subscription"
-
-        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription1, RhythmyxIngestionService.WORKFLOW_TRANSITION_UPDATE)
-
-        and: "transition the second rhythmyx subscription"
-
-        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription2, RhythmyxIngestionService.WORKFLOW_TRANSITION_UPDATE)
-    }
-
     void "do update transitions correctly handles a failed rhythmyx subscription"() {
 
         when: "transitioning the rhythmyx subscriptions"
 
-        service.doUpdateTransitions(rhythmyxSubscriptons)
+        service.doUpdateTransitions(rhythmyxSubscription)
 
-        then: "transition the first rhythmyx subscription"
+        then: "transition the rhythmyx subscription"
 
-        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription1, RhythmyxIngestionService.WORKFLOW_TRANSITION_UPDATE) >> {
+        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription, RhythmyxIngestionService.WORKFLOW_TRANSITION_UPDATE) >> {
             throw new RhythmyxIngestionException('The Wolfman Attacks!')
         }
-
-        and: "transition the second rhythmyx subscription"
-
-        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription2, RhythmyxIngestionService.WORKFLOW_TRANSITION_UPDATE)
 
         and: "no exceptions are thrown"
 
@@ -129,38 +104,17 @@ class RhythmyxSubscriptionTransitionServiceSpec extends Specification {
         noExceptionThrown()
     }
 
-    void "do delete transitions correctly handles multiple rhythmyx subscriptions"() {
-
-        when: "doing import transitions"
-
-        service.doDeleteTransitions(rhythmyxSubscriptons)
-
-        then: "transition the first rhythmyx subscription"
-
-        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription1, RhythmyxIngestionService.WORKFLOW_TRANSITION_DELETE)
-
-        and: "transition the second rhythmyx subscription"
-
-        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription2, RhythmyxIngestionService.WORKFLOW_TRANSITION_DELETE)
-    }
-
     void "do delete transitions correctly handles a failed rhythmyx subscription"() {
 
         when: "transitioning the rhythmyx subscriptions"
 
-        service.doDeleteTransitions(rhythmyxSubscriptons)
+        service.doDeleteTransitions(rhythmyxSubscription)
 
-        then: "transition the first rhythmyx subscription"
+        then: "transition the rhythmyx subscription"
 
-        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription1, RhythmyxIngestionService.WORKFLOW_TRANSITION_DELETE) >> {
+        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription, RhythmyxIngestionService.WORKFLOW_TRANSITION_DELETE) >> {
             throw new RhythmyxIngestionException('The Wolfman Attacks!')
         }
-
-        and: "transition the second rhythmyx subscription"
-
-        1 * rhythmyxIngestionService.transitionContentItem(rhythmyxSubscription2, RhythmyxIngestionService.WORKFLOW_TRANSITION_DELETE)
-
-        and: "no exceptions are thrown"
 
         notThrown(RhythmyxIngestionException)
     }

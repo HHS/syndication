@@ -15,12 +15,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.marshal
 
+import com.ctacorp.syndication.Campaign
 import grails.converters.JSON
-import com.ctacorp.syndication.*
-import syndication.preview.ThumbnailService
-import syndication.rest.MediaService
-import syndication.tag.TagsService
-import syndication.tinyurl.TinyUrlService
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,10 +25,7 @@ import syndication.tinyurl.TinyUrlService
  * Time: 2:08 PM
  */
 class CampaignMarshaller {
-    ThumbnailService thumbnailService
-    TinyUrlService tinyUrlService
-    TagsService tagsService
-    MediaService mediaService
+    def services
 
     CampaignMarshaller(){
         JSON.registerObjectMarshaller(Campaign){ Campaign c ->

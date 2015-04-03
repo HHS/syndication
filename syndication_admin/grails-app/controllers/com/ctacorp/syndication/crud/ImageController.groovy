@@ -14,16 +14,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.NOT_FOUND
+
 import com.ctacorp.syndication.FeaturedMedia
-import com.ctacorp.syndication.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
-import com.ctacorp.syndication.Collection
-import com.ctacorp.syndication.authentication.UserRole
+import com.ctacorp.syndication.media.Collection
 
-import javax.print.attribute.standard.Media
-
-import static org.springframework.http.HttpStatus.*
-import com.ctacorp.syndication.Image
+import com.ctacorp.syndication.media.Image
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
@@ -60,13 +60,13 @@ class ImageController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond new Image(params), model: [subscribers:subscribers]
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(Image imageInstance) {
         if (imageInstance == null) {
@@ -77,7 +77,7 @@ class ImageController {
         def status =  mediaItemsService.updateItemAndSubscriber(imageInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action:'create', params:params
+            respond imageInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers() ]
             return
         }
 
@@ -97,7 +97,7 @@ class ImageController {
         respond imageInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(imageInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Image imageInstance) {
         if (imageInstance == null) {
@@ -135,7 +135,7 @@ class ImageController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(imageInstance)
+        mediaItemsService.removeMediaItemsFromUserMediaLists(imageInstance, true)
         solrIndexingService.removeMediaItem(imageInstance)
         mediaItemsService.delete(imageInstance.id)
 

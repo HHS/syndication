@@ -6,7 +6,6 @@ import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.storefront.UserMediaList
 import grails.converters.JSON
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import groovy.time.TimeCategory
 
 import javax.servlet.http.HttpServletResponse
 
@@ -30,7 +29,7 @@ class LoginController {
     def mailService
 
     def recaptchaService
-    def accountService
+    def accountServiceSpec
     /**
      * Dependency injection for the authenticationTrustResolver.
      */
@@ -165,7 +164,7 @@ class LoginController {
         if (validCaptcha) {
             try {
                 //passes in a closure to render a template because the render from a service doesn't work
-                success = accountService.passwordReset(params.email){ randomPassword ->
+                success = accountServiceSpec.passwordReset(params.email){ randomPassword ->
                     g.render(template:'passwordResetEmail', model:[randomPassword:randomPassword, user:User.findByUsername(params.email)])
                 }
             } catch (UsernameNotFoundException e) {
@@ -218,7 +217,7 @@ class LoginController {
                 String userHash = stringToHash.encodeAsMD5();
                 String htmlBody = g.render(template:'accountLockedEmail', model:[verification:userHash, id:User.findByUsername(params.email).id])
 
-                success = accountService.accountUnlockEmail(params.email, htmlBody, userHash)
+                success = accountServiceSpec.accountUnlockEmail(params.email, htmlBody, userHash)
             } catch (UsernameNotFoundException e) {
                 flash.errors << "E-mail ${params.email} is not registered."
                 log.info("User not found: ${params.email}\n${e}")

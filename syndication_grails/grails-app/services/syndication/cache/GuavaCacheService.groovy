@@ -35,6 +35,10 @@ class GuavaCacheService {
             extractedContentCache:CacheBuilder.newBuilder().
                     expireAfterWrite(extractedContentCacheTimeout, TimeUnit.MINUTES).
                     maximumSize(extractedContentCacheSize).
+                    build(),
+            imageCache:CacheBuilder.newBuilder().
+                    expireAfterWrite(extractedContentCacheTimeout, TimeUnit.MINUTES).
+                    maximumSize(extractedContentCacheSize).
                     build()
     ]
 
@@ -43,11 +47,21 @@ class GuavaCacheService {
     }
 
     Cache getExtractedContentCache(){
-        caches.apiResponseCache
+        caches.extractedContentCache
+    }
+    
+    Cache getImageCache(){
+        caches.imageCache
     }
 
-    void flushCache(String cacheName){
-        caches."$cacheName".invalidateAll()
+    boolean flushCache(String cacheName){
+        try{
+            caches."$cacheName".invalidateAll()
+        }catch(e){
+            log.error(e)
+            return false
+        }
+        true
     }
 
     //Careful, this flushes **ALL** caches

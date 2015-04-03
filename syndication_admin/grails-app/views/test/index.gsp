@@ -5,7 +5,9 @@
   Time: 4:23 PM
 --%>
 
-<%@ page import="com.ctacorp.syndication.MediaItem" contentType="text/html;charset=UTF-8" %>
+<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.media.MediaItem" %>
 <html>
 <head>
   <title></title>
@@ -25,7 +27,7 @@
   <div>
     <g:form action="testHealth">
       <label>Source URL:</label>
-      <g:select from="${com.ctacorp.syndication.MediaItem.list()}" name="id" optionKey="id"/>
+      <g:select from="${com.ctacorp.syndication.media.MediaItem.list()}" name="id" optionKey="id"/>
       <g:submitButton name="submit"/>
     </g:form>
   </div>

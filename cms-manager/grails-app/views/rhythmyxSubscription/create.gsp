@@ -14,6 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <html>
 <head>
     <g:render template='../mediaItems/datatables_js'/>
+    <g:javascript library="com.ctacorp.syndication.manager.cms.RhythmyxSubscriber" />
     <script>
         $(document).ready(function () {
             updateWorkflow();

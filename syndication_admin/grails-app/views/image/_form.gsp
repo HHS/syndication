@@ -12,7 +12,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Image" %>
+<%@ page import="com.ctacorp.syndication.media.Image" %>
 
 <!-- Text input-->
 <div class="form-group">
@@ -51,6 +51,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <label class="col-md-4 control-label" for="customThumbnailUrl">Custom Thumbnail Url</label>
     <div class="col-md-8">
         <input id="customThumbnailUrl" name="customThumbnailUrl" maxlength="2000" value="${imageInstance?.customThumbnailUrl}" type="url" placeholder="thumbnail url" class="form-control input-md">
+    </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+    <label class="col-md-4 control-label" for="customPreviewUrl">Custom Preview Url</label>
+    <div class="col-md-8">
+        <input id="customPreviewUrl" name="customPreviewUrl" maxlength="2000" value="${imageInstance?.customPreviewUrl}" type="url" placeholder="preview url" class="form-control input-md">
     </div>
 </div>
 
@@ -124,7 +132,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="language">Language<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <g:select from="${com.ctacorp.syndication.Language.findAllByIsActive(true, [sort: "name"])}" name="language.id" id="language" optionKey="id" optionValue="name" value="${imageInstance?.language?.id}" class="form-control"/>
+        <g:select from="${com.ctacorp.syndication.Language.findAllByIsActive(true, [sort: "name"])}" name="language.id" id="language" optionKey="id" optionValue="name" value="${imageInstance?.language?.id}" class="form-control" noSelection="${['null':'-Choose a Language-']}"/>
     </div>
 </div>
 
@@ -187,14 +195,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <label class="col-md-4 control-label" for="externalGuid">External Guid</label>
     <div class="col-md-8">
         <input id="externalGuid" name="externalGuid" value="${imageInstance?.externalGuid}" placeholder="guid" class="form-control input-md">
-    </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="hash">Hash</label>
-    <div class="col-md-8">
-        <input id="hash" name="hash" value="${imageInstance?.hash}" class="form-control input-md">
     </div>
 </div>
 

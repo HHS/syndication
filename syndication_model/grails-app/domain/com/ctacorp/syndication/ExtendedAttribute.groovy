@@ -14,7 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication
 
-import com.ctacorp.grails.swagger.annotations.*
+import com.ctacorp.syndication.media.MediaItem
 
 class ExtendedAttribute {
   

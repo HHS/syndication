@@ -14,14 +14,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
-import com.ctacorp.syndication.Collection
-import com.ctacorp.syndication.FeaturedMedia
-import com.ctacorp.syndication.MediaItem
-import com.ctacorp.syndication.MediaItemSubscriber
-import com.ctacorp.syndication.authentication.UserRole
-import grails.converters.JSON
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.NOT_FOUND
 
-import static org.springframework.http.HttpStatus.*
+import com.ctacorp.syndication.media.Collection
+import com.ctacorp.syndication.FeaturedMedia
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.MediaItemSubscriber
+import grails.converters.JSON
 
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
@@ -59,17 +61,17 @@ class CollectionController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create(Collection collectionInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         def featuredMedia = collectionInstance?.mediaItems
         String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
-        respond new Collection(params), model: [featuredMedia:featuredMedia,
+        respond new Collection(), model: [featuredMedia:featuredMedia,
                                                 featuredMediaForTokenInput:featuredMediaForTokenInput,
                                                 subscribers:subscribers]
     }
 
-    @Secured(['ROLE_ADMIN'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(Collection collectionInstance) {
         if (collectionInstance == null) {
@@ -80,7 +82,12 @@ class CollectionController {
         def status =  mediaItemsService.updateItemAndSubscriber(collectionInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action:'create', params:params
+            def subscribers = cmsManagerKeyService.listSubscribers()
+            def featuredMedia = collectionInstance?.mediaItems
+            String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
+            respond collectionInstance, view:'create', model: [featuredMedia:featuredMedia,
+                                                               featuredMediaForTokenInput:featuredMediaForTokenInput,
+                                                               subscribers:subscribers]
             return
         }
         
@@ -111,7 +118,7 @@ class CollectionController {
                                            currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(collectionInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Collection collectionInstance) {
         if (collectionInstance == null) {
@@ -159,7 +166,7 @@ class CollectionController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(collectionInstance)
+        mediaItemsService.removeMediaItemsFromUserMediaLists(collectionInstance, true)
         solrIndexingService.removeMediaItem(collectionInstance)
         mediaItemsService.delete(collectionInstance.id)
 

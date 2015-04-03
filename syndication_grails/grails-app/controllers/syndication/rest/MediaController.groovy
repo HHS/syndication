@@ -16,14 +16,20 @@ package syndication.rest
 
 import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.*
+import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.commons.util.*
 import com.ctacorp.syndication.jobs.DelayedMetricAddJob
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.preview.MediaPreview
+import com.ctacorp.syndication.preview.MediaThumbnail
 import grails.converters.JSON
 import grails.rest.render.RenderContext
+import grails.util.Holders
 import org.codehaus.groovy.grails.web.mime.MimeType
-import org.springframework.core.io.ByteArrayResource
+
 import syndication.api.*
 import com.ctacorp.syndication.exception.*
+import syndication.Exception.*
 import syndication.render.ApiResponseRenderer
 import java.util.concurrent.Callable
 
@@ -87,9 +93,7 @@ class MediaController {
     def contentRetrievalService
     def grailsApplication
     def fileService
-    def previewService
     def urlService
-    def thumbnailService
     def likeService
     def youtubeService
     def tinyUrlService
@@ -99,6 +103,10 @@ class MediaController {
     def guavaCacheService
     def assetResourceLocator
     def contentCacheService
+
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
 
     @APIResource(path="/resources/media/{id}.json", description = "Information about a specific media item", operations = [
         @Operation(httpMethod="GET", notes="Returns the MediaItem identified by the 'id'.", nickname="getMediaById", type =  "MediaItems", summary = "Get MediaItem by ID", responseMessages=[
@@ -129,7 +137,6 @@ class MediaController {
                 return stringWriter.toString()
             }
         });
-//        renderedResponse = stringWriter.toString()
         render text: renderedResponse, contentType:"application/json"
     }
 
@@ -140,20 +147,29 @@ class MediaController {
         ], parameters = [
             @Parameter(name="q", type="string", description="The search query supplied by the user", required=true, paramType = "query"),
             @Parameter(name="max",     type="integer", format="int32",         description="The maximum number of records to return",                             required=false, paramType = "query"),
-            @Parameter(name="offset",  type="integer", format="int32",         description="The offset of the records set to return for pagination.",             required=false, paramType = "query"),
-            @Parameter(name="sort",    type="string",  description="* Set of fields to sort the records by." ,                            required=false, paramType = "query")
-
+            @Parameter(name="offset",  type="integer", format="int32",         description="The offset of the records set to return for pagination.",             required=false, paramType = "query")
         ])
     ])
     def search() {
-        def searchResults = resourcesService.mediaSearch(params)
+        String key = Hash.md5(params.sort().toString())
+        String renderedResponse
+        renderedResponse = guavaCacheService.apiResponseCache.get(key, new Callable<String>() {
+            @Override
+            public String call(){
+                def searchResults = resourcesService.mediaSearch(params)
 
-        if (!searchResults.list || searchResults.list.size() < 1) {
-            params.total = 0
-        } else {
-            params.total = searchResults.listCount
-        }
-        respond ApiResponse.get200Response(searchResults.list).autoFill(params)
+                if (!searchResults.list || searchResults.list.size() < 1) {
+                    params.total = 0
+                } else {
+                    params.total = searchResults.listCount
+                }
+            ApiResponseRenderer renderer = new ApiResponseRenderer()
+            StringWriter stringWriter = new StringWriter()
+            renderer.render(ApiResponse.get200Response(searchResults.list).autoFill(params), [getWriter:{stringWriter}, setContentType:{it->it}] as RenderContext)
+            return stringWriter.toString()
+            }
+        });
+        render text: renderedResponse, contentType:"application/json"
     }
 
     @APIResource(path="/resources/media/{id}/embed.json", description = "Get the javascript or iframe embed code for this item (to embed it on a web page).", operations = [
@@ -188,11 +204,17 @@ class MediaController {
         }
 
         if(params.flavor?.toLowerCase() == "iframe"){
-            String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/media/$mi.id/syndicate.html"
-            String width = params.width ?: "640"
+            String queryParams = "stripStyles="+    Util.isTrue(params.stripStyles)
+            queryParams += "&stripScripts="+        Util.isTrue(params.stripScripts)
+            queryParams += "&stripBreaks="+         Util.isTrue(params.stripBreaks)
+            queryParams += "&stripImages="+         Util.isTrue(params.stripImages)
+            queryParams += "&stripClasses="+        Util.isTrue(params.stripClasses)
+
+            String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/media/$mi.id/syndicate.html?${queryParams}"
+            String width = params.width ?: "660"
             String height = params.height ?: "480"
             String iframeName = params.iframeName ?: "Syndicated Content"
-            String iframeSnippet =  "<iframe src=\"${url}\" width=\"${width}\" height=\"${height}\" name=\"${iframeName}\"></iframe>".encodeAsHTML()
+            String iframeSnippet =  "<iframe src=\"${url}\" width=\"${width}\" height=\"${height}\" name=\"${iframeName}\" frameborder=\"0\"></iframe>".encodeAsHTML()
 
             withFormat {
                 html {
@@ -217,7 +239,13 @@ class MediaController {
             boolean excludeJquery = Util.isTrue(params.excludeJquery)
             boolean excludeDiv = Util.isTrue(params.excludeDiv)
 
-            String jsSnippet = """${excludeJquery ? "" : jqeuryEmbed}<script>\$(document).ready(function(){\$.ajax({url: '${grailsApplication.config.grails.serverURL}/api/v2/resources/media/${id}/syndicate.json?',type: "GET",dataType:'jsonp',success: function(data){\$('#${divId}').html(data.results[0].content);}});});</script>${excludeDiv ? "" : includedDiv}"""
+            String queryParams = "stripStyles="+    Util.isTrue(params.stripStyles)
+            queryParams += "&stripScripts="+        Util.isTrue(params.stripScripts)
+            queryParams += "&stripBreaks="+         Util.isTrue(params.stripBreaks)
+            queryParams += "&stripImages="+         Util.isTrue(params.stripImages)
+            queryParams += "&stripClasses="+        Util.isTrue(params.stripClasses)
+
+            String jsSnippet = """${excludeJquery ? "" : jqeuryEmbed}<script>\$(document).ready(function(){\$.ajax({url: '${grailsApplication.config.grails.serverURL}/api/v2/resources/media/${id}/syndicate.json?${queryParams}',type: "GET",dataType:'jsonp',success: function(data){\$('#${divId}').html(data.results[0].content);}});});</script>${excludeDiv ? "" : includedDiv}"""
                 .encodeAsHTML()
 
             withFormat {
@@ -297,23 +325,48 @@ class MediaController {
             @ResponseMessage(code = 400, description = "Bad Request"),
             @ResponseMessage(code = 500, description = "Internal Server Error")
         ], parameters = [
-            @Parameter(name="id",           type="integer", format="int64", required=true,  paramType = "path",     description="The id of the media to get a preview for."),
-            @Parameter(name="imageFloat",   type="string",                  required=false, paramType = "query",    description="Accepts valid CSS float options, such as 'left' or 'right'. Will inject a style into the content before rendering."),
-            @Parameter(name="imageMargin",  type="string",                  required=false, paramType = "query",    description="Accepts 4 CSV values representing pixel sizes of margin similar to CSS. Default format is 'north,east,sout,west' - for example '0,10,10,0' would put a 10 pixel margin on the right and bottom sides of an image. Will inject a style into the content before rendering."),
-            @Parameter(name="previewSize",  type="string",                  required=false, paramType = "query",    description="Accepts several preset sizes: thumbnail, small, medium, large, custom. The use of custom requires that height and width be provided as well."),
-            @Parameter(name="width",        type="integer", format="int32", required=false, paramType = "query",    description="(Requires previewSize=custom) Supply the width of the custom preview."),
-            @Parameter(name="height",       type="integer", format="int32", required=false, paramType = "query",    description="(Requires previewSize=custom) Supply the height of the custom preview."),
-            @Parameter(name="crop",         type="boolean",                 required=false, paramType = "query",    description="Turn automatic image cropping on/off (off by default when using preset sizes).")
+            @Parameter(name="id", type="integer", format="int64", description="The id of the media to get a preview for.", required=true,  paramType = "path")
         ])
     ])
     def preview(Long id){
-        def exists = mediaService.getMediaItem(id)
-        if(!exists || exists.active == false){
+        MediaItem mi = mediaService.getMediaItem(id)
+        if(!mi || !mi.active){
             response.status = 400
             render ApiResponse.get400NotFoundResponse().autoFill(params) as JSON
             return
         }
-        processPreview(exists, params)
+
+        if(mi.customPreviewUrl) {
+            renderImageFromUrl(mi.customPreviewUrl)
+            return
+        }
+
+        //render special icons for collections and social media
+        switch(mi){
+            case Collection:
+                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream
+                renderBytes(f.bytes)
+                return
+            case SocialMedia:
+                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/social.jpg").inputStream
+                renderBytes(f.bytes)
+                return
+        }
+
+        String key = Hash.md5("preview/$id?" + params.sort().toString())
+        byte[] renderedResponse
+        renderedResponse = guavaCacheService.imageCache.get(key, new Callable<byte[]>() {
+            @Override
+            public byte[] call() {
+                MediaPreview preview = mi.mediaPreview
+                if (!preview || !preview.imageData) {
+                    InputStream f  = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/bad.jpg").inputStream
+                    return f.bytes
+                }
+                return preview.imageData
+            }
+        });
+        renderBytes(renderedResponse)
     }
 
     @APIResource(path="/resources/media/{id}/thumbnail.jpg", description = "Get the jpg thumbnail of the content item where applicable.", operations = [
@@ -325,32 +378,46 @@ class MediaController {
         ])
     ])
     def thumbnail(Long id){
-        def exists = mediaService.getMediaItem(id)
-        if(!exists || exists.active == false){
+        MediaItem mi = mediaService.getMediaItem(id)
+        if(!mi || !mi.active){
             response.status = 400
             render ApiResponse.get400NotFoundResponse().autoFill(params) as JSON
             return
         }
 
-        if(exists.customThumbnailUrl) {
-            renderCustomThumbnail(exists.customThumbnailUrl)
+        if(mi.customThumbnailUrl) {
+            renderImageFromUrl(mi.customThumbnailUrl)
             return
         }
 
         //render special icons for collections and social media
-        switch(exists){
+        switch(mi){
             case Collection:
-                ByteArrayResource r = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.png")
-                renderBytes(r.byteArray, "image/png")
+                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream
+                renderBytes(f.bytes)
                 return
             case SocialMedia:
-                ByteArrayResource r = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/social.png")
-                renderBytes(r.byteArray, "image/png")
+                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/social.jpg").inputStream
+                renderBytes(f.bytes)
                 return
         }
+        
+        String key = Hash.md5("thumbnail/${id}?" + params.sort().toString())
+        byte[] renderedResponse
+        renderedResponse = guavaCacheService.imageCache.get(key, new Callable<byte[]>() {
+            @Override
+            public byte[] call() {
 
-        File thumbnail = thumbnailService.getThumbnail(id)
-        renderImage(thumbnail)
+                MediaThumbnail thumbnail = mi.mediaThumbnail
+                if(!thumbnail || !thumbnail.imageData) {
+                    InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/bad.jpg").inputStream
+                    return f.bytes
+                }
+                return  thumbnail.imageData
+            }
+        });
+        renderBytes(renderedResponse)
+
     }
 
     @APIResource(path="/resources/media/{id}/content", description = "The actual media content (html, image, etc...)", operations = [
@@ -377,6 +444,11 @@ class MediaController {
                 Html html = mi as Html
                 String extractedContent = contentRetrievalService.extractSyndicatedContent(html.sourceUrl, params)
                 renderHtml(extractedContent)
+                return
+            case Periodical:
+                Periodical periodical = mi as Periodical
+                String extractedPeriodicalContent = contentRetrievalService.extractSyndicatedContent(periodical.sourceUrl, params)
+                renderHtml(extractedPeriodicalContent)
                 return
             case Image:
                 Image image = mi as Image
@@ -425,7 +497,7 @@ class MediaController {
 
         DelayedMetricAddJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId: mi.id])
 
-        def resp = new Embedded( id: mi.id, name: mi.name, description: mi.description)
+        def resp = new Embedded( id: mi.id, name: mi.name, description: mi.description, sourceUrl: mi.sourceUrl)
 
         switch(mi){
             case Html:
@@ -495,7 +567,7 @@ class MediaController {
             case Video:
                 Video video = mi as Video
                 resp.mediaType = "Video"
-                String content = youtubeService.getIframeEmbedCode(video.sourceUrl)
+                String content = youtubeService.getIframeEmbedCode(video.sourceUrl, params)
                 content = contentRetrievalService.wrapWithSyndicateDiv(content)
                 content = contentRetrievalService.addAttributionToExtractedContent(video.id, content)
                 response.withFormat {
@@ -508,11 +580,11 @@ class MediaController {
                     }
                 }
                 break
-            case com.ctacorp.syndication.Collection:
-                com.ctacorp.syndication.Collection collection = mi as com.ctacorp.syndication.Collection
+            case com.ctacorp.syndication.media.Collection:
+                com.ctacorp.syndication.media.Collection collection = mi as com.ctacorp.syndication.media.Collection
                 resp.mediaType = "Collection"
-                def items = collection.mediaItems.collect{ item ->
-                    "<li>${item.id} - ${item.name} <a href='${item.sourceUrl}'>${item.sourceUrl}</a></li>"
+                def items = collection.mediaItems.sort{it.name}.collect{ item ->
+                    "<li>${item.name} <a href='${item.sourceUrl}'>${item.sourceUrl}</a> [${item.id}]</li>"
                 }
                 String content = "<ul>"
                 items.each{
@@ -547,6 +619,7 @@ class MediaController {
             @Parameter(name="max",                          type="integer", format="int32", description="The maximum number of records to return",                                                                          required=false, paramType = "query"),
             @Parameter(name="offset",                       type="integer", format="int32", description="The offset of the records set to return for pagination.",                                                          required=false, paramType = "query"),
             @Parameter(name="sort",                         type="string",                  description="* Set of fields to sort the records by.",                                                                          required=false, paramType = "query"),
+            @Parameter(name="order",                        type="string",                  description="* The ascending or descending order.",                                                                             required=false, paramType = "query"),
             @Parameter(name="mediaTypes",                   type="string",                  description="Find all media items belonging to the specified media type[s].",                                                   required=false, paramType = "query"),
             @Parameter(name="name",                         type="string",                  description="Find all media items containing the provided name, case insensitive.",                                             required=false, paramType = "query"),
             @Parameter(name="collectionId",                 type="integer", format="int32", description="Restrict filtering to media items in a specific collection.",                                                      required=false, paramType = "query"),
@@ -598,7 +671,7 @@ class MediaController {
         ])
     ])
     def list() {
-        String key = Hash.md5(params.sort().toString())
+        String key = Hash.md5(params.sort().toString() + params.order.toString())
         String renderedResponse = guavaCacheService.apiResponseCache.get(key, new Callable<String>() {
             @Override
             public String call(){
@@ -677,6 +750,10 @@ class MediaController {
             return
         }
         def code = youtubeService.getMetaDataForVideoUrl(mediaItem.sourceUrl)
+        if(code?.error?.code == 404){
+            respond ApiResponse.get400ResponseCustomMessage("Youtube reports that the specified video does not exist").autoFill(params)
+            return
+        }
         respond ApiResponse.get200Response([code]).autoFill(params)
     }
 
@@ -693,13 +770,21 @@ class MediaController {
     def saveAudio(Audio audioInstance){
         stripTail(audioInstance)
         log.info "Attempting to publish: ${audioInstance} - ${audioInstance.sourceUrl}"
-        mediaService.saveAudio(audioInstance)
+        try{
+            mediaService.saveAudio(audioInstance)
+        } catch(UnauthorizedException e){
+            ApiResponse.get400ResponseCustomMessage(e.message)
+        }
     }
 
     def saveCollection(Collection collectionInstance){
         stripTail(collectionInstance)
         log.info "Attempting to publish: ${collectionInstance} - ${collectionInstance.sourceUrl}"
-        mediaService.saveCollection(collectionInstance)
+        try{
+            mediaService.saveCollection(collectionInstance)
+        } catch(UnauthorizedException e){
+            ApiResponse.get400ResponseCustomMessage(e.message)
+        }
     }
 
     def saveHtml(Html htmlInstance){
@@ -716,7 +801,7 @@ class MediaController {
         } else{
             try{
                 htmlInstance = mediaService.saveHtml(htmlInstance, params)
-                if (htmlInstance.id) { // Media saved just fine
+                if (htmlInstance?.id) { // Media saved just fine
                     apiResponse = ApiResponse.get200Response([htmlInstance]).autoFill(params)
                 } else { // it didn't save, error handle:
                     log.error("Couldn't save the instance: ${htmlInstance.errors}")
@@ -726,6 +811,8 @@ class MediaController {
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
             } catch(ContentUnretrievableException e){
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
+            } catch(UnauthorizedException e){
+                apiResponse = ApiResponse.get400ResponseCustomMessage(e.message)
             }
         }
         guavaCacheService.flushAllCaches()
@@ -733,7 +820,6 @@ class MediaController {
     }
 
     def savePeriodical(Periodical periodicalInstance){
-        println periodicalInstance.period
         stripTail(periodicalInstance)
         log.info "Attempting to publish: ${periodicalInstance} - ${periodicalInstance.sourceUrl}"
         ApiResponse apiResponse
@@ -747,7 +833,7 @@ class MediaController {
         } else{
             try{
                 periodicalInstance = mediaService.savePeriodical(periodicalInstance)
-                if (periodicalInstance.id) { // Media saved just fine
+                if (periodicalInstance?.id) { // Media saved just fine
                     apiResponse = ApiResponse.get200Response([periodicalInstance]).autoFill(params)
                 } else { // it didn't save, error handle:
                     log.error("Couldn't save the instance: ${periodicalInstance.errors}")
@@ -757,6 +843,8 @@ class MediaController {
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
             } catch(ContentUnretrievableException e){
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
+            } catch(UnauthorizedException e){
+                apiResponse = ApiResponse.get400ResponseCustomMessage(e.message)
             }
         }
         guavaCacheService.flushAllCaches()
@@ -775,7 +863,7 @@ class MediaController {
         } else {
             try{
                 imageInstance = mediaService.saveImage(imageInstance)
-                if (imageInstance.id) { // Media saved just fine
+                if (imageInstance?.id) { // Media saved just fine
                     apiResponse = ApiResponse.get200Response([imageInstance]).autoFill(params)
                 } else { // it didn't save, error handle:
                     log.error("Couldn't save the instance: ${imageInstance.errors}")
@@ -783,6 +871,8 @@ class MediaController {
                 }
             } catch(ContentUnretrievableException e){
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
+            } catch(UnauthorizedException e){
+                apiResponse = ApiResponse.get400ResponseCustomMessage(e.message)
             }
         }
 
@@ -802,7 +892,7 @@ class MediaController {
         } else {
             try{
                 infographicInstance = mediaService.saveInfographic(infographicInstance)
-                if (infographicInstance.id) { // Media saved just fine
+                if (infographicInstance?.id) { // Media saved just fine
                     apiResponse = ApiResponse.get200Response([infographicInstance]).autoFill(params)
                 } else { // it didn't save, error handle:
                     log.error("Couldn't save the instance: ${infographicInstance.errors}")
@@ -810,6 +900,8 @@ class MediaController {
                 }
             } catch(ContentUnretrievableException e){
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
+            } catch(UnauthorizedException e){
+                apiResponse = ApiResponse.get400ResponseCustomMessage(e.message)
             }
         }
 
@@ -817,7 +909,11 @@ class MediaController {
     }
 
     def saveSocialMedia(SocialMedia socialMediaInstance){
-        mediaService.saveSocialMedia(socialMediaInstance)
+        try{
+            mediaService.saveSocialMedia(socialMediaInstance)
+        } catch(UnauthorizedException e){
+            ApiResponse.get400ResponseCustomMessage(e.message)
+        }
     }
 
     def saveVideo(Video videoInstance){
@@ -830,7 +926,7 @@ class MediaController {
         } else{
             try{
                 videoInstance = mediaService.saveVideo(videoInstance)
-                if (videoInstance.id) { // Media saved just fine
+                if (videoInstance?.id) { // Media saved just fine
                     apiResponse = ApiResponse.get200Response([videoInstance]).autoFill(params)
                 } else { // it didn't save, error handle:
                     log.error("Couldn't save the instance: ${videoInstance.errors}")
@@ -838,6 +934,8 @@ class MediaController {
                 }
             } catch(ContentUnretrievableException e){
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
+            } catch(UnauthorizedException e){
+                apiResponse = ApiResponse.get400ResponseCustomMessage(e.message)
             }
         }
         guavaCacheService.flushAllCaches()
@@ -845,7 +943,11 @@ class MediaController {
     }
 
     def saveWidget(Widget widgetInstance){
-        mediaService.saveWidget(widgetInstance)
+        try{
+            mediaService.saveWidget(widgetInstance)
+        } catch(UnauthorizedException e){
+            ApiResponse.get400ResponseCustomMessage(e.message)
+        }
     }
 
 // ======================================================
@@ -895,10 +997,19 @@ class MediaController {
 
     private void mediaPostSaveAndRespond(ApiResponse apiResponse, MediaItem instance){
         if(apiResponse.meta.status == 200){
-            log.info " - Saved ${instance.sourceUrl}"
-
+            def requestJson = request.getJSON()
             //Tag media
-            tagsService.tagMedia(instance.id, request.getJSON().tags)
+            if(requestJson.tags) {
+                tagsService.tagMedia(instance.id, requestJson.tags)
+            }
+
+            if(requestJson.tagNames){
+                tagsService.tagMediaItemByNames(instance.id, requestJson.tagNames)
+            }
+
+            if(requestJson.tagDetails){
+                tagsService.tagMediaItemByNamesAndLanguageAndType(instance.id, requestJson.tagDetails)
+            }
 
             //Add URL Mapping
             tinyUrlService.createMapping(instance.sourceUrl, instance.id, instance.externalGuid)
@@ -909,44 +1020,6 @@ class MediaController {
             response.status = 400
         }
         respond apiResponse
-    }
-
-    private processPreview(MediaItem mi, params){
-        if(mi.customThumbnailUrl) {
-            renderCustomThumbnail(mi.customThumbnailUrl)
-            return
-        }
-        switch(mi){
-            case Html:
-                String urlWithParams = "${urlService.getContentUrl(mi.id)}?${urlService.aggregateSupportedCommands(params)}"
-                File imageFile = previewService.previewHtml(urlWithParams, params)
-                renderImage(imageFile)
-                return
-            case Image:
-                File imageFile = previewService.previewImage(mi.sourceUrl, params)
-                renderImage(imageFile)
-                return
-            case Infographic:
-                File imageFile = previewService.previewImage(mi.sourceUrl, params)
-                renderImage(imageFile)
-                return
-            case Video:
-                File imageFile = previewService.previewImage(youtubeService.thumbnailLinkForUrl(mi.sourceUrl), params)
-                renderImage(imageFile)
-                return
-            case Collection:
-                File imageFile = previewService.previewImage(assetPath(src:'defaultIcons/thumbnail/collection.png', absolute: true), params)
-                renderImage(imageFile)
-                return
-            case SocialMedia:
-                File imageFile = previewService.previewImage(assetPath(src:'defaultIcons/thumbnail/social.png', absolute: true), params)
-                renderImage(imageFile)
-                return
-            default:
-                File imageFile = previewService.previewImage(assetPath(src:'defaultIcons/thumbnail/unknown.png', absolute: true), params)
-                renderImage(imageFile)
-                return
-        }
     }
 
     private void renderHtml(String html){
@@ -972,17 +1045,16 @@ class MediaController {
             case "png":contentType =  "image/png"
                 break
         }
-
         renderBytes(img.bytes, contentType)
     }
 
-    private void renderCustomThumbnail(String url){
+    private void renderImageFromUrl(String url){
         def content=url.toURL().bytes
         def contentType=URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(content))
         renderBytes(content, contentType)
     }
 
-    private void renderBytes(byte[] bytes, String contentType = "image/jpeg"){
+    private renderBytes(byte[] bytes, String contentType = "image/jpeg"){
         response.contentType = contentType
         response.setHeader('Content-length', "${bytes.size()}")
         response.outputStream << bytes
@@ -990,6 +1062,15 @@ class MediaController {
     }
 
     private String getExtractedContent(MediaItem mi){
+        //for debugging
+        if(Holders.config.disableGuavaCache){
+            Map extractedContentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mi.sourceUrl, params)
+            String extractedContent = extractedContentAndHash.content
+            extractedContent = contentRetrievalService.addAttributionToExtractedContent(mi.id, extractedContent)
+            extractedContent += analyticsService.getGoogleAnalyticsString(mi)
+            return extractedContent
+        }
+
         String key = Hash.md5(mi.sourceUrl + params.sort().toString())
         String extractedContent = guavaCacheService.extractedContentCache.get(key, new Callable<String>() {
             @Override
@@ -1004,7 +1085,6 @@ class MediaController {
                         extractedContent = lastKnownGood.content
                     } else {
                         throw new ContentNotExtractableException("There is no syndicated markup/content found!")
-                        return
                     }
                 } else{ //Else update the lastKnownGood if it's out of date
                     if(!lastKnownGood || lastKnownGood.mediaItem.hash != newHash){

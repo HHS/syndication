@@ -17,7 +17,6 @@ package syndication
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
 import syndication.api.ApiResponse
-import syndication.api.Message
 
 class ErrorController {
     static responseFormats = ["JSON"]

@@ -1,4 +1,3 @@
-
 %{--
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -13,8 +12,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Source" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.Source" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -31,7 +31,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <div class="row">
         <div class="col-lg-12">
             <!-- /.panel-heading -->
-            <div class="panel-body">
+            <div class="panel panel-info">
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered table-hover">
                         <thead>
@@ -70,12 +70,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         </g:each>
                         </tbody>
                     </table>
-
-                    <div class="pagination">
-                        <g:paginate total="${sourceInstanceCount ?: 0}"/>
-                    </div>
                 </div>
             </div>
+
+            <div class="pagination">
+                <g:paginate total="${sourceInstanceCount ?: 0}"/>
+            </div>
+            
         </div>
     </div>
 </div>

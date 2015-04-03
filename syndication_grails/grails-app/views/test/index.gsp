@@ -20,7 +20,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
   Time: 1:08 PM
 --%>
 
-<%@ page import="com.ctacorp.syndication.MediaItem" contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.media.MediaItem" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <title></title>

@@ -5,7 +5,7 @@
   Time: 1:24 PM
   To change this template use File | Settings | File Templates.
 --%>
-
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
@@ -58,7 +58,7 @@
     </p>
 
     <a id="beta"></a><h3>What is Beta Testing?</h3>
-    <p>We have just launched this content syndication service. As an early user, you will be a “beta tester.” Beta testing helps us identify and correct technical, content, user experience, and other issues prior to releasing the product more widely. Beta testers should try out all aspects of the system including: registering; signing in; finding Web pages that you’re interested in syndicating and adding those pages to your list; and getting the syndication code from this site and implementing on your website. Please report any feedback or issues to <a href="mailto:syndicationSystem@hhs.gov?subject=Information Request">syndicationAdmin@hhs.gov</a> so we can continue to improve the system.
+    <p>We have just launched this content syndication service. As an early user, you will be a “beta tester.” Beta testing helps us identify and correct technical, content, user experience, and other issues prior to releasing the product more widely. Beta testers should try out all aspects of the system including: registering; signing in; finding Web pages that you’re interested in syndicating and adding those pages to your list; and getting the syndication code from this site and implementing on your website. Please report any feedback or issues to <a href="mailto:${adminEmail}?subject=Information Request">syndicationAdmin@hhs.gov</a> so we can continue to improve the system.
     </p>
     <a id="api"></a><h3>Where can I get the API / syndication code to add to my site?</h3>
     <p>Getting the syndication code is very easy using HHS’s Content Syndication site. Simply follow these steps:</p>

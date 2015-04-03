@@ -24,17 +24,17 @@ import com.ctacorp.grails.swagger.annotations.Parameter
 import com.ctacorp.grails.swagger.annotations.PropertyAttribute
 import com.ctacorp.grails.swagger.annotations.ResponseMessage
 import com.ctacorp.syndication.AlternateImage
-import com.ctacorp.syndication.Audio
-import com.ctacorp.syndication.Collection
-import com.ctacorp.syndication.Html
-import com.ctacorp.syndication.Image
-import com.ctacorp.syndication.Infographic
+import com.ctacorp.syndication.media.Audio
+import com.ctacorp.syndication.media.Collection
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.Image
+import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.MediaItem
-import com.ctacorp.syndication.SocialMedia
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.media.SocialMedia
 import com.ctacorp.syndication.Source
-import com.ctacorp.syndication.Video
-import com.ctacorp.syndication.Widget
+import com.ctacorp.syndication.media.Video
+import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.storefront.UserMediaList
 import syndication.api.ApiResponse
 import syndication.api.Message
@@ -97,6 +97,10 @@ import syndication.api.Pagination
 class UserMediaListsController {
     static responseFormats = ['json']
 
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
+
     @APIResource(path="/resources/userMediaLists/{id}.json", description = "Get a specific user media list.", operations = [
         @Operation(httpMethod="GET", notes="Get a specific user media list by 'id'.", nickname="getUserMediaList", type = "MediaItems", summary = "Get UserMediaList by ID", responseMessages=[
             @ResponseMessage(code = 400, description = "Invalid ID"),
@@ -108,6 +112,7 @@ class UserMediaListsController {
     def show(Long id){
         def userMediaList = UserMediaList.get(id)
         if(!userMediaList){
+            response.status = 400
             respond ApiResponse.get400NotFoundResponse().autoFill(params)
             return
         }

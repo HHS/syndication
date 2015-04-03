@@ -12,16 +12,16 @@ Redistribution and use in source and binary forms, with or without modification,
 
 */
 package com.ctacorp.syndication.manager.cms
-
 import com.ctacorp.syndication.rsrw.ContentTypesResource
 import com.ctacorp.syndication.rsrw.PercussionContentServicesFactory
 import com.ctacorp.syndication.rsrw.SyndicatedContentResource
 import com.ctacorp.syndication.rsrw.model.Guid
 import com.ctacorp.syndication.rsrw.model.SyndicatedContent
+import grails.transaction.Transactional
 
 import javax.ws.rs.core.Response
 
-@SuppressWarnings(["GrUnresolvedAccess", "SpellCheckingInspection"])
+@Transactional
 class RhythmyxIngestionService {
 
     static final WORKFLOW_TRANSITION_UPDATE = 0
@@ -62,8 +62,7 @@ class RhythmyxIngestionService {
         SyndicatedContentResource resource = rhythmyxResourceFactory.syndicatedContentResource(subscription)
         SyndicatedContent syndicatedContent = rhythmyxResourceFactory.syndicatedContent(subscription, syndicatedMediaItem.content, syndicatedMediaItem.name)
 
-        //noinspection GroovyUnusedAssignment
-        Response response = resource.updateContent(syndicatedContent, subscription.contentId as Long)
+        Response response
 
         try {
             response = resource.updateContent(syndicatedContent, subscription.contentId as Long)
@@ -136,7 +135,7 @@ class RhythmyxIngestionService {
         }
     }
 
-    class RhythmyxResourceFactory {
+    static class RhythmyxResourceFactory {
 
         def syndicatedContentResource(rhythmyxSubscription) {
 
@@ -164,6 +163,7 @@ class RhythmyxIngestionService {
             servicesFactory
         }
 
+        @SuppressWarnings("GrMethodMayBeStatic")
         def syndicatedContent(subscription, mediaContent, systemTitle) {
             def content = new SyndicatedContent()
             content.content = mediaContent

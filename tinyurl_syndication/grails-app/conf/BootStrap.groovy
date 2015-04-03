@@ -24,7 +24,6 @@ class BootStrap {
 ==========================================
 | -> Tiny Url Ready.                     |
 =========================================="""
-        println systemRunningMessage
         log.info systemRunningMessage
     }
 

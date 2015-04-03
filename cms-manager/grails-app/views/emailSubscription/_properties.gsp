@@ -38,13 +38,16 @@ Redistribution and use in source and binary forms, with or without modification,
 
 <dt>${message(code: 'subscription.delivery.status.label')}</dt>
 <g:if test="${instance.deliveryFailureLogId && !instance.isPending}">
-    <dd class="delivery-failed">${message(code: 'subscription.delivery.status.failure')}</dd>
+    <dd class="property-value delivery-failed">${message(code: 'subscription.delivery.status.updateFailed')}</dd>
 </g:if>
-<g:elseif test="${instance.isPending}">
-    <dd class="delivery-pending">${message(code: 'subscription.delivery.status.pending')}</dd>
+<g:elseif test="${instance.deliveryFailureLogId && instance.isPending}">
+    <dd class="property-value delivery-failed">${message(code: 'subscription.delivery.status.failed')}</dd>
+</g:elseif>
+<g:elseif test="${!instance.deliveryFailureLogId && instance.isPending}">
+    <dd class="property-value delivery-pending">${message(code: 'subscription.delivery.status.pending')}</dd>
 </g:elseif>
 <g:else>
-    <dd class="delivery-success">${message(code: 'subscription.delivery.status.success')}</dd>
+    <dd class="property-value delivery-success">${message(code: 'subscription.delivery.status.updated')}</dd>
 </g:else>
 
 <g:if test="${instance.deliveryFailureLogId}">

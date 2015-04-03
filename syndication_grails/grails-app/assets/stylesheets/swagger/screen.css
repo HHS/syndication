@@ -1117,6 +1117,11 @@ table {
     width: 702px;
 }
 
+.footer-connect-icons p {
+  clear:both;
+
+}
+
 .gen-footer-container .footer-right .footer-connect-title{
     background-color:#cdd9e8;
     color:#333;

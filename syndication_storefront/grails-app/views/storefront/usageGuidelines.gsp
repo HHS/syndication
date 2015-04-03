@@ -6,6 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 
+<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
@@ -28,7 +29,7 @@
         <li>You may not redistribute the Syndication Content Feed</li>
         <li>You must provide attribution to HHS or the relevant Content Feed provider adjacent to the Content Feed</li>
         <li>HHS reserves the right to include or apply special codes and to track usage of the Syndication Content Feeds</li>
-        <li>Note that the Content Syndication site and Content Syndication Feeds are subject to change without notice. If you have any questions about these Usage Guidelines, please contact <a href="mailto:syndicationSystem@hhs.gov?subject=Information Request">syndicationAdmin@hhs.gov</a></li>
+        <li>Note that the Content Syndication site and Content Syndication Feeds are subject to change without notice. If you have any questions about these Usage Guidelines, please contact <a href="mailto:${syndicationEmail}?subject=Information Request">${syndicationEmail}</a></li>
     </ol>
 </div>
 </body>

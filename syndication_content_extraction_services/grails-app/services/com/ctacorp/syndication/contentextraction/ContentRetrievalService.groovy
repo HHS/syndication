@@ -13,7 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.contentextraction
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.exception.ContentUnretrievableException
@@ -79,6 +79,7 @@ class ContentRetrievalService {
         content + attr
     }
 
+    //This looks hella sketchy, are we really doing this anywhere? Looks legacy to me -Steffen
     private String wrap(String content, params){
         StringBuilder sb = new StringBuilder()
         if(params.jsonP){

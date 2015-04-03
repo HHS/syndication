@@ -15,7 +15,7 @@ package syndication.rest
 
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
-import com.ctacorp.syndication.*
+import com.ctacorp.syndication.media.*
 import com.ctacorp.solr.EntityType
 
 @Transactional()
@@ -38,36 +38,53 @@ class ResourcesService {
             return []
 
         def mediaItemType = EntityType.MEDIAITEM.toString()
-        def newList = []
+        def fullSolrResultList = []
 
         try {
             def solrSearchResults = solrSearchService.search(params.q,EntityType.MEDIAITEM)
-            newList = solrSearchResults.getResults().collect {
+            fullSolrResultList = solrSearchResults.getResults().collect {
                 it.id.replace("${mediaItemType}-", '')
             }
         } catch (ex) {
             log.info "failed on search ${ex}"
         }
 
-        if (newList.isEmpty()) {
+        if (fullSolrResultList.isEmpty()) {
             return [list:[], listCount: 0]
         }
-        params.restrictToSet = newList.join(',')
-        def limits = [max: params.max, offset: params.offset]
 
+        def newList = fullSolrResultList
+        def startIndex = params.offset ? params.offset as int : 0
+        def endIndex = null
+        if(params.max) {
+            endIndex = startIndex + new Integer(params.max) - 1
+            if(endIndex >= newList.size()){
+                endIndex = newList.size()-1
+            }
+        }
+        else {
+            startIndex = null
+            endIndex = null
+        }
+
+        if(startIndex!=null && endIndex!=null ) {
+            newList = newList[startIndex..endIndex]
+        }
+
+        params.restrictToSet = newList.join(',')
         params['active'] = true
 
-        def mediaItemsList = MediaItem.facetedSearch(params).list(limits)
-
+        def mediaItemsList = MediaItem.facetedSearch(params).list()
         def mediaItemsMap = mediaItemsList.collectEntries{[it.id, (it)]}
         def response = []
 
         newList.each {
             if(mediaItemsMap.containsKey(new Long(it))) {
-                response.add(mediaItemsMap[new Long(it)])
+                response << mediaItemsMap[new Long(it)]
             }
         }
-        return [list:response, listCount: mediaItemsList.getTotalCount()]
+
+        return [list:response, listCount: fullSolrResultList.size()]
     }
 
     @Transactional(readOnly = true)

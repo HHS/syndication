@@ -1,6 +1,6 @@
 package com.ctacorp.syndication.cache
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 
 class CachedContent {
     MediaItem mediaItem

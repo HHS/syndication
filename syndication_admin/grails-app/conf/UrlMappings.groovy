@@ -25,6 +25,6 @@ class UrlMappings {
         "/statusCheck"(controller:"statusCheck")
 
         "/"(controller:'dashboard', action:'syndDash')
-        "500"(view:'/error')
+        "500"(controller:'dashboard', action:'error500')
 	}
 }

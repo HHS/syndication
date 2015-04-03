@@ -15,7 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.rest
 
 import grails.transaction.Transactional
-import com.ctacorp.syndication.*
+import com.ctacorp.syndication.Language
 import syndication.api.ApiResponse
 import syndication.api.Meta
 import syndication.api.Pagination
@@ -37,6 +37,10 @@ class LanguagesController {
     static responseFormats = ['json']
     static defaultAction = "list"
     def languagesService
+
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
 
     @APIResource(path = "/resources/languages/{id}.json", description = "Information about a specific language", operations = [
         @Operation(httpMethod = "GET", notes="Returns the Language identified by the 'id'.", nickname="getLanguageById", type = "Languages", summary = "Get Language by ID", responseMessages = [

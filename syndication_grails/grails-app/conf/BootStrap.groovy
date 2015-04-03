@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -15,30 +14,31 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 import clover.org.apache.commons.lang.SystemUtils
 import com.ctacorp.syndication.*
+import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.authentication.*
 import com.ctacorp.syndication.storefront.UserMediaList
 import grails.util.Environment
 import grails.util.Holders
-import org.codehaus.groovy.grails.commons.ApplicationAttributes
 import syndication.marshal.*
 import syndication.testdata.TestDataPopulator
 
 class BootStrap {
-
     def grailsApplication
-    def thumbnailService
+    def urlService
     def tinyUrlService
     def tagsService
     def youtubeService
     def mediaService
     def systemEventService
-    def solrService
     def queueService
-    def config
+    def mediaPreviewThumbnailJobService
+    def config = Holders.config
 
     def init = { servletContext ->
         log.info ("*** API is running in --> ${Environment.current} <-- mode. ***")
-        config = Holders.config
+
+        //Too many misconfigured ssl sites out there, disable SNI for ingestion
+        System.setProperty("jsse.enableSNIExtension", "false");
 
         //Previews and Caching
         createScratchDirectories()
@@ -64,7 +64,10 @@ class BootStrap {
             td.seedLanguages()
         }
 
-        MediaItemChangeListener.initialize(grailsApplication, queueService)
+        MediaItemChangeListener.initialize(grailsApplication, queueService, mediaPreviewThumbnailJobService)
+
+        //initial admins UserMediaList
+        initUserMediaList()
 
         systemEventService.systemStarted()
 
@@ -94,9 +97,12 @@ class BootStrap {
             println "Could not save the user ${adminUsername} due to the following errors: ${adminUser.errors}"
         }
 
-        new UserMediaList(name: "My List", description:"Default list", user: adminUser).save(flush:true)
-
         UserRole.create adminUser, adminRole, true
+    }
+    
+    private void initUserMediaList(){
+        def adminUser = User.findByName("Syndication Administrator")
+        new UserMediaList(name: "My List", description:"Default list", user: adminUser,mediaItems: MediaItem.findAllByIdInList((20..30))).save(flush:true)
     }
 
     private void createScratchDirectories() {
@@ -117,6 +123,7 @@ class BootStrap {
         new File("${rootPath}/preview/medium").mkdirs()
         new File("${rootPath}/preview/large").mkdirs()
         new File("${rootPath}/preview/custom").mkdirs()
+        new File("${rootPath}/preview/tmp").mkdirs()
 
         new File("${rootPath}/html").mkdirs()
     }
@@ -130,6 +137,7 @@ class BootStrap {
         verifyDirectory(new File("${rootPath}/preview/medium"))
         verifyDirectory(new File("${rootPath}/preview/large"))
         verifyDirectory(new File("${rootPath}/preview/custom"))
+        verifyDirectory(new File("${rootPath}/preview/tmp"))
         verifyDirectory(new File("${rootPath}/html"))
     }
 
@@ -145,7 +153,7 @@ class BootStrap {
             new HtmlMarshaller(),
             new InfographicMarshaller(),
             new ImageMarshaller(),
-            new VideoMarshaller(youtubeService:youtubeService),
+            new VideoMarshaller(),
             new SourceMarshaller(),
             new CollectionMarshaller(),
             new CampaignMarshaller(),
@@ -154,14 +162,20 @@ class BootStrap {
             new MediaTypeHolderMarshaller(),
             new AudioMarshaller(),
             new SocialMediaMarshaller(),
-            new PeriodicalMarshaller()
+            new PeriodicalMarshaller(),
+            new WidgetMarshaller()
+        ]
+
+        def services = [
+                urlService: urlService,
+                tinyUrlService: tinyUrlService,
+                tagsService: tagsService,
+                mediaService: mediaService,
+                youtubeService: youtubeService
         ]
 
         marshallers.each { marshaller ->
-            marshaller.thumbnailService = thumbnailService
-            marshaller.tinyUrlService = tinyUrlService
-            marshaller.tagsService = tagsService
-            marshaller.mediaService = mediaService
+            marshaller.services = services
         }
     }
 
@@ -188,25 +202,10 @@ class BootStrap {
         def path = config.imageMagick.location
         verifyProgram(path, "convert", "-version", "Version")
 
-        //xvfb
-        if (SystemUtils.IS_OS_LINUX) {
-            path = config.xvfb.location
-            verifyProgram(path, 'xvfb-run', '-help', 'Usage')
-        }
         //cutycapt
         path = config.cutycapt.location
         if (SystemUtils.IS_OS_MAC) {
             verifyProgram(path, 'cutycapt', '--help', 'help') //note the capitalization
-        } else {
-            def command = "${config.xvfb.location}/xvfb-run  ${config.cutycapt.location}/cutycapt --version"
-            def process = command.execute()
-            String retval = process.text
-            process.destroy()
-            def programRunnable = retval.contains("Usage")
-            if (!programRunnable) {
-                log.error("exiting on startup: convert does not execute, is cutycapt installed?")
-                throw new Exception("exiting on startup: convert does not execute, is cutycapt installed?")
-            }
         }
     }
 }

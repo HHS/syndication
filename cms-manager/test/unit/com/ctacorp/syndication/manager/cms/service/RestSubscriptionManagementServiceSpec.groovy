@@ -121,7 +121,7 @@ class RestSubscriptionManagementServiceSpec extends Specification {
 
         then: "return a null media id from the content extraction service"
 
-        1 * contentExtractionService.getMediaId(sourceUrl) >> null
+        1 * contentExtractionService.getMediaItemBySourceUrl(sourceUrl) >> null
 
         and: "return a 400 status with bad request message"
 
@@ -145,7 +145,7 @@ class RestSubscriptionManagementServiceSpec extends Specification {
 
         then: "throw and exception when trying to get the media id"
 
-        1 * contentExtractionService.getMediaId(sourceUrl) >> {
+        1 * contentExtractionService.getMediaItemBySourceUrl(sourceUrl) >> {
             throw exception
         }
 

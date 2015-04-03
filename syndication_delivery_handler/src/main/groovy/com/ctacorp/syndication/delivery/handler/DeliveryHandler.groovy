@@ -76,7 +76,7 @@ class DeliveryHandler implements IPSDeliveryHandler {
 
     static PSDeliveryResult handleGeneralFailure(response, String content, IPSGuid itemId, long jobId, long referenceId, String deliveryPath) {
 
-        log.info("Error occured when publishing conent to syndication")
+        log.info("Error occurred when publishing conent to syndication")
         log.severe("Delivery path was '${deliveryPath}'")
         log.severe("POST body was was: \n'${content}'")
         return new PSDeliveryResult(IPSDeliveryResult.Outcome.FAILED, "Repsonse was ${response.properties.toString()}", itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
@@ -122,10 +122,15 @@ class DeliveryHandler implements IPSDeliveryHandler {
 
         @SuppressWarnings("GrMethodMayBeStatic")
         RESTClient newRestClient() {
+
             def client = new RESTClient(Config.PUBLISH_URL)
             def httpClient = client.client
+
+            client.handler.failure = { resp, data -> resp.setData(data); return resp }
+
             httpClient.params.setIntParameter('http.connection.timeout', Config.HTTP_CONNECTION_TIMEOUT)
             httpClient.params.setIntParameter('http.socket.timeout', Config.HTTP_SOCKET_TIMEOUT)
+
             client
         }
     }

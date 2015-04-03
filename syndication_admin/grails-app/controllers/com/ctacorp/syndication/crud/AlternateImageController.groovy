@@ -12,17 +12,21 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
-import com.ctacorp.syndication.Audio
-import com.ctacorp.syndication.Html
-import com.ctacorp.syndication.Collection
-import com.ctacorp.syndication.Image
-import com.ctacorp.syndication.Infographic
-import com.ctacorp.syndication.MediaItem
-import com.ctacorp.syndication.Periodical
-import com.ctacorp.syndication.SocialMedia
-import com.ctacorp.syndication.Video
-import com.ctacorp.syndication.Widget
-import static org.springframework.http.HttpStatus.*
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.NOT_FOUND
+
+import com.ctacorp.syndication.media.Audio
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.Collection
+import com.ctacorp.syndication.media.Image
+import com.ctacorp.syndication.media.Infographic
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.media.Periodical
+import com.ctacorp.syndication.media.SocialMedia
+import com.ctacorp.syndication.media.Video
+import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.AlternateImage
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
@@ -67,7 +71,7 @@ class AlternateImageController {
 
         if (alternateImageInstance.hasErrors()) {
             flash.errors = alternateImageInstance.errors.allErrors.collect{[message:g.message([error : it])]}
-            redirect action:'create', params:params
+            respond alternateImageInstance, view:'create'
             return
         }
 

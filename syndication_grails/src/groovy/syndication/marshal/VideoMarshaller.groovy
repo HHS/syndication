@@ -16,13 +16,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.marshal
 
 import clover.com.lowagie.text.html.HtmlEncoder
+import com.ctacorp.syndication.ExtendedAttribute
+import com.ctacorp.syndication.media.Video
 import grails.converters.JSON
-import com.ctacorp.syndication.*
-import syndication.rest.MediaService
-import syndication.tag.TagsService
-import syndication.preview.ThumbnailService
-import syndication.tinyurl.TinyUrlService
-import syndication.youtube.YoutubeService
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,16 +28,12 @@ import syndication.youtube.YoutubeService
  *
  */
 class VideoMarshaller {
-    ThumbnailService thumbnailService
-    TinyUrlService tinyUrlService
-    TagsService tagsService
-    MediaService mediaService
-    YoutubeService youtubeService
+    def services
 
     VideoMarshaller() {
         JSON.registerObjectMarshaller(Video) { Video v ->
-            def tinyInfo = mediaService.getTinyUrlInfoForMediaItemForAPIResponse(v)
-            def campaigns = mediaService.getCampaignsForAPIResponse(v)
+            def tinyInfo = services.mediaService.getTinyUrlInfoForMediaItemForAPIResponse(v)
+            def campaigns = services.mediaService.getCampaignsForAPIResponse(v)
 
             def attr = HtmlEncoder.encode("<div id='hhsAttribution'>Content provided and maintained by <a href='${v.source.websiteUrl}' target='_blank'>Health and Human Services</a> (HHS). Please see our system <a href='http:syndication.hhs.gov' target='_blank'>usage guidelines and disclaimer</a>.</div>")
 
@@ -52,7 +44,6 @@ class VideoMarshaller {
                     description:            v.description,
                     sourceUrl:              v.sourceUrl,
                     targetUrl:              v.targetUrl,
-                    customThumbnailUrl:      v.customThumbnailUrl,
                     dateContentAuthored:    v.dateContentAuthored,
                     dateContentUpdated:     v.dateContentUpdated,
                     dateContentPublished:   v.dateContentPublished,
@@ -66,13 +57,14 @@ class VideoMarshaller {
                     source:                 v.source,
                     alternateImages:        v.alternateImages,
                     campaigns:              campaigns,
-                    tags:                   mediaService.getTagsForMediaItemForAPIResponse(v),
+                    tags:                   services.mediaService.getTagsForMediaItemForAPIResponse(v),
                     tinyUrl:                tinyInfo.tinyUrl,
                     tinyToken:              tinyInfo.tinyUrlToken,
-                    thumbnailUrl:           thumbnailService.getThumbnailUrl(v.id),
+                    thumbnailUrl:           services.urlService.getThumbnailUrl(v.id),
+                    previewUrl:             services.urlService.getPreviewUrl(v.id),
                     attribution:            attr,
                     extendedAttributes:     marshalDescriptor(v.extendedAttributes),
-                    youtubeMetaData:        youtubeService.getMetaDataForVideoUrl(v.sourceUrl)
+                    youtubeMetaData:        services.youtubeService.getMetaDataForVideoUrl(v.sourceUrl)
             ]
         }
     }

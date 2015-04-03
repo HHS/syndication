@@ -55,21 +55,27 @@ class RestSubscriptionConsumerServiceSpec extends Specification {
         noExceptionThrown()
     }
 
-    void "correctly handle an update message when the rest service fails"() {
+    void "correctly handle a failed update"() {
+
+        given: "a rest subscription"
+
+        def restSubscription = RestSubscription.build()
 
         when: "handling a valid update message"
 
-        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: '123'), queueName)
+        service.handleMessage(new Message(messageType: MessageType.UPDATE, subscriptionId: '123', meta: [attempts: 2]), queueName)
 
-        then: "when an update exception is thrown by the rest service"
+        then: "fail the update"
 
-        restSubscriptionUpdateService.updateSubscriptions('123') >> {
-            throw new RuntimeException("boogers!")
-        }
+        restSubscriptionUpdateService.updateSubscription(restSubscription) >> false
 
-        and: "don't catch the exception"
+        and: "requeue the message"
 
-        thrown(RuntimeException)
+        queueService.sendToRestErrorQueue(MessageType.UPDATE, restSubscription.id, null, 2)
+
+        and: "don't throw the exception"
+
+        noExceptionThrown()
     }
 
     void "correctly handle an import message with a missing subscriptionId"() {
@@ -145,51 +151,78 @@ class RestSubscriptionConsumerServiceSpec extends Specification {
         queueService.sendToRhythmyxErrorQueue(MessageType.IMPORT, 123, null, 1)
     }
 
-    void "correctly handle a failed update"() {
-
-        when: "handling a valid update message"
-
-        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: '1'), queueName)
-
-        then: "an exception is thrown by the rest service"
-
-        1 * restSubscriptionUpdateService.updateSubscriptions('1') >> [[id:9],[id:10]]
-
-        then: "send the first failed update message to the rhythmyx error queue"
-
-        queueService.sendToRhythmyxErrorQueue(MessageType.UPDATE, 9, '1', 0)
-
-        and: "send the second failed update message to the rhythmyx error queue"
-
-        queueService.sendToRhythmyxErrorQueue(MessageType.UPDATE, 10, '1', 0)
-    }
-
-    void "correctly handle a second attempt failed update"() {
-
-        when: "handling a valid update message"
-
-        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: 1, attempts: 1), queueName)
-
-        then: "an exception is thrown by the rest service"
-
-        1 * restSubscriptionUpdateService.updateSubscriptions('1') >> [[id:9]]
-
-        then: "send the first failed update message to the rhythmyx error queue"
-
-        queueService.sendToRhythmyxErrorQueue(MessageType.UPDATE, 9, '1', 1)
-    }
-
     void "correctly handle an update message"() {
 
-        when: "handling a valid import message"
+        given: "a rest subscription"
 
-        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: '123'), queueName)
+        def restSubscription = RestSubscription.build()
 
-        then: "when an exception is thrown by the rest service"
+        when: "handling a valid update message"
 
-        1 * restSubscriptionUpdateService.updateSubscriptions('123')
+        service.handleMessage(new Message(messageType: MessageType.UPDATE, subscriptionId: '123', meta: [attempts: 2]), queueName)
 
-        and: "don't catch the exception"
+        then: "update the rest subscription"
+
+        restSubscriptionUpdateService.updateSubscription(restSubscription) >> false
+    }
+
+    void "correctly handle a delete"() {
+
+        given: "a rest subscription"
+
+        def restSubscription = RestSubscription.build()
+
+        when: "handling a valid update message"
+
+        service.handleMessage(new Message(messageType: MessageType.DELETE, subscriptionId: '123', meta: [attempts: 2]), queueName)
+
+        then: "update the rest subscription"
+
+        restSubscriptionUpdateService.deleteSubscription(restSubscription) >> false
+    }
+
+    void "correctly handle a failed delete"() {
+
+        given: "a rest subscription"
+
+        def restSubscription = RestSubscription.build()
+
+        when: "handling a valid update message"
+
+        service.handleMessage(new Message(messageType: MessageType.DELETE, subscriptionId: '123', meta: [attempts: 2]), queueName)
+
+        then: "fail the update"
+
+        restSubscriptionUpdateService.deleteSubscription(restSubscription) >> false
+
+        and: "requeue the message"
+
+        queueService.sendToRestErrorQueue(MessageType.DELETE, restSubscription.id, null, 2)
+
+        and: "don't throw the exception"
+
+        noExceptionThrown()
+    }
+
+    void "handle message creates requeues individual update subscriptions"() {
+
+        given: "an email subscription instance"
+
+        def subscription = Subscription.build(mediaId: '123456')
+
+        def restSubscription1 = RestSubscription.build(subscription: subscription)
+        def restSubscription2 = RestSubscription.build(subscription: subscription)
+
+        when: "sending a message to the consumer with an update the message type a media id"
+
+        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: '123456'), queueName)
+
+        then: "requeue each individual subscription found"
+
+        1 * queueService.sendToRestUpdateQueue(MessageType.UPDATE, restSubscription1.id)
+        1 * queueService.sendToRestUpdateQueue(MessageType.UPDATE, restSubscription2.id)
+
+        and: "expect no exceptions to be thrown"
 
         noExceptionThrown()
     }

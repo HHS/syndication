@@ -9,7 +9,7 @@ import spock.lang.Specification
 
 @SuppressWarnings("GroovyAssignabilityCheck")
 @TestFor(EmailSubscriptionConsumerService)
-@Build([EmailSubscription,Subscription])
+@Build([EmailSubscription, Subscription])
 class EmailSubscriptionConsumerServiceSpec extends Specification {
 
     def emailSubscriptionUpdateService = Mock(EmailSubscriptionUpdateService)
@@ -43,21 +43,52 @@ class EmailSubscriptionConsumerServiceSpec extends Specification {
         noExceptionThrown()
     }
 
+    void "handle message creates requeues individual update subscriptions"() {
+
+        given: "an email subscription instance"
+
+        def subscription = Subscription.build(mediaId: '123456')
+
+        def emailSubscription1 = EmailSubscription.build(subscription: subscription)
+        def emailSubscription2 = EmailSubscription.build(subscription: subscription)
+
+        when: "sending a message to the consumer with an update the message type a media id"
+
+        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: '123456'), queueName)
+
+        then: "requeue each individual subscription found"
+
+        1 * queueService.sendToEmailUpdateQueue(MessageType.UPDATE, emailSubscription1.id)
+        1 * queueService.sendToEmailUpdateQueue(MessageType.UPDATE, emailSubscription2.id)
+
+        and: "expect no exceptions to be thrown"
+
+        noExceptionThrown()
+    }
+
     void "correctly handle an update message when the email service fails"() {
+
+        given: "an email subscription instance"
+
+        def emailSubscription = EmailSubscription.build()
 
         when: "handling a valid update message"
 
-        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: '123'), queueName)
+        service.handleMessage(new Message(messageType: MessageType.UPDATE, emailSubscription: emailSubscription.id, meta: [attempts: 2]), queueName)
 
         then: "when an update exception is thrown by the email service"
 
-        emailSubscriptionUpdateService.updateEmailSubscriptions('123') >> {
+        emailSubscriptionUpdateService.updateEmailSubscription(emailSubscription) >> {
             throw new RuntimeException("boogers!")
         }
 
-        and: "don't catch the exception"
+        then: "requeue the message on the error queue"
 
-        thrown(RuntimeException)
+        queueService.sendToEmailErrorQueue(MessageType.UPDATE, emailSubscription.id, null, 2)
+
+        and: "don't throw the exception"
+
+        noExceptionThrown()
     }
 
     void "correctly handle an import message with a missing subscriptionId"() {
@@ -113,9 +144,9 @@ class EmailSubscriptionConsumerServiceSpec extends Specification {
 
         1 * emailSubscriptionUpdateService.importEmailSubscription(123) >> false
 
-        then: "send the message to the rhythmyx error queue"
+        then: "send the message to the email error queue"
 
-        queueService.sendToRhythmyxErrorQueue(MessageType.IMPORT, 123, null, 0)
+        queueService.sendToEmailErrorQueue(MessageType.IMPORT, 123, null, 0)
     }
 
     void "correctly handle a second attempt failed import"() {
@@ -128,57 +159,42 @@ class EmailSubscriptionConsumerServiceSpec extends Specification {
 
         1 * emailSubscriptionUpdateService.importEmailSubscription(123) >> false
 
-        then: "send the message to the rhythmyx error queue"
+        then: "send the message to the email error queue"
 
-        queueService.sendToRhythmyxErrorQueue(MessageType.IMPORT, 123, null, 1)
+        queueService.sendToEmailErrorQueue(MessageType.IMPORT, 123, null, 1)
     }
 
     void "correctly handle a failed update"() {
 
-        when: "handling a valid update message"
+        given: "an email subscription instance"
 
-        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: '1'), queueName)
-
-        then: "an exception is thrown by the email service"
-
-        1 * emailSubscriptionUpdateService.updateEmailSubscriptions('1') >> [[id:9],[id:10]]
-
-        then: "send the first failed update message to the rhythmyx error queue"
-
-        queueService.sendToRhythmyxErrorQueue(MessageType.UPDATE, 9, '1', 0)
-
-        and: "send the second failed update message to the rhythmyx error queue"
-
-        queueService.sendToRhythmyxErrorQueue(MessageType.UPDATE, 10, '1', 0)
-    }
-
-    void "correctly handle a second attempt failed update"() {
+        def emailSubscription = EmailSubscription.build()
 
         when: "handling a valid update message"
 
-        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: 1, attempts: 1), queueName)
+        service.handleMessage(new Message(messageType: MessageType.UPDATE, subscriptionId: emailSubscription.id, meta: [attempts: 2]), queueName)
 
-        then: "an exception is thrown by the email service"
+        then: "fail the update"
 
-        1 * emailSubscriptionUpdateService.updateEmailSubscriptions('1') >> [[id:9]]
+        1 * emailSubscriptionUpdateService.updateEmailSubscription(emailSubscription) >> false
 
-        then: "send the first failed update message to the rhythmyx error queue"
+        and: "requeue the update on the email error queue"
 
-        queueService.sendToRhythmyxErrorQueue(MessageType.UPDATE, 9, '1', 1)
+        queueService.sendToEmailErrorQueue(MessageType.UPDATE, emailSubscription.id, null, 2)
     }
 
     void "correctly handle an update message"() {
 
-        when: "handling a valid import message"
+        given: "an email subscription instance"
 
-        service.handleMessage(new Message(messageType: MessageType.UPDATE, mediaId: '123'), queueName)
+        def emailSubscription = EmailSubscription.build()
 
-        then: "when an exception is thrown by the email service"
+        when: "handling a valid update message"
 
-        1 * emailSubscriptionUpdateService.updateEmailSubscriptions('123')
+        service.handleMessage(new Message(messageType: MessageType.UPDATE, subscriptionId: emailSubscription.id, meta: [attempts: 2]), queueName)
 
-        and: "don't catch the exception"
+        then: "an exception is thrown by the email service"
 
-        noExceptionThrown()
+        1 * emailSubscriptionUpdateService.updateEmailSubscription(emailSubscription) >> true
     }
 }

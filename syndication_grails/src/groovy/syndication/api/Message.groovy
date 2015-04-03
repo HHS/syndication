@@ -18,7 +18,7 @@ package syndication.api
 import com.ctacorp.grails.swagger.annotations.Model
 import com.ctacorp.grails.swagger.annotations.ModelProperty
 import com.ctacorp.grails.swagger.annotations.PropertyAttribute
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
 import org.springframework.validation.FieldError
 import syndication.error.Error

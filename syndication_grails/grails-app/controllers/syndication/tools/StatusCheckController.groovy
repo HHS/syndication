@@ -20,6 +20,10 @@ class StatusCheckController {
     def tinyUrlService
     def tagsService
 
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
+
     def index() {
         boolean allSystemsGo = true
         if(!tinyUrlService.status()){

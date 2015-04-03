@@ -13,7 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 */
 package com.ctacorp.syndication.manager.cms
 import com.ctacorp.syndication.commons.mq.MessageType
-import com.ctacorp.syndication.swagger.rest.client.model.SyndicatedMediaItem
+import com.ctacorp.syndication.manager.cms.utils.mq.RabbitDelayJobScheduler
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
@@ -28,13 +28,13 @@ class RestSubscriptionController {
     def queueService
     def loggingService
     def subscriptionService
-    def restSubscriptionDeliveryService
+    def rabbitDelayJobScheduler = new RabbitDelayJobScheduler()
 
     static allowedMethods = [save: "POST", delete: "DELETE"]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        respond RestSubscription.list(params), model:[instanceCount: RestSubscription.count()], view: 'index'
+        respond RestSubscription.list(params), model: [instanceCount: RestSubscription.count()], view: 'index'
     }
 
     def show(RestSubscription restSubscription) {
@@ -56,46 +56,35 @@ class RestSubscriptionController {
         }
 
         def sourceUrl = restSubscription.sourceUrl
-        if(!sourceUrl) {
+        if (!sourceUrl) {
             restSubscription.validate()
             respond restSubscription.errors, view: 'create'
             return
         }
 
         //noinspection GroovyUnusedAssignment
-        def mediaId = null
+        def mediaItem = null
+
         try {
-            mediaId = getMediaId(sourceUrl) as String
-        } catch (Exception e) {
-            flash.errors = [loggingService.logError("Error occurred when fetching the media item for sourceUrl=${sourceUrl}", e)]
-            redirect action: "index", method: "GET"
-            return
-        }
-
-        if(!mediaId) {
-            flash.errors = [message(code: 'restSubscription.sourceUrl.not.syndicated', args: [sourceUrl])]
-            redirect action: "index", method: "GET"
-            return
-        } else {
-
-            try {
-                SyndicatedMediaItem mediaItem = contentExtractionService.extractSyndicatedContent(mediaId)
-                restSubscription.title = mediaItem.name
-            } catch (e) {
-                flash.errors = [loggingService.logError("Error occurred when extracting the content for mediaId=${mediaId}", e)]
+            mediaItem = contentExtractionService.getMediaItemBySourceUrl(sourceUrl)
+            if (!mediaItem) {
+                flash.errors = [message(code: 'restSubscription.sourceUrl.not.syndicated', args: [sourceUrl])]
                 redirect action: "index", method: "GET"
                 return
             }
+        } catch (e) {
+            flash.errors = [loggingService.logError("An error occurred when trying to get the media item associated with sourceUrl '${sourceUrl}'", e)]
+            redirect action: "index", method: "GET"
+            return
         }
 
-        def existingSubscription = Subscription.findByMediaId(mediaId)
-        def restSubscriber = restSubscription.restSubscriber
+        def existingSubscription = Subscription.findByMediaId(mediaItem.id as String)
 
-        if(!existingSubscription) {
+        if (!existingSubscription) {
 
-            def subscription = new Subscription(mediaId: mediaId)
+            def subscription = new Subscription(mediaId: mediaItem.id)
 
-            if(!subscription.validate()) {
+            if (!subscription.validate()) {
                 respond subscription.errors, view: 'create'
                 return
             }
@@ -105,10 +94,11 @@ class RestSubscriptionController {
 
         } else {
 
+            def restSubscriber = restSubscription.restSubscriber
             def existingRestSubscription = RestSubscription.findBySubscriptionAndRestSubscriber(existingSubscription, restSubscriber)
 
-            if(existingRestSubscription) {
-                flash.errors = [message(code: 'restSubscription.already.subscribed.message', args: [restSubscriber.deliveryEndpoint, mediaId])]
+            if (existingRestSubscription) {
+                flash.errors = [message(code: 'restSubscription.already.subscribed.message', args: [restSubscriber.deliveryEndpoint, mediaItem.id])]
                 redirect action: "index", method: "GET"
                 return
             }
@@ -116,15 +106,29 @@ class RestSubscriptionController {
             restSubscription.subscription = existingSubscription
         }
 
+        restSubscription.title = mediaItem.name
         restSubscription.isPending = true
-        restSubscription.save(flush:true)
+        restSubscription.save(flush: true)
 
         if (restSubscription.hasErrors()) {
             respond restSubscription.errors, view: 'create'
         } else {
-            queueService.sendToRestUpdateQueue(MessageType.IMPORT, restSubscription.id)
+            rabbitDelayJobScheduler.schedule(MessageType.IMPORT, restSubscription)
             showInstance(restSubscription, 'default.created.message')
         }
+    }
+
+    def deliver(RestSubscription restSubscription) {
+        try {
+            if(restSubscription.deliveryFailureLogId && restSubscription.isPending){
+                flash.message = "Please wait to redeliver until the subscription is no longer pending."
+            } else {
+                flash.message = "The Rest Subscription id:${restSubscription.id} has been delivered."
+                queueService.sendToRestUpdateQueue(MessageType.UPDATE, restSubscription.id)
+            }
+        } catch (ignore) {
+        }
+        redirect(action: "index", method: "GET")
     }
 
     @Transactional
@@ -134,33 +138,17 @@ class RestSubscriptionController {
             return notFound()
         }
 
-        def subscription = restSubscription.subscription
+        def restSubscriptionId = restSubscription.id
 
-        def content = null
-        def syndicatedMediaItem
         try {
-            syndicatedMediaItem = contentExtractionService.extractSyndicatedContent(subscription.mediaId)
-            content = syndicatedMediaItem?.content
+            rabbitDelayJobScheduler.schedule(MessageType.DELETE, restSubscription)
+            flash.message = message(code: 'restSubscription.delete.queued.message', args: [restSubscriptionId])
         } catch (e) {
-            log.error("Error occurred when extracting the content for mediaId '${subscription.mediaId}'", e)
-        }
-        try{
-            restSubscriptionDeliveryService.deliverDelete(restSubscription, content, true)
-        }catch (e) {
-            log.error("Error occurred when sending the subscription delete for mediaId '${subscription.mediaId}' to '${restSubscription.restSubscriber.deliveryEndpoint}'", e)
+            flash.errors = [loggingService.logError("Error occurred when queuing a delete message for restSubscription '${restSubscriptionId}'", e)]
+            flash.contentTypes = flash.contentTypes
         }
 
-        subscriptionService.deleteChildSubscription(restSubscription)
-
-        flash.message = message(code: 'default.deleted.message', args: [message(code: 'restSubscription.label'), subscription.mediaUri])
         redirect action: "index", method: "GET"
-    }
-
-    private def getMediaId(String sourceUrl) {
-        log.info("looking up mediaId for sourceUrl=${sourceUrl}")
-        def mediaId = contentExtractionService.getMediaId(sourceUrl)
-        log.info("mediaId for sourceUrl=${sourceUrl} is ${mediaId}")
-        return mediaId
     }
 
     def notFound() {

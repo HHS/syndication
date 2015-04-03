@@ -18,19 +18,23 @@ import com.ctacorp.syndication.authentication.*
 import com.ctacorp.syndication.commons.mq.Message
 import com.ctacorp.syndication.commons.mq.MessageType
 import grails.util.Environment
+import grails.util.Holders
 
 class BootStrap {
     def grailsApplication
     def queueService
+    def mediaPreviewThumbnailJobService
+    def config = Holders.config
 
     def init = { servletContext ->
         log.info ("Admin is running in --> ${Environment.current} <-- mode.")
         initUsers()
 
-        MediaItemChangeListener.initialize(grailsApplication, queueService)
+        System.setProperty("jsse.enableSNIExtension", "false");
 
+        MediaItemChangeListener.initialize(grailsApplication, queueService, mediaPreviewThumbnailJobService)
         warmUpMq()
-
+        createScratchDirectories()
         String systemRunningMessage = """
 ==========================================
 | -> Syndication Admin Ready.            |
@@ -41,9 +45,20 @@ class BootStrap {
     def destroy = {
     }
 
+    //TODO this might not be needed anymore with the new rabbit mq client plugin
     private warmUpMq(){
         //First time a message is sent to MQ, it bombs. No idea why. Warming it up will prevent a failure later!
         queueService.sendMessage(new Message(messageType: MessageType.UPDATE))
+    }
+
+    private createScratchDirectories(){
+        //The API should be creating this folder, and it should exist anyway because that's where google keys go
+        //But just in case the admin is run by itself, this will ensure it's created.
+        File scratch = new File(config.syndication.scratch.root)
+        if(!scratch.exists()){
+            scratch.mkdir()
+            log.info "No scratch directory found so creating one: ${scratch}"
+        }
     }
 
     @SuppressWarnings("GroovyUnusedAssignment")
@@ -57,12 +72,12 @@ class BootStrap {
         def publisherRole  = Role.findOrSaveByAuthority('ROLE_PUBLISHER')
 
         //noinspection GroovyAssignabilityCheck
-        String adminUserName = grailsApplication.config.springsecurity.syndicationAdmin.adminUsername
+        String adminUserName = config.springsecurity.syndicationAdmin.adminUsername
         if (User.findByUsername(adminUserName)) {
             return
         }
 
-        String initialPassword = grailsApplication.config.springsecurity.syndicationAdmin.initialAdminPassword
+        String initialPassword = config.springsecurity.syndicationAdmin.initialAdminPassword
         def adminUser = new User(username: adminUserName, enabled: true, password: initialPassword)
         adminUser.save(flush: true)
 

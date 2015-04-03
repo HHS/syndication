@@ -12,8 +12,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 --}%
 
-<%@ page import="com.ctacorp.syndication.Audio" %>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -56,12 +56,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
             <g:if test="${audioInstance?.targetUrl}">
                 <dt id="targetUrl-label" class="word_wrap"><g:message code="audio.targetUrl.label" default="Target Url"/></dt>
-                <dd class="word_wrap"><g:fieldValue bean="${audioInstance}" field="targetUrl"/></dd>
+                <dd class="word_wrap"><a target="_blank" href="${audioInstance?.targetUrl}"><g:fieldValue bean="${audioInstance}" field="targetUrl"/></a></dd>
             </g:if>
 
             <g:if test="${audioInstance?.customThumbnailUrl}">
                 <dt id="customThumbnailUrl-label" class="word_wrap"><g:message code="audio.customThumbnailUrl.label" default="Custom Thumbnail Url"/></dt>
                 <dd class="word_wrap"><g:fieldValue bean="${audioInstance}" field="customThumbnailUrl"/></dd>
+            </g:if>
+
+            <g:if test="${audioInstance?.customPreviewUrl}">
+                <dt id="customPreviewUrl-label" class="word_wrap"><g:message code="audio.customPreviewUrl.label" default="Custom Preview Url"/></dt>
+                <dd class="word_wrap"><g:fieldValue bean="${audioInstance}" field="customPreviewUrl"/></dd>
             </g:if>
 
             <g:if test="${audioInstance?.language}">
@@ -84,10 +89,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <dd class="word_wrap"><g:formatDate date="${audioInstance?.dateSyndicationCaptured}"/></dd>
             </g:if>
 
-            %{--<g:if test="${audioInstance?.dateSyndicationVisible}">--}%
-                %{--<dt id="dateSyndicationVisible-label" class="word_wrap"><g:message code="audio.dateSyndicationVisible.label" default="Syndication Visible"/></dt>--}%
-                %{--<dd class="word_wrap"><g:formatDate date="${audioInstance?.dateSyndicationVisible}"/></dd>--}%
-            %{--</g:if>--}%
+            <g:if test="${audioInstance?.dateSyndicationVisible}">
+                <dt id="dateSyndicationVisible-label" class="word_wrap"><g:message code="audio.dateSyndicationVisible.label" default="Syndication Visible"/></dt>
+                <dd class="word_wrap"><g:formatDate date="${audioInstance?.dateSyndicationVisible}"/></dd>
+            </g:if>
 
             <g:if test="${audioInstance?.dateContentUpdated}">
                 <dt id="dateContentUpdated-label" class="word_wrap"><g:message code="audio.dateContentUpdated.label" default="Content Updated"/></dt>
@@ -164,13 +169,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <fieldset class="buttons">
             <g:form  url="[resource:audioInstance, action:'edit']">
                 <a href="${apiBaseUrl + '/resources/media/'+ audioInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
-                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER, ROLE_USER">
                     <g:link class="edit" action="edit" resource="${audioInstance}">
                         <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
                     </g:link>
-                </sec:ifAnyGranted>
-                <sec:ifAnyGranted roles="ROLE_USER">
-                    <g:actionSubmit class="btn btn-warning" value="Alternate/Extended Attributes" action="edit"/>
                 </sec:ifAnyGranted>
                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_PUBLISHER">
                     <g:actionSubmit class="btn btn-danger" action="delete" onclick="return confirm('Are you sure?');" value="Delete"/>

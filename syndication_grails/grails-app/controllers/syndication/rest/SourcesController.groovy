@@ -41,8 +41,11 @@ class SourcesController {
 
     static defaultAction = "list"
 
-    def apiResponseBuilderService
     def sourceService
+
+    def beforeInterceptor = {
+        response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
+    }
 
     @APIResource(path = "/resources/sources/{id}.json", description = "Information about a specific source.", operations = [
         @Operation(httpMethod = "GET", notes="Returns the Source identified by the 'id'.", nickname="getSourceById", type = "Sources", summary = "Get Source by ID", responseMessages = [

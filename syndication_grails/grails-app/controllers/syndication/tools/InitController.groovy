@@ -14,9 +14,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.tools
 
-import com.ctacorp.syndication.*
+import com.ctacorp.syndication.MediaItemSubscriber
+import com.ctacorp.syndication.media.MediaItem
 import grails.plugin.springsecurity.annotation.Secured
-import org.codehaus.groovy.grails.commons.ApplicationAttributes
 
 @Secured(['ROLE_ADMIN'])
 class InitController {

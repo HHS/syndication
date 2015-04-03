@@ -1,9 +1,10 @@
 package com.ctacorp.syndication.crud
 
-import com.ctacorp.syndication.MediaItem
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.Source
-import com.ctacorp.syndication.MediaMetric
+import com.ctacorp.syndication.metric.MediaMetric
+import com.ctacorp.syndication.authentication.Role
 import com.ctacorp.syndication.authentication.UserRole
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
@@ -20,9 +21,34 @@ class MetricReportController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
     def viewMetricService
     def springSecurityService
+    def queryAuditService
+    def googleAnalyticsService
 
-    def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id ?: []}
+    static defaultAction = "overview"
 
+    def publisherItems = { MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id ?: [] }
+
+    def overview(OverviewMetaHolder overviewMeta){
+        if(!overviewMeta){
+            overviewMeta = new OverviewMetaHolder()
+        }
+
+        def mostPopular = null
+        switch(overviewMeta.popularRange){
+            case "week":    mostPopular = queryAuditService.getMostPopular(new Date()-7); break
+            case "month":   mostPopular = queryAuditService.getMostPopular(); break
+            case "year":    mostPopular = queryAuditService.getMostPopular(new Date()-365); break
+            case "alltime": mostPopular = queryAuditService.getMostPopularAllTime(); break
+        }
+
+        [
+                start:overviewMeta.start,
+                googleOverview: googleAnalyticsService.getDashboardOverviewData(overviewMeta?.start),
+                mostPopular: mostPopular,
+                subscribers: UserRole.findAllByRole(Role.findByAuthority("ROLE_STOREFRONT_USER"))*.user,
+                popularRange: overviewMeta.popularRange
+        ]
+    }
 
     def mediaViewMetrics(Integer max){
         params.max = Math.min(max ?: 10, 100)
@@ -63,7 +89,7 @@ class MetricReportController {
             }
         }
 
-        render view:"mediaViewMetrics", model:[mediaItemInstanceList:mediaItems, active: "date", day: day, mediaItemInstanceCount: count]
+        render view:"mediaViewMetrics", model:[mediaItemInstanceList:mediaItems, day: day, mediaItemInstanceCount: count]
     }
 
     def mediaRangeViewMetrics(Integer max){
@@ -118,7 +144,7 @@ class MetricReportController {
             }
         }
 
-        render view:"mediaRangeViewMetrics", model:[mediaItemInstanceList:mediaItems, active: "range", fromDay: fromDay, toDay: toDay, mediaItemInstanceCount: count]
+        render view:"mediaRangeViewMetrics", model:[mediaItemInstanceList:mediaItems, fromDay: fromDay, toDay: toDay, mediaItemInstanceCount: count]
     }
 
     def totalViews(Integer max){
@@ -155,7 +181,7 @@ class MetricReportController {
             }
         }
         
-        render view:"totalViews", model:[mediaItemInstanceList:mediaItems, mediaItemInstanceCount: count, active:"total"]
+        render view:"totalViews", model:[mediaItemInstanceList:mediaItems, mediaItemInstanceCount: count]
     }
 
 // all graphing actions
@@ -163,12 +189,16 @@ class MetricReportController {
         def mediaItems = MediaItem.list()
         def mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',')) ?: []
         String mediaForTokenInput = mediaToGraph.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
+        def secondTabActive = null
+        if(params.fromSecondTab){
+            secondTabActive = true
+        }
 
-        render view:"viewGraphs", model:[mediaItemInstanceList: mediaItems, mediaToGraph:mediaToGraph, mediaForTokenInput: mediaForTokenInput, active:"graph",agencyList:Source.list()]
+        render view:"viewGraphs", model:[mediaItemInstanceList: mediaItems, mediaToGraph:mediaToGraph, mediaForTokenInput: mediaForTokenInput ,agencyList:Source.list(), secondTabActive:secondTabActive]
     }
 
     def mediaContent(){
-        params.whichData = params.whichData ?: "storefrontViewCount"
+        params.whichData = params.whichData ?: "apiViewCount"
         def data = [
                 data:[],
                 xkey:"month",
@@ -212,4 +242,9 @@ class MetricReportController {
 
         render data as JSON
     }
+}
+
+class OverviewMetaHolder {
+    Date start = new Date()
+    String popularRange = "week"
 }

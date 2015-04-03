@@ -93,10 +93,10 @@ class EmailSubscriberController {
             return notFound()
         }
 
-        def subscriptions = EmailSubscription.findByEmailSubscriber(emailSubscriber)
-        subscriptions.each {
-            it.delete(flush:true)
+        EmailSubscription.findAllByEmailSubscriber(emailSubscriber).each { emailSubscription ->
+            emailSubscription.delete(flush: true)
         }
+
         emailSubscriber.delete(flush: true)
 
         flash.message = message(code: 'emailSubscriber.deleted.message', args: [message(code: 'emailSubscriber.label'), emailSubscriber.email])

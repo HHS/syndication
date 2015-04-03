@@ -12,13 +12,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 */
 package com.ctacorp.syndication.manager.cms.controller
-
-import com.ctacorp.syndication.manager.cms.RestSubscriber
-import com.ctacorp.syndication.manager.cms.RestSubscriberController
-import com.ctacorp.syndication.manager.cms.RestSubscription
-import com.ctacorp.syndication.manager.cms.Subscriber
-import com.ctacorp.syndication.manager.cms.Subscription
-import com.ctacorp.syndication.manager.cms.SubscriptionService
+import com.ctacorp.syndication.manager.cms.*
 import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -32,7 +26,6 @@ class RestSubscriberControllerSpec extends Specification {
     RestSubscriber restSubscriber
     RestSubscriber restSubscriber2
     RestSubscription restSubscription
-    def subscriptionService = Mock(SubscriptionService)
 
     def setup() {
         subscriber = Subscriber.build()

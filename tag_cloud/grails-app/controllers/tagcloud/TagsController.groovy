@@ -174,6 +174,7 @@ class TagsController {
 
     def tagSyndicatedItemByTagName() {
         def data = request.JSON
+
         Long syndicationId = data.syndicationId as Long
         String url = data.url
         String tagName = data.tagName

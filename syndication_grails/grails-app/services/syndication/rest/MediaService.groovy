@@ -16,6 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.rest
 
 import com.ctacorp.syndication.commons.util.Hash
+import com.ctacorp.syndication.media.*
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import com.ctacorp.syndication.*
@@ -23,6 +24,7 @@ import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import com.ctacorp.syndication.exception.*
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.codehaus.groovy.grails.web.util.WebUtils
+import syndication.Exception.*
 
 @Transactional
 class MediaService {
@@ -36,7 +38,7 @@ class MediaService {
 
     @Transactional(readOnly = true)
     def getMediaItem(Long id){
-        MediaItem.get(id)
+        MediaItem.read(id)
     }
 
     def saveAudio(Audio audioInstance) {
@@ -44,21 +46,34 @@ class MediaService {
             return audioInstance
         }
 
+        MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(audioInstance)
+        
+        audioInstance.manuallyManaged = false
         audioInstance.save(flush: true)
-        createOrUpdateMediaItemSubscriber(audioInstance)
+        mediaItemSubscriber.save()
+        
         audioInstance
     }
-
+    
     def saveCollection(Collection collectionInstance) {
         if (!collectionInstance.validate()) {
             return collectionInstance
         }
+
+        MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(collectionInstance)
+        
+        collectionInstance.manuallyManaged = false
         collectionInstance.save(flush: true)
-        createOrUpdateMediaItemSubscriber(collectionInstance)
+        mediaItemSubscriber.save()
+        
         collectionInstance
     }
 
-    Html saveHtml(Html htmlInstance, params) throws ContentNotExtractableException, ContentUnretrievableException{
+    private generalMediaItemLoader = { MediaItem item ->
+        MediaItem.findBySourceUrl(item.sourceUrl)
+    }
+
+    def saveHtml(Html htmlInstance, params) throws ContentNotExtractableException, ContentUnretrievableException{
         //Extract the content (or try to)
         String content = contentRetrievalService.extractSyndicatedContent(htmlInstance.sourceUrl, params)
         if (!content) { //Extraction failed
@@ -79,8 +94,7 @@ class MediaService {
                 }
             }
 
-            htmlInstance = createOrUpdateMediaItem(htmlInstance, content,{ MediaItem item -> MediaItem.findBySourceUrl(item.sourceUrl) })      //load or update and existing record if it exists
-            createOrUpdateMediaItemSubscriber(htmlInstance)
+            htmlInstance = createOrUpdateMediaItem(htmlInstance, content, generalMediaItemLoader)      //load or update and existing record if it exists
         }
         htmlInstance
     }
@@ -105,25 +119,18 @@ class MediaService {
                 }
             }
 
-            periodicalInstance = createOrUpdateMediaItem(periodicalInstance, content,{ MediaItem item -> MediaItem.findBySourceUrl(item.sourceUrl) })      //load or update and existing record if it exists
+            periodicalInstance = createOrUpdateMediaItem(periodicalInstance, content, generalMediaItemLoader)      //load or update and existing record if it exists
         }
         periodicalInstance
     }
 
     def saveImage(Image imageInstance) {
-        imageInstance = createOrUpdateMediaItem(imageInstance, { MediaItem image ->
-            MediaItem.findBySourceUrl(image.sourceUrl)
-        })      //load or update and existing record if it exists
-        createOrUpdateMediaItemSubscriber(imageInstance)
+        imageInstance = createOrUpdateMediaItem(imageInstance, generalMediaItemLoader)      //load or update and existing record if it exists
         imageInstance
     }
 
     def saveInfographic(Infographic infographicInstance) {
-        if (!infographicInstance.validate()) {
-            return infographicInstance
-        }
-        infographicInstance.save(flush: true)
-        createOrUpdateMediaItemSubscriber(infographicInstance)
+        infographicInstance = createOrUpdateMediaItem(infographicInstance, generalMediaItemLoader)      //load or update and existing record if it exists
         infographicInstance
     }
 
@@ -131,46 +138,53 @@ class MediaService {
         if (!socialMediaInstance.validate()) {
             return socialMediaInstance
         }
+
+        MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(socialMediaInstance)
+        
+        socialMediaInstance.manuallyManaged = false
         socialMediaInstance.save(flush: true)
-        createOrUpdateMediaItemSubscriber(socialMediaInstance)
+        mediaItemSubscriber.save()
+        
         socialMediaInstance
     }
 
     def saveVideo(Video videoInstance) {
         Video fromImport = youtubeService.getVideoInstanceFromUrl(videoInstance.sourceUrl)
 
-        videoInstance.description = videoInstance.description ?: fromImport.description
-        videoInstance.duration = videoInstance.duration ?: fromImport.duration
-        videoInstance.externalGuid = videoInstance.externalGuid ?: fromImport.externalGuid
-        videoInstance.name = videoInstance.name ?: fromImport.name
+        videoInstance.description = videoInstance?.description ?: fromImport?.description
+        videoInstance.duration = videoInstance?.duration ?: fromImport?.duration
+        videoInstance.externalGuid = videoInstance?.externalGuid ?: fromImport?.externalGuid
+        videoInstance.name = videoInstance?.name ?: fromImport?.name
 
         videoInstance = createOrUpdateMediaItem(videoInstance, { MediaItem video ->
             String videoId = youtubeService.getVideoId(video.sourceUrl)
             MediaItem.sourceUrlContains(videoId).get()
         }) as Video      //load or update and existing record if it exists
 
-        if (!videoInstance.validate()) {
-            createOrUpdateMediaItemSubscriber(videoInstance)
-            return videoInstance
-        }
+        return videoInstance
     }
 
     def saveWidget(Widget widgetInstance) {
         if (!widgetInstance.validate()) {
             return widgetInstance
         }
+
+        MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(widgetInstance)
+        widgetInstance.manuallyManaged = false
         widgetInstance.save(flush: true)
-        createOrUpdateMediaItemSubscriber(widgetInstance)
+        mediaItemSubscriber.save()
+        
         widgetInstance
     }
 
     private MediaItem createOrUpdateMediaItem(MediaItem item, String content = null, Closure mediaFinder){
         boolean savetoDB = true
         MediaItem existing = mediaFinder(item)
+        
         if (existing) {
             def result = updateMediaItem(existing, item)
             // -- media type specific updates here --
-            if (!result.changed) {
+            if(!result.changed){
                 log.info "Item not changed, skipping update ${result.updatedRecord.sourceUrl}"
                 item = existing // if there were no changes, return the existing record instead
                 savetoDB = false
@@ -179,33 +193,57 @@ class MediaService {
                 item = result.updatedRecord
             }
         }
+        
         if(savetoDB) {
+            MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(item)
+            item.manuallyManaged = false
             item.save(flush: true)
+            mediaItemSubscriber.save()
+
             log.info "media saved: ${item.id}"
-            //TODO we need a trigger here to refresh hash, and thumbnails, expire cache - all that
             if (grailsApplication.config.syndication.solrService.useSolr) {
                solrIndexingService.inputMediaItem(item,content)
             }
+            log.info "Media Item Created/Updated: ${item.id} - ${item.sourceUrl}"
         }
-
         item
     }
 
-    def createOrUpdateMediaItemSubscriber(MediaItem mediaItem){
+    /**
+     * Validates a that the publisher is able to access/modify the current mediaItem
+     * @param mediaItem
+     * @return
+     */
+    MediaItemSubscriber createAndFindMediaItemSubscriber(MediaItem mediaItem){
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         def request = webUtils.getCurrentRequest()
         String[] apiKey = request.getHeader("Authorization").substring("syndication_api_key ".length()).split(':')
         def apiKeyLength = apiKey.length
 
         if (apiKeyLength != 2) {
+            mediaItem.discard()
             log.error("(${System.currentTimeMillis() as String}) api key is malformed")
-            return null
+            throw new UnauthorizedException("You do not have permission to access this item.")
         }
 
         def senderPublicKey = apiKey[0] as String
-        Long subscriberId = cmsManagerService.getSubscriber(senderPublicKey)?.id as Long
-
-        MediaItemSubscriber.findOrSaveBySubscriberIdAndMediaItem(subscriberId, mediaItem).save(flush: true)
+        def mediaItemSubscriber
+        try{
+            Long subscriberId = cmsManagerService.getSubscriber(senderPublicKey)?.id as Long
+            if(mediaItem.id){
+                mediaItemSubscriber = MediaItemSubscriber.findBySubscriberIdAndMediaItem(subscriberId, mediaItem)
+                if(mediaItemSubscriber?.id) {
+                    return mediaItemSubscriber
+                }
+            } else {
+                return new MediaItemSubscriber(subscriberId:subscriberId, mediaItem:mediaItem)
+            }
+        } catch(e){
+            log.error(e)
+        }
+        log.error(" Permission denied, could not find or create a valid MediaItemSubscriber for the mediaItem! ")
+        mediaItem.discard()
+        throw new UnauthorizedException("You do not have permission to access this item.")
     }
 
     @NotTransactional
@@ -226,6 +264,9 @@ class MediaService {
         params.max = getMax(params)
         if (params.id) {
             return [MediaItem.get(params.id as Long)]
+        }
+        if(params?.order == "desc"){
+            params.sort = "-" + params.sort
         }
         if (params.tagIds) {
             def mediaIds = tagsService.getMediaForTagIds(params.tagIds).join(",")
@@ -266,7 +307,7 @@ class MediaService {
     }
 
     @Transactional(readOnly = true)
-    def getCollectionMediaItemsForAPIResponse(com.ctacorp.syndication.Collection collection) {
+    def getCollectionMediaItemsForAPIResponse(com.ctacorp.syndication.media.Collection collection) {
         def mediaItems = []
         collection.mediaItems.each { mi ->
             def tmi = MediaItem.get(mi.id)
@@ -302,6 +343,13 @@ class MediaService {
         Math.min(params.int("max") ?: 20, 1000)
     }
 
+    //Ignore updates to these fields
+    private ignoredFields = ["lastUpdated", "dateCreated", "dateSyndicationCaptured", "dateSyndicationUpdated", "manuallyManaged"] //These will never match between an existing item and a saved item, so ignore them
+
+    //This would be needed in the case where a new instance is created in memory from a publish
+    //but an existing item with the same sourceURL already exists in the DB. The new item would not have an
+    //id, but would represent the same item logically. In that case, copy any updated properties from the
+    //new item to the existing item and then save it, otherwise if all fields are the same, ignore it.
     private Map updateMediaItem(MediaItem o, MediaItem u) { //original, updated
         boolean changed = false
 
@@ -309,13 +357,28 @@ class MediaService {
 
         //Iterate over all MediaItem properties except oneToMany and ManyToMany
         mediaItemClass.getPersistentProperties().findAll{!it.isOneToMany() && !it.isManyToMany()}.each { p ->
+            if(!(p.name in ignoredFields)) {
+                def oProp = o.properties[p.name]
+                def uProp = u.properties[p.name]
 
-            def oProp = o.properties[p.name]
-            def uProp = u.properties[p.name]
+                if(uProp instanceof Date){
+                    Date oDate = oProp as Date
+                    Date uDate = uProp as Date
+                }
 
-            if( uProp && uProp != oProp) {
-                o.properties[p.name] = uProp
-                changed = true
+                if (uProp && uProp != oProp) {
+                    o.properties[p.name] = uProp
+                    changed = true
+//                    if(changed == true){
+//                        println p.name
+//                        println "$oProp -> $uProp"
+//                        if(oProp instanceof Date || uProp instanceof Date){
+//                            println "${oProp.format('MMM dd, yyyy - HH:mm:ss')} -> ${uProp.format('MMM dd, yyyy - HH:mm:ss')}"
+//                        }
+//
+//                        println "--------------------------------"
+//                    }
+                }
             }
         }
 
