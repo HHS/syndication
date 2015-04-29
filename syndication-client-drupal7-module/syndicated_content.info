@@ -1,0 +1,5 @@
+name = Syndicated Content
+description = Content syndicated from a remote source.
+core = 7.x
+files[] = lib/Syndication.lib.php
+configure = admin/config/syndicated_content

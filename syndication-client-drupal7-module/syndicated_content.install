@@ -1,0 +1,241 @@
+<?php
+
+function syndicated_content_install()
+{
+    drupal_set_message(t('Syndicated Content module installed'));
+}
+
+function syndicated_content_uninstall()
+{
+    drupal_set_message(t('Syndicated Content module uninstalled'));
+    db_truncate('syndicated_content');
+    db_truncate('syndicated_content_sources');
+    db_truncate('syndicated_content_types');
+}
+
+function syndicated_content_enable()
+{
+    drupal_set_message(t('Syndicated Content module enabled'));
+
+    /// Re-Introduce Content Type
+    $bundle = array(
+        'type'     => 'syndicated_content',
+        'name'     => st('Syndicated Content'),
+        'description' => st('Load content from a remote source.'),
+        'base'     => 'node_content',
+        'custom'   => FALSE,
+        'modified' => TRUE,
+        'locked'   => FALSE
+    );
+    $bundle = node_type_set_defaults($bundle);
+    $existing_bundles = node_type_get_names();
+    if ( !isset($existing_bundles['syndicated_content']) )
+    {
+        node_type_save($bundle);
+        node_types_rebuild();
+    }
+}
+
+function syndicated_content_disable()
+{
+    drupal_set_message(t('Syndicated Content module disabled'));
+    /// Remove Content Type
+    $existing_types = node_type_get_names();
+    if ( isset($existing_types['syndicated_content']) ) {
+        node_type_delete('syndicated_content');
+        node_types_rebuild();
+    }
+}
+function syndicated_content_update_7000() {
+  // Add meta_canonical
+    $spec = array(
+        'description'   => t('Drupal Custom Field'),
+        'type'          => 'varchar',
+        'length'        => 128,
+        'default'       => ''
+    );
+    db_add_field('syndicated_content_types', 'drupal_field', $spec);
+}
+function syndicated_content_schema()
+{
+    $schema['syndicated_content_sources'] = array(
+        'description' => 'Syndication Sources.',
+        'fields' => array(
+            'id' => array(
+                'description' => 'ID for syndication source servers',
+                'type'        => 'serial',
+                'unsigned'    => TRUE,
+                'not null'    => TRUE),
+            'name' => array(
+                'description' => 'Source Name',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
+            'syndication_url' => array(
+                'description' => 'Syndication API root',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
+            'syndication_tinyurl' => array(
+                'description' => 'Syndication Tiny Url root',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
+            'source_org_id' =>array(
+                'description' => 'Organization or Agency',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
+            'cms_manager_url' => array(
+                'description' => 'CMS Manger server',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
+            'cms_manager_id' => array(
+                'description' => 'CMS Manger Id',
+                'type'        => 'varchar',
+                'length'      => 32,
+                'default'     => ''),
+            'key_private' => array(
+                'description' => 'Private Key',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
+            'key_public' => array(
+                'description' => 'Public Key',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
+            'key_secret' => array(
+                'description' => 'Secret Key',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
+        ),
+        'primary key' => array('id'),
+    );
+
+    $schema['syndicated_content_types'] = array(
+        'description' => 'Syndication Content Type Mappings.',
+        'fields' => array(
+            'syndication_source_id' => array(
+                'description' => 'Syndication Source ID',
+                'type' => 'int',
+                'not null' => TRUE),
+            'syndication_type' => array(
+                'description' => 'Syndication Content Type',
+                'type'        => 'varchar',
+                'length'      => 128),
+            'drupal_type' => array(
+                'description' => 'Drupal Content Type',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
+            'drupal_field' => array(
+                'description' => 'Drupal Custom Field',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
+        ),
+        /// no pk, all many-to-many
+    );
+
+    $schema['syndicated_content'] = array(
+        'description' => 'Syndicated Content MetaData.',
+        'fields' => array(
+            'node_id' => array(
+                'description' => 'Local Drupal Node ID',
+                'type' => 'int',
+                'not null' => TRUE),
+            'syndication_source_id' => array(
+                'description' => 'Syndication Source ID',
+                'type' => 'int',
+                'not null' => TRUE),
+            'media_id' => array(
+                'description' => 'Syndication ID',
+                'type' => 'int',
+                'not null' => TRUE),
+            'media_type' => array(
+                'description' => 'Syndication Media Type',
+                'type' => 'varchar',
+                'length' => 32,
+                'not null' => TRUE),
+            'tiny_url' => array(
+                'description' => 'Tiny Url',
+                'type' => 'varchar',
+                'length' => 128,
+                'default' => ''),
+            'locally_owned' => array(
+                'description' => 'We Own Content',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => '0'),
+            'date_authored' => array(
+                'description' => 'Last Publish Time',
+                'type' => 'varchar',
+                'length' => 32,
+                'not null' => TRUE,
+                'default' => ''),
+            'date_updated' => array(
+                'description' => 'Last Update Time',
+                'type' => 'varchar',
+                'length' => 32,
+                'not null' => TRUE,
+                'default' => ''),
+            'date_synced' => array(
+                'description' => 'Last Sync Time',
+                'type' => 'varchar',
+                'length' => 32,
+                'not null' => TRUE,
+                'default' => ''),
+            'language' => array(
+                'description' => 'Language Name',
+                'type' => 'varchar',
+                'length' => 256,
+                'default' => ''),
+            'source' => array(
+                'description' => 'source',
+                'type' => 'varchar',
+                'length' => 128,
+                'default' => ''),
+            'source_acronym' => array(
+                'description' => 'source Acronym',
+                'type' => 'varchar',
+                'length' => 16,
+                'default' => ''),
+            'source_url' => array(
+                'description' => 'source Url',
+                'type' => 'varchar',
+                'length' => 256,
+                'default' => ''),
+            'metadata' => array(
+                'description' => 'JSON MetaData From Source',
+                'type' => 'text',
+                'not null' => TRUE),
+            /* /// we may have to go around taxonomy
+            'campaign_ids' => array(
+                'description' => 'Campaign IDs',
+                'type' => 'varchar',
+                'length' => 64,
+                'default' => ''),
+            'campaigns' => array(
+                'description' => 'Campaigns',
+                'type' => 'varchar',
+                'length' => 256,
+                'default' => ''),
+            'tag_ids' => array(
+                'description' => 'Tag IDs',
+                'type' => 'varchar',
+                'length' => 64,
+                'default' => ''),
+            'tags' => array(
+                'description' => 'Tags',
+                'type' => 'varchar',
+                'length' => 1024,
+                'default' => ''),
+            */
+        ),
+        'primary key' => array('node_id'),
+    );
+    return $schema;
+}

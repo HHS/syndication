@@ -1,0 +1,176 @@
+<?php
+/**
+ * @file
+ * A module that displays pages syndicated from a remote resource.
+ */
+
+/// leave a few public functions here incase another module developer wants to trigger some of these actions themselves
+/*
+function syndicated_content_get_node_metadata ( &$node ) { return null; } /// update node with data from source
+function syndicated_content_do_node_update    ( &$node ) { return null; } /// update node with data from source
+function syndicated_content_do_node_publish   ( &$node ) { return null; } /// try and publish local node
+function syndicated_content_do_node_unpublish ( &$node ) { return null; } /// try and unpublish local node
+*/
+
+/// all main drupal hooks must be here - each main hook includes a file for the rest of it's stuff
+
+/// Routes handled by module
+function syndicated_content_menu()
+{
+  $items = array();
+
+  $items['admin/config/syndicated_content'] = array(
+    'title'            => 'Syndicated Content Settings',
+    'description'      => 'Configuration for Syndicated Content module',
+    'page callback'    => 'syndicated_content_settings_page',
+    'access arguments' => array('access administration pages'),
+    'type'             => MENU_NORMAL_ITEM
+  );
+
+  $items['admin/config/syndicated_content/sources'] = array(
+    'title'            => 'Syndicated Content Sources',
+    'description'      => 'Sources of Syndicated Content',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('syndicated_content_admin_sources_form'),
+    'access arguments' => array('access administration pages'),
+    'type'             => MENU_NORMAL_ITEM
+  );
+/*
+  $items['admin/config/syndicated_content/content'] = array(
+    'title'            => 'Syndicated Item List',
+    'description'      => 'Listing of Syndicated Content',
+    'page callback'    => '_syndicated_content_listings_page',
+    'access arguments' => array('access administration pages'),
+    'type'             => MENU_NORMAL_ITEM
+  );
+*/
+  $items['syndicated_content/subscription'] = array(
+    'page callback'    => 'syndicated_content_listener',
+    'access callback'  => TRUE,
+    'type'             => MENU_CALLBACK,
+  );
+/*
+  $items['syndicated_content/multiform'] = array(
+    'title'            => 'MultiForm Test',
+    'page callback'    => 'syndicated_content_multiform',
+    'page arguments'   => array('syndicated_content_form'),
+    'access callback'  => TRUE,
+    'access arguments' => array('access administration pages'),
+    'type'             => MENU_NORMAL_ITEM
+  );
+*/
+  return $items;
+}
+
+function syndicated_content_help($path, $arg)
+{
+    switch ($path)
+    {
+        case "admin/help#syndicated_content":
+            return '<p>' . t("Displays pages syndicated from a remote resource") . '</p>';
+            break;
+    }
+}
+
+function syndicated_content_forms( $form_id, $args )
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.admin');
+    $forms['syndicated_content_admin_sources_form'] = array(
+        'callback' => '_syndicated_content_admin_sources_form',
+    );
+    return $forms;
+}
+
+/// All global functions must be present in main module file
+/// but I want as little code here as possible
+
+/// MODULE SETTINGS ADMIN
+
+function syndicated_content_settings_page()
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.admin');
+    return _syndicated_content_settings_page();
+}
+
+function syndicated_content_form($form, &$form_state)
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.admin');
+    return _syndicated_content_form($form,$form_state);
+}
+
+function syndicated_content_admin_sources_form_validate($form, &$form_state)
+{
+  /// we need to this run before any other actions take place, so I choose hook_validate over hook_presave
+  module_load_include('php','syndicated_content','includes/syndicated_content.admin');
+  return _syndicated_content_admin_sources_form_validate($form,$form_state);
+}
+
+/// SYNDICATION SOURCE LISTENER
+
+function syndicated_content_listener()
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.listener');
+    return _syndicated_content_listener();
+}
+
+/// AJAX HANDLERS
+
+function syndicated_content_lookup_ajax( $form, &$form_state )
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.ajax');
+    return _syndicated_content_lookup_ajax($form,$form_state);
+}
+
+function syndicated_content_search_ajax( $form, &$form_state )
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.ajax');
+    return _syndicated_content_search_ajax($form,$form_state);
+}
+
+function syndicated_content_browse_ajax( $form, &$form_state )
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.ajax');
+    return _syndicated_content_browse_ajax($form,$form_state);
+}
+
+/// FORMS
+
+function syndicated_content_form_node_admin_content_alter(&$form, &$form_state, $form_id)
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.forms');
+    return _syndicated_content_form_node_admin_content_alter($form, $form_state, $form_id);
+}
+
+function syndicated_content_form_alter( &$form, &$form_state, $form_id )
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.forms');
+    return _syndicated_content_form_alter( $form, $form_state, $form_id );
+}
+
+function syndicated_content_form_submit( $form, &$form_state )
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.data');
+    return _syndicated_content_form_submit($form,$form_state);
+}
+
+function syndicated_content_node_insert( $node )
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.data');
+    return _syndicated_content_node_insert($node);
+}
+function syndicated_content_node_update( $node )
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.data');
+    return _syndicated_content_node_update($node);
+}
+function syndicated_content_node_validate( $node, $form, &$form_state )
+{
+    module_load_include('php','syndicated_content','includes/syndicated_content.data');
+    return _syndicated_content_node_validate( $node, $form, $form_state );
+}
+
+// TRYING
+function syndicated_content_node_view($node, $view_mode, $langcode) {
+    module_load_include('php','syndicated_content','includes/syndicated_content.data');
+    return _syndicated_content_node_view( $node, $view_mode, $langcode );
+}

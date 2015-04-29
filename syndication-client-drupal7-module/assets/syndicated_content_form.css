@@ -1,0 +1,96 @@
+.right-button {
+    float:right;
+}
+
+
+.syndication-form-subscribe-submit
+{
+    
+    float: right;
+}
+.form-item-syndicated-content-local-type
+{
+    float: right;
+    position: relative;
+    bottom: .75em;
+    right: 2em;
+}
+.form-item-syndicated-content-local-type label
+{
+    float: left;
+    font-weight: normal;
+}
+.form-item-syndicated-content-local-type select
+{
+    margin-left: .5em;
+}
+
+#search_metadata table tr td:nth-child(1) { overflow:hidden; max-width: 1em; }
+#search_metadata table tr td:nth-child(2) { overflow:hidden; max-width: 20%; }
+#search_metadata table tr td:nth-child(3) { overflow:hidden; max-width: 50%; }
+#search_metadata table tr td:nth-child(4) { overflow:hidden; max-width: 30%; }
+
+#edit-syndication-search legend { display:none; }
+
+#edit-syndication-adv-search .form-item-syndication-adv-name,
+#edit-syndication-adv-search .form-item-syndication-adv-description,
+#edit-syndication-adv-search .form-item-syndication-adv-source,
+#edit-syndication-adv-search .form-item-syndication-adv-organization
+{
+    width: 46%; float: left; padding: 5px 5px !important;
+}
+#edit-syndication-adv-search .form-item-syndication-adv-media-types,
+#edit-syndication-adv-search .form-item-syndication-adv-language,
+#edit-syndication-adv-authored,
+#edit-syndication-adv-updated
+{
+    width: 94%; float: left; padding: 5px 5px !important;
+}
+
+#edit-syndication-reg-search-submit,
+#edit-syndication-adv-search-submit
+{
+    display: block; clear: both;
+}
+
+#edit-syndication-reg-search-submit
+{
+    margin-top: 2em;
+}
+#edit-syndication-adv-search-submit
+{
+    margin-top: 4.5em;
+}
+#edit-syndication-adv-search .form-item-syndication-adv-authored-when,
+#edit-syndication-adv-search .form-item-syndication-adv-authored-start,
+#edit-syndication-adv-search .form-item-syndication-adv-authored-between,
+#edit-syndication-adv-search .form-item-syndication-adv-updated-when,
+#edit-syndication-adv-search .form-item-syndication-adv-updated-start,
+#edit-syndication-adv-search .form-item-syndication-adv-updated-between
+{
+    float: left; padding-right: 1.25em;
+}
+
+#edit-syndication-adv-search .form-item-syndication-adv-authored-when,
+#edit-syndication-adv-search .form-item-syndication-adv-updated-when
+{
+    width: 5.25em;
+}
+
+#edit-syndication-adv-search .form-item-syndication-adv-authored-between .field-prefix,
+#edit-syndication-adv-search .form-item-syndication-adv-updated-between  .field-prefix
+{
+    padding-right: 1em;
+    display: inline-block;
+    width: 5.25em; text-align: center;
+}
+#edit-syndication-adv-search .form-item-syndication-adv-authored-between .container-inline,
+#edit-syndication-adv-search .form-item-syndication-adv-updated-between  .container-inline
+{
+    display: inline;
+}
+
+form#syndicated-content-node-form input#edit-syndication-ajax-search-submit
+{
+    display:none;
+}
