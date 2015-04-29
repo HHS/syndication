@@ -171,7 +171,8 @@ function _syndicated_content_create_admin_source_form($form,&$form_state,$source
             '#title'         => t('Base Syndication API Url'),
             '#default_value' => $source['syndication_url'],
             '#required' => false,
-        );/*
+        );
+        /*
         $form["syndication_sources_{$source['id']}"]["api_urls"]["syndication_tinyurl_{$source['id']}"] = array(
             '#type'          => 'textfield',
             '#title'         => t('Base Syndication Tiny Url'),
@@ -183,7 +184,11 @@ function _syndicated_content_create_admin_source_form($form,&$form_state,$source
             '#title'         => t('Base API URL'),
             '#default_value' => $source["cms_manager_url"],
         );
-
+        $form["syndication_sources_{$source['id']}"]["api_urls"]["ssl_auth_{$source['id']}"] = array(
+            '#type'          => 'checkbox',
+            '#title'         => t('Bypass SSL'),
+            '#default_value' => isset($source['ssl_auth']) ? $source['ssl_auth'] : "",
+        );
         $form["syndication_sources_{$source['id']}"]["api_identiy"] = array(
             '#type'  => 'fieldset',
             '#title' => t('API Identity'),
@@ -316,7 +321,7 @@ function _syndicated_content_admin_sources_form_validate($form, &$form_state)
 function _syndicated_content_create_source_from_form($form, &$form_state)
 {
     $source_id = db_insert('syndicated_content_sources')
-        ->fields(array('name','syndication_url','syndication_tinyurl','key_public','key_private','key_secret','cms_manager_url','cms_manager_id' ))
+        ->fields(array('name','syndication_url','syndication_tinyurl','key_public','key_private','key_secret','cms_manager_url','cms_manager_id', 'ssl_auth' ))
         ->values(array(
             'name'                 => "Syndication Service",
             'source_org_id'        => variable_get('site_name', "Default site name"), //$form_state['values']['source_org_id_new_source'],
@@ -326,7 +331,8 @@ function _syndicated_content_create_source_from_form($form, &$form_state)
             'key_public'           => $form_state['values']['key_public_new_source'],
             'key_secret'           => $form_state['values']['key_secret_new_source'],
             'cms_manager_url'      => $form_state['values']['cms_manager_url_new_source'],
-            'cms_manager_id'       => "ss_manager_id" //$form_state['values']['cms_manager_id_new_source']
+            'cms_manager_id'       => "ss_manager_id", //$form_state['values']['cms_manager_id_new_source']
+            'ssl_auth'             => $form_state['values']['ssl_auth_new_source']
             ))
         ->execute();
     if ( $source_id!==null )
@@ -368,7 +374,8 @@ function _syndicated_content_update_source_from_form($form, &$form_state, $sourc
             'key_public'           => $form_state['values']["key_public_{$source_id}"],
             'key_secret'           => $form_state['values']["key_secret_{$source_id}"],
             'cms_manager_url'      => $form_state['values']["cms_manager_url_{$source_id}"],
-            'cms_manager_id'       => "ss_manager_id" ))
+            'cms_manager_id'       => "ss_manager_id",
+            'ssl_auth'             => $form_state['values']["ssl_auth_{$source_id}"] ))
         ->condition('id', $source_id)
         ->execute();
     drupal_set_message('Syndication source updated');
@@ -413,7 +420,10 @@ function _syndicated_content_test_source_from_form($form, &$form_state, $source_
     module_load_include('php','syndicated_content','includes/syndicated_content.util');
 
     $syndication = _syndicated_content_api_factory();
-    $response = $syndication->testCredentials();
+    
+    $ssl_auth = isset($form_state['values']["ssl_auth_{$source_id}"]) ? $form_state['values']["ssl_auth_{$source_id}"] : (isset($form_state['values']["ssl_auth_new_source"]) ? $form_state['values']["ssl_auth_new_source"] : 0);
+    
+    $response = $syndication->testCredentials(array('ssl_auth'=>$ssl_auth));
     if ( !empty($response->status) && $response->status=='200' ) 
     {
        drupal_set_message('Your Credentials Work');

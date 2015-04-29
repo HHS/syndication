@@ -14,7 +14,7 @@ The Syndicated Content module adds the capability to publish local content to an
 
 REQUIREMENTS
 ------------
-This module requires Drupal 7. Now other modules are required. 
+This module requires Drupal 7. No other modules are required. 
 
 Searching and Importing content do not require an *api identity*. 
 

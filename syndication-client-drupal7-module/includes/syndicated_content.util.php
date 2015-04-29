@@ -1,5 +1,17 @@
 <?php
-
+function _syndicated_content_init() {
+    $sources = _syndicated_content_api_sources();
+    $source = array();
+    foreach($sources as $source_temp) {
+        if(isset($source_temp['name'])) {
+            $source = $source_temp;
+            break;
+        }
+    }
+    $ssl_auth = isset($source['ssl_auth']) ? $source['ssl_auth'] : 0;
+    if(!defined('SYNDICATIONAPICLIENT_SSL_AUTH'))
+        define('SYNDICATIONAPICLIENT_SSL_AUTH', $ssl_auth);
+}
 function _syndicated_content_api_sources()
 {
     $results = db_select('syndicated_content_sources', 's')

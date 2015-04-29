@@ -62,6 +62,11 @@ function syndicated_content_menu()
   return $items;
 }
 
+function syndicated_content_init() {
+    module_load_include('php','syndicated_content','includes/syndicated_content.util');
+    _syndicated_content_init();
+}
+
 function syndicated_content_help($path, $arg)
 {
     switch ($path)
@@ -169,7 +174,7 @@ function syndicated_content_node_validate( $node, $form, &$form_state )
     return _syndicated_content_node_validate( $node, $form, $form_state );
 }
 
-// TRYING
+// NODE VIEW Wrapper
 function syndicated_content_node_view($node, $view_mode, $langcode) {
     module_load_include('php','syndicated_content','includes/syndicated_content.data');
     return _syndicated_content_node_view( $node, $view_mode, $langcode );

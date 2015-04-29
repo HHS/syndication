@@ -376,11 +376,11 @@ class SyndicationAPIClient
      * @return SyndicationResponse ->results[]
      *      empty
      */
-    function testCredentials()
+    function testCredentials($params = array())
     {
         try
         {
-            $result = $this->apiCall('get',"{$this->api['cms_manager_url']}/keyTest");
+            $result = $this->apiCall('get',"{$this->api['cms_manager_url']}/keyTest", $params);
             return $this->createResponse($result,'Test APIKey Credentials','ApiKey');
         } catch ( Exception $e ) {
             return $this->createResponse($e,'API Call');
@@ -688,6 +688,14 @@ class SyndicationAPIClient
             $response_format = $this->guessFormatFromUrl($url);
         }
 
+        $ssl_auth = 0;
+        if(defined('SYNDICATIONAPICLIENT_SSL_AUTH'))
+            $ssl_auth = SYNDICATIONAPICLIENT_SSL_AUTH;
+        if(isset($params['ssl_auth'])) {
+            $ssl_auth = $params['ssl_auth'];
+            unset($params['ssl_auth']);
+        }
+
         /*
         foreach ( $params as $p=>$param )
         {
@@ -786,6 +794,10 @@ class SyndicationAPIClient
         $verbose = fopen('php://temp', 'rw+');
         curl_setopt($curl, CURLOPT_STDERR, $verbose);
 
+        if($ssl_auth == 1) {
+                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        }
+        
         $content = curl_exec($curl);
         rewind($verbose);
         $verbose_log = stream_get_contents($verbose);

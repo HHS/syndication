@@ -56,6 +56,15 @@ function syndicated_content_update_7000() {
     );
     db_add_field('syndicated_content_types', 'drupal_field', $spec);
 }
+function syndicated_content_update_7001() {
+    $spec = array(
+        'description'   => t('Bypass SSL'),
+        'type'          => 'int',
+        'length'        => 1,
+        'default'       => 0
+    );
+    db_add_field('syndicated_content_sources', 'ssl_auth', $spec);
+}
 function syndicated_content_schema()
 {
     $schema['syndicated_content_sources'] = array(
@@ -111,6 +120,11 @@ function syndicated_content_schema()
                 'type'        => 'varchar',
                 'length'      => 128,
                 'default'     => ''),
+            'ssl_auth' => array(
+                'description' => 'Bypass SSL',
+                'type'        => 'int',
+                'length'      => 1,
+                'default'     => 0),
         ),
         'primary key' => array('id'),
     );
