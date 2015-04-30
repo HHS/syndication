@@ -5,6 +5,7 @@ CONTENTS OF THIS FILE
 * Installation
 * Configuration
 * Usage
+* Download Link
 
 INTRODUCTION
 ------------
@@ -66,3 +67,7 @@ Pressing the *Subscribe* button will send you to an auto-populated local content
 **Publishing**
 
 Local Content Types chosen as *syndicatable* get a new section in their edit screen for managing the publishing process. It provides a publish form for available content. It displays metadata for content already published. It provides an *update* button to manually send a new copy of your content to inform your source of any content changes.
+
+Download Link
+----------------------
+[Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication-client-drupal7-module.zip?raw=true)
