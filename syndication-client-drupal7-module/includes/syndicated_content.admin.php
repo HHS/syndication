@@ -214,6 +214,11 @@ function _syndicated_content_create_admin_source_form($form,&$form_state,$source
             '#title'         => t('Secret Key'),
             '#default_value' => $source['key_secret'],
         );
+        $form["syndication_sources_{$source['id']}"]["api_identiy"]["key_json_{$source['id']}"] = array(
+            '#type'          => 'textarea',
+            '#title'         => t('JSON Keys'),
+            '#default_value' => "",
+        );
         /*
         $form["syndication_sources_{$source['id']}"]["api_identiy"]['submit_test'] = array(
             '#type'  => 'submit',
@@ -320,6 +325,8 @@ function _syndicated_content_admin_sources_form_validate($form, &$form_state)
 
 function _syndicated_content_create_source_from_form($form, &$form_state)
 {
+    list($key_private, $key_public, $key_secret) = _syndicated_content_decode_keys($form_state['values'], 0);
+    
     $source_id = db_insert('syndicated_content_sources')
         ->fields(array('name','syndication_url','syndication_tinyurl','key_public','key_private','key_secret','cms_manager_url','cms_manager_id', 'ssl_auth' ))
         ->values(array(
@@ -327,9 +334,9 @@ function _syndicated_content_create_source_from_form($form, &$form_state)
             'source_org_id'        => variable_get('site_name', "Default site name"), //$form_state['values']['source_org_id_new_source'],
             'syndication_url'      => $form_state['values']['cms_manager_url_new_source'].(substr($form_state['values']["cms_manager_url_new_source"], -1) == "/" ? "" : "/")."api/v2",
             'syndication_tinyurl'  => $form_state['values']["cms_manager_url_new_source"].(substr($form_state['values']["cms_manager_url_new_source"], -1) == "/" ? "" : "/")."TinyUrl",
-            'key_private'          => $form_state['values']['key_private_new_source'],
-            'key_public'           => $form_state['values']['key_public_new_source'],
-            'key_secret'           => $form_state['values']['key_secret_new_source'],
+            'key_private'          => $key_private,
+            'key_public'           => $key_public,
+            'key_secret'           => $key_secret,
             'cms_manager_url'      => $form_state['values']['cms_manager_url_new_source'],
             'cms_manager_id'       => "ss_manager_id", //$form_state['values']['cms_manager_id_new_source']
             'ssl_auth'             => $form_state['values']['ssl_auth_new_source']
@@ -364,15 +371,17 @@ function _syndicated_content_create_source_from_form($form, &$form_state)
 
 function _syndicated_content_update_source_from_form($form, &$form_state, $source_id)
 {
+    list($key_private, $key_public, $key_secret) = _syndicated_content_decode_keys($form_state['values'], $source_id);
+    
     db_update('syndicated_content_sources')
         ->fields(array(
             'name'                 => "Syndication Service",
             'source_org_id'        => variable_get('site_name', "Default site name"), //$form_state['values']["source_org_id_{$source_id}"],
             'syndication_url'      => $form_state['values']["cms_manager_url_{$source_id}"].(substr($form_state['values']["cms_manager_url_{$source_id}"], -1) == "/" ? "" : "/")."api/v2",
             'syndication_tinyurl'  => $form_state['values']["cms_manager_url_{$source_id}"].(substr($form_state['values']["cms_manager_url_{$source_id}"], -1) == "/" ? "" : "/")."TinyUrl",
-            'key_private'          => $form_state['values']["key_private_{$source_id}"],
-            'key_public'           => $form_state['values']["key_public_{$source_id}"],
-            'key_secret'           => $form_state['values']["key_secret_{$source_id}"],
+            'key_private'          => $key_private,
+            'key_public'           => $key_public,
+            'key_secret'           => $key_secret,
             'cms_manager_url'      => $form_state['values']["cms_manager_url_{$source_id}"],
             'cms_manager_id'       => "ss_manager_id",
             'ssl_auth'             => $form_state['values']["ssl_auth_{$source_id}"] ))
@@ -404,7 +413,24 @@ function _syndicated_content_update_source_from_form($form, &$form_state, $sourc
     }
     $ins->execute();
 }
+function _syndicated_content_decode_keys($formVals, $source_id) {
+    $source_id = ($source_id > 0) ? $source_id : "new_source";
 
+    $json           = isset($formVals["key_json_{$source_id}"])    ? $formVals["key_json_{$source_id}"]    : "";
+    $key_private    = isset($formVals["key_private_{$source_id}"]) ? $formVals["key_private_{$source_id}"] : "";
+    $key_public     = isset($formVals["key_public_{$source_id}"])  ? $formVals["key_public_{$source_id}"]  : "";
+    $key_secret     = isset($formVals["key_secret_{$source_id}"])  ? $formVals["key_secret_{$source_id}"]  : "";
+    
+    if($json != "") {
+        $json = str_replace(" Key", "Key", $json);
+        $json = json_decode($json);
+        $key_private = isset($json->PrivateKey) ? $json->PrivateKey : $key_private;
+        $key_public  = isset($json->PublicKey)  ? $json->PublicKey  : $key_public;
+        $key_secret  = isset($json->SecretKey)  ? $json->SecretKey  : $key_secret;
+    }
+    
+    return array($key_private, $key_public, $key_secret);
+}
 function _syndicated_content_delete_source_from_form($form, &$form_state, $source_id)
 {
     db_delete('syndicated_content_sources')

@@ -582,10 +582,20 @@ function _syndicated_content_node_view($node, $view_mode, $langcode) {
     $syndicatable_content_types = _syndicated_content_type_mapping();
 
     if (!empty($syndicatable_content_types['by_drupal_type'][$node->type]) ) {
-        if(isset($node->content['body'][0]))
-            $node->content['body'][0] = array(
-                '#markup' => "<div class='syndicate'>".$node->content['body'][0]['#markup']."</div>", 
-            );
+        if(isset($node->content['body'][0])) {
+            if(isset($node->content['body'][0]['#markup'])) {
+                $dom = new DOMDocument();
+                $dom->loadHTML($node->content['body'][0]['#markup']);
+                $xpath = new DOMXPath($dom);
+                $syndicatedContent = $xpath->query('//div[@class="syndicate"]');
+                
+                if($syndicatedContent->length == 0) {
+                    $node->content['body'][0] = array(
+                        '#markup' => "<div class='syndicate'>".$node->content['body'][0]['#markup']."</div>", 
+                    );
+                }
+            }
+        }
     }
 }
 
