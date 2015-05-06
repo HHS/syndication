@@ -32,7 +32,7 @@ class CampaignControllerSpec extends Specification {
         controller.solrIndexingService = solrService
         def mockCmsManagerKeyService = [listSubscribers:{}, getSubscriberById: {CampaignSubscriber cs ->}]
         controller.cmsManagerKeyService = mockCmsManagerKeyService
-        def mockCampaignService = [updateCampaignAndSubscriber: {Campaign c, String id -> }]
+        def mockCampaignService = [updateCampaignAndSubscriber: {Campaign c, String id -> if(c.save(flush:true)){return null} else{return "errors"}}]
         controller.campaignService = mockCampaignService
     }
     def populateValidParams(params) {
@@ -67,7 +67,6 @@ class CampaignControllerSpec extends Specification {
         when: "The save action is executed with an invalid instance"
             request.contentType = FORM_CONTENT_TYPE
             request.method = "POST"
-            controller.campaignService = [updateCampaignAndSubscriber: {Campaign c, String id -> return true}]
 
             def campaign = new Campaign()
             campaign.validate()
@@ -81,7 +80,6 @@ class CampaignControllerSpec extends Specification {
             response.reset()
             populateValidParams(params)
             campaign = new Campaign(params)
-            controller.campaignService = [updateCampaignAndSubscriber: {Campaign c, String id -> }]
 
             controller.save(campaign)
 
@@ -124,6 +122,10 @@ class CampaignControllerSpec extends Specification {
     }
 
     void "Test the update action performs an update on a valid domain instance"() {
+        setup:""
+            populateValidParams(params)
+            def campaign = new Campaign(params)
+
         when: "Update is called for a domain instance that doesn't exist"
             request.contentType = FORM_CONTENT_TYPE
             request.method = "PUT"
@@ -136,21 +138,17 @@ class CampaignControllerSpec extends Specification {
 
         when: "An invalid domain instance is passed to the update action"
             response.reset()
-            def campaign = new Campaign()
-            campaign.validate()
-            controller.update(campaign.id)
+            def invalidCampaign = new Campaign()
+            controller.update(invalidCampaign)
 
         then: "The edit view is rendered again with the invalid instance"
-            response.redirectedUrl == '/campaign/index'
+            view == 'edit'
             flash.message != null
-//            view == 'edit'
-//            model.campaignInstance == campaign
+            model.campaignInstance == invalidCampaign
 
         when: "A valid domain instance is passed to the update action"
             response.reset()
-            populateValidParams(params)
-            campaign = new Campaign(params).save(flush: true)
-            controller.update(campaign.id)
+            controller.update(campaign)
 
         then: "A redirect is issues to the show action"
             response.redirectedUrl == "/campaign/show/$campaign.id"

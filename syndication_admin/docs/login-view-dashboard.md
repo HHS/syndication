@@ -1,5 +1,5 @@
  
-#LOGIN
+#Login
  
 + Launch a web browser, enter the following uniform resource locater (url) in the address bar:  http://ctacdev.com:8090/SyndicationAdmin  
 
@@ -15,7 +15,7 @@
 
 ![Syndication_Dashboard.png](https://bitbucket.org/repo/X7nKza/images/987566007-Syndication_Dashboard.png)
 
-# VIEW SYNDICATION DASHBOARD AND EVENTS
+# View Syndication Dashboard and Events
  
 
 + Click the Showing Content by ‘Date Syndication Captured’ chart next to the desired date to display the number of media items syndication captured per month by agency. 

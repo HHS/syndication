@@ -93,25 +93,26 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the compile step ----------------------------------------------------
-        compile "org.grails.plugins:syndication-model:1.7.4"      //Syndication domain classes
-        compile "org.grails.plugins:content-extraction-services:1.3.2"   //syndication content extraction tools
+        compile "org.grails.plugins:syndication-model:1.8.1"      //Syndication domain classes
+        compile "org.grails.plugins:content-extraction-services:1.3.7"   //syndication content extraction tools
         compile "org.grails.plugins:solr-operations:1.2"        //syndication solr stuff
 
         //plugins for the compile step
         compile ":scaffolding:2.1.2"
-        compile ':cache:1.1.7'
-        compile ':asset-pipeline:1.9.9'
+        compile ':cache:1.1.8'
+        compile ':asset-pipeline:2.1.5'
 
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
 
-        compile ":rest-client-builder:2.0.1"
+        compile ":rest-client-builder:2.1.1"
         compile ":quartz:1.0.2"
+        compile ":quartz-monitor:1.0"
         compile ":pretty-time:2.1.3.Final-1.0.1"
         compile ":spring-security-core:2.0-RC4"
         compile ":rabbitmq-native:2.0.10"                         //mq
 
         // plugins needed at runtime but not for compilation -------------------------------
-        runtime ":hibernate4:4.3.6.1" // or ":hibernate4:4.1.11.1"
+        runtime ":hibernate4:4.3.8.1" // or ":hibernate4:4.1.11.1"
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
 
@@ -120,8 +121,8 @@ grails.project.dependency.resolution = {
         compile ":greenmail:1.3.4"
 
         // plugins for the build system only -----------------------------------------------
-        build ":tomcat:7.0.55"
-        build (":release:3.0.1"){                                 //artifactory integration
+        build ":tomcat:7.0.55.2"
+        build (":release:3.1.1"){                                 //artifactory integration
             excludes "rest-client-builder"
         }
 

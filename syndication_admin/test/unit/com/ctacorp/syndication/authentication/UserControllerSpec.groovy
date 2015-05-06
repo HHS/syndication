@@ -1,14 +1,22 @@
 package com.ctacorp.syndication.authentication
 
+import com.ctacorp.syndication.CmsManagerKeyService
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import spock.lang.Specification
 
 @TestFor(UserController)
-@Mock(User)
+@Mock([User, Role, User, UserRole])
 class UserControllerSpec extends Specification {
 
+    def userService = Mock(UserService)
+    def cmsManagerKeyService = Mock(CmsManagerKeyService)
+
     void setup() {
+        User user = new User(name:"admin", username: "test@example.com", enabled: true, password: "SomerandomPass1").save()
+        Role role = new Role(authority: "ROLE_ADMIN").save()
+        UserRole.create user, role, true
+        controller.springSecurityService = [currentUser:User.get(1)]
 
         def userMockService = mockFor(UserService, true)
         userMockService.demand.saveUserAndRole {User userInstance, String authority ->
@@ -17,7 +25,8 @@ class UserControllerSpec extends Specification {
         userMockService.demand.deleteUser {User userInstance ->
             userInstance.delete flush: true
         }
-        controller.userService = userMockService.createMock()
+        controller.cmsManagerKeyService = cmsManagerKeyService
+        controller.userService = userService
         User.metaClass.encodePassword = { -> }
     }
 
@@ -25,7 +34,7 @@ class UserControllerSpec extends Specification {
         assert params != null
         params["id"] = 1
         params["name"] = "admin"
-        params["username"] = "admin"
+        params["username"] = "admin@example.com"
         params["password"] = "password"
         params["authority"] = "ROLE_ADMIN"
 
@@ -37,8 +46,7 @@ class UserControllerSpec extends Specification {
             controller.index()
 
         then: "The model is correct"
-            !model.userInstanceList
-            model.userInstanceCount == 0
+            1 * userService.indexResponse(params)
     }
 
     void "Test the create action returns the correct model"() {
@@ -50,28 +58,33 @@ class UserControllerSpec extends Specification {
     }
 
     void "Test the save action correctly persists an instance"() {
+        setup:
+        populateValidParams(params)
+        def user1 = new User(params).save()
 
         when: "The save action is executed with an invalid instance"
+            request.method = 'POST'
+            params.authority = 1
             request.contentType = FORM_CONTENT_TYPE
-            def user = new User()
+            def user = new User([username:"admin@example.com"])
             user.validate()
             controller.save(user)
 
         then: "The create view is rendered again with the correct model"
-            model.userInstance != null
             view == 'create'
+            model.userInstance != null
+
 
         when: "The save action is executed with a valid instance"
             response.reset()
-            populateValidParams(params)
-            user = new User(params)
-
-            controller.save(user)
+            params.authority = 1
+            params.password = "match"
+            params.passwordVerify = "match"
+            controller.save(user1)
 
         then: "A redirect is issued to the show action"
-            response.redirectedUrl == '/user/show/1'
-            controller.flash.message != null
-            User.count() == 1
+            response.redirectedUrl == "/user/show/$user1.id"
+            1 * controller.userService.saveUserAndRole(user1, 1)
     }
 
     void "Test that the show action returns the correct model"() {
@@ -107,7 +120,13 @@ class UserControllerSpec extends Specification {
     }
 
     void "Test the update action performs an update on a valid domain instance"() {
+        setup:
+            populateValidParams(params)
+            def user1 = new User(params).save(flush: true)
+
         when: "Update is called for a domain instance that doesn't exist"
+            request.method = 'PUT'
+            params.authority = 1
             request.contentType = FORM_CONTENT_TYPE
             controller.update(null)
 
@@ -123,23 +142,23 @@ class UserControllerSpec extends Specification {
             controller.update(user)
 
         then: "The edit view is rendered again with the invalid instance"
-            view == 'edit'
-            model.userInstance == user
+            response.redirectedUrl == '/user/edit'
 
         when: "A valid domain instance is passed to the update action"
             response.reset()
-            populateValidParams(params)
-            user = new User(params).save(flush: true)
-            controller.update(user)
+            params.password = "match"
+            params.passwordVerify = "match"
+            controller.update(user1)
 
         then: "A redirect is issues to the show action"
-            response.redirectedUrl == "/user/show/$user.id"
+            response.redirectedUrl == "/user/show/$user1.id"
             flash.message != null
     }
 
     void "Test that the delete action deletes an instance if it exists"() {
         when: "The delete action is called for a null instance"
-            request.contentType = FORM_CONTENT_TYPEz
+            request.contentType = FORM_CONTENT_TYPE
+            request.method = 'DELETE'
             controller.delete(null)
 
         then: "A 404 is returned"
@@ -149,7 +168,7 @@ class UserControllerSpec extends Specification {
         when: "A domain instance is created"
             response.reset()
             populateValidParams(params)
-            def user = new User(params).save(flush: true)
+            def user = new User(params)
 
         then: "It exists"
             User.count() == 1
@@ -157,8 +176,8 @@ class UserControllerSpec extends Specification {
         when: "The domain instance is passed to the delete action"
             controller.delete(user)
 
-        then: "The instance is deleted"
-            User.count() == 0
+        then: "The userService delete method is called"
+            1 * controller.userService.deleteUser(user)
             response.redirectedUrl == '/user/index'
             flash.message != null
     }

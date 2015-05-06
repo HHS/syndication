@@ -15,19 +15,25 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
+import com.ctacorp.syndication.Campaign
+import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.metric.CampaignMetric
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import spock.lang.Specification
 
 @TestFor(CampaignMetricController)
-@Mock(CampaignMetric)
+@Mock([CampaignMetric, Campaign])
 class CampaignMetricControllerSpec extends Specification {
 
     def populateValidParams(params) {
         assert params != null
         // TODO: Populate valid properties like...
-        //params["name"] = 'someValidName'
+        params["campaign"] = new Campaign()
+//        params["name"] = 'Allergy'
+//        params["startDate"] = new Date()
+//        params["source"] = new Source()
+        params["day"] = new Date()
     }
 
     void "Test the index action returns the correct model"() {
@@ -51,6 +57,8 @@ class CampaignMetricControllerSpec extends Specification {
     void "Test the save action correctly persists an instance"() {
 
         when: "The save action is executed with an invalid instance"
+            request.method = 'POST'
+            request.contentType = FORM_CONTENT_TYPE
             def campaignMetric = new CampaignMetric()
             campaignMetric.validate()
             controller.save(campaignMetric)
@@ -63,7 +71,6 @@ class CampaignMetricControllerSpec extends Specification {
             response.reset()
             populateValidParams(params)
             campaignMetric = new CampaignMetric(params)
-
             controller.save(campaignMetric)
 
         then: "A redirect is issued to the show action"
@@ -106,6 +113,8 @@ class CampaignMetricControllerSpec extends Specification {
 
     void "Test the update action performs an update on a valid domain instance"() {
         when: "Update is called for a domain instance that doesn't exist"
+            request.contentType = FORM_CONTENT_TYPE
+            request.method = 'PUT'
             controller.update(null)
 
         then: "A 404 error is returned"
@@ -136,6 +145,8 @@ class CampaignMetricControllerSpec extends Specification {
 
     void "Test that the delete action deletes an instance if it exists"() {
         when: "The delete action is called for a null instance"
+            request.contentType = FORM_CONTENT_TYPE
+            request.method = 'DELETE'
             controller.delete(null)
 
         then: "A 404 is returned"

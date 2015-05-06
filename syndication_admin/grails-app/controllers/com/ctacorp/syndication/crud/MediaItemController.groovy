@@ -20,6 +20,7 @@ import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
+import com.ctacorp.syndication.media.PDF
 import com.ctacorp.syndication.media.Periodical
 import com.ctacorp.syndication.media.SocialMedia
 import com.ctacorp.syndication.media.Video
@@ -47,6 +48,7 @@ class MediaItemController {
             case Html: redirect controller:         "Html",        action: 'show', id: id, model:[htmlInstance:mi];         break;
             case Image: redirect controller:        "Image",       action: 'show', id: id, model:[imageInstance:mi];        break;
             case Infographic: redirect controller:  "Infographic", action: 'show', id: id, model:[infographicInstance:mi];  break;
+            case PDF:         redirect controller:  "PDF",         action: 'show', id: id, model:[PDFInstance:mi];   break;
             case Periodical:  redirect controller:  "Periodical",  action: 'show', id: id, model:[periodicalInstance:mi];   break;
             case SocialMedia: redirect controller:  "SocialMedia", action: 'show', id: id, model:[socialMediaInstance:mi];  break;
             case Video: redirect controller:        "Video",       action: 'show', id: id, model:[videoInstance:mi];        break;
@@ -64,6 +66,8 @@ class MediaItemController {
             case Html: redirect controller:         "Html",        action: 'edit', id: id, model:[htmlInstance:mi];         break;
             case Image: redirect controller:        "Image",       action: 'edit', id: id, model:[imageInstance:mi];        break;
             case Infographic: redirect controller:  "Infographic", action: 'edit', id: id, model:[infographicInstance:mi];  break;
+            case PDF:         redirect controller:  "PDF",         action: 'edit', id: id, model:[PDFInstance:mi];   break;
+            case Periodical:  redirect controller:  "Periodical",  action: 'edit', id: id, model:[periodicalInstance:mi];   break;
             case SocialMedia: redirect controller:  "SocialMedia", action: 'edit', id: id, model:[socialMediaInstance:mi];  break;
             case Video: redirect controller:        "Video",       action: 'edit', id: id, model:[videoInstance:mi];        break;
             case Widget: redirect controller:       "Widget",      action: 'edit', id: id, model:[widgetInstance:mi];       break;

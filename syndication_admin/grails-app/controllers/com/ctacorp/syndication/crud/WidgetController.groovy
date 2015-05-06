@@ -47,7 +47,6 @@ class WidgetController {
 
     def show(Widget widgetInstance) {
         def tagData = tagService.getTagInfoForMediaShowViews(widgetInstance, params)
-
         respond widgetInstance, model:[tags:tagData.tags,
                                       languages:tagData.languages,
                                       tagTypes:tagData.tagTypes,
@@ -75,6 +74,7 @@ class WidgetController {
         }
 
         def status =  mediaItemsService.updateItemAndSubscriber(widgetInstance, params.long('subscriberId'))
+
         if(status){
             flash.errors = status
             respond widgetInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]
@@ -82,6 +82,7 @@ class WidgetController {
         }
 
         solrIndexingService.inputMediaItem(widgetInstance)
+
         request.withFormat {
             form {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'widgetInstance.label', default: 'Widget'), [widgetInstance.name]])
@@ -108,11 +109,12 @@ class WidgetController {
         def status =  mediaItemsService.updateItemAndSubscriber(widgetInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action:'edit', id:widgetInstance.id
+            redirect action:'edit', id:params.id
             return
         }
 
         solrIndexingService.inputMediaItem(widgetInstance)
+
         request.withFormat {
             form {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'Widget.label', default: 'Widget'), [widgetInstance.name]])
@@ -135,6 +137,7 @@ class WidgetController {
             featuredItem.delete()
         }
 
+        solrIndexingService.inputMediaItem(widgetInstance)
         mediaItemsService.removeMediaItemsFromUserMediaLists(widgetInstance, true)
         solrIndexingService.removeMediaItem(widgetInstance)
         mediaItemsService.delete(widgetInstance.id)

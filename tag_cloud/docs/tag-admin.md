@@ -4,11 +4,11 @@
 
 + From the Tag Administration screen, click the Add Tag link next to the desired Syndication Identification (ID) and Source URL.  
 
-![Tag Administration Add Tag Screen.png](https://bitbucket.org/repo/GXybrE/images/145007818-Tag%20Administration%20Add%20Tag%20Screen.png) 
+![Tag Administration Add Tag Screen.png](images/Tag_Administration_Add_Tag_Screen.png) 
 
 + The Tag Details screen will appear.
 
-![Tag Details Screen Add Tag.png](https://bitbucket.org/repo/GXybrE/images/1631943734-Tag%20Details%20Screen%20Add%20Tag.png)
+![Tag Details Screen Add Tag.png](images/Tag_Details_Screen_Add_Tag.png)
  
 + Enter the Tag Name.
 
@@ -16,58 +16,58 @@
 
 + Click the Tag Item button.  The Tag Administration screen will appear with a confirmation message.
 
-![Tag Administration Screen With Tag Added Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/562098499-Tag%20Administration%20Screen%20With%20Tag%20Added%20Confirmation%20Message.png) 
+![Tag Administration Screen With Tag Added Confirmation Message.png](images/Tag_Administration_Screen_With_Tag_Added_Confirmation_Message.png) 
 
 ## Edit Tag
 
 + From the Tag Administration screen, click the Edit Tag link next to the desired Syndication ID and Source URL.
 
-![Tag Administration Screen Edit Tag.png](https://bitbucket.org/repo/GXybrE/images/2465513764-Tag%20Administration%20Screen%20Edit%20Tag.png) 
+![Tag Administration Screen Edit Tag.png](images/Tag_Administration_Screen_Edit_Tag.png) 
 
 + The Tag Details screen will appear.
 
-![Tag Details Screen Edit Tag.png](https://bitbucket.org/repo/GXybrE/images/3737843055-Tag%20Details%20Screen%20Edit%20Tag.png)  
+![Tag Details Screen Edit Tag.png](images/Tag_Details_Screen_Edit_Tag.png)  
 
 + Select the Tag to edit from the drop-down menu.
 
 + Click the Edit Item button.  The Edit Tag screen will appear.
 
-![Edit Tag Screen.png](https://bitbucket.org/repo/GXybrE/images/1982960845-Edit%20Tag%20Screen.png) 
+![Edit Tag Screen.png](images/Edit_Tag_Screen.png) 
 
 + Modify the desired fields.
 
 + Click the Update button.  The Show Tag screen will appear with the updated confirmation message.
 
-![Show Tag With Updated Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/576596751-Show%20Tag%20With%20Updated%20Confirmation%20Message.png) 
+![Show Tag With Updated Confirmation Message.png](images/Show_Tag_With_Updated_Confirmation_Message.png) 
 
 + Click the Home button.  The Tag Administration screen will appear.
 
-![Tag Administration Screen With Updated Tag.png](https://bitbucket.org/repo/GXybrE/images/2081871848-Tag%20Administration%20Screen%20With%20Updated%20Tag.png) 
+![Tag Administration Screen With Updated Tag.png](images/Tag_Administration_Screen_With_Updated_Tag.png) 
 
 ## Delete Tag
 
 + From the Tag Administration screen, click the Delete Tag link next to the desired Syndication ID and Source URL.
 
-![Tag Administration With Delete Tag.png](https://bitbucket.org/repo/GXybrE/images/287781856-Tag%20Administration%20With%20Delete%20Tag.png)
+![Tag Administration With Delete Tag.png](images/Tag_Administration_With_Delete_Tag.png)
  
 + The Tag Details screen will appear.
 
-![Tag Details Screen Delete Item.png](https://bitbucket.org/repo/GXybrE/images/4026334720-Tag%20Details%20Screen%20Delete%20Item.png)
+![Tag Details Screen Delete Item.png](images/Tag_Details_Screen_Delete_Item.png)
  
 + Select the Tag from the drop-down menu.
 
 + Click the Delete Item button.  The Show Tag screen will appear.
 
-![Show Tag Screen.png](https://bitbucket.org/repo/GXybrE/images/66163482-Show%20Tag%20Screen.png)
+![Show Tag Screen.png](images/Show_Tag_Screen.png)
  
 + Click the Delete button.  The Are you sure? pop-up window will appear.
 
-![Are you sure pop-up window.png](https://bitbucket.org/repo/GXybrE/images/4021518390-Are%20you%20sure%20pop-up%20window.png)
+![Are you sure pop-up window.png](images/Are_you_sure_pop-up_window.png)
  
 + Click the OK button.  The Tag List screen will appear with the deleted confirmation message.
 
-![Tag List Screen With Deleted Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/1357307351-Tag%20List%20Screen%20With%20Deleted%20Confirmation%20Message.png)
+![Tag List Screen With Deleted Confirmation Message.png](images/Tag_List_Screen_With_Deleted_Confirmation_Message.png)
  
 + Click the Home Link.  The Tag Administration screen will appear with the tag deleted.
 
-![Tag Administration Screen With Tag Deleted.png](https://bitbucket.org/repo/GXybrE/images/2337125117-Tag%20Administration%20Screen%20With%20Tag%20Deleted.png)
+![Tag Administration Screen With Tag Deleted.png](images/Tag_Administration_Screen_With_Tag_Deleted.png)

@@ -4,26 +4,26 @@
 
 + From the Tag Administration screen, click the Application (App) Information (Info) link.
 
-![Tag Administration Screen App Info.png](https://bitbucket.org/repo/GXybrE/images/3673317573-Tag%20Administration%20Screen%20App%20Info.png) 
+![Tag Administration Screen App Info.png](images/Tag_Administration_Screen_App_Info.png) 
 
 + The Available Controllers screen will appear.
  
-![Available Controllers Screen.png](https://bitbucket.org/repo/GXybrE/images/1168250396-Available%20Controllers%20Screen.png)
+![Available Controllers Screen.png](images/Available_Controllers_Screen.png)
 
 + Click the tagCloud.TagController link.  The Tag List screen will 
 will appear.
 
-![Tag List Screen.png](https://bitbucket.org/repo/GXybrE/images/545665592-Tag%20List%20Screen.png) 
+![Tag List Screen.png](images/Tag_List_Screen.png) 
 
 ## Create
 
 + From the Tag List screen, click the New Tag button.  
 
-![Tag List Screen for New Tag.png](https://bitbucket.org/repo/GXybrE/images/1300322709-Tag%20List%20Screen%20for%20New%20Tag.png) 
+![Tag List Screen for New Tag.png](images/Tag_List_Screen_for_New_Tag.png) 
 
 + The Create Tag screen will appear.
 
-![Create Tag Screen.png](https://bitbucket.org/repo/GXybrE/images/1717951177-Create%20Tag%20Screen.png) 
+![Create Tag Screen.png](images/Create_Tag_Screen.png) 
 
 + Enter the Name.
 
@@ -37,15 +37,15 @@ will appear.
 
 + Click the Create button.  The Show Tag screen will appear with the created confirmation message.
 
-![Show Tag Screen With Created Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/449597023-Show%20Tag%20Screen%20With%20Created%20Confirmation%20Message.png) 
+![Show Tag Screen With Created Confirmation Message.png](images/Show_Tag_Screen_With_Created_Confirmation_Message.png) 
 
 + Click the Tag List button.  The Tag List screen will appear.
 
-![Tag List Screen With New Item.png](https://bitbucket.org/repo/GXybrE/images/1986447029-Tag%20List%20Screen%20With%20New%20Item.png) 
+![Tag List Screen With New Item.png](images/Tag_List_Screen_With_New_Item.png) 
 
 + Click the Home button.  The Tag Administration screen will appear. 
 
-![Tag Administration Screen.png](https://bitbucket.org/repo/GXybrE/images/3451767872-Tag%20Administration%20Screen.png) 
+![Tag Administration Screen.png](images/Tag_Administration_Screen.png) 
 
 * Note:  creating a tag in the Tag Controller does not add a tag to an item imported from Syndication that appears in the Tag Administration screen.  For detailed instructions, go to Add a Tag.
 
@@ -59,56 +59,56 @@ will appear.
 
 + From the Tag List screen, click the desired tag name link.
 
-![Tag List Screen for Edit.png](https://bitbucket.org/repo/GXybrE/images/1388215665-Tag%20List%20Screen%20for%20Edit.png) 
+![Tag List Screen for Edit.png](images/Tag_List_Screen_for_Edit.png) 
 
 + The Show Tag screen will appear.
 
-![Show Tag Screen for Edit.png](https://bitbucket.org/repo/GXybrE/images/3845218453-Show%20Tag%20Screen%20for%20Edit.png) 
+![Show Tag Screen for Edit.png](images/Show_Tag_Screen_for_Edit.png) 
 
 + Click the Edit button.  The Edit Tag screen will appear.
 
-![Edit Tag Screen.png](https://bitbucket.org/repo/GXybrE/images/4122346059-Edit%20Tag%20Screen.png) 
+![Edit Tag Screen.png](images/Edit_Tag_Screen.png) 
 
 + Modify the desired fields.
 
 + Click the Update button.  The Show Tag screen with updated confirmation message will appear.  
 
-![Show Tag Screen With Updated Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/3012725783-Show%20Tag%20Screen%20With%20Updated%20Confirmation%20Message.png) 
+![Show Tag Screen With Updated Confirmation Message.png](images/Show_Tag_Screen_With_Updated_Confirmation_Message.png) 
 
 + Click the Tag List button.  The Tag List screen will appear.
 
-![Tag List Screen With Edited Item.png](https://bitbucket.org/repo/GXybrE/images/725720475-Tag%20List%20Screen%20With%20Edited%20Item.png) 
+![Tag List Screen With Edited Item.png](images/Tag_List_Screen_With_Edited_Item.png) 
 
 ## Merge Tags
 
 + From the Tag List screen, click the Go to Tools link.
 
-![Tag List Screen Go to Tools.png](https://bitbucket.org/repo/GXybrE/images/50888299-Tag%20List%20Screen%20Go%20to%20Tools.png) 
+![Tag List Screen Go to Tools.png](images/Tag_List_Screen_Go_to_Tools.png) 
 
 + The Merge Tags screen will appear.
  
-![Merge Tags Screen.png](https://bitbucket.org/repo/GXybrE/images/1048950746-Merge%20Tags%20Screen.png)
+![Merge Tags Screen.png](images/Merge_Tags_Screen.png)
 
 + Enter the names of the tags to merge.
 
 + Enter the New Tag name.
 
 + Click the Merge button.  The Tag List screen will appear with the tags merged.
-![Tags List Screen With Merged Tags.png](https://bitbucket.org/repo/GXybrE/images/2522428405-Tags%20List%20Screen%20With%20Merged%20Tags.png)
+![Tags List Screen With Merged Tags.png](images/Tags_List_Screen_With_Merged_Tags.png)
 
 ## Split Tags
 
 + From the Tag List screen, click the Go to Tools link.
 
-![Tag List Screen Go to Tools.png](https://bitbucket.org/repo/GXybrE/images/3874975982-Tag%20List%20Screen%20Go%20to%20Tools.png) 
+![Tag List Screen Go to Tools.png](images/Tag_List_Screen_Go_to_Tools.png) 
 
 + The Merge Tags screen will appear.
 
-![Merge Tags Screen.png](https://bitbucket.org/repo/GXybrE/images/2958935434-Merge%20Tags%20Screen.png) 
+![Merge Tags Screen.png](images/Merge_Tags_Screen.png) 
 
 + Click Split Tag.  The Split Tag screen will appear.
 
-![Split Tag screen.png](https://bitbucket.org/repo/GXybrE/images/2519081451-Split%20Tag%20screen.png) 
+![Split Tag screen.png](images/Split_Tag_screen.png) 
 
 + Enter the name of the tag to split. 
 
@@ -116,26 +116,26 @@ will appear.
 
 + Click the Split button.  The Tag List screen will appear with the tags split.
 
-![Tag List Screen With Split Tags.png](https://bitbucket.org/repo/GXybrE/images/3545908355-Tag%20List%20Screen%20With%20Split%20Tags.png) 
+![Tag List Screen With Split Tags.png](images/Tag_List_Screen_With_Split_Tags.png) 
 
 ## Delete Tag
 
 + From the Tag List screen, click the desired name link.
 
-![Tag List Screen for Delete.png](https://bitbucket.org/repo/GXybrE/images/2246751016-Tag%20List%20Screen%20for%20Delete.png) 
+![Tag List Screen for Delete.png](images/Tag_List_Screen_for_Delete.png) 
 
 + The Show Tag screen will appear.
 
-![Show Tag Screen for Delete.png](https://bitbucket.org/repo/GXybrE/images/3791861109-Show%20Tag%20Screen%20for%20Delete.png) 
+![Show Tag Screen for Delete.png](images/Show_Tag_Screen_for_Delete.png) 
 
 + Click the Delete button.  The Are you sure? pop-up window will appear.
 
-![Are you sure pop-up window.png](https://bitbucket.org/repo/GXybrE/images/1527205876-Are%20you%20sure%20pop-up%20window.png) 
+![Are you sure pop-up window.png](images/Are_you_sure_pop-up_window.png) 
 
 + Click the OK button.  The Tag List screen will appear with the deleted confirmation message.
  
-![Tag List Screen With Deleted Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/3980095943-Tag%20List%20Screen%20With%20Deleted%20Confirmation%20Message.png)
+![Tag List Screen With Deleted Confirmation Message.png](images/Tag_List_Screen_With_Deleted_Confirmation_Message.png)
 
 + Click the Home link to return to the Tag Administration screen.  
 
-![Tag Administration Screen.png](https://bitbucket.org/repo/GXybrE/images/606973359-Tag%20Administration%20Screen.png)
+![Tag Administration Screen.png](images/Tag_Administration_Screen.png)

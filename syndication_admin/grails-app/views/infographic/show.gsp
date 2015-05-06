@@ -125,6 +125,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <dt id="active-label" class="word_wrap"><g:message code="infographic.visibleInStorefront.label" default="Visible In Storefront"/></dt>
             <dd class="word_wrap"><g:formatBoolean boolean="${infographicInstance?.visibleInStorefront}"/></dd>
 
+            <dt id="active-label" class="word_wrap"><g:message code="infographic.manuallyManaged.label" default="Manually Managed"/></dt>
+            <dd class="word_wrap"><g:formatBoolean boolean="${infographicInstance?.manuallyManaged}"/></dd>
+
             <g:if test="${infographicInstance?.externalGuid}">
                 <dt id="externalGuid-label" class="word_wrap"><g:message code="infographic.externalGuid.label" default="External Guide"/></dt>
                 <dd class="word_wrap"><g:fieldValue bean="${infographicInstance}" field="externalGuid"/></dd>
@@ -193,7 +196,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_PUBLISHER">
-                <g:actionSubmit class="btn btn-danger" onclick="return confirm('Are you sure?');" value="Delete" action="delete"/>
+                <g:actionSubmit class="btn btn-danger" onclick="return confirm('${message(code: 'default.button.delete.mediaItem.confirm', default: 'Are you sure?')}');" value="Delete" action="delete"/>
             </sec:ifAnyGranted>
             <g:link class="button" action="index">
                 <button type="button" class="btn">Cancel</button>

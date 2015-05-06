@@ -16,6 +16,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.authentication
 
+import grails.converters.JSON
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -40,9 +42,94 @@ class UserController {
         return userService.indexResponse(params)
     }
 
+    @Secured(["ROLE_ADMIN"])
+    def breakdown(){
+        def emails = User.list()*.username
+        emails = emails.collect{(it =~ /@([\w\W]+)/)[0][1]}
+        emails = emails.sort()
+
+        def totalEmails = emails.size()
+
+        def org = emails.findAll{it.contains(".org")}
+        def gov = emails.findAll{it.contains(".gov")}
+        def net = emails.findAll{it.contains(".net")}
+        def edu = emails.findAll{it.contains(".edu")}
+        def com = emails.findAll{it.contains(".com")}
+        def evElse = emails - org - gov - net - edu - com
+
+        emails = emails.unique()
+        def totalUniqueEmails = emails.size()
+
+        def uorg = emails.findAll{it.contains(".org")}
+        def ugov = emails.findAll{it.contains(".gov")}
+        def unet = emails.findAll{it.contains(".net")}
+        def uedu = emails.findAll{it.contains(".edu")}
+        def ucom = emails.findAll{it.contains(".com")}
+        def uevElse = emails - org - gov - net - edu - com
+
+        [
+                totalEmails         : totalEmails,
+                totalUniqueEmailes  : totalUniqueEmails,
+                org                 : org,
+                gov                 : gov,
+                net                 : net,
+                edu                 : edu,
+                com                 : com,
+                evElse              : evElse,
+                uorg                : uorg,
+                ugov                : ugov,
+                unet                : unet,
+                uedu                : uedu,
+                ucom                : ucom,
+                uevElse             : uevElse
+        ]
+    }
+
+    @Secured(["ROLE_ADMIN"])
+    def domainDistribution(){
+        def emails = User.list()*.username
+        emails = emails.collect{(it =~ /@([\w\W]+)/)[0][1]}
+        emails = emails.sort()
+
+        def org = emails.findAll{it.contains(".org")}.size()
+        def gov = emails.findAll{it.contains(".gov")}.size()
+        def net = emails.findAll{it.contains(".net")}.size()
+        def edu = emails.findAll{it.contains(".edu")}.size()
+        def com = emails.findAll{it.contains(".com")}.size()
+        def evElse = (emails.size() - org - gov - net - edu - com)
+
+        def data = [
+                [
+                        label: "org",
+                        value: org
+                ],
+                [
+                        label: "gov",
+                        value: gov
+                ],
+                [
+                        label: "net",
+                        value: net
+                ],
+                [
+                        label: "edu",
+                        value: edu
+                ],
+                [
+                        label: "com",
+                        value: com
+                ],
+                [
+                        label: "other",
+                        value: evElse
+                ]
+        ]
+        render data as JSON
+    }
+
     @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
     def show(User userInstance) {
-        boolean allowDelete = userInstance.id != springSecurityService.currentUser.id
+        boolean allowDelete = userInstance?.id != springSecurityService.currentUser.id
 
         respond userInstance, model: [allowDelete: allowDelete]
     }
@@ -65,12 +152,17 @@ class UserController {
             notFound()
             return
         }
-        
+
         if (userInstance.hasErrors() || (Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId)) {
             flash.errors = []
             flash.errors = userInstance.errors.allErrors.collect{[message:g.message([error : it])]}
             if(Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId){flash.errors << [message:"Select a Key"]}
-            redirect action: 'create', params:params, model: [subscribers:cmsManagerKeyService.listSubscribers()]
+            def roles = Role.list()
+            if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER"){
+                roles = Role.findAllByAuthorityInList(userService.getManagersAuthorityRoles())
+            }
+
+            respond userInstance, view:'create', model: [subscribers:cmsManagerKeyService.listSubscribers(), roles:roles, currentRoleId: params?.authority]
             return
         }
 

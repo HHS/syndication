@@ -1,5 +1,6 @@
 package com.ctacorp.syndication.tools
 
+import com.ctacorp.syndication.jobs.DelayedMediaPreviewThumbnailJob
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.cache.CachedContent
@@ -9,11 +10,16 @@ import grails.plugin.springsecurity.annotation.Secured
 @Secured(["ROLE_ADMIN"])
 class TestController {
     def mediaValidationService
-    def contentRetrievalService
     def contentCacheService
     def previewService
+    def mediaPreviewThumbnailService
+    def remoteCacheService
 
-    def index() {}
+    static allowedMethods = ["generateMissing":"POST", "regenerateThumbnailPreviewForAllMedia":"POST"]
+
+    def index() {
+        println MediaItem.list().size()
+    }
 
     def flagItems(){
         Random ran = new Random()
@@ -53,7 +59,6 @@ class TestController {
         previewService.generate(m)
         render m
     }
-
 
     def cacheSomeData(){
 //        render "<ul>"

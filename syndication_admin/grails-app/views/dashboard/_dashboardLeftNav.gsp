@@ -43,6 +43,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <g:link controller="infographic"><i class="fa fa-info fa-fw"></i> Infographics</g:link>
                         </li>
                         <li>
+                            <g:link controller="PDF"><i class="fa fa-file-pdf-o fa-fw"></i> PDFs</g:link>
+                        </li>
+                        <li>
                             <g:link controller="periodical"><i class="fa fa-clock-o fa-fw"></i> Periodicals</g:link>
                         </li>
                         <li>
@@ -154,6 +157,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <li>
                             <g:link controller="log"><i class="fa fa-file-text-o fa-fw"></i> Logs</g:link>
                         </li>
+                        <li>
+                            <g:link controller="mediaPreviewThumbnail" action="allThumbnails"><i class="fa fa-picture-o fa-fw"></i> Thumbnail Overview</g:link>
+                        </li>
                     </sec:ifAnyGranted>
                     <li>
                         <g:link controller="mediaTestPreview"><i class="fa fa-eye fa-fw"></i> Media Preview & Test</g:link>
@@ -169,6 +175,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <li>
                                 <g:link controller="user" action="index"><i
                                         class="fa fa-users fa-fw"></i> List Users</g:link>
+                            </li>
+                            <li>
+                                <g:link controller="user" action="breakdown"><i class="fa fa-map-marker fa-fw"></i> User Breakdown</g:link>
                             </li>
                         </sec:ifAnyGranted>
                         <li>

@@ -1,83 +1,112 @@
-# USERS
+# Users
 
-## LIST USER
+## View User List
 
-**23.1.1 View The User List**
-
-From the Syndication Dashboard, click the Users menu and List Users submenu.  
++ From Syndication Dashboard, click Users menu and List Users submenu.  
  
-![Left menu Users List Users highlighted.png](https://bitbucket.org/repo/X7nKza/images/1769221257-Left%20menu%20Users%20List%20Users%20highlighted.png)
+![Left menu Users List Users highlighted.png](images/User_List_Submenu.png)
 
-The User List screen will appear.
++ User List screen will appear.
 
 ![User List screen.png](https://bitbucket.org/repo/X7nKza/images/3553373096-User%20List%20screen.png)
 
-**23.1.2 Edit A User**
+## Create User
 
-23.1.2.1 From the User List screen, click the desired username link.
-
-![User List screen for editing.png](https://bitbucket.org/repo/X7nKza/images/1942160229-User%20List%20screen%20for%20editing.png)
- 
-The Show User screen will appear.
-
-![Show User screen with edit highlighted.png](https://bitbucket.org/repo/X7nKza/images/512954374-Show%20User%20screen%20with%20edit%20highlighted.png)
- 
-23.1.2.2 Click the Edit button.  The Edit User screen will appear.
-
-![Edit user screen.png](https://bitbucket.org/repo/X7nKza/images/687783411-Edit%20user%20screen.png)
- 
-23.1.2.3 Modify the desired fields.  Refer to Appendix B, User Permissions by Role.  
-
-23.1.2.4 Either click the Update or Cancel button.  The User List screen will appear.  
-
-**23.1.3 Sort The User List**
-
-23.1.3.1 From the User List screen, click desired sortable heading (ID, Username, Name, Account Expired, Account Locked, Enabled) to sort. 
-
-23.1.3.2 Click again.  The order will be changed (descending to ascending).
-
-**23.1.4 Delete A User**
-
-23.1.4.1 From the User List screen, click the desired Username link.
- 
-![User List for delete.png](https://bitbucket.org/repo/X7nKza/images/3066259389-User%20List%20for%20delete.png)
-
-The Show User screen will appear.	
- 
-![Show User screen with delete highlighted.png](https://bitbucket.org/repo/X7nKza/images/746251069-Show%20User%20screen%20with%20delete%20highlighted.png)
-
-23.1.4.2 Click the Delete button. The Are You Sure? pop-up window will appear.
- 
-![Are you sure pop-up window.png](https://bitbucket.org/repo/X7nKza/images/1734548820-Are%20you%20sure%20pop-up%20window.png)
-
-23.1.4.3 Click the OK button.  The User List screen will appear with the deleted confirmation message.
-
-![User List with deleted confimation message.png](https://bitbucket.org/repo/X7nKza/images/1666473297-User%20List%20with%20deleted%20confimation%20message.png)
-
-## CREATE A USER
-
-23.2.1 From the Syndication Dashboard, click the Users menu Create User submenu.  
++ From Syndication Dashboard, click Users menu Create User submenu.  
 
 ![Left menu Users Create User.png](https://bitbucket.org/repo/X7nKza/images/3966622884-Left%20menu%20Users%20Create%20User.png)
 
-The Create User screen will appear.
++ Create User screen will appear.
 
-![Create User screen.png](https://bitbucket.org/repo/X7nKza/images/2678197470-Create%20User%20screen.png)
+![Create User screen.png](images/Create_User_blank.png)
  
-23.2.2 Select the Authority from the drop-down menu.  Refer to Appendix B, User Permissions by Role.  
++ Select Authority from drop-down menu.  Refer to Appendix B, User Permissions by Role.  
 
-23.2.3 Optionally, enter the Name.
++ Optionally, enter Name.
 
-23.2.4 Enter the Username.
++ Enter Email
 
-23.2.5 Enter the Password.
++ Enter Password.
 
-23.2.6 Click the Enabled checkbox.
++ Re-enter Password.
 
-23.2.7 Click the Create button.  The Show User screen should appear with a confirmation message.
++ Select Subscriber [only applies to ROLE_PUBLISHER authority].
 
-![Show User with created confirmation message.png](https://bitbucket.org/repo/X7nKza/images/3635567454-Show%20User%20with%20created%20confirmation%20message.png)
++ Enabled checkbox will be checked.
+
++ Click Create button.  Show User screen should appear with a confirmation message.
+
+![Show User with created confirmation message.png](images/Show_User_confirmation_page.png)
  
-23.2.8 Click the List or Cancel button.  The User List screen will appear.
++ Click List or Cancel button.  User List screen will appear.
 
 ![User List screen.png](https://bitbucket.org/repo/X7nKza/images/1065353026-User%20List%20screen.png)
+
+## Edit User
+
++ From User List screen, click desired username link.
+
+![User List screen for editing.png](images/User_List_screen_for_editing.png)
+ 
++ Show User screen will appear.
+
+![Show User screen with edit highlighted.png](images/Show_User_screen_with_edit_highlighted.png)
+ 
++  Click Edit button.  Edit User screen will appear.
+
+![Edit user screen.png](images/Edit_User_screen.png)
+ 
++ Modify desired fields.   
+
++ Either click Update or cancel button.
+
+## Sort User List
+
++ From User List screen, click desired sortable heading (ID, Username, Name, Account Expired, Account Locked, Enabled) to sort. 
+
++ Click again, order will be changed (descending to ascending).
+
+## Delete User
+
++ From User List screen, click desired Username link.
+ 
+![User List for delete.png](https://bitbucket.org/repo/X7nKza/images/3066259389-User%20List%20for%20delete.png)
+
++ Show User screen will appear.	
+ 
+![Show User screen with delete highlighted.png](https://bitbucket.org/repo/X7nKza/images/746251069-Show%20User%20screen%20with%20delete%20highlighted.png)
+
++ Click Delete button. Pop-up window will appear asking: Are You Sure?.
+ 
+![Are you sure pop-up window.png](https://bitbucket.org/repo/X7nKza/images/1734548820-Are%20you%20sure%20pop-up%20window.png)
+
++ Click OK button.  User List screen will appear with deleted confirmation message.
+
+![User List with deleted confimation message.png](https://bitbucket.org/repo/X7nKza/images/1666473297-User%20List%20with%20deleted%20confimation%20message.png)
+
+
+## Search User
+
++ At User List page, enter Name/Username.
+
++ Click on Name or Username radio button.
+
++ Click Apply, it will bring search result.
+
+![User_Search_Result](images/User_List_Search_Result.png)
+
++ Click on Clear Filter, search query will go away & full list will appear.
+
+# My Account
+
++ From Syndication Dashboard, click Users menu and My Account submenu.
+
+![User_List_My_Account](images/User_List_My_Account.png)
+
++ My Account page will open
+
+![My_Account_Page](images/Edit_User_My_Account_Page.png)
+
++ Edit fields where required and hit Update button, it will bring confirmation message & redirect to Dashboard page.
+
+![Syndication_Dashboard_Account_Update_Confirmation](images/Syndication_Dashboard_Account_Update_Confirmation.png)

@@ -62,12 +62,20 @@ class Message {
         defaultMessagesForError Error.CONTENT_NOT_EXTRACTABLE
     }
 
+    static Message getContentUnretrievableMessage(){
+        defaultMessagesForError Error.CONTENT_UNRETRIEVABLE
+    }
+
     static Message getInvalidResourceForTypeError(){
         defaultMessagesForError Error.INVALID_RESOURCE_FOR_MEDIA_TYPE
     }
 
     static Message getNotAuthorizedError(){
         defaultMessagesForError Error.NOT_AUTHORIZED
+    }
+
+    static Message getFieldConstraintError(){
+        defaultMessagesForError Error.FIELD_CONSTRAINT_VIOLATION
     }
 
     static Message getFieldConstraintError(FieldError fieldError){

@@ -33,7 +33,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <!-- Text input-->
 <div class="form-group">
-    <label class="col-md-4 control-label" for="name"><g:message code="alternateImage.name.label" default="Name" /></label>
+    <label class="col-md-4 control-label" for="name">
+        <g:message code="alternateImage.name.label" default="Name" />
+        <span class="required-indicator">*</span>
+    </label>
     <div class="col-md-4">
         <input name="name" type="text" placeholder="image name" class="form-control input-md" value="${alternateImageInstance?.name}">
     </div>

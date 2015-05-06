@@ -1,8 +1,8 @@
-#OTHER
+#Other
 
-## ALTERNATE IMAGES
+## Alternate Images
 
-#### VIEW
+#### View
 
 + From the Syndication Dashboard, click the Other menu and Alternate Images submenu.  
  
@@ -12,7 +12,7 @@
 
 ![AlternateImage List.png](https://bitbucket.org/repo/X7nKza/images/1487746-AlternateImage%20List.png) 
 
-#### CREATE
+#### Create
 
 + From the Alternate Image List screen, click the New button.  The Create Alternate Image screen will appear.
 
@@ -36,13 +36,13 @@
 
 ![Alternate Image List With New Item.png](https://bitbucket.org/repo/X7nKza/images/2926666163-Alternate%20Image%20List%20With%20New%20Item.png) 
 
-#### SORT
+#### Sort
 
 + From the Alternate Image List screen, click the desired heading (ID, Width, Height, Name, URL).
 
 + Click again.  The order will be changed (descending to ascending).
 
-#### EDIT
+#### Edit
 
 + From the Alternate Images list screen, click the link desired Alternate Image ID link.  
  
@@ -66,7 +66,7 @@
 
 ![alternateimage list with edited item.png](https://bitbucket.org/repo/X7nKza/images/1359921205-alternateimage%20list%20with%20edited%20item.png) 
 
-#### DELETE
+#### Delete
  
 + Click the desired Alternate Image ID link.  
  
@@ -84,9 +84,9 @@
 
 ![AlternateImage List With Deleted Confirmation Message.png](https://bitbucket.org/repo/X7nKza/images/3764856911-AlternateImage%20List%20With%20Deleted%20Confirmation%20Message.png) 
 
-## CAMPAIGNS
+## Campaigns
 
-#### VIEW
+#### View
 
 + From the Syndication Dashboard, click the Other menu and Campaigns submenu.  
 
@@ -96,7 +96,7 @@
 
 ![Campaign List Screen.png](https://bitbucket.org/repo/X7nKza/images/3953133425-Campaign%20List%20Screen.png)
  
-#### CREATE
+#### Create
 
 + From the Campaign List screen, click the New button.  The Create Campaign screen will appear.
  
@@ -127,13 +127,13 @@ Create a Campaign Metric.
 
 ![Campaign List With New Item.png](https://bitbucket.org/repo/X7nKza/images/2153787653-Campaign%20List%20With%20New%20Item.png) 
 
-#### SORT
+#### Sort
 
 + From the Campaign List screen, click the desired heading (ID, Name, Description, Contact Email, Start Date, End Date).
 
 + Click again.  The order will be changed (descending to ascending).
 
-#### EDIT
+#### Edit
 
 + From the Campaign List screen, click the link desired Campaign ID link.  The Show Campaign screen will appear
 
@@ -153,7 +153,7 @@ Create a Campaign Metric.
 
 ![Campaign List With Updated Item.png](https://bitbucket.org/repo/X7nKza/images/359974305-Campaign%20List%20With%20Updated%20Item.png) 
 
-#### DELETE
+#### Delete
 
 + Click the desired Campaign ID link.  
 
@@ -171,9 +171,9 @@ Create a Campaign Metric.
  
 ![Campaign List With Deleted Confirmation Message.png](https://bitbucket.org/repo/X7nKza/images/1458777084-Campaign%20List%20With%20Deleted%20Confirmation%20Message.png)
 
-## LANGUAGES
+## Languages
 
-#### VIEW
+#### View
 
 + From the Syndication Dashboard, click the Other menu and Languages submenu.  
 
@@ -183,7 +183,7 @@ Create a Campaign Metric.
 
 ![Langauge List Screen.png](https://bitbucket.org/repo/X7nKza/images/2730498482-Langauge%20List%20Screen.png) 
 
-#### CREATE
+#### Create
 
 + From the Language List screen, click the New button.  The Create Language screen will appear.
  
@@ -203,13 +203,13 @@ Create a Campaign Metric.
 
 ![Langauge List With Updated Item.png](https://bitbucket.org/repo/X7nKza/images/3165300273-Langauge%20List%20With%20Updated%20Item.png)
 
-#### SORT
+#### Sort
 
 + From the Language List screen, click the desired heading (ID, Name, Iso Code) to sort. 
 
 + Click again.  The order will be changed (descending to ascending).
 
-#### EDIT
+#### Edit
 
 + From the Language List screen, click the link desired Language ID link.  The Show Language screen will appear.
 
@@ -229,7 +229,7 @@ Create a Campaign Metric.
 
 ![Langauge List For Update.png](https://bitbucket.org/repo/X7nKza/images/234136948-Langauge%20List%20For%20Update.png) 
 
-#### DELETE
+#### Delete
 
 + Click the desired Language ID link.  
 
@@ -247,9 +247,9 @@ Create a Campaign Metric.
 
 ![Language List With Deleted Confirmation Message.png](https://bitbucket.org/repo/X7nKza/images/1911949458-Language%20List%20With%20Deleted%20Confirmation%20Message.png)
 
-## EXTENDED ATTRIBUTES
+## Extended Attributes
 
-#### VIEW
+#### View
 
 + From the Syndication Dashboard, click the Other menu and Extended Attributes submenu.  
 
@@ -259,7 +259,7 @@ Create a Campaign Metric.
 
 ![ExtendedAttributeList Screen.png](https://bitbucket.org/repo/X7nKza/images/1539045626-ExtendedAttributeList%20Screen.png) 
 
-#### CREATE
+#### Create
 
 + From the Extended Attribute List screen, click the New button.  
 
@@ -283,13 +283,13 @@ The Create Extended Attribute screen will appear.
 
 ![ExtendedAttribute List Screen With New Item.png](https://bitbucket.org/repo/X7nKza/images/3524987268-ExtendedAttribute%20List%20Screen%20With%20New%20Item.png) 
 
-#### SORT
+#### Sort
 
 + From the Extended Attribute List screen, click the desired heading (ID, Name, Value) to sort. 
 
 + Click again.  The order will be changed (descending to ascending).
 
-#### EDIT
+#### Edit
 
 + From the Extended Attributes List screen, click the link desired Extended Attribute ID link.  
 
@@ -313,7 +313,7 @@ The Create Extended Attribute screen will appear.
 
 ![Extended Attribute List With Updated Item.png](https://bitbucket.org/repo/X7nKza/images/2795765903-Extended%20Attribute%20List%20With%20Updated%20Item.png) 
 
-#### DELETE
+#### Delete
 
 + Click the desired Extended Attribute ID link.
 
@@ -331,9 +331,9 @@ The Create Extended Attribute screen will appear.
  
 ![Extended Attribute List With Deleted Confirmation Message.png](https://bitbucket.org/repo/X7nKza/images/3866821371-Extended%20Attribute%20List%20With%20Deleted%20Confirmation%20Message.png)
 
-## SOURCES
+## Sources
 
-#### VIEW
+#### View
 
 + From the Syndication Dashboard, click the Other menu and Sources submenu.  
  
@@ -343,7 +343,7 @@ The Create Extended Attribute screen will appear.
 
 ![Source List Screen.png](https://bitbucket.org/repo/X7nKza/images/97151932-Source%20List%20Screen.png) 
 
-#### CREATE
+#### Create
 
 + From the Source List screen, click the New button.  
 
@@ -375,13 +375,13 @@ The Create Extended Attribute screen will appear.
 
 ![Source List With Updated item.png](https://bitbucket.org/repo/X7nKza/images/1177702842-Source%20List%20With%20Updated%20item.png)
  
-#### SORT
+#### Sort
 
 + From the Source List screen, click the desired heading (ID, Name, Acronym, Description, Contact Email, Website URL, Large Logo URL, Small Logo URL) to sort. 
 
 + Click again.  The order will be changed (descending to ascending).
 
-#### EDIT
+#### Edit
 
 + From the Source List screen, click the link desired Source ID link.  
  
@@ -405,7 +405,7 @@ The Create Extended Attribute screen will appear.
 
 ![Source List Screen With Updated Item.png](https://bitbucket.org/repo/X7nKza/images/2439095732-Source%20List%20Screen%20With%20Updated%20Item.png)
  
-#### DELETE
+#### Delete
 
 + Click the desired Source ID link.
 
@@ -424,9 +424,9 @@ The Create Extended Attribute screen will appear.
 ![Source List Screen With Deleted Confirmation Message.png](https://bitbucket.org/repo/X7nKza/images/2569177108-Source%20List%20Screen%20With%20Deleted%20Confirmation%20Message.png)
  
  
-## FEATURED MEDIA
+## Featured Media
 
-#### VIEW
+#### View
 
 + From the Syndication Dashboard, click the Featured menu.
 
@@ -436,7 +436,7 @@ The Create Extended Attribute screen will appear.
 
 ![Featured Media List.png](https://bitbucket.org/repo/X7nKza/images/101482068-Featured%20Media%20List.png)
 
-#### ADD MEDIA ITEMS
+#### Add Media Items
 
 + From the Featured Media List screen, enter desired media item title or partial title. Select from the drop-down.  Note: If the media item is not active it should not appear. 
 
@@ -444,7 +444,7 @@ The Create Extended Attribute screen will appear.
  
 + Click the Save Featured Items button.
 
-#### DELETE MEDIA ITEMS
+#### Delete Media Items
 
 + From the Featured Media List screen, click the x next the media item(s) to be removed from the list. 
 

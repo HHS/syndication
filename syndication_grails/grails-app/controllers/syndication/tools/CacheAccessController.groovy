@@ -21,6 +21,10 @@ import grails.plugin.springsecurity.annotation.Secured
 class CacheAccessController {
     def guavaCacheService
 
+    def index(){
+
+    }
+
     def flushCache(){
         log.info("Flushing Guava Cache by Request")
         boolean successful = guavaCacheService.flushAllCaches()
@@ -36,6 +40,18 @@ class CacheAccessController {
     def flushCacheByName(){
         log.info("Flushing Guava Cache for " + params.cacheName)
         boolean successful = guavaCacheService.flushCache(params.cacheName)
+        if(successful) {
+            render text: [msg: "Cache Flushed Successfully."] as JSON, status: 200, contentType: "application/json"
+        } else{
+            long time = System.nanoTime()
+            log.error("Cache flush failed: ${time}")
+            render text: [msg: "There was an error flushing the cache, error code ${time}"] as JSON, status: 500, contentType: "application/json"
+        }
+    }
+
+    def flushCacheByNameAndKey(){
+        log.info("Flushing Guava Cache for " + params.cacheName + " : " + params.key)
+        boolean successful = guavaCacheService.flushItem(params.cacheName, params.key)
         if(successful) {
             render text: [msg: "Cache Flushed Successfully."] as JSON, status: 200, contentType: "application/json"
         } else{

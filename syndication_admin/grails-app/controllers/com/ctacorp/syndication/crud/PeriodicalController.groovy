@@ -1,5 +1,7 @@
 package com.ctacorp.syndication.crud
 
+import com.ctacorp.syndication.FeaturedMedia
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -100,7 +102,7 @@ class PeriodicalController {
         def status =  mediaItemsService.updateItemAndSubscriber(periodicalInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action:'edit', id:periodicalInstance.id
+            redirect action:"edit", id:params.id
             return
         }
 
@@ -122,7 +124,12 @@ class PeriodicalController {
             notFound()
             return
         }
-        
+
+        def featuredItem = FeaturedMedia.findByMediaItem(periodicalInstance)
+        if(featuredItem){
+            featuredItem.delete()
+        }
+
         mediaItemsService.removeMediaItemsFromUserMediaLists(periodicalInstance, true)
         solrIndexingService.removeMediaItem(periodicalInstance)
         mediaItemsService.delete(periodicalInstance.id)

@@ -7,7 +7,11 @@ import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.health.FlaggedMedia
 import com.ctacorp.syndication.media.Periodical
+import com.ctacorp.syndication.preview.MediaPreview
+import com.ctacorp.syndication.preview.MediaThumbnail
 import com.ctacorp.syndication.storefront.UserMediaList
+import com.ctacorp.syndication.preview.MediaPreview
+import com.ctacorp.syndication.preview.MediaThumbnail
 import grails.util.Environment
 import grails.transaction.Transactional
 
@@ -52,6 +56,24 @@ class MediaItemsService {
         users.each { col ->
             col.removeFromLikes(mi)
         }
+        
+        // Media Preview and thumbnails --------------------------------
+        MediaPreview.where{
+            mediaItem == mi
+        }.deleteAll()
+
+        MediaThumbnail.where{
+            mediaItem == mi
+        }.deleteAll()
+
+        // Media Preview and thumbnails --------------------------------
+        MediaPreview.where{
+            mediaItem == mi
+        }.deleteAll()
+
+        MediaThumbnail.where{
+            mediaItem == mi
+        }.deleteAll()
 
         CachedContent.findByMediaItem(mi)?.delete(flush:true)
         FlaggedMedia.findByMediaItem(mi)?.delete(flush:true)
@@ -99,7 +121,7 @@ class MediaItemsService {
     }
 
     //removes mediaItems from user media lists if active or visibleInStorefront went from true to false
-    void removeMediaItemsFromUserMediaLists(MediaItem mediaItem, deleting = false){
+    void removeMediaItemsFromUserMediaLists(MediaItem mediaItem, deletingMediaItem = false){
         if(MediaItem.get(mediaItem.id)?.getPersistentValue("visibleInStorefront") && !mediaItem.visibleInStorefront ||
                 MediaItem.get(mediaItem.id)?.getPersistentValue("active") && !mediaItem.active){
 
@@ -108,7 +130,7 @@ class MediaItemsService {
                 it.mediaItems.remove(mediaItem)
             }
         }
-        if(deleting){
+        if(deletingMediaItem){
             List<UserMediaList> userMedia = UserMediaList.containsMediaItem(mediaItem).list() ?: []
             userMedia.each{
                 it.mediaItems.remove(mediaItem)
@@ -185,7 +207,6 @@ class MediaItemsService {
             }
         }
 
-        mediaItem.manuallyManaged = true
         //TODO this needs to be renamed, it makes it sound like it removes this item from all user media lists
         removeMediaItemsFromUserMediaLists(mediaItem)
 

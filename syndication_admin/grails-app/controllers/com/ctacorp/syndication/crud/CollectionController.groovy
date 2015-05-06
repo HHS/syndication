@@ -108,7 +108,7 @@ class CollectionController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
     def edit(Collection collectionInstance) {
-        def featuredMedia = collectionInstance.mediaItems
+        def featuredMedia = collectionInstance?.mediaItems
         def subscribers = cmsManagerKeyService.listSubscribers()
         String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
 
@@ -129,19 +129,19 @@ class CollectionController {
         def status =  mediaItemsService.updateItemAndSubscriber(collectionInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action: "edit", id: collectionInstance.id
+            redirect action:"edit", id:params.id
             return
         }
 
         //deletes and adds the media items back in one at a time because of Gorm issue not being able to query
         // all at once on a many-to-many relationship.
         def mediaItems = params.allMediaItems ?:  ","
-        mediaItems.split(",").collect{ it as Long }.each{ mediaId ->
-            collectionInstance?.addToMediaItems(MediaItem.load(mediaId as Long))
-        }
-
-        mediaItemsService.removeMediaItemsFromUserMediaLists(collectionInstance)
+        collectionInstance.mediaItems = []
         collectionInstance.save flush:true
+
+        mediaItems.split(",").collect{ it as Long }.each{ mediaId ->
+            collectionInstance?.addToMediaItems(MediaItem.load(mediaId))
+        }
 
         solrIndexingService.inputMediaItem(collectionInstance)
         request.withFormat {

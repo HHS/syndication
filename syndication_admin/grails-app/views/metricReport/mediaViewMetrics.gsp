@@ -106,7 +106,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                 <h2>Select a Specific Day</h2>
                             </div>
                             <div class="form-group">
-                                <g:datePicker name="day" precision="day" class="form-control" relativeYears="[-20..1]"  value="${day}"/>
+                                <g:datePicker name="day" precision="day" class="form-control" relativeYears="[-10..10]"  value="${day}"/>
                             </div>
                             <div class="form-group">
                                 <g:actionSubmit action="mediaViewMetrics" class="btn btn-success" value="Submit Date"/>

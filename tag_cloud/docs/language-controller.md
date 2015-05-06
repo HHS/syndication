@@ -4,26 +4,26 @@
 
 + From the Tag Administration screen, click the Application (App) Information (Info) link.
 
-![Tag Administration Screen App Info.png](https://bitbucket.org/repo/GXybrE/images/3603818869-Tag%20Administration%20Screen%20App%20Info.png) 
+![Tag Administration Screen App Info.png](images/Tag_Administration_Screen_App_Info.png) 
 
 + The Available Controllers screen will appear.
 
-![Available Controllers Screen.png](https://bitbucket.org/repo/GXybrE/images/3527920611-Available%20Controllers%20Screen.png)
+![Available Controllers Screen.png](images/Available_Controllers_Screen.png)
  
 6+ Click the tagCloud.LanguageController link.  The Language List screen will 
 will appear.
 
-![Language List Screen.png](https://bitbucket.org/repo/GXybrE/images/2659139043-Language%20List%20Screen.png)
+![Language List Screen.png](images/Language_List_Screen.png)
 
 ## Create
 
 + From the Language List screen, click the New Language button.  
 
-![Language List Screen For New Language.png](https://bitbucket.org/repo/GXybrE/images/2321181174-Language%20List%20Screen%20For%20New%20Language.png) 
+![Language List Screen For New Language.png](images/Language_List_Screen_For_New_Language.png) 
 
 + he Create Language screen will appear.
  
-![Create Language Screen.png](https://bitbucket.org/repo/GXybrE/images/2156252603-Create%20Language%20Screen.png)
+![Create Language Screen.png](images/Create_Language_Screen.png)
 
 + Enter the Name.  Note: language names are based on the International Organization for Standardization (ISO) standards found at the following website: http://loc.gov/standards/iso639-2/php/code_list.php
 
@@ -31,11 +31,11 @@ will appear.
 
 + Click the Create button.  The Show Language screen will appear with the created confirmation message.
  
-![Show Language Screen With Created Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/1340951791-Show%20Language%20Screen%20With%20Created%20Confirmation%20Message.png)
+![Show Language Screen With Created Confirmation Message.png](images/Show_Language_Screen_With_Created_Confirmation_Message.png)
 
 + Click the Language List button.  The Language List screen will appear.
 
-![Language List Screen With Created Language.png](https://bitbucket.org/repo/GXybrE/images/1740170180-Language%20List%20Screen%20With%20Created%20Language.png)
+![Language List Screen With Created Language.png](images/Language_List_Screen_With_Created_Language.png)
  
 ## Sort
 
@@ -47,15 +47,15 @@ will appear.
 
 + From the Language List screen, click the desired language name link.
 
-![Language List Screen for Edit.png](https://bitbucket.org/repo/GXybrE/images/865413268-Language%20List%20Screen%20for%20Edit.png) \
+![Language List Screen for Edit.png](images/Language_List_Screen_for_Edit.png) 
 
 + The Show Language screen will appear.
 
-![Show Language Screen for Edit.png](https://bitbucket.org/repo/GXybrE/images/1667075624-Show%20Language%20Screen%20for%20Edit.png) 
+![Show Language Screen for Edit.png](images/Show_Language_Screen_for_Edit.png) 
 
 + Click the Edit button.  The Edit language screen will appear.
  
-![Edit Language Screen.png](https://bitbucket.org/repo/GXybrE/images/3797980399-Edit%20Language%20Screen.png)
+![Edit Language Screen.png](images/Edit_Language_Screen.png)
 
 + Modify the desired fields.
 
@@ -63,26 +63,26 @@ will appear.
 
 + Click the Language List button.  The Language List screen will appear.
 
-![Language List Screen for Edit.png](https://bitbucket.org/repo/GXybrE/images/463744579-Language%20List%20Screen%20for%20Edit.png) 
+![Language List Screen for Edit.png](images/Language_List_Screen_for_Edit.png) 
 
 ## Delete
 
 + From the Language List screen, click the desired name link.
 
-![Language List Screen for Delete.png](https://bitbucket.org/repo/GXybrE/images/1118805465-Language%20List%20Screen%20for%20Delete.png)
+![Language List Screen for Delete.png](images/Language_List_Screen_for_Delete.png)
   
 + The Show Language screen will appear.
 
-![Show Language Screen for Delete.png](https://bitbucket.org/repo/GXybrE/images/1351929819-Show%20Language%20Screen%20for%20Delete.png) 
+![Show Language Screen for Delete.png](images/Show_Language_Screen_for_Delete.png) 
 
 + Click the Delete button.  The Are you sure? pop-up window will appear.
  
-![Are you sure pop-up window.png](https://bitbucket.org/repo/GXybrE/images/3682844739-Are%20you%20sure%20pop-up%20window.png)
+![Are you sure pop-up window.png](images/Are_you_sure_pop-up_window.png)
 
 + Click the OK button.  The Language List screen will appear with the deleted confirmation message.
 
-![Language List Screen With Deleted Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/4068803660-Language%20List%20Screen%20With%20Deleted%20Confirmation%20Message.png) 
+![Language List Screen With Deleted Confirmation Message.png](images/Language_List_Screen_With_Deleted_Confirmation_Message.png) 
 
 + Click the Home link to return to the Tag Administration screen.  
 
-![Tag Administration Screen.png](https://bitbucket.org/repo/GXybrE/images/3237056932-Tag%20Administration%20Screen.png)
+![Tag Administration Screen.png](images/Tag_Administration_Screen.png)

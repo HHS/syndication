@@ -105,18 +105,19 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the build system only ---------------------------------------------------------------------------
-        build ":tomcat:7.0.55"
-        build (":release:3.0.1"){
+        build ":tomcat:7.0.55.2"
+        build(":release:3.1.1") {
             excludes "rest-client-builder"
         }
 
         // plugins for the compile step --------------------------------------------------------------------------------
-        compile "org.grails.plugins:syndication-model:1.7.4"   //syndication domain models
-        compile "org.grails.plugins:content-extraction-services:1.3.2"   //syndication content extraction tools
+        compile "org.grails.plugins:syndication-model:1.8.1"   //syndication domain models
+        compile "org.grails.plugins:content-extraction-services:1.3.8"   //syndication content extraction tools
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
-        compile ":asset-pipeline:1.9.9"
-        compile ":rest-client-builder:2.0.1"
+        compile ":asset-pipeline:2.1.5"
+        compile ":release:3.1.1"
+        compile ":rest-client-builder:2.1.1"
         compile ":spring-security-core:2.0-RC4"
         compile ":rabbitmq-native:2.0.10"                       //mq
         compile ":quartz:1.0.2"                                 //quartz
@@ -124,7 +125,7 @@ grails.project.dependency.resolution = {
 
         // plugins needed at runtime but not for compilation -----------------------------------------------------------
         runtime ":swagger-grails:0.3"
-        runtime ":hibernate4:4.3.6.1"
+        runtime ":hibernate4:4.3.8.1"
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
 

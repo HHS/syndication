@@ -1,5 +1,6 @@
 package com.ctacorp.syndication
 
+import com.ctacorp.syndication.AuthorizationService
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 

@@ -126,7 +126,10 @@ class CampaignController {
         def status =  campaignService.updateCampaignAndSubscriber(campaignInstance, params.subscriberId)
         if (status) {
             flash.errors = status
-            redirect action: 'edit', id: campaignInstance.id
+            def subscribers = cmsManagerKeyService.listSubscribers()
+            def featuredMedia = campaignInstance.mediaItems
+            String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
+            respond campaignInstance, view: 'edit', imodel:[featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput, subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(CampaignSubscriber.findByCampaign(campaignInstance)?.subscriberId)]
             return
         }
         

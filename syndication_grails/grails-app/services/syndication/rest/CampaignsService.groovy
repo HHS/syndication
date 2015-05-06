@@ -25,6 +25,9 @@ class CampaignsService {
 
     def listCampaigns(params) {
         params.max = getMax(params)
+        if(params?.sort && params?.sort[0].isNumber()){
+            params.sort = "id"
+        }
         if(params.id){
             return Campaign.get(params.id)
         }

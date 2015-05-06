@@ -4,26 +4,26 @@
 
 + From the Tag Administration screen, click the Application (App) Information (Info) link.
 
-![Tag Administration Screen App Info.png](https://bitbucket.org/repo/GXybrE/images/1719109393-Tag%20Administration%20Screen%20App%20Info.png)
+![Tag Administration Screen App Info.png](images/Tag_Administration_Screen_App_Info.png)
 
 + The Available Controllers screen will appear.
 
-![Available Controllers Screen.png](https://bitbucket.org/repo/GXybrE/images/4074765309-Available%20Controllers%20Screen.png)
+![Available Controllers Screen.png](images/Available_Controllers_Screen.png)
 
 + Click the tagCloud.TypeController link.  The Type List screen will 
 will appear.
 
-![Type List Screen.png](https://bitbucket.org/repo/GXybrE/images/2580569542-Type%20List%20Screen.png) 
+![Type List Screen.png](images/Type_List_Screen.png) 
 
 ## Create
 
 + From the &lt;Tag&gt; Type List screen, click the New Type button.  
 
-![Type List Screen for New Type.png](https://bitbucket.org/repo/GXybrE/images/1600486470-Type%20List%20Screen%20for%20New%20Type.png) 
+![Type List Screen for New Type.png](images/Type_List_Screen_for_New_Type.png) 
 
 + The Create Type screen will appear.
 
-![Create Type Screen.png](https://bitbucket.org/repo/GXybrE/images/2395017210-Create%20Type%20Screen.png) 
+![Create Type Screen.png](images/Create_Type_Screen.png) 
 
 + Enter the Name.  
 
@@ -31,11 +31,11 @@ will appear.
 
 + Click the Create button.  The Show Type screen will appear with the created confirmation message.
 
-![Show Type Screen With Created Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/2192343995-Show%20Type%20Screen%20With%20Created%20Confirmation%20Message.png) 
+![Show Type Screen With Created Confirmation Message.png](images/Show_Type_Screen_With_Created_Confirmation_Message.png) 
 
 + Click the Type List button.  The Type List screen will appear.
 
-![Type List Screen.png](https://bitbucket.org/repo/GXybrE/images/137649626-Type%20List%20Screen.png)
+![Type List Screen.png](images/Type_List_Screen.png)
  
 ## Sort
 
@@ -47,44 +47,44 @@ will appear.
 
 + From the Type List screen, click the desired type name link.
 
-![Type List Screen for Edit.png](https://bitbucket.org/repo/GXybrE/images/1744109421-Type%20List%20Screen%20for%20Edit.png) 
+![Type List Screen for Edit.png](images/Type_List_Screen_for_Edit.png) 
 
 + The Show Type screen will appear.
 
-![Show Type Screen for Edit.png](https://bitbucket.org/repo/GXybrE/images/1413122908-Show%20Type%20Screen%20for%20Edit.png) 
+![Show Type Screen for Edit.png](images/Show_Type_Screen_for_Edit.png) 
 
 + Click the Edit button.  The Edit Type screen will appear.
 
-![Edit Type Screen.png](https://bitbucket.org/repo/GXybrE/images/3672952803-Edit%20Type%20Screen.png)
+![Edit Type Screen.png](images/Edit_Type_Screen.png)
  
 + Modify the desired fields.
 
 + Click the Update button.  The Show Type screen will appear with the updated confirmation message.
 
-![Show Type Screen With Updated Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/2857233543-Show%20Type%20Screen%20With%20Updated%20Confirmation%20Message.png) 
+![Show Type Screen With Updated Confirmation Message.png](images/Show_Type_Screen_With_Updated_Confirmation_Message.png) 
 
 + Click the Type List button.  The Type List screen will appear.
  
-![Type List Screen with Updated Item.png](https://bitbucket.org/repo/GXybrE/images/3793350171-Type%20List%20Screen%20with%20Updated%20Item.png)
+![Type List Screen with Updated Item.png](images/Type_List_Screen_with_Updated_Item.png)
 
 ## Delete
 
 + From the Type List screen, click the desired name link.
 
-![Type List Screen for Delete.png](https://bitbucket.org/repo/GXybrE/images/3490084905-Type%20List%20Screen%20for%20Delete.png) 
+![Type List Screen for Delete.png](images/Type_List_Screen_for_Delete.png) 
 
 + The Show Type screen will appear.
  
-![Show Type Screen.png](https://bitbucket.org/repo/GXybrE/images/4040489713-Show%20Type%20Screen.png)
+![Show Type Screen.png](images/Show_Type_Screen.png)
 
 + Click the Delete button.  The Are you sure? pop-up window will appear.
 
-![Are you sure pop-up window.png](https://bitbucket.org/repo/GXybrE/images/291842783-Are%20you%20sure%20pop-up%20window.png) 
+![Are you sure pop-up window.png](images/Are_you_sure_pop-up_window.png) 
 
 + Click the OK button.  The Type List screen will appear with the deleted confirmation message.
 
-![Type List screen With Deleted Confirmation Message.png](https://bitbucket.org/repo/GXybrE/images/297005474-Type%20List%20screen%20With%20Deleted%20Confirmation%20Message.png) 
+![Type List screen With Deleted Confirmation Message.png](images/Type_List_screen_With_Deleted_Confirmation_Message.png) 
 
 + Click the Home link to return to the Tag Administration screen.  
 
-![Tag Administration Screen.png](https://bitbucket.org/repo/GXybrE/images/2539763903-Tag%20Administration%20Screen.png)
+![Tag Administration Screen.png](images/Tag_Administration_Screen.png)

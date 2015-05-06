@@ -75,6 +75,7 @@ class LanguageController {
     protected void notFound() {
         request.withFormat {
             form multipartForm {
+
                 flash.message = message(code: 'default.not.found.message', args: [message(code: 'language.label', default: 'Language'), params.id])
                 redirect action: "index", method: "GET"
             }

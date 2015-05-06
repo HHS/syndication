@@ -9,5 +9,6 @@
 
 // The path of directory to be outputted a document
 //outputDirectoryPath = "build"
+
 homePage = "README.md"
-numbering = false
+//numbering = false

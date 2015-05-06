@@ -24,7 +24,7 @@ import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import com.ctacorp.syndication.exception.*
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.codehaus.groovy.grails.web.util.WebUtils
-import syndication.Exception.*
+import syndication.Exception.UnauthorizedException
 
 @Transactional
 class MediaService {
@@ -99,6 +99,21 @@ class MediaService {
         htmlInstance
     }
 
+    def saveImage(Image imageInstance) {
+        imageInstance = createOrUpdateMediaItem(imageInstance, generalMediaItemLoader)      //load or update and existing record if it exists
+        imageInstance
+    }
+
+    def saveInfographic(Infographic infographicInstance) {
+        infographicInstance = createOrUpdateMediaItem(infographicInstance, generalMediaItemLoader)      //load or update and existing record if it exists
+        infographicInstance
+    }
+
+    def savePDF(PDF PDFInstance){
+        PDFInstance = createOrUpdateMediaItem(PDFInstance, generalMediaItemLoader)
+        PDFInstance
+    }
+
     Periodical savePeriodical(Periodical periodicalInstance){
         String content = contentRetrievalService.extractSyndicatedContent(periodicalInstance.sourceUrl)
         if (!content) { //Extraction failed
@@ -124,16 +139,6 @@ class MediaService {
         periodicalInstance
     }
 
-    def saveImage(Image imageInstance) {
-        imageInstance = createOrUpdateMediaItem(imageInstance, generalMediaItemLoader)      //load or update and existing record if it exists
-        imageInstance
-    }
-
-    def saveInfographic(Infographic infographicInstance) {
-        infographicInstance = createOrUpdateMediaItem(infographicInstance, generalMediaItemLoader)      //load or update and existing record if it exists
-        infographicInstance
-    }
-
     def saveSocialMedia(SocialMedia socialMediaInstance) {
         if (!socialMediaInstance.validate()) {
             return socialMediaInstance
@@ -149,7 +154,19 @@ class MediaService {
     }
 
     def saveVideo(Video videoInstance) {
-        Video fromImport = youtubeService.getVideoInstanceFromUrl(videoInstance.sourceUrl)
+        Video fromImport
+        try {
+            fromImport = youtubeService.getVideoInstanceFromUrl(videoInstance.sourceUrl)
+        } catch (InaccessibleVideoException e){
+            log.error("The video is private and cannot be imported! ${videoInstance.sourceUrl} : ${e}")
+            videoInstance.duration = 1
+            videoInstance.validate()
+            videoInstance.errors.rejectValue("sourceUrl", "Video is Private", "The specified video is private and cannot be imported/published to syndication. Please contact the video's owner.")
+            return videoInstance
+        } catch(e){
+            log.error e
+            return null
+        }
 
         videoInstance.description = videoInstance?.description ?: fromImport?.description
         videoInstance.duration = videoInstance?.duration ?: fromImport?.duration
@@ -161,7 +178,7 @@ class MediaService {
             MediaItem.sourceUrlContains(videoId).get()
         }) as Video      //load or update and existing record if it exists
 
-        return videoInstance
+        videoInstance
     }
 
     def saveWidget(Widget widgetInstance) {
@@ -197,8 +214,11 @@ class MediaService {
         if(savetoDB) {
             MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(item)
             item.manuallyManaged = false
-            item.save(flush: true)
-            mediaItemSubscriber.save()
+            def result = item.save(flush: true)
+            if(!result){
+                log.error "Media item didn't save. Errors were: ${item.errors}"
+            }
+            mediaItemSubscriber.save(flush:true)
 
             log.info "media saved: ${item.id}"
             if (grailsApplication.config.syndication.solrService.useSolr) {

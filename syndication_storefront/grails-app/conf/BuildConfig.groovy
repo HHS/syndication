@@ -66,16 +66,16 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        compile ":rest-client-builder:2.0.1"
-        compile "org.grails.plugins:syndication-model:1.7.6"
+        compile ":rest-client-builder:2.1.1"
+        compile "org.grails.plugins:syndication-model:1.8.1"
 
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
         compile ":recaptcha:0.6.9"
 
         // plugins for the compile step
         compile ":scaffolding:2.1.2"
-        compile ':cache:1.1.7'
-        compile ':asset-pipeline:1.9.9'
+        compile ':cache:1.1.8'
+        compile ':asset-pipeline:2.1.5'
         compile ":quartz:1.0.2"
 
         compile ":spring-security-core:2.0-RC4"
@@ -86,7 +86,7 @@ grails.project.dependency.resolution = {
         compile ":greenmail:1.3.4"
 
         // plugins needed at runtime but not for compilation
-        runtime ":hibernate4:4.3.6.1" // or ":hibernate4:4.1.11.2"
+        runtime ":hibernate4:4.3.8.1" // or ":hibernate4:4.1.11.2"
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
 
@@ -96,7 +96,7 @@ grails.project.dependency.resolution = {
             excludes "rest-client-builder"
         }
 
-        build ":tomcat:7.0.55"
+        build ":tomcat:7.0.55.2"
 
         // Uncomment these to enable additional asset-pipeline capabilities
         //compile ":sass-asset-pipeline:1.9.0"

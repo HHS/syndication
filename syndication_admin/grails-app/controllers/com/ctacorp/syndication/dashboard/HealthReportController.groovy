@@ -49,7 +49,6 @@ class HealthReportController {
 
     @Transactional
     def ignoreFlaggedMedia(FlaggedMedia fm){
-        println "getting here"
         if(fm){
             fm.ignored = true
             fm.save(flush:true)

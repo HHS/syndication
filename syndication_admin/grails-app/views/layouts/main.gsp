@@ -47,7 +47,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <a href="#list-html" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
             <br/>
             <sec:ifAnyGranted roles="ROLE_ADMIN">
-                <g:if test="${!params.controller.equals("metricReport")}">
+                <g:if test="${!params.controller.equals("metricReport") && !params.controller.equals("mediaPreviewThumbnail")}">
                     <nav class="navbar navbar-default" role="navigation">
                         <div class="container-fluid">
                             <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>

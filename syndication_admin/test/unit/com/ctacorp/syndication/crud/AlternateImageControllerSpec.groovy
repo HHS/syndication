@@ -16,12 +16,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.AlternateImage
+import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.Language
+import com.ctacorp.syndication.Source
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import spock.lang.Specification
 
 @TestFor(AlternateImageController)
-@Mock(AlternateImage)
+@Mock([AlternateImage,Language,Source,MediaItem])
 class AlternateImageControllerSpec extends Specification {
     def setup() {
         def mockAlternativeImageService = [ifPublisherValid: {AlternateImage alternateImage -> return true}]
@@ -36,6 +39,7 @@ class AlternateImageControllerSpec extends Specification {
         // TODO: Populate valid properties like...
         params["name"] = 'flu'
         params["url"] = 'http://www.example.com/1'
+        params["mediaItem"] = new MediaItem([name:"a valid name",sourceUrl:"http://www.example.com/jhgfjhg", language:new Language(), source:new Source()]).save(flush:true)
     }
 
     void "Test the index action returns the correct model"() {
@@ -115,6 +119,10 @@ class AlternateImageControllerSpec extends Specification {
     }
 
     void "Test the update action performs an update on a valid domain instance"() {
+        setup:""
+            populateValidParams(params)
+            AlternateImage alternateImage = new AlternateImage(params).save(flush:true)
+
         when:"Update is called for a domain instance that doesn't exist"
             request.contentType = FORM_CONTENT_TYPE
             request.method = "PUT"
@@ -127,26 +135,29 @@ class AlternateImageControllerSpec extends Specification {
 
         when:"An invalid domain instance is passed to the update action"
             response.reset()
-            def alternateImage = new AlternateImage()
-            alternateImage.validate()
-            controller.update(alternateImage)
+            AlternateImage invalidAlternateImage = new AlternateImage([name:"invalid object"])
+            controller.update(invalidAlternateImage)
 
         then:"The edit view is rendered again with the invalid instance"
             view == 'edit'
-            model.alternateImageInstance == alternateImage
+            model.alternateImageInstance == invalidAlternateImage
 
         when:"A valid domain instance is passed to the update action"
             response.reset()
-            populateValidParams(params)
-            alternateImage = new AlternateImage(params).save(flush: true)
             controller.update(alternateImage)
 
         then:"A redirect is issues to the show action"
-            response.redirectedUrl == "/alternateImage/show/$alternateImage.id"
+            response.redirectedUrl == "/alternateImage/show/$alternateImage.id?mediaId="
             flash.message != null
     }
 
     void "Test that the delete action deletes an instance if it exists"() {
+        setup:""
+            populateValidParams(params)
+            def alternateImage = new AlternateImage(params).save(flush: true)
+            AlternateImage.count() == 1
+
+
         when:"The delete action is called for a null instance"
             request.contentType = FORM_CONTENT_TYPE
             request.method = "DELETE"
@@ -156,20 +167,12 @@ class AlternateImageControllerSpec extends Specification {
             response.redirectedUrl == '/alternateImage/index'
             flash.message != null
 
-        when:"A domain instance is created"
-            response.reset()
-            populateValidParams(params)
-            def alternateImage = new AlternateImage(params).save(flush: true)
-
-        then:"It exists"
-            AlternateImage.count() == 1
-
         when:"The domain instance is passed to the delete action"
             controller.delete(alternateImage)
 
         then:"The instance is deleted"
             AlternateImage.count() == 0
-            response.redirectedUrl == '/alternateImage/index'
+//            response.redirectedUrl == '/alternateImage/index'
             flash.message != null
     }
 }

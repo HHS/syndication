@@ -32,7 +32,7 @@
     <br/>
     <strong>Media Type: ${mediaItemInstance.class.simpleName}</strong>
     <ul>
-        <g:if test="${mediaItemInstance?.sourceUrl}"><li>SourceUrl: <a href="${mediaItemInstance.sourceUrl}">${mediaItemInstance.sourceUrl}</a></li></g:if>
+        <g:if test="${mediaItemInstance?.sourceUrl}"><li>SourceUrl: <a href="${mediaItemInstance.sourceUrl}" style="word-break: break-all;">${mediaItemInstance.sourceUrl}</a></li></g:if>
         <g:if test="${mediaItemInstance?.id}"><li>Syndication ID: ${mediaItemInstance.id}</li></g:if>
         <g:if test="${mediaItemInstance?.language}"><li>Language: ${mediaItemInstance.language.name}</li></g:if>
         <g:if test="${mediaItemInstance?.source}"><li>Source: ${mediaItemInstance.source.name} (${mediaItemInstance.source.acronym})</li></g:if>
@@ -121,8 +121,8 @@
                     </div>
                 </div>
             </div>
-            <div style="margin-left: 420px;">
-                <g:textArea name="embedCode" cols="80" rows="10" id="snippetCode"/>
+            <div style="margin-left: 420px; margin-right: 10px">
+                <g:textArea name="embedCode" cols="80" style="max-width: 100%;" rows="10" id="snippetCode"/>
             </div>
         </div>
         <br/>

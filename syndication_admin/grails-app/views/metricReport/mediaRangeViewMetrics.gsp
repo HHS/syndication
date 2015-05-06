@@ -62,14 +62,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                                     <td><g:link controller="mediaItem" action="show" id="${mediaItemInstance.id}">${fieldValue(bean: mediaItemInstance, field: "name")}</g:link></td>
 
-                                    <g:if test="${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay + 1,mediaItemInstance)?.storefrontViewCount}">
-                                        <td>${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay + 1,mediaItemInstance)?.storefrontViewCount?.sum() ?: 0}</td>
+                                    <g:if test="${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.storefrontViewCount}">
+                                        <td>${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.storefrontViewCount?.sum() ?: 0}</td>
                                     </g:if>
                                     <g:else>
                                         <td>0</td>
                                     </g:else>
-                                    <g:if test="${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay + 1,mediaItemInstance)?.apiViewCount}">
-                                        <td>${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay + 1,mediaItemInstance)?.apiViewCount?.sum() ?: 0}</td>
+                                    <g:if test="${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.apiViewCount}">
+                                        <td>${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.apiViewCount?.sum() ?: 0}</td>
                                     </g:if>
                                     <g:else>
                                         <td>0</td>
@@ -113,11 +113,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             </div>
                             <div class="form-group">
                                 <label for="fromDay">From:</label>
-                                <g:datePicker name="fromDay" precision="day" class="form-control" relativeYears="[-20..1]"  value="${fromDay}"/>
+                                <g:datePicker name="fromDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${fromDay}"/>
                             </div>
                             <div class="form-group">
                                 <label for="toDay">To:</label>
-                                <g:datePicker name="toDay" precision="day" class="form-control" relativeYears="[-20..1]"  value="${toDay}"/>
+                                <g:datePicker name="toDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${toDay}"/>
                             </div>
                             <div class="form-group pull-left">
                                 <g:actionSubmit action="mediaRangeViewMetrics" class="btn btn-success" value="Submit Date Range"/>

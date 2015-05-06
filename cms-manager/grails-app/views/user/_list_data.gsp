@@ -14,6 +14,6 @@ Redistribution and use in source and binary forms, with or without modification,
 --%>
 <td><g:link action="show" id="${instance.id}">${fieldValue(bean: instance, field: "username")}</g:link></td>
 <g:set var="role" value="${UserRole.findByUser(instance)?.role}"/>
-<td><g:link controller="role" action="show" id="${role?.id}">${role?.authority}</g:link></td>
+<td>${role?.authority}</td>
 <td>${fieldValue(bean: instance, field: "enabled")}</td>
 <td><g:formatDate date="${instance.lastUpdated}" /></td>

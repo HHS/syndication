@@ -61,12 +61,20 @@ class ApiResponse {
         default400ForMessage(Message.getContentNotExtractableError())
     }
 
+    static ApiResponse get400ContentUnretrievableResponse(){
+        default400ForMessage(Message.getContentUnretrievableMessage())
+    }
+
     static ApiResponse  get400ResponseForException(GrailsWrappedRuntimeException exception){
         default400ForMessage(Message.get400MessageForException(exception))
     }
 
     static ApiResponse get400InvalidInstanceErrorResponse(MediaItem mi){
         default400ForMessages(Message.getFieldConstraintErrors(mi))
+    }
+
+    static ApiResponse get400InvalidField(){
+        default400ForMessage(Message.getFieldConstraintError())
     }
 
     static ApiResponse get400InvalidResourceForTypeErrorResponse(){

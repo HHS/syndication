@@ -77,7 +77,9 @@ grails.project.dependency.resolution = {
         runtime 'mysql:mysql-connector-java:5.1.29'
         runtime 'com.ctacorp:syndication-commons:1.1.7'
 
-        compile "com.google.guava:guava:12.0"
+        runtime 'com.fasterxml.jackson.core:jackson-core:2.4.0' // Or 2.2.0 or 2.3.0
+
+        compile "com.google.guava:guava:18.0"
 
         runtime 'com.ctacorp.commons:multi-read-servlet-filter:1.0.0'
         compile('com.ctacorp.commons:api-key-utils:1.5.1') {
@@ -94,25 +96,25 @@ grails.project.dependency.resolution = {
         //plugins for the compile step -----------------------------------------------------
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.8'
-        compile ':asset-pipeline:1.9.9'
-
+        compile ':asset-pipeline:2.1.5'
+        compile ":rest-client-builder:2.1.1"
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
 
-        compile ":rest-client-builder:2.0.1"
+
         compile ":spring-security-core:2.0-RC4"
         compile ":marshallers:0.6"  //Object Marshalling
 
         compile ":codenarc:0.23"
 
         // plugins needed at runtime but not for compilation --------------------------------
-        runtime ":hibernate4:4.3.6.1"
+        runtime ":hibernate4:4.3.8.1"
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
 
         // plugins for the build system only ------------------------------------------------
-        build ":tomcat:7.0.55"
-        build (":release:3.0.1"){//artifactory integration
-            excludes "rest-client-builder"
+        build ":tomcat:7.0.55.2"
+        build (":release:3.1.1"){//artifactory integration
+            exclude "rest-client-builder"
         }
 
         // plugins for the test phase -------------------------------------------------------

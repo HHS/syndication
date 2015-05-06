@@ -126,7 +126,7 @@ class AuthorizationService {
         if (body) {
             requestHeaders['Content-Type'] = "application/json"
             requestHeaders['Content-Length'] = body.bytes.size() as String
-        } else{
+        } else if(!grailsApplication.config.cmsManager.headerContentLength){
             requestHeaders['Content-Length'] = "0"
         }
 

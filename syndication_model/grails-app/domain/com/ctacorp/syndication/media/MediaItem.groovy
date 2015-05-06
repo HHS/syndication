@@ -68,11 +68,6 @@ class MediaItem {
     Source source
     Set metrics
 
-    static hasOne = [
-       mediaPreview: MediaPreview,
-       mediaThumbnail: MediaThumbnail
-    ]
-
     static hasMany = [
         campaigns: Campaign,
         metrics: MediaMetric,
@@ -102,8 +97,6 @@ class MediaItem {
         externalGuid            nullable: true,                                 maxSize: 255
         hash                    nullable: true,     blank: false,               maxSize: 255
         source                  nullable: false
-        mediaPreview            nullable: true
-        mediaThumbnail          nullable: true
     }
 
 
@@ -129,6 +122,7 @@ class MediaItem {
         "html" : "com.ctacorp.syndication.media.Html",
         "image" : "com.ctacorp.syndication.media.Image",
         "infographic" : "com.ctacorp.syndication.media.Infographic",
+        "pdf" : "com.ctacorp.syndication.media.PDF",
         "periodical" : "com.ctacorp.syndication.media.Periodical",
         "socialmedia" : "com.ctacorp.syndication.media.SocialMedia",
         "video" : "com.ctacorp.syndication.media.Video",

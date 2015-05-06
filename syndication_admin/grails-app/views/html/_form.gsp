@@ -37,8 +37,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <input id="sourceUrl" name="sourceUrl" maxlength="2000" required="" value="${htmlInstance?.sourceUrl}" type="url" placeholder="source url" class="form-control input-md">
     </div>
     <div class="col-md-2">
-        <button type="button" id="urlModal" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-            urlTest
+        <button type="button" id="urlModal" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">
+            Verify URL
         </button>
         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <g:render template="../mediaTestPreview/testModal"/>
@@ -144,59 +144,37 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 </div>
 
-<!-- Multiple Radios -->
+<!-- Radio Buttons -->
 <div class="form-group">
-    <label class="col-md-4 control-label" for="radios">Active</label>
+    <label class="col-md-4 control-label" for="active">
+        <g:message code="html.active.label" default="Active"/>
+
+    </label>
     <div class="col-md-8">
-        <g:if test="${htmlInstance?.active == true}">
-            <label class="radio" for="active">
-                <input name="active" id="active" value="true" checked="checked" type="radio">
-                Active
-            </label>
-            <label class="radio" for="unactive">
-                <input name="active" id="unactive" value="false" type="radio">
-                Inactive
-            </label>
-        </g:if>
-        <g:else>
-            <label class="radio" for="active">
-                <input name="active" id="active" value="true" type="radio">
-                Active
-            </label>
-            <label class="radio" for="unactive">
-                <input name="active" id="unactive" checked="checked" value="false" type="radio">
-                Inactive
-            </label>
-        </g:else>
+        <g:checkBox name="active" value="${htmlInstance?.active}"/>
     </div>
 </div>
 
-<!-- Multiple Radios -->
 <div class="form-group">
-    <label class="col-md-4 control-label" for="radios">Visible In Storefront</label>
+    <label class="col-md-4 control-label" for="visibleInStorefront">
+        <g:message code="html.visibleInStorefront.label" default="Visible In Storefront"/>
+
+    </label>
     <div class="col-md-8">
-        <g:if test="${htmlInstance?.visibleInStorefront == true}">
-            <label class="radio" for="visibleInStorefront">
-                <input name="visibleInStorefront" id="visibleInStorefront" value="true" checked="checked" type="radio">
-                Visible in Storefront
-            </label>
-            <label class="radio" for="notVisibleInStorefront">
-                <input name="visibleInStorefront" id="notVisibleInStorefront" value="false" type="radio">
-                Not Visible in Storefront
-            </label>
-        </g:if>
-        <g:else>
-            <label class="radio" for="visibleInStorefront">
-                <input name="visibleInStorefront" id="visibleInStorefront" value="true" type="radio">
-                Visible in Storefront
-            </label>
-            <label class="radio" for="notVisibleInStorefront">
-                <input name="visibleInStorefront" id="notVisibleInStorefront" checked="checked" value="false" type="radio">
-                Not Visible in Storefront
-            </label>
-        </g:else>
+        <g:checkBox name="visibleInStorefront" value="${htmlInstance?.visibleInStorefront}"/>
     </div>
 </div>
+
+<div class="form-group">
+    <label class="col-md-4 control-label" for="manuallyManaged">
+        <g:message code="html.manuallyManaged.label" default="Manually Managed"/>
+
+    </label>
+    <div class="col-md-8">
+        <g:checkBox name="manuallyManaged" value="${htmlInstance?.manuallyManaged}"/>
+    </div>
+</div>
+
 
 <!-- Text input-->
 <div class="form-group">

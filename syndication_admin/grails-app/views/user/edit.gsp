@@ -44,7 +44,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <div class="row">
         <div class="col-md-6 col-sm-10">
 
-            <g:form class="form-horizontal" url="[resource: userInstance, action: 'update']" onsubmit="checkPass(); return false;" method="PUT">
+            <g:form class="form-horizontal" url="[resource: userInstance, action: 'update']" method="PUT">
                 <g:hiddenField name="version" value="${userInstance?.version}"/>
                     <g:render template="form"/>
                     <g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}"/>

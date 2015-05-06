@@ -66,11 +66,11 @@ class MetricReportController {
         if(params.sort == "storefrontViewCount" || params.sort == "apiViewCount") {
             def results
             if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
-                mediaItems = MediaMetric.findAllByDayBetweenAndMediaInList(day, day + 1, MediaItem.findAllByIdInList(publisherItems()), params).media
-                count = MediaMetric.countByDayBetweenAndMediaInList(day, day + 1, MediaItem.findAllByIdInList(publisherItems()), params)
+                mediaItems = MediaMetric.findAllByDayAndMediaInList(day, MediaItem.findAllByIdInList(publisherItems()), params).media
+                count = MediaMetric.countByDayAndMediaInList(day, MediaItem.findAllByIdInList(publisherItems()), params)
             } else {
                 results = MediaMetric.createCriteria().list(params){
-                    between("day", day, day + 1)
+                    eq("day", day)
                 }
                 count = results.totalCount
                 mediaItems = results.media
@@ -118,17 +118,11 @@ class MetricReportController {
 
         if(params.sort == "storefrontViewCount" || params.sort == "apiViewCount") {
             if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
-                mediaItems = MediaMetric.findAllByDayBetweenAndMediaInList(fromDay, toDay + 1, MediaItem.findAllByIdInList(publisherItems()), params).media
-                count = MediaMetric.countByDayBetweenAndMediaInList(fromDay, toDay + 1, MediaItem.findAllByIdInList(publisherItems()), params)
+                mediaItems = MediaMetric.findAllByDayBetweenAndMediaInList(fromDay, toDay, MediaItem.findAllByIdInList(publisherItems()), params).media.unique()
+                count = MediaMetric.findAllByDayBetweenAndMediaInList(fromDay, toDay, MediaItem.findAllByIdInList(publisherItems())).media.unique().size
             } else {
-                mediaItems = viewMetricService.findRangeOfViews(params, fromDay, toDay + 1).collect{it[0]}
-                def metrics = MediaItem.list().metrics
-                count = 0
-                metrics.each{
-                    if(it){
-                        count++
-                    }
-                }
+                mediaItems = MediaMetric.findAllByDayBetween(fromDay, toDay, params).media.unique()
+                count = MediaMetric.findAllByDayBetween(fromDay, toDay).media.unique().size
             }
         } else {
             if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {

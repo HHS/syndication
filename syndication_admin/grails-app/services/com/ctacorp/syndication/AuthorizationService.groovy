@@ -17,6 +17,7 @@ import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import com.icegreen.greenmail.imap.AuthorizationException
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
+import org.springframework.web.client.ResourceAccessException
 
 import javax.annotation.PostConstruct
 
@@ -82,48 +83,54 @@ class AuthorizationService {
         if (body) {
             requestHeaders['Content-Type'] = "application/json"
             requestHeaders['Content-Length'] = body.bytes.size() as String
+        } else if(!grailsApplication.config.cmsManager.headerContentLength){
+            requestHeaders['Content-Length'] = "0"
         }
 
-        log.info "Making authorized request -------------------"
-        log.info "headers: $requestHeaders"
-        log.info "url: $url"
-        log.info "method: $method"
-        log.info "body: $body"
-
         def apiKeyHeaderValue = generator.getApiKeyHeaderValue(requestHeaders, url, method, body)
-        log.info apiKeyHeaderValue
         def resp
 
-        switch (method) {
-            case "POST":
-                resp = rest.post(url) {
-                    header 'Date', requestHeaders.Date
-                    header 'Authorization', apiKeyHeaderValue
-                    accept "application/json"
+        try {
+            switch (method) {
+                case "POST":
+                    resp = rest.post(url) {
+                        header 'Date', requestHeaders.Date
+                        header 'Authorization', apiKeyHeaderValue
+                        accept "application/json"
 
-                    json body
-                }
-                break
-            case "DELETE":
-                resp = rest.delete(url) {
-                    header 'Date', requestHeaders.Date
-                    header 'Authorization', apiKeyHeaderValue
-                }
-                break
-            case "GET":
-                resp = rest.get(url) {
-                    header 'Date', requestHeaders.Date
-                    header 'Authorization', apiKeyHeaderValue
-                    accept "application/json"
-                }
-                break
-            default: break; //do nothing
+                        json body
+                    }
+                    break
+                case "DELETE":
+                    resp = rest.delete(url) {
+                        header 'Date', requestHeaders.Date
+                        header 'Authorization', apiKeyHeaderValue
+                    }
+                    break
+                case "GET":
+                    resp = rest.get(url) {
+                        header 'Date', requestHeaders.Date
+                        header 'Authorization', apiKeyHeaderValue
+                        accept "application/json"
+                    }
+                    break
+                default: break; //do nothing
+            }
+        } catch(ResourceAccessException e){
+            log.error "Couldn't reach remote server, it might be down"
+        } catch(e){
+            log.error "Unexpected connection error occured trying to communicated with: ${url}"
         }
 
         if (resp?.status == 403) {
             String responseDetails = "Status code:${resp.status}\nJsonBody: ${resp.json}"
             log.error(responseDetails)
             throw new AuthorizationException("Access Denied - Your authorization keys have been denied.")
+        }
+
+        if(!resp || !resp.json){
+            log.error "No json response from server ${url}"
+            return null
         }
 
         resp.json

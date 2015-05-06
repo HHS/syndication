@@ -16,16 +16,21 @@ package syndication.cache
 
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.Cache
+import grails.util.Holders
 
 import java.util.concurrent.TimeUnit
 
 class GuavaCacheService {
     static transactional = false
-    private final int apiResponseCacheSize = 10000
+    private final int apiResponseCacheSize = Holders.config.disableGuavaCache ? 0 : 10000
     private final int apiResponseCacheTimeout = 1
 
-    private final int extractedContentCacheSize = 200
+    private final int extractedContentCacheSize = Holders.config.disableGuavaCache ? 0 : 200
     private final int extractedContentCacheTimeout = 30
+
+    private final int imageCacheSize = Holders.config.disableGuavaCache ? 0 : 500
+    private final int imageCacheTimeout = 60*60
+
 
     def caches = [
             apiResponseCache: CacheBuilder.newBuilder().
@@ -37,8 +42,8 @@ class GuavaCacheService {
                     maximumSize(extractedContentCacheSize).
                     build(),
             imageCache:CacheBuilder.newBuilder().
-                    expireAfterWrite(extractedContentCacheTimeout, TimeUnit.MINUTES).
-                    maximumSize(extractedContentCacheSize).
+                    expireAfterWrite(imageCacheTimeout, TimeUnit.MINUTES).
+                    maximumSize(imageCacheSize).
                     build()
     ]
 
@@ -54,9 +59,20 @@ class GuavaCacheService {
         caches.imageCache
     }
 
+    boolean flushItem(String cacheName, String key){
+        try{
+            caches."$cacheName".invalidate(key)
+            return true
+        } catch(e){
+            log.error(e)
+            return false
+        }
+    }
+
     boolean flushCache(String cacheName){
         try{
             caches."$cacheName".invalidateAll()
+            return true
         }catch(e){
             log.error(e)
             return false
@@ -70,6 +86,7 @@ class GuavaCacheService {
             caches.each{ String name, Cache cache ->
                 cache.invalidateAll()
             }
+            return true
         }catch(e){
             log.error(e)
             return false

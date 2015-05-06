@@ -23,13 +23,13 @@ import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.preview.MediaPreview
 import com.ctacorp.syndication.preview.MediaThumbnail
 import grails.converters.JSON
+import grails.plugins.rest.client.RestBuilder
 import grails.rest.render.RenderContext
-import grails.util.Holders
 import org.codehaus.groovy.grails.web.mime.MimeType
-
+import sun.net.www.http.HttpCaptureInputStream
 import syndication.api.*
 import com.ctacorp.syndication.exception.*
-import syndication.Exception.*
+import syndication.Exception.UnauthorizedException
 import syndication.render.ApiResponseRenderer
 import java.util.concurrent.Callable
 
@@ -78,6 +78,8 @@ import java.util.concurrent.Callable
         Html,
         Image,
         Infographic,
+        PDF,
+        Periodical,
         Language,
         Source,
         SocialMedia,
@@ -103,6 +105,7 @@ class MediaController {
     def guavaCacheService
     def assetResourceLocator
     def contentCacheService
+    RestBuilder rest = new RestBuilder()
 
     def beforeInterceptor = {
         response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
@@ -283,18 +286,15 @@ class MediaController {
                 return
             case Image:
                 Image image = mediaItem as Image
-                File imageFile = fileService.getImage(image.sourceUrl)
-                renderImage(imageFile)
+                renderImage(image.sourceUrl)
                 return
             case Infographic:
                 Infographic infographic = mediaItem as Infographic
-                File infographicFile = fileService.getImage(infographic.sourceUrl)
-                renderImage(infographicFile)
+                renderImage(infographic.sourceUrl)
                 return
             default: render ApiResponse.get400ResponseCustomMessage("The requested media type does not support browser rendering/display.").autoFill(params)
         }
     }
-
 
     @APIResource(path="/resources/media/featured.json", description = "Get the list of featured content in the syndication system", operations = [
         @Operation(httpMethod="GET", notes="Get the list of featured content in the syndication system", nickname="getFeaturedMedia", type = "string", summary = "Get the list of featured content in the syndication system", produces = ['application/json'], responseMessages=[
@@ -347,6 +347,10 @@ class MediaController {
                 InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream
                 renderBytes(f.bytes)
                 return
+            case PDF:
+                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/pdf.jpg").inputStream
+                renderBytes(f.bytes)
+                return
             case SocialMedia:
                 InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/social.jpg").inputStream
                 renderBytes(f.bytes)
@@ -358,7 +362,7 @@ class MediaController {
         renderedResponse = guavaCacheService.imageCache.get(key, new Callable<byte[]>() {
             @Override
             public byte[] call() {
-                MediaPreview preview = mi.mediaPreview
+                MediaPreview preview = MediaPreview.findByMediaItem(mi)
                 if (!preview || !preview.imageData) {
                     InputStream f  = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/bad.jpg").inputStream
                     return f.bytes
@@ -396,19 +400,22 @@ class MediaController {
                 InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream
                 renderBytes(f.bytes)
                 return
+            case PDF:
+                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/pdf.jpg").inputStream
+                renderBytes(f.bytes)
+                return
             case SocialMedia:
                 InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/social.jpg").inputStream
                 renderBytes(f.bytes)
                 return
         }
-        
+
         String key = Hash.md5("thumbnail/${id}?" + params.sort().toString())
         byte[] renderedResponse
         renderedResponse = guavaCacheService.imageCache.get(key, new Callable<byte[]>() {
             @Override
             public byte[] call() {
-
-                MediaThumbnail thumbnail = mi.mediaThumbnail
+                MediaThumbnail thumbnail = MediaThumbnail.findByMediaItem(mi)
                 if(!thumbnail || !thumbnail.imageData) {
                     InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/bad.jpg").inputStream
                     return f.bytes
@@ -417,7 +424,6 @@ class MediaController {
             }
         });
         renderBytes(renderedResponse)
-
     }
 
     @APIResource(path="/resources/media/{id}/content", description = "The actual media content (html, image, etc...)", operations = [
@@ -439,32 +445,43 @@ class MediaController {
             return
         }
         DelayedMetricAddJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId:mi.id])
-        switch(mi){
-            case Html:
-                Html html = mi as Html
-                String extractedContent = contentRetrievalService.extractSyndicatedContent(html.sourceUrl, params)
-                renderHtml(extractedContent)
-                return
-            case Periodical:
-                Periodical periodical = mi as Periodical
-                String extractedPeriodicalContent = contentRetrievalService.extractSyndicatedContent(periodical.sourceUrl, params)
-                renderHtml(extractedPeriodicalContent)
-                return
-            case Image:
-                Image image = mi as Image
-                File imageFile = fileService.getImage(image.sourceUrl)
-                renderImage(imageFile)
-                return
-            case Infographic:
-                Infographic infographic = mi as Infographic
-                File infographicFile = fileService.getImage(infographic.sourceUrl)
-                renderImage(infographicFile)
-                return
-            default:
+        try {
+            switch (mi) {
+                case Html:
+                    Html html = mi as Html
+                    String extractedContent = contentRetrievalService.extractSyndicatedContent(html.sourceUrl, params)
+                    renderHtml(extractedContent)
+                    return
+                case PDF:
+                    PDF pdf = mi as PDF
+                    InputStream inputStream = new URL(pdf.sourceUrl).newInputStream()
+                    renderStream(pdf.sourceUrl, "application/pdf")
+                    inputStream.close()
+                    return
+                case Periodical:
+                    Periodical periodical = mi as Periodical
+                    String extractedPeriodicalContent = contentRetrievalService.extractSyndicatedContent(periodical.sourceUrl, params)
+                    renderHtml(extractedPeriodicalContent)
+                    return
+                case Image:
+                    Image image = mi as Image
+                    renderImage(image.sourceUrl)
+                    return
+                case Infographic:
+                    Infographic infographic = mi as Infographic
+                    renderImage(infographic.sourceUrl)
+                    return
+                default:
+                    response.status = 400
+                    response.contentType = "application/json"
+                    render ApiResponse.get400ResponseCustomMessage("The requested media type does not support browser rendering/display.").autoFill(params) as JSON
+            }
+        }catch(ContentUnretrievableException e){
                 response.status = 400
                 response.contentType = "application/json"
-                render ApiResponse.get400ResponseCustomMessage("The requested media type does not support browser rendering/display.").autoFill(params) as JSON
+                render ApiResponse.get400ContentUnretrievableResponse() as JSON
         }
+
     }
 
     @APIResource(path="/resources/media/{id}/syndicate.{format}", description = "Get syndicated content.", operations = [
@@ -514,6 +531,31 @@ class MediaController {
                     }
                 }
                 break
+            case PDF:
+                PDF pdf = mi as PDF
+                resp.mediaType = "PDF"
+                String content
+                if(Util.isTrue(params.thumbnailGeneration)){
+                    println "thumbnail generation"
+                    content = "<object data='${pdf.sourceUrl}' width='100%' height='350px'></object>"
+                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
+                } else{
+                    content = "<object data='${pdf.sourceUrl}' width='100%' height='350px'></object>"
+                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
+                    content = contentRetrievalService.addAttributionToExtractedContent(pdf.id, content)
+                    content += analyticsService.getGoogleAnalyticsString(mi)
+                }
+
+                response.withFormat {
+                    html{
+                        render text: content, contentType: MimeType.HTML.name
+                    }
+                    json{
+                        resp.content = content
+                        respond ApiResponse.get200Response([resp]).autoFill(params)
+                    }
+                }
+                break
             case Periodical:
                 String extractedContent = getExtractedContent(mi)
                 resp.mediaType = "Periodical"
@@ -531,10 +573,16 @@ class MediaController {
             case Image:
                 Image img = mi as Image
                 resp.mediaType = "Image"
-                String content = "<img src='${img.sourceUrl}' alt='${img.altText}'/>"
-                content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                content = contentRetrievalService.addAttributionToExtractedContent(img.id, content)
-                content += analyticsService.getGoogleAnalyticsString(mi)
+                String content
+                if(Util.isTrue(params.thumbnailGeneration)){
+                    content = "<html><body style='padding:0px; margin:0px;'><img style='width:100%' src='${img.sourceUrl}' alt='${img.altText}'/></body></html>"
+                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
+                } else{
+                    content = "<img src='${img.sourceUrl}' alt='${img.altText}'/>"
+                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
+                    content = contentRetrievalService.addAttributionToExtractedContent(img.id, content)
+                    content += analyticsService.getGoogleAnalyticsString(mi)
+                }
 
                 response.withFormat {
                     html{
@@ -549,10 +597,16 @@ class MediaController {
             case Infographic:
                 Infographic ig = mi as Infographic
                 resp.mediaType = "Infographic"
-                String content = "<img src='${ig.sourceUrl}' alt='${ig.altText}'/>"
-                content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                content = contentRetrievalService.addAttributionToExtractedContent(ig.id, content)
-                content += analyticsService.getGoogleAnalyticsString(mi)
+                String content
+                if(Util.isTrue(params.thumbnailGeneration)){
+                    content = "<html><body style='padding:0px; margin:0px;'><img style='width:100%' src='${ig.sourceUrl}' alt='${ig.altText}'/></body></html>"
+                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
+                } else{
+                    content = "<img src='${ig.sourceUrl}' alt='${ig.altText}'/>"
+                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
+                    content = contentRetrievalService.addAttributionToExtractedContent(ig.id, content)
+                    content += analyticsService.getGoogleAnalyticsString(mi)
+                }
 
                 response.withFormat {
                     html{
@@ -567,9 +621,16 @@ class MediaController {
             case Video:
                 Video video = mi as Video
                 resp.mediaType = "Video"
-                String content = youtubeService.getIframeEmbedCode(video.sourceUrl, params)
-                content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                content = contentRetrievalService.addAttributionToExtractedContent(video.id, content)
+                String content
+
+                if(Util.isTrue(params.thumbnailGeneration)){
+                    content = "<html><body style='padding:0px; margin:0px;'><img style='width:100%' src='${youtubeService.thumbnailLinkForUrl(video.sourceUrl)}'/></body></html>"
+                } else{
+                    content = youtubeService.getIframeEmbedCode(video.sourceUrl, params)
+                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
+                    content = contentRetrievalService.addAttributionToExtractedContent(video.id, content)
+                }
+
                 response.withFormat {
                     html{
                         render text: content, contentType: MimeType.HTML.name
@@ -675,18 +736,27 @@ class MediaController {
         String renderedResponse = guavaCacheService.apiResponseCache.get(key, new Callable<String>() {
             @Override
             public String call(){
-                def mediaItems = mediaService.listMediaItems(params) ?: []
-                params.total = mediaItems.size() > 0 ? mediaItems.getTotalCount() : 0
+                try{
+                    def mediaItems = mediaService.listMediaItems(params) ?: []
+                    params.total = mediaItems.size() > 0 ? mediaItems.getTotalCount() : 0
 
-                ApiResponseRenderer renderer = new ApiResponseRenderer()
-                StringWriter stringWriter = new StringWriter()
-                //We need to hook into the ApiReponseRenderer here, so we can capture it's output in a string writer. I'm faking the RenderContext to hijack this
-                renderer.render(ApiResponse.get200Response(mediaItems).autoFill(params), [getWriter:{stringWriter}, setContentType:{it->it}] as RenderContext)
-                return stringWriter.toString()
+                    ApiResponseRenderer renderer = new ApiResponseRenderer()
+                    StringWriter stringWriter = new StringWriter()
+                    //We need to hook into the ApiReponseRenderer here, so we can capture it's output in a string writer. I'm faking the RenderContext to hijack this
+                    renderer.render(ApiResponse.get200Response(mediaItems).autoFill(params), [getWriter:{stringWriter}, setContentType:{it->it}] as RenderContext)
+                    return stringWriter.toString()
+                } catch(e){
+                    ApiResponseRenderer renderer = new ApiResponseRenderer()
+                    StringWriter stringWriter = new StringWriter()
+                    renderer.render(ApiResponse.get400InvalidField().autoFill(params), [getWriter:{stringWriter}, setContentType:{it->it}] as RenderContext)
+                    response.status = 400
+                    return stringWriter.toString()
+                }
             }
         });
 
-        response.contentType = "application/json"
+        String statusCode = ((renderedResponse =~ /"status":(\d{3})/)[0][1])
+        response.status =  statusCode ? statusCode as Integer : 200
         render text: renderedResponse, contentType:"application/json"
     }
 
@@ -773,7 +843,7 @@ class MediaController {
         try{
             mediaService.saveAudio(audioInstance)
         } catch(UnauthorizedException e){
-            ApiResponse.get400ResponseCustomMessage(e.message)
+            ApiResponse.get400NotAuthorizedResponse()
         }
     }
 
@@ -783,7 +853,7 @@ class MediaController {
         try{
             mediaService.saveCollection(collectionInstance)
         } catch(UnauthorizedException e){
-            ApiResponse.get400ResponseCustomMessage(e.message)
+            ApiResponse.get400NotAuthorizedResponse()
         }
     }
 
@@ -812,11 +882,40 @@ class MediaController {
             } catch(ContentUnretrievableException e){
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
             } catch(UnauthorizedException e){
-                apiResponse = ApiResponse.get400ResponseCustomMessage(e.message)
+                apiResponse = ApiResponse.get400NotAuthorizedResponse()
             }
         }
         guavaCacheService.flushAllCaches()
         mediaPostSaveAndRespond(apiResponse, htmlInstance)
+    }
+
+    def savePDF(PDF PDFInstance){
+        log.info "Attempting to publish: ${PDFInstance} - ${PDFInstance.sourceUrl}"
+        ApiResponse apiResponse
+        if (!PDFInstance) { // 400 -- no json body
+            log.error "Instance couldn't be created from publish"
+            apiResponse = ApiResponse.get400ResponseCustomMessage("Could not create instance from request, did you provide the correct JSON payload in your post?").autoFill(params)
+        }else if(!PDFInstance.validate()){ //Check validation first before something like a bad or missing url
+            log.error "Instance wasn't valid: ${PDFInstance.errors}"
+            apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(PDFInstance).autoFill(params)
+        } else {
+            try{
+                PDFInstance = mediaService.savePDF(PDFInstance)
+                if (PDFInstance?.id) { // Media saved just fine
+                    apiResponse = ApiResponse.get200Response([PDFInstance]).autoFill(params)
+                } else { // it didn't save, error handle:
+                    log.error("Couldn't save the instance: ${PDFInstance.errors}")
+                    apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(PDFInstance).autoFill(params)
+                }
+            } catch(ContentUnretrievableException e){
+                apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
+            } catch(UnauthorizedException e){
+                apiResponse = ApiResponse.get400NotAuthorizedResponse()
+            }
+        }
+
+        guavaCacheService.flushAllCaches()
+        mediaPostSaveAndRespond(apiResponse, PDFInstance)
     }
 
     def savePeriodical(Periodical periodicalInstance){
@@ -844,7 +943,7 @@ class MediaController {
             } catch(ContentUnretrievableException e){
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
             } catch(UnauthorizedException e){
-                apiResponse = ApiResponse.get400ResponseCustomMessage(e.message)
+                apiResponse = ApiResponse.get400NotAuthorizedResponse()
             }
         }
         guavaCacheService.flushAllCaches()
@@ -872,7 +971,7 @@ class MediaController {
             } catch(ContentUnretrievableException e){
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
             } catch(UnauthorizedException e){
-                apiResponse = ApiResponse.get400ResponseCustomMessage(e.message)
+                apiResponse = ApiResponse.get400NotAuthorizedResponse()
             }
         }
 
@@ -901,7 +1000,7 @@ class MediaController {
             } catch(ContentUnretrievableException e){
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
             } catch(UnauthorizedException e){
-                apiResponse = ApiResponse.get400ResponseCustomMessage(e.message)
+                apiResponse = ApiResponse.get400NotAuthorizedResponse()
             }
         }
 
@@ -912,7 +1011,7 @@ class MediaController {
         try{
             mediaService.saveSocialMedia(socialMediaInstance)
         } catch(UnauthorizedException e){
-            ApiResponse.get400ResponseCustomMessage(e.message)
+            ApiResponse.get400NotAuthorizedResponse()
         }
     }
 
@@ -935,7 +1034,7 @@ class MediaController {
             } catch(ContentUnretrievableException e){
                 apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
             } catch(UnauthorizedException e){
-                apiResponse = ApiResponse.get400ResponseCustomMessage(e.message)
+                apiResponse = ApiResponse.get400NotAuthorizedResponse()
             }
         }
         guavaCacheService.flushAllCaches()
@@ -946,7 +1045,7 @@ class MediaController {
         try{
             mediaService.saveWidget(widgetInstance)
         } catch(UnauthorizedException e){
-            ApiResponse.get400ResponseCustomMessage(e.message)
+            ApiResponse.get400NotAuthorizedResponse()
         }
     }
 
@@ -1034,18 +1133,16 @@ class MediaController {
         }
     }
 
-    private void renderImage(File img){
-        //This causes browsers to download rather than render ... :?
-        String extension = img.getName().split("\\.")[-1].toLowerCase()
+    private void renderImage(String url){
         String contentType
-        switch(extension){
-            case "jpg":
-            case "jpeg":contentType = "image/jpeg"
-                break
-            case "png":contentType =  "image/png"
-                break
+        if (url.endsWith(".jpg") || url.endsWith(".jpeg")) {
+            contentType = "image/jpeg"
+        } else if (url.endsWith(".png")) {
+            contentType =  "image/png"
+        } else {
+            log.error ("Tried to save an image that isn't a jpg or png: ${url}")
         }
-        renderBytes(img.bytes, contentType)
+        renderStream(url, contentType)
     }
 
     private void renderImageFromUrl(String url){
@@ -1061,16 +1158,16 @@ class MediaController {
         response.outputStream.flush()
     }
 
-    private String getExtractedContent(MediaItem mi){
-        //for debugging
-        if(Holders.config.disableGuavaCache){
-            Map extractedContentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mi.sourceUrl, params)
-            String extractedContent = extractedContentAndHash.content
-            extractedContent = contentRetrievalService.addAttributionToExtractedContent(mi.id, extractedContent)
-            extractedContent += analyticsService.getGoogleAnalyticsString(mi)
-            return extractedContent
-        }
+    private renderStream(String url, String contentType = "image/jpeg") {
+        InputStream inputStream = new URL(url).newInputStream()
+        response.contentType = contentType
+        response.setHeader('Content-length', "${rest.head(url).getHeaders().'Content-Length'[0]}")
+        response.outputStream << inputStream
+        response.outputStream.flush()
+        inputStream.close()
+    }
 
+    private String getExtractedContent(MediaItem mi){
         String key = Hash.md5(mi.sourceUrl + params.sort().toString())
         String extractedContent = guavaCacheService.extractedContentCache.get(key, new Callable<String>() {
             @Override

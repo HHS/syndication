@@ -4,7 +4,7 @@
 
 + Hit Enter or Click the Go button next to the address bar.  The Syndication Tiny URL Mapping Login screen will appear. 
 
-![Login.png](https://bitbucket.org/repo/X79GKG/images/2378947375-Login.png) 
+![Login.png](images/Login.png) 
 
 + Enter the Username.
 
@@ -14,4 +14,4 @@
 
 + Click the Login button.  The Media Mapping List screen will appear.
 
-![Media Mapping List screen.png](https://bitbucket.org/repo/X79GKG/images/1218212542-Media%20Mapping%20List%20screen.png)
+![Media Mapping List screen.png](images/Media_Mapping_List_screen.png)

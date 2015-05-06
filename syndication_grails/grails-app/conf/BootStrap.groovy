@@ -67,8 +67,9 @@ class BootStrap {
         MediaItemChangeListener.initialize(grailsApplication, queueService, mediaPreviewThumbnailJobService)
 
         //initial admins UserMediaList
-        initUserMediaList()
-
+        if (MediaItem.count() == 0) {
+            initUserMediaList()
+        }
         systemEventService.systemStarted()
 
         String systemRunningMessage = """

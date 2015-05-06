@@ -33,7 +33,7 @@ class MediaMetricControllerSpec extends Specification {
         params["day"] = new Date()
         params["media"] = new MediaItem(name: "sd", sourceUrl: "http://www.example.com/1",
                 language: new Language(name: "English", isoCode: "Eng"),
-                source: new Source(name: "National Institute on Aging", acronym: "NIA", websiteUrl: "http://www.example.com/1"))
+                source: new Source(name: "National Institute on Aging", acronym: "NIA", websiteUrl: "http://www.example.com/1")).save()
     }
 
     void "Test the index action returns the correct model"() {
@@ -75,7 +75,6 @@ class MediaMetricControllerSpec extends Specification {
             controller.save(mediaMetric)
 
         then:"A redirect is issued to the show action"
-            view == 'create'
             response.redirectedUrl == '/mediaMetric/show/1'
             controller.flash.message != null
             MediaMetric.count() == 1

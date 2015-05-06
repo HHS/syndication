@@ -4,7 +4,7 @@
 
 + Hit Enter or Click the Go button next to the address bar.  The Syndication Tag Cloud Login screen will appear.
 
-![Login Screen.png](https://bitbucket.org/repo/GXybrE/images/2894575991-Login%20Screen.png) 
+![Login Screen.png](images/Login_Screen.png) 
 
 + Enter the Username.
 
@@ -14,4 +14,4 @@
 
 + Click the Login button.  The Tag Administration screen will appear.
  
-![Tag Administration Screen.png](https://bitbucket.org/repo/GXybrE/images/1629167439-Tag%20Administration%20Screen.png)
+![Tag Administration Screen.png](images/Tag_Administration_Screen.png)

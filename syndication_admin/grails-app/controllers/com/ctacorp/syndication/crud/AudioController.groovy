@@ -109,7 +109,7 @@ class AudioController {
         def status =  mediaItemsService.updateItemAndSubscriber(audioInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action:'edit', id:audioInstance.id
+            redirect action:"edit", id:params.id
             return
         }
 

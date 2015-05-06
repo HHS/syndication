@@ -108,7 +108,7 @@ class InfographicController {
         def status =  mediaItemsService.updateItemAndSubscriber(infographicInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action:'edit', id:infographicInstance.id
+            redirect action:'edit', id:params.id
             return
         }
 

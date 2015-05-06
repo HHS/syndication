@@ -136,57 +136,34 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 </div>
 
-<!-- Multiple Radios -->
+<!-- Radio Buttons -->
 <div class="form-group">
-    <label class="col-md-4 control-label" for="radios">Active</label>
+    <label class="col-md-4 control-label" for="active">
+        <g:message code="image.active.label" default="Active"/>
+
+    </label>
     <div class="col-md-8">
-        <g:if test="${imageInstance?.active == true}">
-            <label class="radio" for="active">
-                <input name="active" id="active" value="true" checked="checked" type="radio">
-                Active
-            </label>
-            <label class="radio" for="unactive">
-                <input name="active" id="unactive" value="false" type="radio">
-                Inactive
-            </label>
-        </g:if>
-        <g:else>
-            <label class="radio" for="active">
-                <input name="active" id="active" value="true" type="radio">
-                Active
-            </label>
-            <label class="radio" for="unactive">
-                <input name="active" id="unactive" checked="checked" value="false" type="radio">
-                Inactive
-            </label>
-        </g:else>
+        <g:checkBox name="active" value="${imageInstance?.active}"/>
     </div>
 </div>
 
-<!-- Multiple Radios -->
 <div class="form-group">
-    <label class="col-md-4 control-label" for="radios">Visible In Storefront</label>
+    <label class="col-md-4 control-label" for="visibleInStorefront">
+        <g:message code="image.visibleInStorefront.label" default="Visible In Storefront"/>
+
+    </label>
     <div class="col-md-8">
-        <g:if test="${imageInstance?.visibleInStorefront == true}">
-            <label class="radio" for="visibleInStorefront">
-                <input name="visibleInStorefront" id="visibleInStorefront" value="true" checked="checked" type="radio">
-                Visible in Storefront
-            </label>
-            <label class="radio" for="notVisibleInStorefront">
-                <input name="visibleInStorefront" id="notVisibleInStorefront" value="false" type="radio">
-                Not Visible in Storefront
-            </label>
-        </g:if>
-        <g:else>
-            <label class="radio" for="visibleInStorefront">
-                <input name="visibleInStorefront" id="visibleInStorefront" value="true" type="radio">
-                Visible in Storefront
-            </label>
-            <label class="radio" for="notVisibleInStorefront">
-                <input name="visibleInStorefront" id="notVisibleInStorefront" checked="checked" value="false" type="radio">
-                Not Visible in Storefront
-            </label>
-        </g:else>
+        <g:checkBox name="visibleInStorefront" value="${imageInstance?.visibleInStorefront}"/>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-4 control-label" for="manuallyManaged">
+        <g:message code="image.manuallyManaged.label" default="Manually Managed"/>
+
+    </label>
+    <div class="col-md-8">
+        <g:checkBox name="manuallyManaged" value="${imageInstance?.manuallyManaged}"/>
     </div>
 </div>
 

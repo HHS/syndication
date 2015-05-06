@@ -29,17 +29,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         </label>
 
         <div class="col-sm-8">
-            <g:textField autocomplete="off" placeholder="display name" name="name" value="${userInstance?.name}" class="form-control"/>
+            <g:textField autocomplete="off" placeholder="Full Name" name="name" value="${userInstance?.name}" class="form-control"/>
         </div>
     </div>
 
     <div class="form-group ${hasErrors(bean: userInstance, field: 'username', 'error')} required">
         <label for="username" class="col-sm-4 control-label">
-            <g:message code="user.username.label" default="Email"/><span class="required-indicator">*</span>
+            <g:message code="user.username.label" default="Email" type="email"/><span class="required-indicator">*</span>
         </label>
 
         <div class="col-sm-8">
-            <g:textField autocomplete="off" name="username" placeholder="username" required="" value="${userInstance?.username}" class="form-control"/>
+            <g:field autocomplete="off" type="email" name="username" placeholder="Email Address" required="" value="${userInstance?.username}" class="form-control"/>
         </div>
     </div>
 

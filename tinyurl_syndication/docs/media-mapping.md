@@ -4,11 +4,11 @@
 
 + From the Media Mapping List screen, click the New Media Mapping button.  
  
-![Media Mapping List screen.png](https://bitbucket.org/repo/X79GKG/images/2106049858-Media%20Mapping%20List%20screen.png)
+![Media Mapping List screen.png](images/Media_Mapping_List_screen.png)
 
 + The Create Media Mapping screen will appear.
 
-![Create Media Mapping Screen.png](https://bitbucket.org/repo/X79GKG/images/4261493544-Create%20Media%20Mapping%20Screen.png) 
+![Create Media Mapping Screen.png](images/Create_Media_Mapping_Screen.png) 
 
 + Enter the Target URL.  Note: this should be http or https.
 
@@ -18,39 +18,39 @@
  
 + Click the Create button.  The Show Media Mapping screen will appear with a confirmation message.
 
-![Show Media Mapping With Created Confirmation Message.png](https://bitbucket.org/repo/X79GKG/images/388842121-Show%20Media%20Mapping%20With%20Created%20Confirmation%20Message.png) 
+![Show Media Mapping With Created Confirmation Message.png](images/Show_Media_Mapping_With_Created_Confirmation_Message.png) 
 
 + Click the Media Mapping List button.  The Media Mapping screen will appear.
 
-![Media Mapping List Screen With New Item.png](https://bitbucket.org/repo/X79GKG/images/2763224557-Media%20Mapping%20List%20Screen%20With%20New%20Item.png) 
+![Media Mapping List Screen With New Item.png](images/Media_Mapping_List_Screen_With_New_Item.png) 
 
 ## Edit
 
 + From the Media Mapping List screen, click the desired ID link.
 
-![Media Mapping List with ID link highlighted.png](https://bitbucket.org/repo/X79GKG/images/935031429-Media%20Mapping%20List%20with%20ID%20link%20highlighted.png) 
+![Media Mapping List with ID link highlighted.png](images/Media_Mapping_List_with_ID_link_highlighted.png) 
 
 + The Show Media Mapping screen will appear.
 
-![Show Media Mapping Screen.png](https://bitbucket.org/repo/X79GKG/images/1376424919-Show%20Media%20Mapping%20Screen.png) 
+![Show Media Mapping Screen.png](images/Show_Media_Mapping_Screen.png) 
 
 + Click the Edit link.  
 
-![Show Media Mapping with Edit button highlighted.png](https://bitbucket.org/repo/X79GKG/images/1947351904-Show%20Media%20Mapping%20with%20Edit%20button%20highlighted.png)
+![Show Media Mapping with Edit button highlighted.png](images/Show_Media_Mapping_with_Edit_button_highlighted.png)
  
 + The Edit Media Mapping screen will appear.
 
-![Edit Media Mapping Screen.png](https://bitbucket.org/repo/X79GKG/images/1351837655-Edit%20Media%20Mapping%20Screen.png)
+![Edit Media Mapping Screen.png](images/Edit_Media_Mapping_Screen.png)
  
 + Modify the desired fields.
 
 + Click the Update button.  The Show Media Mapping screen will appear with a confirmation message.
 
-![Show Media Mapping Screen With Updated Confirmation Message.png](https://bitbucket.org/repo/X79GKG/images/2155083679-Show%20Media%20Mapping%20Screen%20With%20Updated%20Confirmation%20Message.png) 
+![Show Media Mapping Screen With Updated Confirmation Message.png](images/Show_Media_Mapping_Screen_With_Updated_Confirmation_Message.png) 
 
 + Click the Media Mapping List.  The Media Mapping List screen will appear.
 
-![Media Mapping List With Updated Item.png](https://bitbucket.org/repo/X79GKG/images/3622188602-Media%20Mapping%20List%20With%20Updated%20Item.png)
+![Media Mapping List With Updated Item.png](images/Media_Mapping_List_With_Updated_Item.png)
 
 ## Sort
 
@@ -62,16 +62,16 @@
 
 + From the Media Mapping List screen, click the desired ID.
 
-![Media Mapping List for Delete with ID link highlighted.png](https://bitbucket.org/repo/X79GKG/images/1734928732-Media%20Mapping%20List%20for%20Delete%20with%20ID%20link%20highlighted.png)
+![Media Mapping List for Delete with ID link highlighted.png](images/Media_Mapping_List_for_Delete_with_ID_link_highlighted.png)
 
 + The Show Media Mapping screen will appear.
 
-![Show Media Mapping Screen With Delete Button Highlighted.png](https://bitbucket.org/repo/X79GKG/images/986065246-Show%20Media%20Mapping%20Screen%20With%20Delete%20Button%20Highlighted.png) 
+![Show Media Mapping Screen With Delete Button Highlighted.png](images/Show_Media_Mapping_Screen_With_Delete_Button_Highlighted.png) 
 
 + Click the Delete button.  The Are you sure? pop-up window will appear.
 
-![Are you sure pop-up window.png](https://bitbucket.org/repo/X79GKG/images/2544983990-Are%20you%20sure%20pop-up%20window.png)
+![Are you sure pop-up window.png](images/Are_you_sure_pop-up_window.png)
  
 + Click the OK button.  The Media Mapping List screen will appear with a deleted confirmation message.
  
-![Media Mapping List with Deleted Confirmation Message.png](https://bitbucket.org/repo/X79GKG/images/2142369881-Media%20Mapping%20List%20with%20Deleted%20Confirmation%20Message.png)
+![Media Mapping List with Deleted Confirmation Message.png](images/Media_Mapping_List_with_Deleted_Confirmation_Message.png)

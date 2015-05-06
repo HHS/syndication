@@ -23,6 +23,7 @@ import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.media.PDF
 import com.ctacorp.syndication.media.Periodical
 import com.ctacorp.syndication.media.SocialMedia
 import com.ctacorp.syndication.media.Video
@@ -107,9 +108,14 @@ class AlternateImageController {
             return
         }
 
+        alternateImageInstance.validate()
         if (alternateImageInstance.hasErrors()) {
             flash.errors = alternateImageInstance.errors.allErrors.collect{[message:g.message([error : it])]}
-            redirect action:'edit', id:alternateImageInstance.id, params:[mediaId:params.mediaId]
+            if(!alternativeImageService.ifPublisherValid(alternateImageInstance)){
+                response.sendError(404)
+                return
+            }
+            respond alternateImageInstance, view:'edit', params:[mediaId:params.mediaId, user:springSecurityService.currentUser]
             return
         }
 
@@ -144,7 +150,8 @@ class AlternateImageController {
                 if(params.mediaId){
                     redirect controller:'mediaItem', action:'show', id:params.long('mediaId')
                 } else{
-                    redirect action: "index", method:"GET"
+                    params.max = 10
+                    respond AlternateImage.list(params), view: "index", method:"GET", model:[alternateImageInstanceCount: AlternateImage.count()]
                 }
             }
             '*'{ render status: NO_CONTENT }
@@ -155,7 +162,7 @@ class AlternateImageController {
         request.withFormat {
             form {
                 flash.message = message(code: 'default.not.found.message', args: [message(code: 'alternateImageInstance.label', default: 'Alternate Image'), params.id])
-                redirect controller: 'dashboard', action: "syndDash", method: "GET"
+                redirect controller: 'alternateImage', action: "index", method: "GET"
             }
             '*'{ render status: NOT_FOUND }
         }
@@ -181,6 +188,7 @@ class AlternateImageController {
             case Html: redirect controller: "html", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Image: redirect controller: "image", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Infographic: redirect controller: "infographic", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
+            case PDF: redirect controller: "PDF", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Periodical: redirect controller: "periodical", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case SocialMedia: redirect controller: "socialMedia", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Video: redirect controller: "video", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break

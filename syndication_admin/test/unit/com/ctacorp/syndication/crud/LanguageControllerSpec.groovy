@@ -16,6 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
+import com.ctacorp.syndication.LanguageService
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import spock.lang.Specification
@@ -27,135 +28,86 @@ class LanguageControllerSpec extends Specification {
     def populateValidParams(params) {
         assert params != null
         // TODO: Populate valid properties like...
-        //params["name"] = 'someValidName'
+        params["name"] = 'english'
+        params["isoCode"] = 'eng'
     }
 
     void "Test the index action returns the correct model"() {
+        setup: ""
+            populateValidParams(params)
+            params.isActive = true
+            Language language = new Language(params).save(flush: true)
 
         when:"The index action is executed"
             controller.index()
 
         then:"The model is correct"
-            !model.languageInstanceList
-            model.languageInstanceCount == 0
+            model.languageInstanceList == [language]
+            model.activeTagLanguageInstanceList == [language]
     }
 
-    void "Test the create action returns the correct model"() {
-        when:"The create action is executed"
-            controller.create()
+    void "Test the setActive fails properly with an invalid language"() {
+        setup: ""
+            request.contentType = MULTIPART_FORM_CONTENT_TYPE
+            populateValidParams(params)
+            Language language = new Language(params).save(flush: true)
+            !language.isActive
 
-        then:"The model is correctly created"
-            model.languageInstance!= null
-    }
+        when:"The setActive is called with a null"
+            controller.setActive(null)
 
-    void "Test the save action correctly persists an instance"() {
+        then:"The index is properly displayed"
+            response.status == 302
+            response.redirectedUrl == "/language/index"
 
-        when:"The save action is executed with an invalid instance"
-            def language = new Language()
-            language.validate()
-            controller.save(language)
-
-        then:"The create view is rendered again with the correct model"
-            model.languageInstance!= null
-            view == 'create'
-
-        when:"The save action is executed with a valid instance"
+        when:"The setActive is called with a invalid id"
             response.reset()
-            populateValidParams(params)
-            language = new Language(params)
+            controller.setActive(-1)
 
-            controller.save(language)
+        then:"the index is properly displayed"
+            response.status == 302
+            response.redirectedUrl == "/language/index"
 
-        then:"A redirect is issued to the show action"
-            response.redirectedUrl == '/language/show/1'
-            controller.flash.message != null
-            Language.count() == 1
-    }
-
-    void "Test that the show action returns the correct model"() {
-        when:"The show action is executed with a null domain"
-            controller.show(null)
-
-        then:"A 404 error is returned"
-            response.status == 404
-
-        when:"A domain instance is passed to the show action"
-            populateValidParams(params)
-            def language = new Language(params)
-            controller.show(language)
-
-        then:"A model is populated containing the domain instance"
-            model.languageInstance == language
-    }
-
-    void "Test that the edit action returns the correct model"() {
-        when:"The edit action is executed with a null domain"
-            controller.edit(null)
-
-        then:"A 404 error is returned"
-            response.status == 404
-
-        when:"A domain instance is passed to the edit action"
-            populateValidParams(params)
-            def language = new Language(params)
-            controller.edit(language)
-
-        then:"A model is populated containing the domain instance"
-            model.languageInstance == language
-    }
-
-    void "Test the update action performs an update on a valid domain instance"() {
-        when:"Update is called for a domain instance that doesn't exist"
-            controller.update(null)
-
-        then:"A 404 error is returned"
-            response.redirectedUrl == '/language/index'
-            flash.message != null
-
-
-        when:"An invalid domain instance is passed to the update action"
+        when:"The setActive is called with a valid inactive language id"
             response.reset()
-            def language = new Language()
-            language.validate()
-            controller.update(language)
+            controller.setActive(language.id)
 
-        then:"The edit view is rendered again with the invalid instance"
-            view == 'edit'
-            model.languageInstance == language
-
-        when:"A valid domain instance is passed to the update action"
-            response.reset()
-            populateValidParams(params)
-            language = new Language(params).save(flush: true)
-            controller.update(language)
-
-        then:"A redirect is issues to the show action"
-            response.redirectedUrl == "/language/show/$language.id"
-            flash.message != null
+        then:"the language is set to active"
+            language.isActive
+            response.redirectedUrl == "/language/index"
     }
 
-    void "Test that the delete action deletes an instance if it exists"() {
-        when:"The delete action is called for a null instance"
-            controller.delete(null)
+    void "Test the setInactive fails properly with an invalid language"() {
+        setup: ""
+        controller.languageService = Mock(LanguageService)
+        request.contentType = MULTIPART_FORM_CONTENT_TYPE
+        populateValidParams(params)
+        params.isActive = true
+        Language language = new Language(params).save(flush: true)
+        language.isActive
 
-        then:"A 404 is returned"
-            response.redirectedUrl == '/language/index'
-            flash.message != null
+        when:"The setInactive is called with a null"
+        controller.setActive(null)
 
-        when:"A domain instance is created"
-            response.reset()
-            populateValidParams(params)
-            def language = new Language(params).save(flush: true)
+        then:"The index is properly displayed"
+        response.status == 302
+        response.redirectedUrl == "/language/index"
 
-        then:"It exists"
-            Language.count() == 1
+        when:"The setInactive is called with a invalid id"
+        response.reset()
+        controller.setActive(-1)
 
-        when:"The domain instance is passed to the delete action"
-            controller.delete(language)
+        then:"the index is properly displayed"
+        response.status == 302
+        response.redirectedUrl == "/language/index"
 
-        then:"The instance is deleted"
-            Language.count() == 0
-            response.redirectedUrl == '/language/index'
-            flash.message != null
+        when:"The setInactive is called with a valid inactive language id"
+        response.reset()
+        println "languageId: " + language.id
+        controller.setInactive(language.id)
+
+        then:"the language is set to inactive"
+        !language.isActive
+        response.redirectedUrl == "/language/index"
     }
 }

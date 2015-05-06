@@ -95,9 +95,17 @@ class YoutubeService {
     String getVideoId(String sourceUrl) {
         try {
             def url = new URIBuilder(sourceUrl)
-            url?.query?.v
-        }catch(e){
-            log.error "An unhandeled error has occured trying to retrieve video location from the provided url\n${e}"
+            if(url?.query?.v){
+                return url.query.v
+            }
+            def matcher = sourceUrl =~ /embed\/([\w\W&&[^\/]]+)/
+            if(matcher.count) {
+                return matcher[0][1]
+            }
+            println "Could not extract a youtube video ID from ${sourceUrl}"
+            return null
+        } catch(e){
+            println "An unhandeled error has occured trying to retrieve video location from the provided url\n${e}"
             return null
         }
     }

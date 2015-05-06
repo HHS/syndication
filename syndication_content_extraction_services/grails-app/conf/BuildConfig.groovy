@@ -47,7 +47,7 @@ grails.project.dependency.resolution = {
         runtime 'com.ctacorp:syndication-commons:1.1.7',
                 'com.google.guava:guava:18.0'
         //Misc http
-        runtime('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
+        compile('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
             excludes 'xalan'
             excludes 'xml-apis'
             excludes 'groovy'
@@ -55,11 +55,11 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        runtime ("org.grails.plugins:syndication-model:1.7.2"){
+        runtime ("org.grails.plugins:syndication-model:1.7.4"){
             export = false
         }
 
-        compile(":release:3.0.1",
+        compile(":release:3.1.1",
               ":rest-client-builder:1.0.3") {
             export = false
         }

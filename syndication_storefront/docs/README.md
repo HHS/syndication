@@ -1,7 +1,7 @@
 Syndication Storefront User Guide
 =============================================
 
-# Introduction 123
+# Introduction 
  
 This document includes select processes for using the Syndication Storefront.
 
@@ -17,13 +17,13 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + Hit Enter or Click Go button next to the address bar.  The Syndication Storefront Home page will appear. 
 
-![Storefront Home screen.png](https://bitbucket.org/repo/XR54q7/images/952145691-Storefront%20Home%20screen.png)
+![Storefront Home screen](images/StorefrontHomescreen.png)
  
 ## View What Is Content Syndication?
 
 + From Home page, under What is Content Syndication? heading, click Learn More link; Questions and Answers screen will appear.
 
-![Questions and Answers screen.png](https://bitbucket.org/repo/XR54q7/images/2289752270-Questions%20and%20Answers%20screen.png) 
+![Questions and Answers screen](images/QuestionsandAnswersscreen.png) 
 
 + Click desired link on the right-hand side of the screen.
 
@@ -31,11 +31,11 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + From Home page, click at desired Featured Media title link.
 
-![Featured Media Link screen.png](https://bitbucket.org/repo/XR54q7/images/160662528-Featured%20Media%20Link%20screen.png)
+![Featured Media Link screen](images/FeaturedMediaLinkscreen.png)
  
 + Featured Media details screen will appear.
 
-![Detailed Featured Media screen.png](https://bitbucket.org/repo/XR54q7/images/1534968106-Detailed%20Featured%20Media%20screen.png)
+![Detailed Featured Medias creen](images/DetailedFeaturedMediascreen.png)
  
 + Click Preview button.  A pop-up window will appear.
 
@@ -43,47 +43,47 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + Click X in the upper right-hand corner to close the screen.
 
-## View Syndication Application Programming Interface (api) Documentation
+## View Application Programming Interface (API) Documentation
 
 + From the Home page, under the Syndication API heading, click the API documentation link.
 
-![API Documentation link.png](https://bitbucket.org/repo/XR54q7/images/3303003393-API%20Documentation%20link.png) 
+![API Documentation link](images/APIDocumentationlink.png) 
 
 + The HHS Media Services API screen will appear.
 
-![HHS Media Service API screen.png](https://bitbucket.org/repo/XR54q7/images/2582182879-HHS%20Media%20Service%20API%20screen.png)
+![HHS Media Service API screen](images/HHSMediaServiceAPIscreen.png)
 
 + Click desired links to review HHS Media Service API documentation.
 
-## View Additional Documentation
+## View Additional Information
 
 + From Home page, under the Additional Information section, click Questions and Answers link.
 
-![Additional Information Q&A link.png](https://bitbucket.org/repo/XR54q7/images/37420725-Additional%20Information%20Q&A%20link.png)
+![Additional Information Q&A link](images/AdditionalInformationQ&Alink.png)
 
 + Questions and Answers screen will appear.
 
-![Q&A screen.png](https://bitbucket.org/repo/XR54q7/images/556341819-Q&A%20screen.png)
+![Q&A screen](images/Q&Ascreen.png)
  
 + Click Home link.  The Home page will appear.
 
 + From Home page, under the Additional Information heading, click Usage Guidelines link.
 
-![Usage Guidelines link.png](https://bitbucket.org/repo/XR54q7/images/4226144055-Usage%20Guidelines%20link.png)
+![Usage Guidelines link](images/UsageGuidelineslink.png)
 
 + Usage Guidelines screen will appear.
 
-![Usage Guidelines screen.png](https://bitbucket.org/repo/XR54q7/images/614128736-Usage%20Guidelines%20screen.png)
+![Usage Guidelines screen](images/UsageGuidelinesscreen.png)
 
 + Click Home link. Home page will appear.
 
 + From Home page, under the Additional Information heading, click Syndication Roadmap link.
 
-![Syndication Roadmap link.png](https://bitbucket.org/repo/XR54q7/images/224317538-Syndication%20Roadmap%20link.png)
+![Syndication Roadmap link](images/SyndicationRoadmaplink.png)
 
 + Syndication Roadmap screen will appear.
 
-![Syndication Roadmap screen.png](https://bitbucket.org/repo/XR54q7/images/3257592725-Syndication%20Roadmap%20screen.png)
+![Syndication Roadmap screen](images/SyndicationRoadmapscreen.png)
 
 + Click desired link on the right-hand side of the screen for more information.
 
@@ -91,11 +91,11 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + From Home page, under Additional Information heading, click Report a Problem With A Syndicated Page link.
 
-![Syndication_Storefront - Report a Problem.png](https://bitbucket.org/repo/XR54q7/images/744413290-Syndication_Storefront%20-%20Report%20a%20Problem.png)
+![Syndication_Storefront - Report a Problem](images/Syndication_Storefront-ReportaProblem.png)
 
 + Report a Problem with the Syndication System screen will appear.
 
-![Report a Problem With The Syndication System.png](https://bitbucket.org/repo/XR54q7/images/1375342419-Report%20a%20Problem%20With%20The%20Syndication%20System.png)
+![Report a Problem With The Syndication System](images/ReportaProblemWithTheSyndicationSystem.png)
 
 + Enter E-mail address.
 
@@ -105,15 +105,15 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + Click Submit button. Home page will appear with confirmation message that the message was sent.
 
-![report filed confirmation message.png](https://bitbucket.org/repo/XR54q7/images/279011809-report%20filed%20confirmation%20message.png)
+![report filed confirmation message](images/reportfiledconfirmationmessage.png)
 
 + From Home page, under Additional Information heading, click Request a Page to be Syndicated link.
 
-![Syndication_Storefront - Request a Page to be Syndicated.png](https://bitbucket.org/repo/XR54q7/images/948437320-Syndication_Storefront%20-%20Request%20a%20Page%20to%20be%20Syndicated.png)
+![Syndication_Storefront - Request a Page to be Syndicated](images/Syndication_Storefront-Request_a_Page_to_be_Syndicated.png)
 
 + The Request The Syndication Of A Content Item pop-up window will appear. 
 
-![request the syndication of a content item screen.png](https://bitbucket.org/repo/XR54q7/images/979372138-request%20the%20syndication%20of%20a%20content%20item%20screen.png)
+![request the syndication of a content item screen](images/request_the_syndication_of_a_content_item_screen.png)
 
 + Enter the E-mail address.
 
@@ -123,23 +123,23 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + Click the Submit button.  The Home page will appear with a confirmation message.
 
-![Request has been sent.png](https://bitbucket.org/repo/XR54q7/images/1415467016-Request%20has%20been%20sent.png)
+![Request has been sent](images/Request_has_been_sent.png)
  
 + Click "Get the Syndicate This button link" 
 
-![Syndication_Storefront - Get the Syndicate This button.png](https://bitbucket.org/repo/XR54q7/images/844680375-Syndication_Storefront%20-%20Get%20the%20Syndicate%20This%20button.png)
+![Syndication_Storefront - Get the Syndicate This button](images/Syndication_Storefront-Get_the_Syndicate_This_button.png)
 
 + Syndicate This code snippet page will open:
 
-![Syndication_Storefront - Syndicate This code snippet.png](https://bitbucket.org/repo/XR54q7/images/3473560702-Syndication_Storefront%20-%20Syndicate%20This%20code%20snippet.png)
+![Syndication_Storefront - Syndicate This code snippet](images/Syndication_Storefront-Syndicate_This_code_snippet.png)
 
 + Click "Release Notes" 
 
-![Syndication_Storefront - Release Notes.png](https://bitbucket.org/repo/XR54q7/images/1023823781-Syndication_Storefront%20-%20Release%20Notes.png)
+![Syndication_Storefront - Release Notes](images/Syndication_Storefront-Release_Notes.png)
 
 + Release Note page will open with recent release date:
 
-![Syndication_Storefront - Detail Release Notes .png](https://bitbucket.org/repo/XR54q7/images/791324487-Syndication_Storefront%20-%20Detail%20Release%20Notes%20.png)
+![Syndication_Storefront - Detail Release Notes ](images/Syndication_Storefront-Detail_Release_Notes.png)
 
 # Search
 
@@ -147,11 +147,11 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + From the Home page, enter the term in the Search field.  Search is based on either the name (or partial name), description (or partial description), or uniform resource locater (url) (or partial url) for the media item.  
 
-![Basic Search.png](https://bitbucket.org/repo/XR54q7/images/1079033935-Basic%20Search.png)
+![Basic Search](images/Basic_Search.png)
 
 + Click the Search button.  If there are results then they will appear under the Search Results heading.  
 
-![Basic search results screen.png](https://bitbucket.org/repo/XR54q7/images/2786142052-Basic%20search%20results%20screen.png) 
+![Basic search results screen](images/Basic_search_results_screen.png) 
 
 + Click the title link of the desired media item.  The detailed media item screen will appear.
 
@@ -159,11 +159,11 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + From the Home page, click the Advanced Search link.
 
-![Advanced search link.png](https://bitbucket.org/repo/XR54q7/images/2733234128-Advanced%20search%20link.png)
+![Advanced search link](images/Advanced_search_link.png)
 
 + The Media Item Lookup screen will appear. 
 
-![Media Item Lookup.png](https://bitbucket.org/repo/XR54q7/images/2694843694-Media%20Item%20Lookup.png)
+![Media Item Lookup](images/Media_Item_Lookup.png)
 
 + Optionally, enter the Title of the media item.
 
@@ -179,33 +179,33 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + Screenshot - Search by Title
 
-![Syndication_Storefront - Search by Title.png](https://bitbucket.org/repo/XR54q7/images/198299115-Syndication_Storefront%20-%20Search%20by%20Title.png)
+![Syndication_Storefront - Search by Title](images/Syndication_Storefront-Search_by_Title.png)
 
 + Screenshot - Search by Title & Media Type:
 
-![Syndication_Storefront - Search by Title & Media.png](https://bitbucket.org/repo/XR54q7/images/1113401835-Syndication_Storefront%20-%20Search%20by%20Title%20&%20Media.png)
+![Syndication_Storefront - Search by Title & Media](images/Syndication_Storefront-Search_by_Title_&_Media.png)
 
 + Screenshot - Search by Title, Source, Media Type & Language:
 
-![Syndication_Storefront - Search by Title Media Type Source & Language.png](https://bitbucket.org/repo/XR54q7/images/1409883888-Syndication_Storefront%20-%20Search%20by%20Title%20Media%20Type%20Source%20&%20Language.png)
+![Syndication_Storefront - Search by Title Media Type Source & Language](images/Syndication_Storefront-Search_by_Title_Media_Type_Source_&_Language.png)
 
 + Screenshot - when there is no search result available:
 
-![Syndication_Storefront - No Search Result.png](https://bitbucket.org/repo/XR54q7/images/234868660-Syndication_Storefront%20-%20No%20Search%20Result.png)
+![Syndication_Storefront - No Search Result](images/Syndication_Storefront-No_Search_Result.png)
  
 + Click the desired title of the media item.  The detailed media item screen will appear.
 
-![Show_content - Detail of a media item.png](https://bitbucket.org/repo/XR54q7/images/2740619525-Show_content%20-%20Detail%20of%20a%20media%20item.png)
+![Show_content - Detail of a media item](images/Show_content-Detail_of_a_media_item.png)
 
 # New User Registration
  
 + From the Home page, click the Register link.
 
-![Register link.png](https://bitbucket.org/repo/XR54q7/images/2184157484-Register%20link.png)
+![Register link](images/Register_link.png)
  
 + The Register screen will appear.
 
-![Register screen.png](https://bitbucket.org/repo/XR54q7/images/2695162739-Register%20screen.png)
+![Register screen](images/Register_screen.png)
 
 + Enter your name (First Name, Middle Initial, Last Name).
 
@@ -219,22 +219,22 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + Click the Register button.  The Sign In screen will appear with the account created confirmation message.
 
-![Login - Storefront user.png](https://bitbucket.org/repo/XR54q7/images/4093968433-Login%20-%20Storefront%20user.png)
+![Login - Storefront user](images/Login-Storefront_user.png)
 
 
 # Reset Password
 
 + From the Home page, click the Login link.  
 
-![Login link.png](https://bitbucket.org/repo/XR54q7/images/2489812051-Login%20link.png)
+![Login link](images/Login_link.png)
 
 + Login screen will appear.
 
-![Forgot password link.png](https://bitbucket.org/repo/XR54q7/images/3260171525-Forgot%20password%20link.png)
+![Forgot password link](images/Forgot_password_link.png)
 
 + Click on Forgot Password? link. Forgot Your Password? screen will appear.
 
-![Forgot your password screen.png](https://bitbucket.org/repo/XR54q7/images/820760867-Forgot%20your%20password%20screen.png)
+![Forgot your password screen](images/Forgot_your_password_screen.png)
 
 + Enter Account E-mail Address.
 
@@ -242,18 +242,18 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + Click on Request Password Reset button.  The Sign In screen will appear and an email will be sent with the new password.
 
-![Sign In screen.png](https://bitbucket.org/repo/XR54q7/images/1090327823-Sign%20In%20screen.png)
+![Sign In screen](images/Sign_In_screen.png)
 
   
 # Login
 
 + From Home page, click the Login link.
 
-![Login link.png](https://bitbucket.org/repo/XR54q7/images/338284513-Login%20link.png)
+![Login link](images/Login_link.png)
  
 + Login screen will appear.
 
-![Sign In screen.png](https://bitbucket.org/repo/XR54q7/images/4029251910-Sign%20In%20screen.png)
+![Sign In screen.png](images/Sign_In_screen.png)
  
 + Enter E-mail address.
 
@@ -263,7 +263,7 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + Click on Sign In button.  The Home page will appear with the user name in the upper right-hand corner.
 
-![User name.png](https://bitbucket.org/repo/XR54q7/images/2365891965-User%20name.png) 
+![User name.png](images/User_name.png) 
 
 # Manage Lists
  
@@ -271,7 +271,7 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + After logging into the storefront, click the Manage Lists link.
 
-![Manage Lists link.png](https://bitbucket.org/repo/XR54q7/images/925293800-Manage%20Lists%20link.png)
+![Manage Lists link.png](images/Manage_Lists_link.png)
 
 + The My Media List screen will appear.
 
@@ -279,11 +279,11 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + From My Media List screen, click the Create Media List link.
 
-![Create Media List.png](https://bitbucket.org/repo/XR54q7/images/2166040298-Create%20Media%20List.png)
+![Create Media List.png](images/Create_Media_List.png)
 
 + Create Media List screen will appear.
 
-![Create Media List screen.png](https://bitbucket.org/repo/XR54q7/images/1782775679-Create%20Media%20List%20screen.png)
+![Create Media List screen.png](images/Create_Media_List_screen.png)
 
 + Enter Name.
 
@@ -291,11 +291,11 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + Select Media Items by entering a letter or character in the title in the Media Items field.  Potential matching items will appear in a drop-down list.
 
-![Create Media List Create.png](https://bitbucket.org/repo/XR54q7/images/4246919995-Create%20Media%20List%20Create.png)
+![Create Media List Create.png](images/Create_Media_List_Create.png)
  
 + Click on Create button.  The Show Media List screen will appear with a created confirmation message.
 
-![Show Media List with created confirmation message.png](https://bitbucket.org/repo/XR54q7/images/505672721-Show%20Media%20List%20with%20created%20confirmation%20message.png)
+![Show Media List with created confirmation message.png](images/Show_Media_List_with_created_confirmation_message.png)
 
 + Click on View Media List link to return to the My Media List screen.
 
@@ -303,23 +303,23 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + From My Media List screen, click on desired name link.
 
-![My Media List with name link.png](https://bitbucket.org/repo/XR54q7/images/3810897708-My%20Media%20List%20with%20name%20link.png) 
+![My Media List with name link.png](images/My_Media_List_with_name_link.png) 
 
 + Show Media List screen will appear.
 
-![Show Media List with edit button.png](https://bitbucket.org/repo/XR54q7/images/2838224143-Show%20Media%20List%20with%20edit%20button.png)
+![Show Media List with edit button.png](images/Show_Media_List_with_edit_button.png)
  
 + Click Edit button. Edit Media List screen will appear.
 
-![Edit Media List.png](https://bitbucket.org/repo/XR54q7/images/3940798315-Edit%20Media%20List.png)
+![Edit Media List.png](images/Edit_Media_List.png)
 
 + Modify desired fields.
 
-![Edit Media List with update button.png](https://bitbucket.org/repo/XR54q7/images/3915800776-Edit%20Media%20List%20with%20update%20button.png)
+![Edit Media List with update button.png](images/Edit_Media_List_with_update_button.png)
  
 + Click Update button.  The Show Media List screen with the updated confirmation message will appear.
 
-![Show Media List with updated confirmation message.png](https://bitbucket.org/repo/XR54q7/images/3537580593-Show%20Media%20List%20with%20updated%20confirmation%20message.png)
+![Show Media List with updated confirmation message.png](images/Show_Media_List_with_updated_confirmation_message.png)
  
 + Click View Media List link.  The My Media List screen will appear.
  
@@ -327,22 +327,42 @@ This document includes select processes for the Syndication Storefront.  It does
 
 + From My Media List screen, click the desired name link.
 
-![My Media List with name link.png](https://bitbucket.org/repo/XR54q7/images/119660579-My%20Media%20List%20with%20name%20link.png) 
+![My Media List with name link.png](images/My_Media_List_with_name_link.png) 
 
 + Show Media List screen will appear.
 
-![Show Media List with delete button.png](https://bitbucket.org/repo/XR54q7/images/2820531740-Show%20Media%20List%20with%20delete%20button.png)
+![Show Media List with delete button.png](images/Show-Media_List-with-delete-button.png)
  
 + Click Delete button.  The Are you sure? pop-up window will appear.
 
-![Are you sure pop up.png](https://bitbucket.org/repo/XR54q7/images/4220529533-Are%20you%20sure%20pop%20up.png)
+![Are you sure pop up.png](images/Are_you_sure_pop_up.png)
  
 + Click OK button.  The My Media List screen with the deleted confirmation message will appear.
 
-![My Media List screen with deleted confirmation.png](https://bitbucket.org/repo/XR54q7/images/61468363-My%20Media%20List%20screen%20with%20deleted%20confirmation.png)
- 
+![My Media List screen with deleted confirmation.png](images/My_Media_List_screen_with_deleted_confirmation.png)
+
+## Un/Like a Media
+
++ Click on Home button.
+
++ click on + sign on any media item, it will open thumbs up iocon.
+
++ Click on thumbs up, it will say x Users liked this content.
+
++ Click again on thumbs up icon, it will unlike that media item.
+
+![Un/Like a Media](images/Syndication_Storefront_like_media_item.png)
+
+## Post Media in Social Network
+
++ click on + sign on any media item, it will display social media icon.
+
++ Click on Facebook/Google Plus/LinkedIn icon, it will redirect to log in to that site; once user is logged in s/he can post that media in that Particular site.
+
+![Post_Media_in_Social Network](images/Syndication_Storefront_post_media_in_Social_Network.png)
+
 # Logout
 
 + Click on Logout link.
 
-![Logout link.png](https://bitbucket.org/repo/XR54q7/images/2756071034-Logout%20link.png)
+![Logout link.png](images/Logout_link.png)

@@ -50,7 +50,11 @@ public enum Error {
     NOT_AUTHORIZED("Not authorized for resource", "6",
         "The requested operation is not authorized for this resource. Check that your API keys" +
                 " are correct and up to date."
-    )
+    ),
+
+    CONTENT_UNRETRIEVABLE("Content Unretrievable", "7",
+            "The sourceUrl for the item is unreachable." +
+                " Verify the SourceUrl address.")
 
     public Error(String name, String code, String message){
         this.name = name

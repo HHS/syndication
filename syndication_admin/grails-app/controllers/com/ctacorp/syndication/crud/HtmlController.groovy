@@ -88,10 +88,6 @@ class HtmlController {
             return
         }
 
-        if(htmlInstance.id) {
-            UpdateSolrIndexJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId: htmlInstance.id])
-        }
-
         htmlInstance.save flush: true
         jobService.solrUpdate10SecondDelay(htmlInstance.id)
 
@@ -121,7 +117,7 @@ class HtmlController {
         def status =  mediaItemsService.updateItemAndSubscriber(htmlInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            redirect action:'edit', id:htmlInstance.id
+            redirect action:"edit", id:params.id
             return
         }
 

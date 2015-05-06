@@ -15,7 +15,6 @@ class FeaturedMediaController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'])
     def featureMediaItems(String featuredMedia){
-        println "multiple"
         if(!featuredMedia){
             featuredMediaService.clear()
             redirect action:'index'
@@ -40,7 +39,6 @@ class FeaturedMediaController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'])
     def featureItem(Long id){
-        println "item"
         flash.message = "The media item has been featured. <a href='${createLink(controller: 'featuredMedia', action: 'index')}'>Click here for feature page</a>"
 
         if(featuredMediaService.listFeatured().id.contains(id)){

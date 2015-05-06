@@ -350,6 +350,7 @@ class UrlMappings {
 
         "/login/${action}"(controller: "login")
         "/logout"(controller:"logout", action:"index")
+        "/keyTest"(controller:"keyTest", action:"index")
 
 // =======================================================================================================
 // |       ###    ########  ########         ######  ########    ###    ######## ##     ##  ######       |

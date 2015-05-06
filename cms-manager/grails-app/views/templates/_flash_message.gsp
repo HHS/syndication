@@ -12,7 +12,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 --%>
 <g:if test="${flash.message}">
-    <div class="alert alert-success" role="alert">${flash.message}</div>
+    <div class="alert alert-success" role="alert">${flash.message.decodeHTML()}</div>
 </g:if>
 <g:if test="${flash.errors}">
     <g:each in="${flash.errors}" var="error">

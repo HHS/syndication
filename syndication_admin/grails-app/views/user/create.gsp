@@ -30,7 +30,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <synd:error/>
             <div class="row">
                 <div class="col-md-6 col-sm-10">
-                    <g:form url="[resource:userInstance, action:'save']" onsubmit="checkPass(); return false;" class="form-horizontal" role="form">
+                    <g:form url="[resource:userInstance, action:'save']" class="form-horizontal" role="form">
                         <fieldset class="form">
                             <g:render template="form"/>
                         </fieldset>

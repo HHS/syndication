@@ -86,11 +86,12 @@ grails.project.dependency.resolution = {
         compile 'com.ctacorp.syndication:syndication-java-sdk-v2:0.1.6'
         compile 'com.ctacorp.syndication:syndication-swagger-rest-client-v2:0.1.6'
         compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+        compile "com.google.guava:guava:18.0"
     }
 
     plugins {
 
-        build ':tomcat:7.0.55'
+        build ':tomcat:7.0.55.2'
         build (":release:3.0.1"){
             excludes "rest-client-builder"
         }
@@ -100,15 +101,15 @@ grails.project.dependency.resolution = {
         compile ":spring-security-core:2.0-RC4"
         compile ":quartz:1.0.2"
         compile ":mail:1.0.7"
-        compile ":rest-client-builder:2.0.1"
-        compile ":asset-pipeline:1.9.9"
-        compile ":less-asset-pipeline:1.10.0"
-        compile ":font-awesome-resources:4.2.0.0"
+        compile ":rest-client-builder:2.1.1"
+        compile ":asset-pipeline:2.1.5"
+        compile ":less-asset-pipeline:2.1.0"
+        compile ":font-awesome-resources:4.3.0.1"
         compile ":rabbitmq-native:2.0.10"
         compile ":greenmail:1.3.4"
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
 
-        runtime ":hibernate4:4.3.6.1"
+        runtime ":hibernate4:4.3.8.1"
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
         runtime ":twitter-bootstrap:3.3.1"

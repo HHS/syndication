@@ -122,6 +122,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <dt id="active-label" class="word_wrap"><g:message code="periodical.visibleInStorefront.label" default="Visible In Storefront"/></dt>
                 <dd class="word_wrap"><g:formatBoolean boolean="${periodicalInstance?.visibleInStorefront}"/></dd>
 
+                <dt id="active-label" class="word_wrap"><g:message code="periodical.manuallyManaged.label" default="Manually Managed"/></dt>
+                <dd class="word_wrap"><g:formatBoolean boolean="${periodicalInstance?.manuallyManaged}"/></dd>
+
                 <g:if test="${periodicalInstance?.externalGuid}">
                     <dt id="externalGuid-label" class="word_wrap"><g:message code="periodical.externalGuid.label" default="External Guide"/></dt>
                     <dd class="word_wrap"><g:fieldValue bean="${periodicalInstance}" field="externalGuid"/></dd>
@@ -171,7 +174,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_PUBLISHER">
-                <g:actionSubmit class="btn btn-danger" action="delete" onclick="return confirm('Are you sure?');" value="Delete"/>
+                <g:actionSubmit class="btn btn-danger" action="delete" onclick="return confirm('${message(code: 'default.button.delete.mediaItem.confirm', default: 'Are you sure?')}');" value="Delete"/>
             </sec:ifAnyGranted>
             <g:link class="button" action="index">
                 <button type="button" class="btn">Cancel</button>

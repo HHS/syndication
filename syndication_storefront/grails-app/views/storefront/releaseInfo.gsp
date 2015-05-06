@@ -18,80 +18,80 @@
         <div id="contentListBox">
             <div class="purplebox">
                 %{--===================================================================--}%
-                <p>04-06-2015 Release:</p>
+                <h2 id="05-04-2015-release-">05-04-2015 Release:</h2>
                 <h3 id="api">API</h3>
                 <ul>
                     <li>New Features<ul>
-                        <li>Thumbnail generation overhaul to improve performance and reliability</li>
-                        <li>Media items can now be tagged by name during a publish</li>
-                        <li>MediaItems now include google tagmanger code instead of the older image beacon for metrics tracking</li>
-                        <li>Project documentation has been automated and stubs for initial documentation push have been added</li>
+                        <li>Added keyTest controller to allow outside parties to verify if their keys are valid or not</li>
+                        <li>Thumbnail generation has been completely overhauled, and has a robust backend to allow the ad-hoc regeneration of thumbnails (for admin users)</li>
+                        <li>Support for new PDF media type</li>
+                        <li>Updated grails to version 2.4.5</li>
                     </ul>
                     </li>
                     <li>Bug Fixes / Improvements<ul>
-                        <li>Additional logging for collections and subscribers</li>
-                        <li>Sites with misconfigured SSL headers can be problematic for publishing, added a workaround that recovers from bad SSL config.</li>
-                        <li>Footer links on the API page were outdated and have been updated</li>
-                        <li>Thumbnails are now backed by in-memory cache for faster performance</li>
-                        <li>Expanded automated test coverage and reporting</li>
+                        <li>JSONP wasn’t working for some limited endpoints, this has been corrected</li>
+                        <li>Better error messages for users that are unauthorized to publish content</li>
                     </ul>
                     </li>
                 </ul>
                 <h3 id="storefront">Storefront</h3>
                 <ul>
                     <li>New Features<ul>
-                        <li>Updates to Solr Search to improve search result relevance &amp; accuracy</li>
-                        <li>Project documentation has been automated and stubs for initial documentation push have been added</li>
-                        <li>“dateVisibleInStorefront” is now respected by storefront to allow targeted release dates for content</li>
-                        <li>Initial set of docs has been included in codebase</li>
-                        <li>Added tagManager tags for metrics tracking of storefront page</li>
+                        <li>Updated grails to version 2.4.5</li>
+                        <li>Documentation has been expanded and bundled with the source code</li>
+                        <li>Added support for new PDF type</li>
                     </ul>
                     </li>
-                    <li>Bug Fixes / Improvements<ul>
-                        <li>&lt;Strong&gt; elements now display correct font</li>
-                        <li>Display of collection names adjusted for clarity</li>
-                        <li>Footer links were outdated and have been updated</li>
-                        <li>expanded code coverage and automated tests</li>
-                        <li>admin email address updated</li>
-                    </ul>
-                    </li>
+                    <li>Bug Fixes / Improvements</li>
                 </ul>
                 <h3 id="cms-manager">CMS Manager</h3>
                 <ul>
                     <li>New Features<ul>
-                        <li>Project documentation has been automated and stubs for initial documentation push have been added</li>
-                        <li>User show view displays the associated subscribers</li>
+                        <li>Updated grails to version 2.4.5</li>
                     </ul>
                     </li>
                     <li>Bug Fixes / Improvements<ul>
-                        <li>expanded automated testing</li>
-                        <li>user delete now cleans up associated subscribers</li>
+                        <li>Fixed a character encoding issue with flash notifications for subscribers</li>
                     </ul>
                     </li>
                 </ul>
                 <h3 id="admin-dashboard">Admin Dashboard</h3>
                 <ul>
                     <li>New Features<ul>
-                        <li>Project documentation has been automated and stubs for initial documentation push have been added</li>
-                        <li>Thumbnails can be generated/regenerated adhoc now for media items</li>
+                        <li>Updated grails to version 2.4.5</li>
+                        <li>Admin GUI for managing missing thumbnails has been added.</li>
+                        <li>Thumbnails generation subsystem has undergone a complete rewrite</li>
+                        <li>Auto-Tagger is a little smarter than before</li>
+                        <li>New user breakdown view for admins allows seeing account distribution by domain</li>
+                        <li>Support for new PDF type</li>
                     </ul>
                     </li>
                     <li>Bugs / Improvements<ul>
-                        <li>Campaign controller had a bug preventing campaign creation in certain circumstances - fixed</li>
+                        <li>Date Range for metrics displayed some erroneous values, this has been corrected</li>
+                        <li>Youtube links in the .com/embed/&lt;some id&gt; format are now supported</li>
                     </ul>
                     </li>
                 </ul>
                 <h3 id="tagcloud">TagCloud</h3>
                 <ul>
-                    <li>Project documentation has been automated and stubs for initial documentation push have been added</li>
-                    <li>Code coverage expanded for automated testing</li>
-                    <li>Logging improvements</li>
+                    <li>New Features<ul>
+                        <li>Updated grails to version 2.4.5</li>
+                        <li>Documentation has been expanded and bundled with the source code</li>
+                    </ul>
+                    </li>
+                    <li>Bug Fixes / Improvements</li>
                 </ul>
                 <h3 id="tinyurl">TinyUrl</h3>
                 <ul>
-                    <li>Project documentation has been automated and stubs for initial documentation push have been added</li>
-                    <li>Logging improvements</li>
-                    <li>Known Issues</li>
+                    <li>New Features<ul>
+                        <li>Updated grails to version 2.4.5</li>
+                        <li>Documentation has been expanded and bundled with the source code</li>
+                    </ul>
+                    </li>
+                    <li>Bug Fixes / Improvements<ul>
+                        <li>Known Issues</li>
+                    </ul>
+                    </li>
                     <li>No significant issues at this time</li>
                 </ul>
                 %{--===================================================================--}%

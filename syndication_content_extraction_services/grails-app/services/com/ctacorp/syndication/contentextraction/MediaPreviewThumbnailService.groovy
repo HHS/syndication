@@ -7,48 +7,36 @@ import com.ctacorp.syndication.media.Video
 import com.ctacorp.syndication.media.Periodical
 import com.ctacorp.syndication.media.Html
 
-import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.preview.MediaThumbnail
 import com.ctacorp.syndication.preview.MediaPreview
 import grails.transaction.Transactional
+import grails.util.Holders
+import org.apache.commons.io.IOUtils
 
+@Transactional
 class MediaPreviewThumbnailService {
-
     def grailsApplication
-    def fileService
-    def youtubeService
-    def grailsLinkGenerator
-    def nativeToolsService
 
-    @Transactional
+    def config = Holders.config
+
     def generate(MediaItem mi) {
-
-        File fullRez
+        def htmlUrl = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/media/${mi.id}/content?imageFloat=left&imageMargin=0,10,10,0"
+        def imageAndVideoUrl = "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/syndicate.html?thumbnailGeneration=1"
 
         switch(mi){
             case Periodical:
             case Html:
-                fullRez = getFullRezHtml(mi)
-                processFullRez(fullRez, mi)
+                savePreview(mi, generatePreview(htmlUrl, mi.id))
+                saveThumbnail(mi, generateThumbnail(htmlUrl, mi.id))
                 break
             case Image:
-                fullRez = getFullRezImage(mi as Image)
-                processFullRez(fullRez, mi)
-                break
             case Infographic:
-                fullRez = getFullRezImage(mi as Infographic)
-                processFullRez(fullRez, mi)
-                break
             case Video:
-                try {
-                    fullRez = getFullRezYoutube(mi as Video)
-                    processFullRez(fullRez, mi)
-                } catch(e){
-                    log.error("There was an error extracting a youtube preview image.")
-                }
+                savePreview(mi, generatePreview(imageAndVideoUrl, mi.id))
+                saveThumbnail(mi, generateThumbnail(imageAndVideoUrl, mi.id))
                 break
             default:
-                "blah"
+                log.error("Tried to generate thumbnail for an unsupported media type: ${mi}")
         }
 
         previewAndThumbnail(mi)
@@ -58,105 +46,63 @@ class MediaPreviewThumbnailService {
         return [preview: MediaPreview.findByMediaItem(m), thumbnail: MediaThumbnail.findByMediaItem(m)]
     }
 
-    private getFullRezHtml(MediaItem mi){
-        def windowSize = 640
-        def extractedContentUrl = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/media/${mi.id}/content?imageFloat=left&imageMargin=0,10,10,0"
-        boolean failure = false
-        try {
-            if (!new URL(extractedContentUrl).text) {
-                log.error "${mi.id} looks bad"
-                failure = true
-            }
-        } catch(e){
-            log.error "${mi.id} looks bad"
-            failure = true
-        }
-        if(failure){
-            extractedContentUrl = grailsLinkGenerator.resource(dir: 'images/defaultIcons/thumbnail', file: 'bad.png', absolute: true)
-        }
-        getImageOfHtml(extractedContentUrl, windowSize)
-    }
-
-    private File getImageOfHtml(String url, int width) {
-        String tmpFileName = "${Hash.md5(url + System.nanoTime())}-full"
-        File dest = new File("${grailsApplication.config.syndication.scratch.root}/preview/tmp/${tmpFileName}.png")
-
-        if(fileService.fileCheck(dest)){
-            return dest
-        }
-
-        String command = ""
-        switch(grailsApplication.config.syndication.htmlRenderingEngine){
-            case "cutycapt": command = "DISPLAY=:7 ${grailsApplication.config.cutycapt.location}/cutycapt --url=\"${url}\" --min-width=${width} --out=${dest.absolutePath}"; break;
-            case "cutycaptMac": command = "${grailsApplication.config.cutycapt.location}/cutycapt --url=\"${url}\" --min-width=${width} --out=${dest.absolutePath}"; break; //cutycapt running on mac only
-            default: command = "Missing or invalid html rendering engine specified"
-        }
-
-        nativeToolsService.exe(command)
-        return dest
-    }
-
-    private getFullRezImage(image){
-        if(image instanceof Image || image instanceof Infographic) {
-            fileService.saveImage(image.sourceUrl)
-        } else{
-            log.error ("Tried to get full rez image of non-image type! id: ${image.id}, type: ${image.getClass()}")
-        }
-    }
-
-    private getFullRezYoutube(Video v){
-        return fileService.saveImage(youtubeService.thumbnailLinkForUrl(v.sourceUrl))
-    }
-
-    private processFullRez(File fullRez, MediaItem mi) {
-        generateThumbnail(fullRez, mi)
-        generatePreview(fullRez, mi)
-        fullRez.delete()
-    }
-
-    private generateThumbnail(File original, MediaItem mi) {
+    private InputStream generateThumbnail(String sourceUrl, Long id) {
         int width = 250
         int height = 188
-        String name = "${Hash.md5(original.bytes)}-thumbnail"
-        File thumbnailFile = new File("${grailsApplication.config.syndication.scratch.root}/preview/tmp/${name}.jpg")
+        String scale = '.4'
 
-        String command = "${grailsApplication.config.imageMagick.location}/convert ${original.absolutePath} -resize ${width}x${height}\\^ -gravity north -extent ${width}x${height} ${thumbnailFile.absolutePath}"
-        nativeToolsService.exe(command)
-
-        thumbnailFile = fileService.verify(thumbnailFile)
-        def mediaThumbnail = MediaThumbnail.findByMediaItem(mi)
-        if(thumbnailFile) {
-            if (mediaThumbnail) {
-                mediaThumbnail.imageData = thumbnailFile.bytes
-            } else {
-                mediaThumbnail = new MediaThumbnail(imageData: thumbnailFile.bytes, mediaItem: mi)
-            }
-            mediaThumbnail.save(flush: true)
-            thumbnailFile.delete()
-        }
-
+        String manetCommand = "${config?.manet?.server?.url ?: 'http://localhost:8891'}/" +
+                "?url=${URLEncoder.encode(sourceUrl, "UTF-8")}" +
+                "&format=jpg" +
+                "&width=${width+1}" +
+                "&height=${height+1}" +
+                "&zoom=${scale}" +
+                "&quality=1" +
+                "&clipRect=1%2C1%2C${width}%2C${height}"
+        new URL(manetCommand).openStream()
     }
 
-    private generatePreview(File original, MediaItem mi){
+    private generatePreview(String sourceUrl, Long id){
         int width = 1024
         int height = 768
-        String name = "${Hash.md5(original.bytes)}-preview"
-        File previewFile = new File("${grailsApplication.config.syndication.scratch.root}/preview/tmp/${name}.jpg")
+        String scale = '1'
 
-        String command = "${grailsApplication.config.imageMagick.location}/convert ${original.absolutePath} -resize ${width}x${height}\\^ -gravity north -extent ${width}x${height} ${previewFile.absolutePath}"
-        nativeToolsService.exe(command)
+        String manetCommand = "${config?.manet?.server?.url ?: 'http://localhost:8891'}/" +
+                "?url=${URLEncoder.encode(sourceUrl, "UTF-8")}" +
+                "&format=jpg" +
+                "&width=${width+1}" +
+                "&height=${height+1}" +
+                "&zoom=${scale}" +
+                "&quality=1" +
+                "&clipRect=1%2C1%2C${width}%2C${height}"
+       new URL(manetCommand).openStream()
+    }
 
-        previewFile = fileService.verify(previewFile)
-        def mediaPreview = MediaPreview.findByMediaItem(mi)
-        if(previewFile) {
-            if (mediaPreview) {
-                mediaPreview.imageData = previewFile.bytes
-            } else {
-                mediaPreview = new MediaPreview(imageData: previewFile.bytes, mediaItem: mi)
-            }
-            mediaPreview.save(flush: true)
-            previewFile.delete()
+    protected saveThumbnail(MediaItem mi, InputStream is){
+        Byte[] imageData = IOUtils.toByteArray(is);
+        MediaThumbnail mt = MediaThumbnail.findByMediaItem(mi)
+        if(mt){
+            mt.imageData = imageData
+        } else{
+            mt = new MediaThumbnail(mediaItem: mi, imageData:imageData)
+        }
+        def result = mt.save(flush:true)
+        if(!result){
+            log.error("Error saving thumbnail: ${mt.errors}")
         }
     }
 
+    protected savePreview(MediaItem mi, InputStream is){
+        Byte[] imageData = IOUtils.toByteArray(is);
+        MediaPreview mt = MediaPreview.findByMediaItem(mi)
+        if(mt){
+            mt.imageData = imageData
+        } else{
+            mt = new MediaPreview(mediaItem: mi, imageData:imageData)
+        }
+        def result = mt.save(flush:true)
+        if(!result){
+            log.error("Error saving thumbnail: ${mt.errors}")
+        }
+    }
 }

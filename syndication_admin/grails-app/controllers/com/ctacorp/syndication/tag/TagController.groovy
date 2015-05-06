@@ -6,6 +6,7 @@ import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.media.PDF
 import com.ctacorp.syndication.media.Periodical
 import com.ctacorp.syndication.media.SocialMedia
 import com.ctacorp.syndication.media.Video
@@ -38,6 +39,7 @@ class TagController {
             case Collection:  redirect controller: "collection",  action: "show", id: mi.id; break
             case Html:        redirect controller: "html",        action: "show", id: mi.id; break
             case Image:       redirect controller: "image",       action: "show", id: mi.id; break
+            case PDF:         redirect controller: "PDF",         action: "show", id: mi.id; break
             case Infographic: redirect controller: "infographic", action: "show", id: mi.id; break
             case SocialMedia: redirect controller: "socialMedia", action: "show", id: mi.id; break
             case Video:       redirect controller: "video",       action: "show", id: mi.id; break
@@ -155,6 +157,7 @@ class TagController {
             case Html:        redirect controller: "html",        action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
             case Image:       redirect controller: "image",       action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
             case Infographic: redirect controller: "infographic", action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
+            case PDF:         redirect controller: "PDF",         action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
             case Periodical:  redirect controller: "periodical",  action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
             case SocialMedia: redirect controller: "socialMedia", action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
             case Video:       redirect controller: "video",       action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
