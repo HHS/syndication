@@ -331,7 +331,7 @@ function _syndicated_content_create_source_from_form($form, &$form_state)
         ->fields(array('name','syndication_url','syndication_tinyurl','key_public','key_private','key_secret','cms_manager_url','cms_manager_id', 'ssl_auth' ))
         ->values(array(
             'name'                 => "Syndication Service",
-            'source_org_id'        => variable_get('site_name', "Default site name"), //$form_state['values']['source_org_id_new_source'],
+            'source_org_id'        => $form_state['values']['source_org_id_new_source'],
             'syndication_url'      => $form_state['values']['cms_manager_url_new_source'].(substr($form_state['values']["cms_manager_url_new_source"], -1) == "/" ? "" : "/")."api/v2",
             'syndication_tinyurl'  => $form_state['values']["cms_manager_url_new_source"].(substr($form_state['values']["cms_manager_url_new_source"], -1) == "/" ? "" : "/")."TinyUrl",
             'key_private'          => $key_private,
@@ -376,7 +376,7 @@ function _syndicated_content_update_source_from_form($form, &$form_state, $sourc
     db_update('syndicated_content_sources')
         ->fields(array(
             'name'                 => "Syndication Service",
-            'source_org_id'        => variable_get('site_name', "Default site name"), //$form_state['values']["source_org_id_{$source_id}"],
+            'source_org_id'        => $form_state['values']["source_org_id_{$source_id}"],
             'syndication_url'      => $form_state['values']["cms_manager_url_{$source_id}"].(substr($form_state['values']["cms_manager_url_{$source_id}"], -1) == "/" ? "" : "/")."api/v2",
             'syndication_tinyurl'  => $form_state['values']["cms_manager_url_{$source_id}"].(substr($form_state['values']["cms_manager_url_{$source_id}"], -1) == "/" ? "" : "/")."TinyUrl",
             'key_private'          => $key_private,
