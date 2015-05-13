@@ -132,6 +132,13 @@ function _syndicated_content_admin_sources_form($form, &$form_state)
     return $form;
 }
 
+function cmp($a, $b)
+{
+    if ($a->name == $b->name) {
+        return 0;
+    }
+    return ($a->name < $b->name) ? -1 : 1;
+}
 
 function _syndicated_content_create_admin_source_form($form,&$form_state,$source,$type_map)
 {
@@ -239,7 +246,10 @@ function _syndicated_content_create_admin_source_form($form,&$form_state,$source
         
         $options = array();
         
-        foreach ( node_type_get_types() as $type )
+        $nTypes = node_type_get_types();
+        usort($nTypes, "cmp");
+        
+        foreach ( $nTypes as $type )
         {
             if ( $type->type == 'syndicated_content' ) { continue; }
             $options[$type->type] = $type->name;

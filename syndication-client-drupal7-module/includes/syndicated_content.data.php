@@ -585,11 +585,21 @@ function _syndicated_content_node_view($node, $view_mode, $langcode) {
         if(isset($node->content['body'][0])) {
             if(isset($node->content['body'][0]['#markup'])) {
                 $dom = new DOMDocument();
-                $dom->loadHTML($node->content['body'][0]['#markup']);
+                $total = 0;
+                $content = $node->content['body'][0]['#markup'];
+                try {
+                    $dom->loadHTML($content);
                 $xpath = new DOMXPath($dom);
-                $syndicatedContent = $xpath->query('//div[@class="syndicate"]');
+                    $syndicatedContent = $xpath->query('//div[contains(concat(\' \', normalize-space(@class), \' \'), \' syndicate \')]');
+                    $total = $syndicatedContent->length;
+                } catch(Exception $e) {
+                    $total = preg_match_all('/\sclass\s*=\s*["\'].*syndicate.*[\'"].*>/',
+                             $content,
+                             $matches,
+                             PREG_PATTERN_ORDER);
+                }
                 
-                if($syndicatedContent->length == 0) {
+                if($total == 0) {
                     $node->content['body'][0] = array(
                         '#markup' => "<div class='syndicate'>".$node->content['body'][0]['#markup']."</div>", 
                     );
