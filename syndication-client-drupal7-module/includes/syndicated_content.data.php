@@ -588,9 +588,11 @@ function _syndicated_content_node_view($node, $view_mode, $langcode) {
                 $total = 0;
                 $content = $node->content['body'][0]['#markup'];
                 try {
+                    libxml_use_internal_errors(true);
                     $dom->loadHTML($content);
                 $xpath = new DOMXPath($dom);
                     $syndicatedContent = $xpath->query('//div[contains(concat(\' \', normalize-space(@class), \' \'), \' syndicate \')]');
+                    libxml_clear_errors();
                     $total = $syndicatedContent->length;
                 } catch(Exception $e) {
                     $total = preg_match_all('/\sclass\s*=\s*["\'].*syndicate.*[\'"].*>/',
