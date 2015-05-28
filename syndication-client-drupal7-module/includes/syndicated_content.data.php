@@ -402,7 +402,13 @@ function _syndicated_content_update($node, $params, $publish = false) {
                 {
                     drupal_set_message("Published Content must have public url. Syndication could not find<br />{$m['errorDetail']['rejectedValue']}",'error');
                 } else {
-                    drupal_set_message("Published Content could not Sync with given data. Please check to make sure all proper fields are filled. ".$m['userMessage'],'error');
+                    drupal_set_message("Published Content could not Sync with given data. Please try the following:
+                    <ul>
+                        <li>Please check to make sure all proper fields are filled.
+                        <li>Verify that the Syndication Server can communicate with your Web Server.</li>
+                        <li>".$m['userMessage']."</li>
+                    </ul>",'error');
+                    //".$m['userMessage']."
                     _syndicated_content_stop_destination($node);
                 }
             }
@@ -415,7 +421,7 @@ function _syndicated_content_update($node, $params, $publish = false) {
         _syndicated_content_save_metadata_for_node( $node, $syndication_metadata );
         drupal_set_message('Published To Syndication Source.');
     } else {
-        drupal_set_message('Not Published.','error');
+        drupal_set_message('Not Published. No Messages Received','error');
         //_syndicated_content_stop_destination($node);
     }
     // If this is the first time we publish, let's stay on the Edit screen.
@@ -590,7 +596,7 @@ function _syndicated_content_node_view($node, $view_mode, $langcode) {
                 try {
                     libxml_use_internal_errors(true);
                     $dom->loadHTML($content);
-                $xpath = new DOMXPath($dom);
+                    $xpath = new DOMXPath($dom);
                     $syndicatedContent = $xpath->query('//div[contains(concat(\' \', normalize-space(@class), \' \'), \' syndicate \')]');
                     libxml_clear_errors();
                     $total = $syndicatedContent->length;

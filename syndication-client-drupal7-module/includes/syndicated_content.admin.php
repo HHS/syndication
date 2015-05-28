@@ -147,6 +147,10 @@ function _syndicated_content_create_admin_source_form($form,&$form_state,$source
         drupal_add_css(drupal_get_path('module', 'syndicated_content') . '/assets/syndicated_content_settings_form.css');
         drupal_add_js(drupal_get_path('module', 'syndicated_content') . '/assets/syndicated_content_settings_form.js');
         
+        $_SESSION['syndication_error'] = isset($_SESSION['syndication_error']) ? $_SESSION['syndication_error'] : "";
+        $syndication_error = addslashes(htmlspecialchars($_SESSION['syndication_error']));
+        unset($_SESSION['syndication_error']);
+        
         $form["syndication_sources_{$source['id']}"] = array(
             '#type'        => 'fieldset',
             '#title'       => t($source['name']),
@@ -171,6 +175,7 @@ function _syndicated_content_create_admin_source_form($form,&$form_state,$source
         $form["syndication_sources_{$source['id']}"]["api_urls"] = array(
             '#type'  => 'fieldset',
             '#title' => t('API URLs'),
+            '#attributes' => array('class'=>($syndication_error == "url" ? array("synd_error") : array('synd')))
         );
 
         $form["syndication_sources_{$source['id']}"]["api_urls"]["syndication_url_{$source['id']}"] = array(
@@ -199,6 +204,7 @@ function _syndicated_content_create_admin_source_form($form,&$form_state,$source
         $form["syndication_sources_{$source['id']}"]["api_identiy"] = array(
             '#type'  => 'fieldset',
             '#title' => t('API Identity'),
+            '#attributes' => array('class'=>($syndication_error == "keys" ? array("synd_error") : array('synd')))
         );
         /*
         $form["syndication_sources_{$source['id']}"]["api_identiy"]["cms_manager_id_{$source['id']}"] = array(
@@ -336,18 +342,19 @@ function _syndicated_content_admin_sources_form_validate($form, &$form_state)
 function _syndicated_content_create_source_from_form($form, &$form_state)
 {
     list($key_private, $key_public, $key_secret) = _syndicated_content_decode_keys($form_state['values'], 0);
+    $cms_manager_url = rtrim($form_state['values']["cms_manager_url_new_source"], '/');
     
     $source_id = db_insert('syndicated_content_sources')
         ->fields(array('name','syndication_url','syndication_tinyurl','key_public','key_private','key_secret','cms_manager_url','cms_manager_id', 'ssl_auth' ))
         ->values(array(
             'name'                 => "Syndication Service",
             'source_org_id'        => $form_state['values']['source_org_id_new_source'],
-            'syndication_url'      => $form_state['values']['cms_manager_url_new_source'].(substr($form_state['values']["cms_manager_url_new_source"], -1) == "/" ? "" : "/")."api/v2",
-            'syndication_tinyurl'  => $form_state['values']["cms_manager_url_new_source"].(substr($form_state['values']["cms_manager_url_new_source"], -1) == "/" ? "" : "/")."TinyUrl",
+            'syndication_url'      => $cms_manager_url."/api/v2",
+            'syndication_tinyurl'  => $cms_manager_url."/TinyUrl",
             'key_private'          => $key_private,
             'key_public'           => $key_public,
             'key_secret'           => $key_secret,
-            'cms_manager_url'      => $form_state['values']['cms_manager_url_new_source'],
+            'cms_manager_url'      => $cms_manager_url,
             'cms_manager_id'       => "ss_manager_id", //$form_state['values']['cms_manager_id_new_source']
             'ssl_auth'             => $form_state['values']['ssl_auth_new_source']
             ))
@@ -382,17 +389,22 @@ function _syndicated_content_create_source_from_form($form, &$form_state)
 function _syndicated_content_update_source_from_form($form, &$form_state, $source_id)
 {
     list($key_private, $key_public, $key_secret) = _syndicated_content_decode_keys($form_state['values'], $source_id);
+    $cms_manager_url = rtrim($form_state['values']["cms_manager_url_{$source_id}"], '/');
+    
+    error_log("Private: [$key_private]");
+    error_log("Public: [$key_public]");
+    error_log("Secret: [$key_secret]");
     
     db_update('syndicated_content_sources')
         ->fields(array(
             'name'                 => "Syndication Service",
             'source_org_id'        => $form_state['values']["source_org_id_{$source_id}"],
-            'syndication_url'      => $form_state['values']["cms_manager_url_{$source_id}"].(substr($form_state['values']["cms_manager_url_{$source_id}"], -1) == "/" ? "" : "/")."api/v2",
-            'syndication_tinyurl'  => $form_state['values']["cms_manager_url_{$source_id}"].(substr($form_state['values']["cms_manager_url_{$source_id}"], -1) == "/" ? "" : "/")."TinyUrl",
+            'syndication_url'      => $cms_manager_url."/api/v2",
+            'syndication_tinyurl'  => $cms_manager_url."/TinyUrl",
             'key_private'          => $key_private,
             'key_public'           => $key_public,
             'key_secret'           => $key_secret,
-            'cms_manager_url'      => $form_state['values']["cms_manager_url_{$source_id}"],
+            'cms_manager_url'      => $cms_manager_url,
             'cms_manager_id'       => "ss_manager_id",
             'ssl_auth'             => $form_state['values']["ssl_auth_{$source_id}"] ))
         ->condition('id', $source_id)
@@ -425,7 +437,7 @@ function _syndicated_content_update_source_from_form($form, &$form_state, $sourc
 }
 function _syndicated_content_decode_keys($formVals, $source_id) {
     $source_id = ($source_id > 0) ? $source_id : "new_source";
-
+    
     $json           = isset($formVals["key_json_{$source_id}"])    ? $formVals["key_json_{$source_id}"]    : "";
     $key_private    = isset($formVals["key_private_{$source_id}"]) ? $formVals["key_private_{$source_id}"] : "";
     $key_public     = isset($formVals["key_public_{$source_id}"])  ? $formVals["key_public_{$source_id}"]  : "";
@@ -460,11 +472,29 @@ function _syndicated_content_test_source_from_form($form, &$form_state, $source_
     $ssl_auth = isset($form_state['values']["ssl_auth_{$source_id}"]) ? $form_state['values']["ssl_auth_{$source_id}"] : (isset($form_state['values']["ssl_auth_new_source"]) ? $form_state['values']["ssl_auth_new_source"] : 0);
     
     $response = $syndication->testCredentials(array('ssl_auth'=>$ssl_auth));
+    
     if ( !empty($response->status) && $response->status=='200' ) 
     {
-       drupal_set_message('Your Credentials Work');
+        drupal_set_message('Syndication Successfully Connected to the Server.');
     } else {
-       drupal_set_message('Invalid Credentials','error');
+        switch($response->status) {
+            case 400:
+                drupal_set_message('Syndication could not verify your keys. Please check your Private, Public, and Secret Keys.','error');
+                $_SESSION['syndication_error'] = "keys";
+                break;
+            case 404:
+                drupal_set_message('Syndication found a Server, but not a Syndication Server. Please check your Base API URL.','error');
+                $_SESSION['syndication_error'] = "url";
+                break;
+            case "":
+                drupal_set_message('Syndication had no response from any Server. Please check your Base API URL.','error');
+                $_SESSION['syndication_error'] = "url";
+                break;
+            default:
+                drupal_set_message('Unknown Error when establishing connection to Syndication Server.','error');
+                $_SESSION['syndication_error'] = "url";
+                break;
+        }
     }
 }
 

@@ -22,3 +22,11 @@ fieldset#edit-type-mapping .fieldset-wrapper .field_layer {
     background: #fff;
     color: #333;
 }
+
+.synd_error {
+    border: 1px solid red;
+}
+
+.version {
+    
+}

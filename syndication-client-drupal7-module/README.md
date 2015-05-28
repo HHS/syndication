@@ -6,6 +6,7 @@ CONTENTS OF THIS FILE
 * Configuration
 * Usage
 * Download Link
+* Change Log
 
 INTRODUCTION
 ------------
@@ -71,3 +72,59 @@ Local Content Types chosen as *syndicatable* get a new section in their edit scr
 Download Link
 ----------------------
 [Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication-client-drupal7-module.zip?raw=true)
+
+CHANGE LOG
+------------
+**1.15.5.28**
+
+Version's Added
+
+More Descriptive Error Messaging on Admin and Publish
+
+Error Message Hints on Admin
+
+CMS Manager URL Fix on Configuration
+
+**1.15.5.20**
+
+Suppress LibXML Warnings
+
+Gentle Syndication Class Search
+
+Secondary Failover PREG Search for Class on Fail
+
+Ordering of Content Types on Admin Page
+
+Organization Name Update
+
+DIV Exceptions
+
+JSON Quick Add for Admin Keys
+
+Extended / Automatic Custom Content Type Mappings
+
+**1.15.4.30**
+
+Override SSL via Param Set for Test Connection
+
+Auto-Push Content Changes to Syndication
+
+Public Content as Infographic and Image Type
+
+Module Settings UI Redo
+
+Module Settings UI - Test Connection Replacement
+
+Auto-Prepare Content for Syndication
+
+Update Functionality for Upgrades
+
+Pass Tags to Syndication
+
+Publish Content as Youtube Video
+
+Full Custom Content Type Field to Field Mapping via UI
+
+Type Mapping Extension
+
+Expand Auto-Prepare to allow optional inclusion
