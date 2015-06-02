@@ -310,7 +310,7 @@ function _syndicated_content_update($node, $params, $publish = false) {
     $type           = isset($type_map['by_drupal_type'][$node->type][0]) ? $type_map['by_drupal_type'][$node->type][0] : "";
     $custom_field   = isset($type_map['by_drupal_type'][$node->type][1]) ? $type_map['by_drupal_type'][$node->type][1] : "";
     
-    $params['source'] = $source['id'];//$source['source_org_id'];
+    $params['source'] = $source['source_org_id'];
     $params['mediaType'] = $type;
     $params['dateAuthored'] = _syndicated_content_date();
     

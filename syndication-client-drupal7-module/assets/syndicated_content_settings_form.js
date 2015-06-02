@@ -3,6 +3,21 @@ jQuery( document ).ready(function( $ ) {
         $(this).parent().prev().addClass("form-item-float-left");
         $(this).parent().addClass("form-item-float-right");
     });
+    var fields = $("fieldset#edit-type-mapping .form-item-float-left").get();
+    for(var i = 0; i < fields.length; i++) {
+        $(fields[i]).before($("<div id='synd_couple_" + i + "' class='synd_couple'></div>"));
+        var nxtItem = $(fields[i]).next();
+        $("#synd_couple_" + i).append($(fields[i]).detach());
+        if(nxtItem.length > 0)
+            $("#synd_couple_" + i).append(nxtItem.detach());
+    }
+	var fields = $("fieldset#edit-type-mapping .form-type-select").get();
+	for(var i = 0; i < fields.length; i++) {
+		if(!$(fields[i]).hasClass("form-item-float-left") && !$(fields[i]).hasClass("form-item-float-right")) {
+			$(fields[i]).before($("<div id='synd_single_" + i + "' class='synd_couple'></div>"));
+			$("#synd_single_" + i).append($(fields[i]).detach());
+		}	
+	}
     $("textarea[id^='edit-key']").parent().parent().hide();
     
     $("fieldset#edit-api-identiy legend span").append($("<span> - </span><a href='#' id='quickAdd'>Quick Add</a>"));

@@ -75,6 +75,14 @@ Download Link
 
 CHANGE LOG
 ------------
+**1.15.5.29**
+
+Organization Save and send to API Fix
+
+New Source - Soft Variable Checks
+
+Style Updates for Multiple Distributions
+
 **1.15.5.28**
 
 Version's Added
