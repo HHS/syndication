@@ -9,6 +9,7 @@
 *
 *
 *= require bootstrap
+*= require jquery-ui-1.10.4.custom.min.css
 *= require magnific-popup.css
 *= require_tree font-awesome-4.2.0
 *= require plugins/timeline/timeline.css

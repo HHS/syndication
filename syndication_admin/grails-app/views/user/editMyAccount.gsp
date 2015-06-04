@@ -33,9 +33,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
         <div class="row">
             <div class="col-lg-8 ">
-
-                <g:form class="form-horizontal" url="[resource: userInstance, action: 'updateMyAccount']" onsubmit="checkPass(); return false;" method="PUT">
-                    <g:hiddenField name="version" value="${userInstance?.version}"/>
+                <g:form class="form-horizontal" url="[resource: userInstance, action: 'updateMyAccount']" onsubmit="return checkPass();" method="PUT">
+                    %{--<g:hiddenField name="version" value="${userInstance?.version}"/>--}%
                     <div class="row">
                         <div class="form-group ${hasErrors(bean: userInstance, field: 'name', 'error')} ">
                             <label for="name" class="col-sm-4 control-label">
@@ -66,7 +65,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                 <g:passwordField autocomplete="off" placeholder="password" id="pass1" name="password" required="" value="${userInstance?.password}" class="form-control"/>
                             </div>
                         </div>
-                        <div class="form-group ${hasErrors(bean: userInstance, field: 'password', 'error')} required">
+                        <div class="form-group required">
                             <label for="password" class="col-sm-4 control-label">
                                 <g:message code="user.password.label" default="Retype-Password"/><span class="required-indicator">*</span>
                             </label>

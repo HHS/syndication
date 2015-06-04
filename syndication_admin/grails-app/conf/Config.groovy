@@ -79,6 +79,10 @@ grails {
     }
 }
 
+grails.war.resources = { stagingDir, args ->
+    copy(file: "MetaData.groovy", tofile: "${stagingDir}/MetaData.groovy")
+}
+
 grails.converters.encoding = "UTF-8"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
@@ -131,48 +135,6 @@ log4j.main = {
     fatal  'org.hibernate.tool.hbm2ddl.SchemaExport'
 }
 
-//MQ
-
-rabbitmq {
-    connection = {
-        connection host: 'localhost', username: 'syndication', password: 'syndication', virtualHost: '/syndication', requestedHeartbeat: 10
-    }
-
-    queues = {
-
-        exchange name: "updateExchange", type: "fanout", {
-            queue name: "emailUpdateQueue", durable: true
-            queue name: "restUpdateQueue", durable: true
-            queue name: "rhythmyxUpdateQueue", durable: true
-        }
-
-        exchange name: "errorExchange", type: "direct", {
-            queue name: "emailErrorQueue", durable: true, binding: "emailError"
-            queue name: "restErrorQueue", durable: true, binding: "restError"
-            queue name: "rhythmyxErrorQueue", durable: true, binding: "rhythmyxError"
-        }
-
-        queue name: "emailErrorDelayQueue", durable: true, arguments: [
-                'x-message-ttl' : 1*60*1000,
-                'x-dead-letter-exchange' : 'errorExchange',
-                'x-dead-letter-routing-key' : 'emailError'
-        ]
-
-        queue name: "restErrorDelayQueue", durable: true, arguments: [
-                'x-message-ttl' : 1*60*1000,
-                'x-dead-letter-exchange' : 'errorExchange',
-                'x-dead-letter-routing-key' : 'restError'
-        ]
-
-        queue name: "rhythmyxErrorDelayQueue", durable: true, arguments: [
-                'x-message-ttl' : 1*60*1000,
-                'x-dead-letter-exchange' : 'errorExchange',
-                'x-dead-letter-routing-key' : 'rhythmyxError'
-        ]
-    }
-}
-
-syndication.mq.updateExchangeName = "updateExchange"
 //-----------------------------------------------------------------
 
 // Added by the Spring Security Core plugin:

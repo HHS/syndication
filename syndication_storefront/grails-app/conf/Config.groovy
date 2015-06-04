@@ -10,6 +10,11 @@ grails.config.locations = [ "file:${userHome}/syndicationSharedConfig.groovy", "
 
 grails.project.groupId = "com.ctacorp.syndication.storefront" // change this to alter the default package name and Maven publishing destination
 
+grails.war.resources = { stagingDir, args ->
+    copy(file: "MetaData.groovy", tofile: "${stagingDir}/MetaData.groovy")
+}
+
+
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
 grails.mime.types = [
@@ -95,7 +100,7 @@ log4j.main = {
     }
 
     root{
-        error 'errorFile', 'infoFile'
+        error 'errorFile', 'infoFile', 'stdout'
     }
 
     info   'grails.app',
@@ -151,3 +156,5 @@ grails.assets.minifyJs = false
 //_______________________________________________________________________________________
 grails.mail.port = 3027
 greenmail.ports.smtp = 3027
+
+grails.plugins.remotepagination.enableBootstrap=true

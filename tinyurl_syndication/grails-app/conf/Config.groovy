@@ -5,6 +5,10 @@
 userHome = userHome ?: System.getProperty('user.home')
 grails.config.locations = ["file:${userHome}/syndicationSharedConfig.groovy", "file:${userHome}/syndicationTinyUrlConfig.groovy"]
 
+grails.war.resources = { stagingDir, args ->
+    copy(file: "MetaData.groovy", tofile: "${stagingDir}/MetaData.groovy")
+}
+
 // if (System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }

@@ -23,6 +23,7 @@ grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 def home = System.getProperty('user.home')
 def config = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedBuildConfig.groovy").toURI().toURL())
+def runtimeConfig = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedConfig.groovy").toURI().toURL())
 
 grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
@@ -93,8 +94,8 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the compile step ----------------------------------------------------
-        compile "org.grails.plugins:syndication-model:1.8.1"      //Syndication domain classes
-        compile "org.grails.plugins:content-extraction-services:1.3.7"   //syndication content extraction tools
+        compile "org.grails.plugins:syndication-model:2.0.3"      //Syndication domain classes
+        compile "org.grails.plugins:content-extraction-services:1.4.8"   //syndication content extraction tools
         compile "org.grails.plugins:solr-operations:1.2"        //syndication solr stuff
 
         //plugins for the compile step
@@ -106,11 +107,16 @@ grails.project.dependency.resolution = {
 
         compile ":rest-client-builder:2.1.1"
         compile ":quartz:1.0.2"
-        compile ":quartz-monitor:1.0"
+//        compile ":quartz-monitor:1.0"
         compile ":pretty-time:2.1.3.Final-1.0.1"
         compile ":spring-security-core:2.0-RC4"
-        compile ":rabbitmq-native:2.0.10"                         //mq
-
+        if(runtimeConfig.mq.disableRabbitMQPlugin){
+            //do nothing
+            println ("MQ Disabled")
+        } else{
+            println ("MQ Enabeled")
+            compile ":rabbitmq-native:2.0.10"                       //mq
+        }
         // plugins needed at runtime but not for compilation -------------------------------
         runtime ":hibernate4:4.3.8.1" // or ":hibernate4:4.1.11.1"
         runtime ":database-migration:1.4.0"

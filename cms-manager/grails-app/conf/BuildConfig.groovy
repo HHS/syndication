@@ -21,6 +21,7 @@ grails.project.source.level = 1.6
 
 def home = System.getProperty('user.home')
 def config = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedBuildConfig.groovy").toURI().toURL())
+def runtimeConfig = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedConfig.groovy").toURI().toURL())
 
 grails.project.fork = [
         test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon: true],
@@ -105,7 +106,13 @@ grails.project.dependency.resolution = {
         compile ":asset-pipeline:2.1.5"
         compile ":less-asset-pipeline:2.1.0"
         compile ":font-awesome-resources:4.3.0.1"
-        compile ":rabbitmq-native:2.0.10"
+        if(runtimeConfig.mq.disableRabbitMQPlugin){
+            //do nothing
+            println ("MQ Disabled")
+        } else{
+            println ("MQ Enabeled")
+            compile ":rabbitmq-native:2.0.10"                       //mq
+        }
         compile ":greenmail:1.3.4"
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
 

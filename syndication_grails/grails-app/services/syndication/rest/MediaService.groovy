@@ -16,15 +16,22 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.rest
 
 import com.ctacorp.syndication.commons.util.Hash
+import com.ctacorp.syndication.commons.util.Util
+import com.ctacorp.syndication.data.TagHolder
 import com.ctacorp.syndication.media.*
+import com.ctacorp.syndication.storefront.UserMediaList
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import com.ctacorp.syndication.*
+import grails.util.Holders
 import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
 import com.ctacorp.syndication.exception.*
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.codehaus.groovy.grails.web.util.WebUtils
 import syndication.Exception.UnauthorizedException
+import org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib
+
+import java.util.concurrent.Callable
 
 @Transactional
 class MediaService {
@@ -35,6 +42,213 @@ class MediaService {
     def solrIndexingService
     def cmsManagerService
     def grailsApplication
+    def analyticsService
+    def guavaCacheService
+    def contentCacheService
+    def groovyPageRenderer
+    def mediaService
+
+    ApplicationTagLib tagLib = new ApplicationTagLib()
+
+    @NotTransactional
+    String renderHtml(Html html, params){
+        String extractedContent = getExtractedContent(html, params)
+        groovyPageRenderer.render(template: "/media/htmlView", model: [extractedContent:extractedContent])
+    }
+
+    String renderPeriodical(Periodical periodical, params){
+        String extractedContent = getExtractedContent(periodical, params)
+        groovyPageRenderer.render(template: "/media/periodicalView", model: [extractedContent:extractedContent])
+    }
+
+    String renderImage(Image img, params){
+        boolean thumbnailGeneration = Util.isTrue(params.thumbnailGeneration)
+        boolean previewGeneration = Util.isTrue(params.previewGeneration)
+
+        String content = groovyPageRenderer.render(template: "/media/imageView", model:[img:img, thumbnailGeneration:thumbnailGeneration, previewGeneration:previewGeneration])
+        content = contentRetrievalService.wrapWithSyndicateDiv(content)
+        if(!thumbnailGeneration){
+            content = contentRetrievalService.addAttributionToExtractedContent(img.id, content)
+            content += analyticsService.getGoogleAnalyticsString(img)
+        }
+        content
+    }
+
+    String renderInfographic(Infographic infographic, params){
+        boolean thumbnailGeneration = Util.isTrue(params.thumbnailGeneration)
+        boolean previewGeneration = Util.isTrue(params.previewGeneration)
+        String content = groovyPageRenderer.render(template: "/media/infographicView", model:[infographic:infographic, thumbnailGeneration:thumbnailGeneration, previewGeneration:previewGeneration])
+        content = contentRetrievalService.wrapWithSyndicateDiv(content)
+
+        if(!thumbnailGeneration){
+            content = contentRetrievalService.addAttributionToExtractedContent(infographic.id, content)
+            content += analyticsService.getGoogleAnalyticsString(infographic)
+        }
+        content
+    }
+
+    String renderVideo(Video video, params){
+        boolean thumbnailGeneration = Util.isTrue(params.thumbnailGeneration)
+        boolean previewGeneration = Util.isTrue(params.previewGeneration)
+        String player = youtubeService.getIframeEmbedCode(video.sourceUrl, params)
+        String thumbnail = youtubeService.thumbnailLinkForUrl(video.sourceUrl)
+        String content = groovyPageRenderer.render(template: "/media/youtubeView", model:[thumbnailGeneration:thumbnailGeneration, previewGeneration:previewGeneration, player:player, thumbnail:thumbnail])
+
+        if(!thumbnailGeneration){
+            content = contentRetrievalService.wrapWithSyndicateDiv(content)
+            content = contentRetrievalService.addAttributionToExtractedContent(video.id, content)
+        }
+        content
+    }
+
+    String renderPdf(PDF pdf, params){
+        String content = groovyPageRenderer.render(template: "/media/pdfView", model: [pdf:pdf])
+        content = contentRetrievalService.wrapWithSyndicateDiv(content)
+        content = contentRetrievalService.addAttributionToExtractedContent(pdf.id, content)
+        content += analyticsService.getGoogleAnalyticsString(pdf)
+        content
+    }
+
+    String renderUserMediaList(UserMediaList userMediaList, params){
+        renderMediaList(userMediaList.mediaItems.sort{it.name}, params)
+    }
+
+    String renderCollection(com.ctacorp.syndication.media.Collection collection, params){
+        params.iframeName = params.iframeName ?: collection.name
+        params.id = collection.id
+        params.mediaSource = "collection"
+        def mediaItems
+        if(Util.isTrue(params.ignoreHiddenMedia,false)){
+            mediaItems = collection.mediaItems.findAll{it.visibleInStorefront}
+        } else {
+            mediaItems = collection.mediaItems
+        }
+        println "mediaItems: " + mediaItems
+        renderMediaList(mediaItems.sort{it.name}, params)
+    }
+
+    String renderMediaForTag(Long id, params){
+        params.id = id
+        params.max = 50
+        def mediaItems = tagsService.getMediaForTagId(params) ?: []
+        renderMediaList(mediaItems, params)
+    }
+
+    String renderMediaForSource(Source source, params){
+        params.max = params.max ?: 50
+        params.sort = params.sort ?: "name"
+        params.order = params.order ?: "desc"
+        def mediaItems = MediaItem.findAllBySource(source, params)
+        renderMediaList(mediaItems, params)
+    }
+
+    String renderMediaViewerSnippet(mediaSource, params){
+        String url
+        switch(mediaSource){
+            case UserMediaList:
+                url = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath +"/resources/userMediaLists/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                break
+            case TagHolder:
+                url = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath +"/resources/tags/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                break;
+            default:
+                url = grailsApplication.config.syndication.contentExtraction.urlBase + "/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+        }
+        String width = params.width ?: "775"
+        String height = params.height ?: "650"
+        String iframeName = params.iframeName ?: mediaSource.name
+        "<iframe src=\"${url}\" width=\"${width}\" height=\"${height}\" name=\"${iframeName}\" scrolling=\"no\" frameborder=\"0\"></iframe>".encodeAsHTML()
+    }
+
+    String renderIframeSnippet(String url, params){
+        url += "/syndicate.html?${mediaService.getExtractionParams(params)}"
+        String width = params.width ?: "660"
+        String height = params.height ?: "480"
+        String iframeName = params.iframeName ?: "Syndicated Content"
+        "<iframe src=\"${url}\" width=\"${width}\" height=\"${height}\" name=\"${iframeName}\" frameborder=\"0\"></iframe>".encodeAsHTML()
+    }
+
+    String renderJSSnippet(String url, mediaSource, params){
+        url += "/syndicate.json?${mediaService.getExtractionParams(params)}&callback=?"
+        String jqeuryEmbed = """<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>"""
+        String divId = params.divId ?: "syndicatedContent_${mediaSource.id}_${System.nanoTime()}"
+        String includedDiv = """<div id="${divId}"></div>"""
+        boolean excludeJquery = Util.isTrue(params.excludeJquery)
+        boolean excludeDiv = Util.isTrue(params.excludeDiv)
+
+        """${excludeJquery ? "" : jqeuryEmbed}<script>\$(document).ready(function(){\$.getJSON('${url}', function(data){\$('#${divId}').html(data.results[0].content);});});</script>${excludeDiv ? "" : includedDiv}""".encodeAsHTML()
+    }
+
+    @Transactional
+    def getRenderedContentByMediaType(mediaList, params){
+        def mediaItemContent = []
+        mediaList.each{ mediaItem ->
+            switch(mediaItem) {
+                case Collection:
+                    //do nothing, we don't do nesting
+                    break
+                case Html:
+                    mediaItemContent << [content:renderHtml(mediaItem as Html, params), meta:mediaItem]
+                    break
+                case Periodical:
+                    mediaItemContent << [content:renderPeriodical(mediaItem as Periodical, params), meta:mediaItem]
+                    break
+                case Image:
+                    mediaItemContent << [content:renderImage(mediaItem as Image, params), meta:mediaItem]
+                    break
+                case Infographic:
+                    mediaItemContent << [content:renderInfographic(mediaItem as Infographic, params), meta:mediaItem]
+                    break
+                case Video:
+                    mediaItemContent << [content:renderVideo(mediaItem as Video, params), meta:mediaItem]
+                    break
+                case PDF:
+                    mediaItemContent << [content:renderPdf(mediaItem as PDF, params), meta:mediaItem]
+                    break
+                default:
+                    log.error "Unsupported media type: ${mediaItem.getClass()}"
+            }
+        }
+        mediaItemContent
+    }
+
+    @Transactional
+    def renderMediaList(mediaList, params){
+        String content
+        switch(params.displayMethod ? params.displayMethod.toLowerCase() : "feed"){
+            case "mv":
+                if(!Util.isTrue(params.autoplay, false)){ params.autoplay = 0 }
+                if(mediaList?.size() > 20){
+                    mediaList = mediaList.toArray().sort{it.name}[0..19]
+                }
+                def mediaItemContent = getRenderedContentByMediaType(mediaList, params)
+                content = params.controllerContext([mediaItemContent:mediaItemContent])
+                break
+            case "feed":
+                if(!Util.isTrue(params.autoplay, false)){ params.autoplay = 0 }
+                def mediaItemContent = getRenderedContentByMediaType(mediaList, params)
+                content = groovyPageRenderer.render(template: "/media/mediaFeedView", model:[mediaItemContent:mediaItemContent])
+                break
+            case "list":
+            default:
+                content = groovyPageRenderer.render(template: "/media/mediaListView", model:[mediaItems:mediaList])
+                content = contentRetrievalService.wrapWithSyndicateDiv(content)
+                content = contentRetrievalService.addAttributionToExtractedContent(params.long('id'), content)
+        }
+        content
+    }
+
+    @NotTransactional
+    String getExtractionParams(params){
+        String queryParams = "stripStyles="+    Util.isTrue(params.stripStyles)
+        queryParams += "&stripScripts="+        Util.isTrue(params.stripScripts)
+        queryParams += "&stripBreaks="+         Util.isTrue(params.stripBreaks)
+        queryParams += "&stripImages="+         Util.isTrue(params.stripImages)
+        queryParams += "&stripClasses="+        Util.isTrue(params.stripClasses)
+        queryParams += "&displayMethod="+       params.displayMethod ?: "feed"
+        queryParams += "&autoplay="+            Util.isTrue(params.autoplay, false)
+        queryParams
+    }
 
     @Transactional(readOnly = true)
     def getMediaItem(Long id){
@@ -54,7 +268,54 @@ class MediaService {
         
         audioInstance
     }
-    
+
+    @NotTransactional
+    String getExtractedContent(MediaItem mi, params){
+        try {
+        //for debugging
+            if(Holders.config.disableGuavaCache){
+
+                    Map extractedContentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mi.sourceUrl, params)
+                    String extractedContent = extractedContentAndHash.content
+                    extractedContent = contentRetrievalService.addAttributionToExtractedContent(mi.id, extractedContent)
+                    extractedContent += analyticsService.getGoogleAnalyticsString(mi)
+                    return extractedContent
+
+            }
+
+            String key = Hash.md5(mi.sourceUrl + params.sort().toString())
+            String extractedContent = guavaCacheService.extractedContentCache.get(key, new Callable<String>() {
+                @Override
+                public String call(){
+                    Map extractedContentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mi.sourceUrl, params)
+                    String extractedContent = extractedContentAndHash.content
+                    String newHash = extractedContentAndHash.hash
+                    def lastKnownGood = contentCacheService.get(mi)
+
+                    if(!extractedContent){
+                        if(lastKnownGood && lastKnownGood.content){
+                            extractedContent = lastKnownGood.content
+                        } else {
+                            throw new ContentNotExtractableException("There is no syndicated markup/content found!")
+                            return
+                        }
+                    } else{ //Else update the lastKnownGood if it's out of date
+                        if(!lastKnownGood || lastKnownGood.mediaItem.hash != newHash){
+                            contentCacheService.cache(mi, extractedContent)
+                        }
+                    }
+                    extractedContent
+                }
+            });
+            extractedContent = contentRetrievalService.addAttributionToExtractedContent(mi.id, extractedContent)
+            extractedContent += analyticsService.getGoogleAnalyticsString(mi)
+            return extractedContent
+        }catch(e){
+            log.error(e)
+            return null
+        }
+    }
+
     def saveCollection(Collection collectionInstance) {
         if (!collectionInstance.validate()) {
             return collectionInstance
@@ -99,19 +360,16 @@ class MediaService {
         htmlInstance
     }
 
-    def saveImage(Image imageInstance) {
-        imageInstance = createOrUpdateMediaItem(imageInstance, generalMediaItemLoader)      //load or update and existing record if it exists
-        imageInstance
+    Image saveImage(Image imageInstance) {
+        createOrUpdateMediaItem(imageInstance, generalMediaItemLoader)      //load or update and existing record if it exists
     }
 
-    def saveInfographic(Infographic infographicInstance) {
-        infographicInstance = createOrUpdateMediaItem(infographicInstance, generalMediaItemLoader)      //load or update and existing record if it exists
-        infographicInstance
+    Infographic saveInfographic(Infographic infographicInstance) {
+        createOrUpdateMediaItem(infographicInstance, generalMediaItemLoader)      //load or update and existing record if it exists
     }
 
-    def savePDF(PDF PDFInstance){
-        PDFInstance = createOrUpdateMediaItem(PDFInstance, generalMediaItemLoader)
-        PDFInstance
+    PDF savePDF(PDF PDFInstance){
+        createOrUpdateMediaItem(PDFInstance, generalMediaItemLoader)
     }
 
     Periodical savePeriodical(Periodical periodicalInstance){
@@ -139,7 +397,7 @@ class MediaService {
         periodicalInstance
     }
 
-    def saveSocialMedia(SocialMedia socialMediaInstance) {
+    SocialMedia saveSocialMedia(SocialMedia socialMediaInstance) {
         if (!socialMediaInstance.validate()) {
             return socialMediaInstance
         }
@@ -153,7 +411,7 @@ class MediaService {
         socialMediaInstance
     }
 
-    def saveVideo(Video videoInstance) {
+    Video saveVideo(Video videoInstance) {
         Video fromImport
         try {
             fromImport = youtubeService.getVideoInstanceFromUrl(videoInstance.sourceUrl)
@@ -181,7 +439,7 @@ class MediaService {
         videoInstance
     }
 
-    def saveWidget(Widget widgetInstance) {
+    Widget saveWidget(Widget widgetInstance) {
         if (!widgetInstance.validate()) {
             return widgetInstance
         }
@@ -216,7 +474,7 @@ class MediaService {
             item.manuallyManaged = false
             def result = item.save(flush: true)
             if(!result){
-                log.error "Media item didn't save. Errors were: ${item.errors}"
+                log.error "Media mediaSource didn't save. Errors were: ${item.errors}"
             }
             mediaItemSubscriber.save(flush:true)
 
@@ -243,7 +501,7 @@ class MediaService {
         if (apiKeyLength != 2) {
             mediaItem.discard()
             log.error("(${System.currentTimeMillis() as String}) api key is malformed")
-            throw new UnauthorizedException("You do not have permission to access this item.")
+            throw new UnauthorizedException("You do not have permission to access this mediaSource.")
         }
 
         def senderPublicKey = apiKey[0] as String
@@ -263,20 +521,20 @@ class MediaService {
         }
         log.error(" Permission denied, could not find or create a valid MediaItemSubscriber for the mediaItem! ")
         mediaItem.discard()
-        throw new UnauthorizedException("You do not have permission to access this item.")
+        throw new UnauthorizedException("You do not have permission to access this mediaSource.")
     }
 
     @NotTransactional
     def getMetaDataTemplate(params, response) {
         def metaMap = apiResponseBuilderService.getMetaData(params, response)
-        return metaMap
+        metaMap
     }
 
     @Transactional(readOnly = true)
     def listRelatedMediaItems(params) {
         params.max = getMax(params)
         def media = tagsService.listRelatedMediaIds(params)
-        return media
+        media
     }
 
     @Transactional(readOnly = true)
@@ -300,13 +558,13 @@ class MediaService {
         def limits = [max: params.max, offset: params.offset]
         params['active'] = true
         def results = MediaItem.facetedSearch(params).list(limits)
-        return results ?: []
+        results ?: []
     }
 
     @Transactional(readOnly = true)
     def listMediaItemsForCampaign(Long campaignId, params) {
         def pag = [max: params.max, offset: params.offset]
-       MediaItem.facetedSearch(active:true, mediaForCampaign: [id:campaignId, sort:params.sort]).list(pag) ?: []
+        MediaItem.facetedSearch(active:true, mediaForCampaign: [id:campaignId, sort:params.sort]).list(pag) ?: []
     }
 
     @NotTransactional
@@ -333,7 +591,6 @@ class MediaService {
             def tmi = MediaItem.get(mi.id)
             mediaItems << [id: mi.id, name: mi.name, mediaType: tmi.getClass().simpleName]
         }
-
         mediaItems
     }
 
@@ -364,12 +621,12 @@ class MediaService {
     }
 
     //Ignore updates to these fields
-    private ignoredFields = ["lastUpdated", "dateCreated", "dateSyndicationCaptured", "dateSyndicationUpdated", "manuallyManaged"] //These will never match between an existing item and a saved item, so ignore them
+    private ignoredFields = ["lastUpdated", "dateCreated", "dateSyndicationCaptured", "dateSyndicationUpdated", "manuallyManaged"] //These will never match between an existing mediaSource and a saved mediaSource, so ignore them
 
     //This would be needed in the case where a new instance is created in memory from a publish
-    //but an existing item with the same sourceURL already exists in the DB. The new item would not have an
-    //id, but would represent the same item logically. In that case, copy any updated properties from the
-    //new item to the existing item and then save it, otherwise if all fields are the same, ignore it.
+    //but an existing mediaSource with the same sourceURL already exists in the DB. The new mediaSource would not have an
+    //id, but would represent the same mediaSource logically. In that case, copy any updated properties from the
+    //new mediaSource to the existing mediaSource and then save it, otherwise if all fields are the same, ignore it.
     private Map updateMediaItem(MediaItem o, MediaItem u) { //original, updated
         boolean changed = false
 
@@ -389,15 +646,6 @@ class MediaService {
                 if (uProp && uProp != oProp) {
                     o.properties[p.name] = uProp
                     changed = true
-//                    if(changed == true){
-//                        println p.name
-//                        println "$oProp -> $uProp"
-//                        if(oProp instanceof Date || uProp instanceof Date){
-//                            println "${oProp.format('MMM dd, yyyy - HH:mm:ss')} -> ${uProp.format('MMM dd, yyyy - HH:mm:ss')}"
-//                        }
-//
-//                        println "--------------------------------"
-//                    }
                 }
             }
         }

@@ -103,9 +103,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1>Application Status</h1>
 			<ul>
 				<li>App version: <br/><strong><g:meta name="app.version"/></strong></li>
-                <li>App Build: <br/><strong>${grailsApplication.metadata.'app.buildHash'}</strong></li>
-				<li>Last git check-in: <br/><strong>${grailsApplication.metadata.'app.lastGitCommitDate'}</strong></li>
-				<li>App Built on: <br/><strong>${grailsApplication.metadata.'app.buildDate'}</strong></li>
+				<li><strong>App git hash:</strong> ${metaData.app.buildHash}</li>
+				<li><strong>App build date:</strong> ${metaData.app.buildDate}</li>
+				<li><strong>Git commit date:</strong> ${metaData.app.lastGitCommitDate}</li>
                 <li>Grails version: <g:meta name="app.grails.version"/></li>
 				<li>Groovy version: ${GroovySystem.getVersion()}</li>
 				<li>JVM version: ${System.getProperty('java.version')}</li>

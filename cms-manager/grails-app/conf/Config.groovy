@@ -18,6 +18,10 @@ sharedConfig="${userHome}/syndicationSharedConfig.groovy"
 grails.config.locations = ["file:${externalConfig}", "file:${sharedConfig}"]
 grails.project.groupId = "com.ctacorp.syndication"
 
+grails.war.resources = { stagingDir, args ->
+    copy(file: "MetaData.groovy", tofile: "${stagingDir}/MetaData.groovy")
+}
+
 //________________________________________
 // MIME TYPES                             \______________________________________________
 //_______________________________________________________________________________________

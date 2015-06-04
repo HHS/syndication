@@ -1,0 +1,70 @@
+/* Extra small devices (phones, less than 768px) */
+/* No media query since this is the default in Bootstrap */
+
+.microsite.grid .microsite-header.row {
+  margin-left: 15px;
+  margin-right: 0;
+}
+
+.microsite-grid-left-col-top,
+.microsite-grid-left-col-bottom {
+  border-radius: 5px;
+  margin-bottom: 15px;
+  margin-left: 15px;
+  padding: 15px;
+}
+
+.microsite-grid-left-col-top {
+  background-color: #386FA4;
+}
+
+.microsite-grid-left-col-bottom {
+  background-color: #59A5D8;
+}
+
+.microsite-grid-right-col {
+  margin-bottom: 10px;
+  margin-top: 10px;
+  padding-right: 0;
+  padding-bottom: 15px;
+}
+
+.grid .panel {
+  border: 1px solid #bbb;
+  height: auto;
+  padding: 15px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  word-wrap: break-word;
+  width: 100%;
+
+}
+}
+
+.grid .panel img {
+  width: 100%;
+  margin-bottom: 15px;
+  margin-top: 10px;
+}
+
+.grid .panel .btn {border: 1px solid #bbb;}
+
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) { ... }
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { ... }
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+
+.microsite-grid-right-col {
+    margin-left: -15px;
+    margin-top: 0;
+}
+
+.grid .panel { width: 300px;}
+
+}
+

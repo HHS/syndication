@@ -24,6 +24,12 @@ class ErrorController {
 
     def fivehundred() {
         GrailsWrappedRuntimeException exception = request.exception
+
+        if(exception.getMessage().contains("could not resolve property:")){
+            redirect action: fourhundred()
+            return
+        }
+
         def status = 500
         def exceptionResp = { ApiResponse.get500ResponseForException(exception) as JSON }
 
@@ -40,5 +46,13 @@ class ErrorController {
             log.error(e)
             e.printStackTrace()
         }
+    }
+
+    def fourhundred(){
+        GrailsWrappedRuntimeException exception = request.exception
+        def status = 400
+        response.status = status
+        response.contentType = "application/json"
+        render ApiResponse.get400ResponseForException(exception).autoFill(params) as JSON
     }
 }

@@ -18,9 +18,13 @@ import com.ctacorp.syndication.social.SocialMediaAccount
 import com.ctacorp.syndication.*
 import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.authentication.*
+import com.ctacorp.syndication.storefront.UserMediaList
 import syndication.tinyurl.TinyUrlService
 import com.ctacorp.syndication.contentextraction.YoutubeService
 import groovy.util.logging.*
+
+import javax.imageio.ImageIO
+import java.awt.image.BufferedImage
 
 /**
  * Created with IntelliJ IDEA.
@@ -40,7 +44,7 @@ class TestDataPopulator {
     private seedHealthReportTestsData(){
         Language english = Language.findByIsoCode("eng")
         Source hhs = Source.findByAcronym("HHS")
-//
+
 //        saveMedia(new Html(sourceUrl:"http://www.example.com", name:"Valid URL, No Markup", language: english, source:hhs))   //bad markup
 //        saveMedia(new Html(sourceUrl:"http://www.example.com/jhgfjkfgyt", name:"Bad URL", language: english, source:hhs))      //404
 //        saveMedia(new Video(sourceUrl:"http://www.youtube.com/watch?v=jhgvsdkashj", name:"Bad YoutubeVideo", language: english, source:hhs, duration:500))      //bad youtube
@@ -73,6 +77,95 @@ class TestDataPopulator {
 //        batchSaver(MediaMetric, batch)
     }
 
+    def getImageSize(String sourceUrl){
+        URL imageUrl = new URL(sourceUrl)
+        BufferedImage img = ImageIO.read(imageUrl.openConnection().getInputStream())
+        [width:img.width, height:img.height]
+    }
+
+    def getImageFormat(String sourceUrl){
+        sourceUrl = sourceUrl.toLowerCase()
+        if(sourceUrl.endsWith(".jpg")){
+            return "jpg"
+        }
+        if(sourceUrl.endsWith(".jpeg")){
+            return "jpg"
+        }
+        if(sourceUrl.endsWith(".png")){
+            return "png"
+        }
+    }
+
+    def seedNihContent(){
+        def videos = []
+        //Videos
+        def video = youtubeService.importYoutubeVideo("https://www.youtube.com/watch?v=hTz_rGP4v9Y")
+        video.description = "X-rays were one of the first forms of biomedical imaging and NIBIB's 60 Seconds of Science explain how they create those images of bones we all know well."
+        videos << video.save()
+        video = youtubeService.importYoutubeVideo("https://www.youtube.com/watch?v=6jSV6OV7rqE")
+        video.description = "Meet Quantum Dot and find out how nanotechnology researchers hope to use quantum dots in the health care of the future."
+        videos << video.save()
+        video = youtubeService.importYoutubeVideo("https://www.youtube.com/watch?v=dmvV_OvdV18")
+        video.description = "National Eye Institute video features Dr. Matt McMahon presenting a fun example and explains how it plays tricks on our eyes."
+        videos << video.save()
+        video = youtubeService.importYoutubeVideo("https://www.youtube.com/watch?v=wzkQyWpu10E")
+        video.description = "This 4-minute video by the National Institutes of Health shows the intricate mechanisms involved in the progression of Alzheimer's disease in the brain."
+        videos << video.save()
+        video = youtubeService.importYoutubeVideo("https://www.youtube.com/watch?v=BYIeJBDNcpo")
+        video.description = "NOMID, or neonatal-onset multisystem inflammatory disease, is a rare disease that is often fatal. This video tells the story of Kayla Martínez, who was diagnosed with NOMID as a baby. It also tells the story of a treatment for NOMID that was discovered by Dr. Raphaela Goldbach-Mansky at the National Institute of Arthritis and Musculoskeletal and Skin Diseases at the National Institutes of Health."
+        videos << video.save()
+        video = youtubeService.importYoutubeVideo("https://www.youtube.com/watch?v=0DSA_8t4-UA")
+        video.description = "The sixth leading cause of death in the United States is the result of hospitalacquired infections which often result in nonhealing wounds colonized by communities of bacteria call biofilms. The research in our lab aims to uncover the mechanisms at the root of the deviation from the normal healing process that results in the development of chronic wounds. These metabolomic studies identify specific metabolite profiles that may be associated with pathogenicity in the chronic wound and could potentially be used in novel noninvasive diagnostics."
+        videos << video.save()
+        video = youtubeService.importYoutubeVideo("https://www.youtube.com/watch?v=eP92qEDZ6rE")
+        video.description = "We have made a video that shows a little bit about the new 3D neuronal imaging techniques we do in the Yuste lab."
+        videos << video.save()
+        video = youtubeService.importYoutubeVideo("https://www.youtube.com/watch?v=HLFQM1e-vJw")
+        video.description = "Simbios is the NIH funded center for PhysicsBased Simulation of Biological Structures. Simbios provides infrastructure software and training to help biomedical researchers understand biological form and function as they create novel drugs synthetic tissues medical devices and surgical interventions. Working with Dr. Scott Delp's biomechanics lab Simbios has developed the free software OpenSim which is now used by scientists around the world to model humans and animals and understand how they move. This video gives an introduction to the project and describes how orthopaedic surgeons use modeling to help plan surgery for children with cerebral palsy."
+        videos << video.save()
+        video = youtubeService.importYoutubeVideo("https://www.youtube.com/watch?v=gYkP9ED5naA")
+        video.description = "Forum celebrating the remarkable advances scientists are making to save, extend, and improve lives worldwide, focusing on the health, social, economic, and other benefits of science and for a renewed commitment to advancing biomedical research."
+        videos << video.save()
+
+        video = youtubeService.importYoutubeVideo("https://www.youtube.com/watch?v=dJYzwuYKijU")
+        video.description = "In the first segment of the video, study participant Kent Stephenson does voluntary training with spinal stimulation. In the last segment, study participant Rob Summers tosses the medicine ball with research staff member Paul Criscola. Studies were conducted at the Human Locomotion Research Center laboratory, a part of the University of Louisville's Kentucky Spinal Cord Injury Research Center, Frazier Rehab Institute, Louisville Kentucky."
+        videos << video.save(flush:true)
+
+
+    }
+
+    def seedMicrositeData(){
+        println "loading microsite data..."
+        Image.withTransaction {
+            (1..32).each{
+                String sourceUrl =  "https://dl.dropboxusercontent.com/u/39235514/syndicationHealthImages/${it}.jpg"
+                def dim = getImageSize(sourceUrl)
+                new Image(name: "Healthy Visions ${it}", source: Source.findByAcronym("HHS"), language: Language.findByIsoCode("eng"), sourceUrl: sourceUrl, height: dim.height, width: dim.width, imageFormat: getImageFormat(sourceUrl), altText: "A picture of something healthy.").save()
+            }
+        }
+
+        User storefrontUser = new User(username: "user@example.com", name: "Steffen Gates", password: "ABC123def").save(flush:true)
+        assert storefrontUser
+        Role storefrontRole = Role.findByAuthority("ROLE_STOREFRONT_USER")
+        assert storefrontRole
+        UserRole userRole = UserRole.create(storefrontUser, storefrontRole, true)
+        assert userRole
+
+        UserMediaList imageList = new UserMediaList(name: "Healthy Living Images", user: storefrontUser, mediaItems: Image.findAllBySourceUrlIlike("https://dl.dropboxusercontent.com/u/39235514/syndicationHealthImages%"), description: "Images of healthy people and lifestyles.").save(flush:true)
+        assert imageList
+
+        UserMediaList videoList = new UserMediaList(name: "Noteworthy Youtube Videos", user: storefrontUser, mediaItems: Video.list(), description: "Videos showing the dangers of bad things and the benefits of good things!").save(flush:true)
+        assert videoList
+
+        UserMediaList htmlContent = new UserMediaList(name: "Excellent articles", user: storefrontUser, mediaItems: Html.list(max:25, sort:"id", order:"asc"), description: "Thought provoking articles with depth of information").save(flush:true)
+        assert htmlContent
+
+        UserMediaList mixedContent = new UserMediaList(name: "Mixed content", user:storefrontUser, mediaItems: Html.list(max:10, sort:"name", order:"asc") + Video.list(max:10, sort:"name", order:"asc") + Image.list(max:10, sort:"name", order:"asc"), description: "A mixed bag of content for all.").save(flush:true)
+        assert mixedContent
+
+        println "... microsite data load complete"
+    }
+
     def seedRealExamples() {
         seedUsers()
         seedLanguages()
@@ -90,11 +183,9 @@ class TestDataPopulator {
             [title: "Dry Pet Food", url: "http://www.cdc.gov/features/salmonelladrypetfood/index.html", description: "A healthy diet is important for pets. But did you know that dry pet food, treats, and supplements can become contaminated with Salmonella, a harmful germ that can make both people and pets sick? To protect you and your pet from getting sick, it is important to know how to correctly purchase, handle, store, and behave when handling dry pet foods and treats."],
             [title: "Preventing Suicide", url: "http://www.cdc.gov/features/PreventingSuicide/index.html", description: "Each year, more than 36,000 Americans take their own lives and about 465,000 people receive medical care for self-inflicted injuries. September 10th is World Suicide Prevention Day. Help prevent suicide in your community."],
             [title: "Grandkid's Health", url: "http://www.cdc.gov/features/grandparents/index.html", description: "Aging well benefits not only you, but also the people you love. Take steps to live a long and healthy life and guide your grandchildren’s health and safety."],
-            [title: "Gynecologic Cancers", url: "http://www.cdc.gov/cancer/dcpc/resources/features/GynecologicCancers/", description: "Get the facts about the signs, symptoms, and risk factors of gynecologic cancers. When gynecologic cancers are found early, treatment is most effective."],
             [title: "Cholesterol Awareness", url: "http://www.cdc.gov/features/CholesterolAwareness/index.html", description: "Learn what steps you can take to prevent high cholesterol or to reduce your LDL \"bad\" cholesterol level."],
             [title: "Preventing Type2 Diabetes", url: "http://www.cdc.gov/features/Fotonovela/index.html", description: "Fotonovela Tells How to Prevent Type 2 Diabetes"],
             [title: "Treating Conjunctivitis", url: "http://www.cdc.gov/features/conjunctivitis/index.html", description: "Pink Eye: Usually Mild and Easy to Treat"],
-            [title: "Prostate Cancer", url: "http://www.cdc.gov/cancer/dcpc/resources/features/ProstateCancer/", description: "Prostate cancer is the most common cancer in men. Talk to your doctor about prostate cancer screening."],
             [title: "Whooping Cough", url: "http://www.cdc.gov/Features/Pertussis/", description: "Whooping cough is very contagious and can cause serious illness―especially in babies too young to be fully vaccinated. Protect babies from whooping cough by getting your vaccine and making sure your baby gets his vaccines."],
             [title: "Hand, Foot, and Mouth Disease", url: "http://www.cdc.gov/Features/HandFootMouthDisease/", description: "Hand, foot, and mouth disease is a contagious viral illness. It commonly affects infants and young children. There is no vaccine to prevent the disease. However, you can take simple steps to reduce your risk."],
             [title: "Newborn Screening", url: "http://www.cdc.gov/features/newbornscreening50years/index.html", description: "This year marks 50 years of saving lives through newborn screening. How much do you know about newborn screening? Take our quiz to find out."],
@@ -201,29 +292,29 @@ class TestDataPopulator {
         def desc = "June 14, 2012; The U.S. Department of Health and Human Services (HHS) and the U.S. Food and Drug Administration (FDA), in partnership with state and local public health authorities and tobacco prevention professionals throughout the Pacific Northwest, held a Youth and Tobacco Town Hall Meeting on the Seattle campus of the University of Washington. The town hall was part of the broader HHS effort to prevent children from starting to use tobacco and to help current tobacco users quit. Three top U.S. health leaders, public health professionals, tobacco use prevention specialists, educators, advocates, policy makers and—importantly—young people from around the Pacific Northwest attended the meeting. The goals of the event were to share information, tools, and best practices in tobacco use prevention, to enhance existing efforts and to devise new strategies to help youth and young people resist social and industry pressure to initiate tobacco use, or to end tobacco use if it has already begun."
         items = [
             [title: "Healthy Kids", url: "http://www.cdc.gov/features/flu/flu_456px.jpg", width: 345, height: 191, desc: "Healthy happy kids having a fun and healthy time."],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm9.staticflickr.com/8152/7415645094_e4f9827465_o.jpg", width: 3824, height: 2540, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm9.staticflickr.com/8005/7415645828_c8df619e8f_o.jpg", width: 3789, height: 2517, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm6.staticflickr.com/5160/7415662296_17ddb42151_o.jpg", width: 3123, height: 2074, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm9.staticflickr.com/8166/7415661744_9745bd9a51_o.jpg", width: 2453, height: 3693, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm8.staticflickr.com/7253/7415655194_3b0129291e_o.jpg", width: 4288, height: 2848, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm6.staticflickr.com/5445/7415656828_e59b76ecdf_o.jpg", width: 2564, height: 3860, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm6.staticflickr.com/5039/7415661070_1c3c36dec4_o.jpg", width: 3711, height: 2465, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm6.staticflickr.com/5115/7415659906_69cebdb0a9_o.jpg", width: 2626, height: 3954, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm9.staticflickr.com/8008/7415659216_e565ac25da_o.jpg", width: 3905, height: 2593, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm9.staticflickr.com/8008/7420010158_c2a9f0e1fd_o.jpg", width: 2589, height: 1720, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm8.staticflickr.com/7259/7415647408_23e02e24e2_o.jpg", width: 3809, height: 2530, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm8.staticflickr.com/7269/7415651398_ed438c3765_o.jpg", width: 2573, height: 3874, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm8.staticflickr.com/7247/7415641940_ebe7061ddd_o.jpg", width: 4288, height: 2848, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm8.staticflickr.com/7275/7415648752_8a59b311af_o.jpg", width: 3451, height: 2292, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm6.staticflickr.com/5116/7415649474_f0d229bacd_o.jpg", width: 2574, height: 3876, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm6.staticflickr.com/5444/7415649912_d68112f44f_o.jpg", width: 3246, height: 2156, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm8.staticflickr.com/7125/7415647976_bba632768e_o.jpg", width: 2722, height: 1808, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm8.staticflickr.com/7139/7420009470_1cebff7bc8_o.jpg", width: 2832, height: 1881, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm9.staticflickr.com/8013/7420008656_10a8101885_o.jpg", width: 2449, height: 1627, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm9.staticflickr.com/8004/7420007630_9841968c8b_o.jpg", width: 2334, height: 1550, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm8.staticflickr.com/7262/7420005844_229b3c6873_o.jpg", width: 2778, height: 1845, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm9.staticflickr.com/8150/7415637182_aefc6320d6_o.jpg", width: 3719, height: 2470, desc: desc],
-            [title: "Youth & Tobacco Town Hall", url: "http://farm9.staticflickr.com/8166/7415635114_d5b25dc707_o.jpg", width: 2286, height: 3442, desc: desc]
+            [title: "Youth & Tobacco Town Hall 1", url: "http://farm9.staticflickr.com/8152/7415645094_e4f9827465_o.jpg", width: 3824, height: 2540, desc: desc],
+            [title: "Youth & Tobacco Town Hall 2", url: "http://farm9.staticflickr.com/8005/7415645828_c8df619e8f_o.jpg", width: 3789, height: 2517, desc: desc],
+            [title: "Youth & Tobacco Town Hall 3", url: "http://farm6.staticflickr.com/5160/7415662296_17ddb42151_o.jpg", width: 3123, height: 2074, desc: desc],
+            [title: "Youth & Tobacco Town Hall 4", url: "http://farm9.staticflickr.com/8166/7415661744_9745bd9a51_o.jpg", width: 2453, height: 3693, desc: desc],
+            [title: "Youth & Tobacco Town Hall 5", url: "http://farm8.staticflickr.com/7253/7415655194_3b0129291e_o.jpg", width: 4288, height: 2848, desc: desc],
+            [title: "Youth & Tobacco Town Hall 6", url: "http://farm6.staticflickr.com/5445/7415656828_e59b76ecdf_o.jpg", width: 2564, height: 3860, desc: desc],
+            [title: "Youth & Tobacco Town Hall 7", url: "http://farm6.staticflickr.com/5039/7415661070_1c3c36dec4_o.jpg", width: 3711, height: 2465, desc: desc],
+            [title: "Youth & Tobacco Town Hall 8", url: "http://farm6.staticflickr.com/5115/7415659906_69cebdb0a9_o.jpg", width: 2626, height: 3954, desc: desc],
+            [title: "Youth & Tobacco Town Hall 9", url: "http://farm9.staticflickr.com/8008/7415659216_e565ac25da_o.jpg", width: 3905, height: 2593, desc: desc],
+            [title: "Youth & Tobacco Town Hall 10", url: "http://farm9.staticflickr.com/8008/7420010158_c2a9f0e1fd_o.jpg", width: 2589, height: 1720, desc: desc],
+            [title: "Youth & Tobacco Town Hall 11", url: "http://farm8.staticflickr.com/7259/7415647408_23e02e24e2_o.jpg", width: 3809, height: 2530, desc: desc],
+            [title: "Youth & Tobacco Town Hall 12", url: "http://farm8.staticflickr.com/7269/7415651398_ed438c3765_o.jpg", width: 2573, height: 3874, desc: desc],
+            [title: "Youth & Tobacco Town Hall 13", url: "http://farm8.staticflickr.com/7247/7415641940_ebe7061ddd_o.jpg", width: 4288, height: 2848, desc: desc],
+            [title: "Youth & Tobacco Town Hall 14", url: "http://farm8.staticflickr.com/7275/7415648752_8a59b311af_o.jpg", width: 3451, height: 2292, desc: desc],
+            [title: "Youth & Tobacco Town Hall 15", url: "http://farm6.staticflickr.com/5116/7415649474_f0d229bacd_o.jpg", width: 2574, height: 3876, desc: desc],
+            [title: "Youth & Tobacco Town Hall 16", url: "http://farm6.staticflickr.com/5444/7415649912_d68112f44f_o.jpg", width: 3246, height: 2156, desc: desc],
+            [title: "Youth & Tobacco Town Hall 17", url: "http://farm8.staticflickr.com/7125/7415647976_bba632768e_o.jpg", width: 2722, height: 1808, desc: desc],
+            [title: "Youth & Tobacco Town Hall 18", url: "http://farm8.staticflickr.com/7139/7420009470_1cebff7bc8_o.jpg", width: 2832, height: 1881, desc: desc],
+            [title: "Youth & Tobacco Town Hall 19", url: "http://farm9.staticflickr.com/8013/7420008656_10a8101885_o.jpg", width: 2449, height: 1627, desc: desc],
+            [title: "Youth & Tobacco Town Hall 20", url: "http://farm9.staticflickr.com/8004/7420007630_9841968c8b_o.jpg", width: 2334, height: 1550, desc: desc],
+            [title: "Youth & Tobacco Town Hall 21", url: "http://farm8.staticflickr.com/7262/7420005844_229b3c6873_o.jpg", width: 2778, height: 1845, desc: desc],
+            [title: "Youth & Tobacco Town Hall 22", url: "http://farm9.staticflickr.com/8150/7415637182_aefc6320d6_o.jpg", width: 3719, height: 2470, desc: desc],
+            [title: "Youth & Tobacco Town Hall 23", url: "http://farm9.staticflickr.com/8166/7415635114_d5b25dc707_o.jpg", width: 2286, height: 3442, desc: desc]
         ]
 
         items.each { item ->
@@ -333,11 +424,19 @@ class TestDataPopulator {
             language: Language.findByIsoCode("eng"),
             source:Source.findByAcronym("HHS")
         )
+
+        oneOff.addToMediaItems(Html.list()[2])
+        oneOff.addToMediaItems(Html.list()[3])
+        oneOff.addToMediaItems(Html.list()[4])
+        oneOff.addToMediaItems(Video.list()[2])
+        oneOff.addToMediaItems(Video.list()[3])
+        oneOff.addToMediaItems(Video.list()[4])
+        oneOff.addToMediaItems(Image.list()[2])
+        oneOff.addToMediaItems(Image.list()[3])
+        oneOff.addToMediaItems(Image.list()[4])
+
         oneOff.save(flush:true)
         assert oneOff.id
-        oneOff.addToMediaItems(Html.list()[2])
-        oneOff.addToMediaItems(Video.list()[2])
-        oneOff.addToMediaItems(Image.list()[2])
 
         //Random Likes --------------------------------------
         count = MediaItem.count()
@@ -399,8 +498,7 @@ class TestDataPopulator {
         }
     }
 
-    def 
-    seedCampaigns() {
+    def seedCampaigns() {
         def diseases = ["Achondroplasia",
             "Acne",
             "AIDS",

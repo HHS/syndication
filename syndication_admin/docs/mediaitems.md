@@ -95,7 +95,9 @@
 
 + Confirm Active checkbox is checked by default.
 
-+ Confirm Visible in Storefront/Not Visible in Storefront checkbox.
++ Confirm Visible in Storefront checkbox is checked by default.
+
++ Confirm Manually Managed checkbox is checked by default.
 
 + Optionally, enter the External GUID.  Note: there is a 255 character limit.
 
@@ -109,7 +111,7 @@
 
 ![Show_Audio.png](https://bitbucket.org/repo/X7nKza/images/674507285-Show_Audio.png)
 
-+3 Click the List button.  The Audio List screen will appear.
++ Click the List button.  The Audio List screen will appear.
 
 ![Audio_List General.png](https://bitbucket.org/repo/X7nKza/images/105359872-Audio_List%20General.png)
 
@@ -183,9 +185,11 @@
 
 + Select the Language from the drop-down menu.
 
-+ Confirm the Active checkbox is checked by default.
++ Confirm Active checkbox is checked by default.
 
-+ Confirm Visible in Storefront/Not Visible in Storefront checkbox.
++ Confirm Visible in Storefront checkbox is checked by default.
+
++ Confirm Manually Managed checkbox is checked by default.
 
 + Optionally, enter the External GUID.  Note: there is a 255 character limit.
 
@@ -277,19 +281,15 @@
 
 + Confirm the Active checkbox is checked by default.
 
++ Confirm Visible in Storefront checkbox is checked by default.
+
++ Confirm Manually Managed checkbox is checked by default.
+
 + Optionally, enter the External GUID.  Note: there is a 255 character limit.
 
-+ Optionally, enter the Hash.  Note: there is a 255 character limit.
++ Select Source from the drop-down menu.
 
-+ Select the Source from the drop-down menu.
-
-+ Optionally, select the Extraction Option from the drop-down menu.
-
-+ Optionally, click the Add Alternate Image link.  For detailed instructions go to Create an Alternate Image.
-
-+ Optionally, select a Campaign, if available.
-
-+ Optionally, select or add an Extended Attribute, if available.  For detailed instructions go to Create an Extended Attribute.
++ Select Subscriber from drop-down menu.
 
 + Click the Create button.  The Show collection screen will appear with a confirmation message.  Note: only the fields completed will appear.
 
@@ -369,6 +369,10 @@
 
 + Confirm the Active checkbox is checked by default.
 
++ Confirm Visible in Storefront checkbox is checked by default.
+
++ Confirm Manually Managed checkbox is checked by default.
+
 + Optionally, enter the External GUID.  Note: there is a 255 character limit.
 
 + Optionally, enter the Hash.  Note: there is a 255 character limit.
@@ -383,15 +387,17 @@
 
 + Enter the Alt Text.
 
++ Select Subscriber from drop-down menu.
+
++ Click the Create button.  The Show Image screen will appear with a confirmation message.  Note: only the fields completed will appear.
+
+![Show Image screen with created confirmation message.png](https://bitbucket.org/repo/X7nKza/images/3586956181-Show%20Image%20screen%20with%20created%20confirmation%20message.png)
+
 + Optionally, click the Add Alternate Image link.  For detailed instructions go to Create an Alternate Image.
 
 + Optionally, select a Campaign, if available.
 
 + Optionally, select or add an Extended Attribute, if available.  For detailed instructions go to Create an Extended Attribute.
-
-+ Click the Create button.  The Show Image screen will appear with a confirmation message.  Note: only the fields completed will appear.
-
-![Show Image screen with created confirmation message.png](https://bitbucket.org/repo/X7nKza/images/3586956181-Show%20Image%20screen%20with%20created%20confirmation%20message.png)
 
 + Click the List button.  The Image List screen will appear.
 
@@ -471,19 +477,29 @@
 
 + Confirm the Active checkbox is checked by default.
 
-+ Optionally, enter the External GUID.  Note: there is a 255 character limit.
++ Confirm Visible in Storefront checkbox is checked by default.
 
-+ Optionally, enter the Hash.  Note: there is a 255 character limit.
++ Confirm Manually Managed checkbox is checked by default.
 
-+ Select the Source from the drop-down menu.
++ Optionally, enter External GUID.  Note: there is a 255 character limit.
 
-+ Enter the Width.
++ Optionally, enter Hash.  Note: there is a 255 character limit.
 
-+ Enter the Height.
++ Select Source from the drop-down menu.
 
-+ Enter the Infographic/Image Format.
++ Enter Width.
 
-+ Enter the Alt Text.
++ Enter Height.
+
++ Enter Infographic/Image Format.
+
++ Enter Alt Text.
+
++ Select Subscriber from drop-down menu.
+
++ Click the Create button.  The Show Infographic screen will appear with a confirmation message.  Note: only the fields completed will appear.
+
+![Show Infographic screen with created confirmation message.png](https://bitbucket.org/repo/X7nKza/images/1239036429-Show%20Infographic%20screen%20with%20created%20confirmation%20message.png)
 
 + Optionally, click the Add Alternate Image link.  For detailed instructions go to Create an Alternate Image.
 
@@ -491,10 +507,6 @@
 
 + Optionally, select or add an Extended Attribute, if available.  For detailed instructions go to Create an Extended Attribute.
 
-+ Click the Create button.  The Show Infographic screen will appear with a confirmation message.  Note: only the fields completed will appear.
-
-![Show Infographic screen with created confirmation message.png](https://bitbucket.org/repo/X7nKza/images/1239036429-Show%20Infographic%20screen%20with%20created%20confirmation%20message.png)
- 
 + Click the List button.  The Infographic List screen will appear.
 
 ![Infographic list screen.png](https://bitbucket.org/repo/X7nKza/images/4247776978-Infographic%20list%20screen.png)
@@ -528,6 +540,120 @@
 + Click the List button.  The Infographic List screen will appear.
  
 ![Infographic List screen with data.png](https://bitbucket.org/repo/X7nKza/images/3457077953-Infographic%20List%20screen%20with%20data.png)
+
+## PDFs
+
+##### **View**
+ 
++ From the Syndication Dashboard, click the Media menu and PDFs submenu.
+
+![Left menu Media PDF submenu highlighted.png](images/Left_menu_Media_PDFs_submenu_highlighted.png)
+
++ PDF List screen will appear.
+
+![PDF List screen.png](images/PDF_List_screen.png)
+
+##### **Create**
+
++ From PDF List screen, click New button, Create PDF screen will appear.
+
+![Create PDF screen.png](images/Create_PDF_Screen.png)
+
++ Enter Name.  Note: there is a 255 character limit.
+
++ Optionally, enter the Description.  Note: there is 2000 character limit.
+
++ Enter Source URL.  Note: this should begin with http or https.
+
++ Optionally, enter Target URL.  Note: this should begin with http or https.
+
++ Optionally, enter Custom Thumbnail URL.  Note: this should begin with http or https.
+
++ Optionally, enter Custom Preview URL.  Note: this should begin with http or https.
+
++ Optionally, enter Date Content Authored.
+
++ Optionally, enter Date Content Updated.
+
++ Optionally, enter Date Content Published.
+
++ Optionally, enter Date Content Reviewed.
+
++ Enter Date Syndication Captured.
+
++ Enter Date Syndication Updated.
+
++ Enter Date Syndication Visible.
+
++ Select Language from the drop-down menu.
+
++ Confirm Active checkbox is checked by default.
+
++ Confirm Visible in Storefront checkbox is checked by default.
+
++ Confirm Manually Managed checkbox is checked by default.
+
++ Confirm Visible In Storefront checkbox is checked by default.
+
++ Confirm Manually Managed checkbox is checked by default.
+
++ Optionally, enter External GUID.  Note: there is a 255 character limit.
+
++ Select the Source from the drop-down menu.
+
++ Select Subscriber from drop-down menu.
+
++ Click Create button.  The Show PDF screen will appear with a confirmation message.  Note: only the fields completed will appear.
+
+![Show PDF screen with created confirmation message.png](images/Show_PDF_with_confirmation_message.png)
+
+##### **Add to Campaign**
++ Select a Campaign from Pick Campaign drop down list and click Add button.
++ Once Campaign is added to the media item, it wil display confirmation message.
+
+![Add Campaign to the Media Item.png](images/Show_PDF_Add_to_your_Campaign.png)
+
+##### **Tag this MediaItem**
+
++ Select Language.
++ Select Tag Type: General/Topic/Audience.
++ Type Tag name at Select tags text box [user may select a tag from existing ones].
++ Once Tag is added to the media item, it wil display confirmation message. 
+
+![Add Tag to the Media Item](images/Show_PDF_Tag_This_Media_Item.png)
+
+##### **Feature this Item**
++ Click on Feature this Item.
++ it will bring confirmation message:The media item has been featured. Click here for feature page
+![Feature this Item](images/Show_PDF_Feature_This_Item.png)
+
++ Click on: "Click here for feature page", it will redirect to the Featured Media page.
+![Featured Media Page](images/PDF_Featured_Media_Page.png)
+
++ Click on the media item, it will redirect to media show page for that media item.
++ Click the List button, PDF List screen will appear.
+
+##### **Sort**
+
++ From PDF List screen, click on desired heading (ID, Name, Description, Source URL, Date Syndication Captured, Date Syndication Updated), the order will change (descending to ascending).
+
+##### **Edit - Add Description**
+
++ From PDF List screen, click on desired PDF Name link, Show PDF screen will appear.
+
++ Click Edit button, Edit PDF screen will appear.
+
++ Modify at desired fields (Type something at Description field)
+
++ Either click Cancel or Update button. The Show PDF screen will appear. If the Update button was selected then a confirmation message will appear as in the example below.
+
+![Show Periodical screen with confirmation message.png](images/Show_PDF_with_Edit_confirmation_message.png)
+
++ Click the List button. The PDF List screen will appear.
+
+![PDF_List](images/PDF_List_with_PDF_Media_item.png)
+
+
 
 ## Periodicals
 
@@ -581,6 +707,8 @@
 
 + Confirm Visible In Storefront checkbox is checked by default.
 
++ Confirm Manually Managed checkbox is checked by default.
+
 + Optionally, enter External GUID.  Note: there is a 255 character limit.
 
 + Select the Source from the drop-down menu.
@@ -609,10 +737,10 @@
 ##### **Feature this Item**
 + Click on Feature this Item.
 + it will bring confirmation message:The media item has been featured. Click here for feature page
-(images/Show_Periodical_Feature_This_Page.png)
+![Featute This Item](images/Show_Periodical_Feature_This_Page.png)
 
 + Click on: "Click here for feature page", it will redirect to the Featured Media page.
-(images/Featured_Media_Page.png)
+![Featured Media ppage](images/Featured_Media_Page.png)
 
 + Click on the media item, it will redirect to media show page for that media item.
 + Click the List button.  The Periodical List screen will appear.
@@ -684,6 +812,10 @@
 
 + Confirm the Active checkbox is checked by default.
 
++ Confirm Visible in Storefront checkbox is checked by default.
+
++ Confirm Manually Managed checkbox is checked by default.
+
 + Optionally, enter the External GUID.  Note: there is a 255 character limit.
 
 + Optionally, enter the Hash.  Note: there is a 255 character limit.
@@ -692,13 +824,6 @@
 
 + Enter the Social Media Type.
 
-+ Optionally, click the Add Alternate Image link.  For detailed instructions go to Create an Alternate 
-Image.
-
-+ Optionally, select a Campaign, if available.
-
-+ Optionally, select or add an Extended Attribute, if available.  For detailed instructions go to Create an Extended Attribute.
-
 + Click the Create button.  The Show Social Media screen will appear with a confirmation message.  Note: only the fields completed will appear.
 
 ![Show Social Media with created confirmation message.png](https://bitbucket.org/repo/X7nKza/images/3813326666-Show%20Social%20Media%20with%20created%20confirmation%20message.png)
@@ -706,6 +831,12 @@ Image.
 + Click the List button.  The Social Media List screen will appear.
 
 ![Social Media List screen with data.png](https://bitbucket.org/repo/X7nKza/images/451309330-Social%20Media%20List%20screen%20with%20data.png)
+
++ Optionally, click the Add Alternate Image link.  For detailed instructions go to Create an Alternate Image.
+
++ Optionally, select a Campaign, if available.
+
++ Optionally, select or add an Extended Attribute, if available.  For detailed instructions go to Create an Extended Attribute.
 
 ##### **Sort**
 
@@ -781,6 +912,8 @@ Image.
 
 + Confirm the Active checkbox is checked by default.
 
++ Confirm Manually Managed checkbox is checked by default.
+
 + Optionally, enter the External GUID.  Note: there is 255 character limit.
 
 + Optionally, enter the Hash.  Note: there is a 255 character limit.
@@ -793,18 +926,19 @@ Image.
 
 + Optionally, enter a Height.
 
-+ Optionally, click the Add Alternate Image link.  For detailed instructions go to Create an Alternate Image.
-
-+ Optionally, select a Campaign, if available.
-
-+ Optionally, select or add an Extended Attribute, if available.  For detailed instructions go to 
-Create an Extended Attribute.
++ Select Subscriber from drop-down menu.
 
 + Click the Create button.  The Show Video screen will appear with a confirmation message.  Note: only the fields completed will appear.
 
 ![Show Video screen with created confirmation message.png](https://bitbucket.org/repo/X7nKza/images/2201129702-Show%20Video%20screen%20with%20created%20confirmation%20message.png)
 
-+ Click the List button.  The Video List screen will appear.
++ Optionally, click the Add Alternate Image link.  For detailed instructions go to Create an Alternate Image.
+
++ Optionally, select a Campaign, if available.
+
++ Optionally, select or add an Extended Attribute, if available.  For detailed instructions go to Create an Extended Attribute.
+
++ + Click the List button.  The Video List screen will appear.
 
 ![Video List screen with data.png](https://bitbucket.org/repo/X7nKza/images/779318565-Video%20List%20screen%20with%20data.png)
 
@@ -856,80 +990,86 @@ Create an Extended Attribute.
 
 ![Create Widget screen.png](https://bitbucket.org/repo/X7nKza/images/4229614346-Create%20Widget%20screen.png)
 
-+ Enter the Name.  Note: there is a 255 character limit.
++ Enter Name. Note: there is a 255 character limit.
 
-+ Optionally, enter the Description.  Note: there is a 2000 character limit.
++ Optionally, enter Description.  Note: there is a 2000 character limit.
 
-+ Enter the Source URL.  Note: this should begin with http or https.
++ Enter Source URL.  Note: this should begin with http or https.
 
-+ Optionally, enter the Target URL.  Note: this should begin with http or https.
++ Optionally, enter Target URL.  Note: this should begin with http or https.
 
-+ Optionally, enter the Date Content Authored.
++ Optionally, enter Date Content Authored.
 
-+ Optionally, enter the Date Content Updated.
++ Optionally, enter Date Content Updated.
 
-+ Optionally, enter the Date Content Published.
++ Optionally, enter Date Content Published.
 
-+ Optionally, enter the Date Content Reviewed.
++ Optionally, enter Date Content Reviewed.
 
-+ Enter the Date Syndication Captured.
++ Enter Date Syndication Captured.
 
-+ Enter the Date Syndication Updated.
++ Enter Date Syndication Updated.
 
-+ Enter the Date Syndication Visible.
++ Enter Date Syndication Visible.
 
-+ Select the Language from the drop-down menu.
++ Select Language from the drop-down menu.
 
-+ Confirm the Active checkbox is checked by default.
++ Confirm Active checkbox is checked by default.
 
-+ Optionally, enter the External GUID.  Note: there is a 255 character limit.
++ Confirm Visible in Storefront checkbox is checked by default.
 
-+ Optionally, enter the Hash.  Note: there is a 255 character limit.
++ Confirm Manually Managed checkbox is checked by default.
 
-+ Select the Source from the drop-down menu.
++ Optionally, enter External GUID.  Note: there is a 255 character limit.
 
-+ Enter the Height.
++ Optionally, enter Hash.  Note: there is a 255 character limit.
 
-+ Enter the Width.
++ Select Source from the drop-down menu.
 
-+ Enter the Code.
++ Enter Height.
 
-+ Optionally, click the Add Alternate Image link.  For detailed instructions go to Create an Alternate Image.
++ Enter Width.
+
++ Enter Code.
+
++ Select Subscriber from drop-down menu.
+
++ Click Create button.  The Show Widget screen will appear with a confirmation message.  Note: only the fields completed will appear.
+
+![Show Widget screen with created confirmation message.png](https://bitbucket.org/repo/X7nKza/images/1739417118-Show%20Widget%20screen%20with%20created%20confirmation%20message.png)
+
++ Optionally, click Add Alternate Image link.  For detailed instructions go to Create an Alternate Image.
 
 + Optionally, select a Campaign, if available.
 
 + Optionally, select or add an Extended Attribute, if available.  For detailed instructions go to Create an Extended Attribute.
 
-+ Click the Create button.  The Show Widget screen will appear with a confirmation message.  Note: only the fields completed will appear.
-
-![Show Widget screen with created confirmation message.png](https://bitbucket.org/repo/X7nKza/images/1739417118-Show%20Widget%20screen%20with%20created%20confirmation%20message.png)
- 
 + Click the List button.  The Widget List screen will appear.
 
 ![Widget List with data.png](https://bitbucket.org/repo/X7nKza/images/6035097-Widget%20List%20with%20data.png)
 
 ##### **Sort**
 
-+ From the Widget List screen, click the desired heading (ID, Name, Description, Source URL, Date Syndication Captured, Date Syndication Updated).
++ From Widget List screen, click desired heading (ID, Name, Description, Source URL, Date Syndication Captured, Date Syndication Updated).
 
 + Click again.  The order will be changed (descending to ascending).
 
 ##### **Edit**
 
-+ From the Widget List screen, click the link desired Widget ID link.  The Show Widget screen will appear.
++ From Widget List screen, click link desired Widget ID link.  The Show Widget screen will appear.
 
 ![Show Widget screen with Edit highlighted.png](https://bitbucket.org/repo/X7nKza/images/801559916-Show%20Widget%20screen%20with%20Edit%20highlighted.png)
 
-+ Click the Edit button.  The Edit Widget screen will appear.
++ Click Edit button.  The Edit Widget screen will appear.
  
 ![Edit Widget screen.png](https://bitbucket.org/repo/X7nKza/images/3306441009-Edit%20Widget%20screen.png)
 
-+ Modify the desired fields.
++ Modify desired fields.
 
-+ Either click the Cancel or Update button. The Show Widget screen will appear.  If the Update button was selected then a confirmation message will appear as in the example below.
++ Either click Cancel or Update button, Show Widget screen will appear.  If the Update button was selected then a confirmation message will appear as in the example below.
 
 ![Show Widget With Updated Confirmation Message.png](https://bitbucket.org/repo/X7nKza/images/429694034-Show%20Widget%20With%20Updated%20Confirmation%20Message.png)
 
-+ Click the List button.  The Widget List screen will appear.
++ Click List button.  The Widget List screen will appear.
 
 ![Widget List with data.png](https://bitbucket.org/repo/X7nKza/images/1722235007-Widget%20List%20with%20data.png)

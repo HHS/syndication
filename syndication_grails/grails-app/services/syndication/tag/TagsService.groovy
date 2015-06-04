@@ -19,6 +19,7 @@ import grails.plugins.rest.client.RestBuilder
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import grails.util.Holders
+import net.sf.ehcache.search.expression.Not
 
 import javax.annotation.PostConstruct
 
@@ -107,6 +108,12 @@ class TagsService {
     }
 
     @NotTransactional
+    def getTagName(Long id){
+        def result = restGet("${serverAddress}/tags/show/${id}.json")
+        return result?.name
+    }
+
+    @NotTransactional
     def query(String q){
         restGet("${serverAddress}/tags/query.json?q=${q}")
     }
@@ -171,7 +178,7 @@ class TagsService {
         String  idString = response.join(',')
         params['restrictToSet'] = idString
         params.id = params.long("id")
-        
+
         def pag = [max:params.max, offset:params.offset]
         def results = MediaItem.facetedSearch(params).list(pag)
 

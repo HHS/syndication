@@ -16,11 +16,14 @@ package com.ctacorp.syndication.contentextraction
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.commons.util.Util
+import com.ctacorp.syndication.exception.InaccessibleVideoException
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.Video
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
 import groovyx.net.http.URIBuilder
+import org.joda.time.format.*
+import org.joda.time.*
 
 @Transactional(readOnly = true)
 class YoutubeService {
@@ -41,7 +44,17 @@ class YoutubeService {
 
     String thumbnailLinkForUrl(String url) {
         String id = getVideoId(url)
-        "http://i1.ytimg.com/vi/${id}/hqdefault.jpg"
+        def json = getMetaDataForVideoUrl(url)
+        def thumbnails = json.items[0].snippet.thumbnails
+        if(thumbnails.maxres){
+            return "http://i.ytimg.com/vi/${id}/maxresdefault.jpg"
+        } else if(thumbnails.high){
+            return "http://i.ytimg.com/vi/${id}/hqdefault.jpg"
+        } else if(thumbnails.medium){
+            return "http://i.ytimg.com/vi/${id}/mqdefault.jpg"
+        } else{
+            return "http://i.ytimg.com/vi/${id}/default.jpg"
+        }
     }
 
     String getIframeEmbedCode(Long id, params = [:]) {
@@ -60,7 +73,7 @@ class YoutubeService {
         boolean autoplay = Util.isTrue(params.autoplay, true)
         boolean rel = Util.isTrue(params.rel)
 
-        "<iframe id=\"ytplayer\" type=\"text/html\" width=\"640\" height=\"390\" src=\"http://www.youtube.com/embed/${videoId}?autoplay=${autoplay ? '1':'0'}&rel=${rel ? '1':'0'}&origin=http://syndication.hhs.gov\" frameborder=\"0\"></iframe>"
+        "<iframe id=\"ytplayer\" type=\"text/html\" width=\"640\" height=\"390\" src=\"https://www.youtube.com/embed/${videoId}?autoplay=${autoplay ? '1':'0'}&rel=${rel ? '1':'0'}&origin=http://syndication.hhs.gov\" frameborder=\"0\"></iframe>"
     }
 
     @Transactional
@@ -75,21 +88,32 @@ class YoutubeService {
 
     def getVideoInstanceFromUrl(String url, Language language = null, Source source = null){
         def jsonData = getMetaDataForVideoUrl(url)
-        if(!jsonData || jsonData.error){
+        if(!jsonData || jsonData.error || jsonData.items.size() == 0){
+            if(jsonData?.error?.message == "Private video"){
+                throw new InaccessibleVideoException("${jsonData?.error?.errors}")
+                return null
+            }
+
             log.error "Error getting info about video: ${url}, details: ${jsonData}"
             return null
         }
         new Video(
-                name: jsonData.data.title,
+                name: jsonData.items[0].snippet.localized.title,
                 sourceUrl: url,
-                dateAuthored: Date.parse(youtubeDateFormat, jsonData.data.uploaded),
-                dateUpdated: Date.parse(youtubeDateFormat, jsonData.data.updated),
+                dateAuthored: Date.parse(youtubeDateFormat, jsonData.items[0].snippet.publishedAt),
                 language: language,
-                externalGuid: jsonData.data.id,
+                externalGuid: jsonData.items[0].id,
                 source: source,
-                duration: jsonData.data.duration,
-                description: jsonData.data.description
+                duration: parseTime(jsonData.items[0].contentDetails.duration),
+                description: jsonData.items[0].snippet.localized.description
         )
+    }
+
+    private parseTime(String timecode){
+        PeriodFormatter formatter = ISOPeriodFormat.standard();
+        Period p = formatter.parsePeriod(timecode);
+        Seconds s = p.toStandardSeconds();
+        s.seconds
     }
 
     String getVideoId(String sourceUrl) {
@@ -110,8 +134,11 @@ class YoutubeService {
         }
     }
 
+    def grailsApplication
     private String getVideoFeedUrl(String sourceUrl) {
-        String youtubeFeedUrl = "http://gdata.youtube.com/feeds/api/videos/${getVideoId(sourceUrl)}?v=2&alt=jsonc"
+        String videoId = getVideoId(sourceUrl)
+        String youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${grailsApplication.config.google.youtube.apiKey}&part=snippet,contentDetails"
+        youtubeFeedUrl
     }
 }
 

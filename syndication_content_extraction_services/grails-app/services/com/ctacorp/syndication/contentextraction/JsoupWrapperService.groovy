@@ -50,7 +50,7 @@ class JsoupWrapperService {
             removeBreaksFromDocument(doc)
         }
 
-        if(Util.isTrue(params.stripClasses)){
+        if(Util.isTrue(params.stripClasses, true)){
             removeClassesFromDocument(doc)
         }
 
@@ -207,8 +207,12 @@ class JsoupWrapperService {
 
     private Document removeClassesFromDocument(Document doc){
         Elements eles = doc.select("[class]")
+        String extractionClass = grailsApplication.config.syndication.contentExtraction.cssClassName ?: 'syndicate'
         eles.each{ ele ->
-            if(ele.attr("class") != "${grailsApplication.config.syndication.contentExtraction.cssClassName}"){
+            if(extractionClass in ele.attr("class").split(" ")){
+                ele.removeAttr("class")
+                ele.addClass(extractionClass)
+            } else{
                 ele.removeAttr("class")
             }
         }

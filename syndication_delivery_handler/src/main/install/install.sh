@@ -2,31 +2,17 @@
 
 echo ""
 
-version="0.2.5"
+version="0.3.0"
 configFile="syndication_delivery_handler_config.groovy"
 keyAgreement="syndication_key_agreement.json"
 springConfig="syndication_delivery_handler.xml"
 jarFile="syndication-delivery-handler-${version}.jar"
 
-# ENCRYPTS THE KEYAGREEMENT FILE SO ITS NOT IN PLAIN TEXT, AND ZEROS OUT THE KEY AGREEMENT
-function encryptKeyAgreement() {
+# ENCRYPTS THE KEY AGREEMENT FILE SO ITS NOT IN PLAIN TEXT, AND ZEROS OUT THE KEY AGREEMENT
+function copyKeyAgreement() {
 
-    keyAgreementEncrypted="${HOME}/syndication_key_agreement.dat"
-    keySubject="/C=US/ST=DC/L=Washinton/O=HHS/OU=HHS Syndication/CN=Syndication Admin/emailAddress=syndicationAdmin@hhs.gov"
-    publicKey="${HOME}/.ssh/syndication_pub.pem"
-    privateKey="${HOME}/.ssh/syndication.pem"
-
-    openssl req -x509 -subj "${keySubject}" -nodes -newkey rsa:1024 -keyout ${privateKey} -out ${publicKey}  > /dev/null 2>&1
-    openssl smime -encrypt -aes256 -in ${keyAgreement} -binary -outform DEM -out ${keyAgreementEncrypted} ${publicKey}  > /dev/null 2>&1
-
-    echo "The key agreement file has been encrypted and copied to ${keyAgreementEncrypted}"
-
-    echo "{
-        \"Public Key\": \"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000=\",
-        \"Entity Name\": \"somewhere.gov\",
-        \"Private Key\": \"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000==\",
-        \"Secret Key\": \"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000==\"
-    }" > ${keyAgreement}
+    cp ${keyAgreement} ${HOME}/${keyAgreement} > /dev/null 2>&1
+    echo "The key agreement file has been copied to ${keyAgreement}"
 }
 
 # MAKES A BACKUP OF THE OLD CONFIG AND COPY A NEW COMMENTED OUT CONFIG TO THE USER HOME
@@ -38,7 +24,7 @@ function installExternalConfigs() {
 
     echo "The configuration file has been copied to ${HOME}/${configFile}"
 
-    encryptKeyAgreement
+    copyKeyAgreement
 }
 
 # UPDATES THE CONFIG AND KEY AGREEMENT FILES IN THE JAR ITSELF

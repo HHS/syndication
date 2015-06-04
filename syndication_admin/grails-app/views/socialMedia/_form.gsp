@@ -180,7 +180,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="source">Source<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <g:select from="${com.ctacorp.syndication.Source.list()}" name="source.id" id="source" class="form-control" optionValue="name" optionKey="id" value="${socialMediaInstance?.source?.id}"/>
+        <g:select from="${com.ctacorp.syndication.Source.list([sort: "name"])}" name="source.id" id="source" class="form-control" optionValue="name" optionKey="id" value="${socialMediaInstance?.source?.id}"/>
     </div>
 </div>
 

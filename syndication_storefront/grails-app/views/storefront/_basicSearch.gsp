@@ -4,7 +4,6 @@
         <input type="button" name="basicSearch" id="basicSearch" value="Search" onclick="this.form.submit();"/>
 </form>
 <p class="more">
-
         <g:remoteLink controller="storefront" action="otherLookupOptions" update="searchOptions">
             <i class="more">Advanced Search > ></i>
         </g:remoteLink>

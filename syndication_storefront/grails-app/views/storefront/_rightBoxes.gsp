@@ -10,8 +10,6 @@
         </p>
     </div>
 
-
-
     <g:if test="${featuredMedia}">
         <div class="sidebar_box_white_bottom"></div>
         <div class="sidebar_box_white">
@@ -27,8 +25,6 @@
                     </g:each>
                 </ul>
             </div>
-
-            %{--<p class="all"><g:remoteLink controller="storefront" action="topFivePopup" update="popupContent" class="popupLink" name="popupContent">More</g:remoteLink> >></p>--}%
         </div>
     </g:if>
 
@@ -51,16 +47,17 @@
     <div class="sidebar_box_blue">
         <h4>Additional Information</h4>
         <ul>
+            <li><g:link controller="workgroup" action="index">Syndication Workgroup Page</g:link></li>
             <li><g:link controller="storefront" action="qa">Questions and Answers</g:link></li>
             <li><g:link controller="storefront" action="usageGuidelines">Usage Guidelines</g:link></li>
             <li><g:link controller="storefront" action="roadMap">Syndication Roadmap</g:link></li>
             <li><g:link controller="storefront" action="reportAProblem" class="popup-form">Report a Problem with a Syndicated Page</g:link></li>
             <li><g:link controller="storefront" action="requestSyndication" class="popup-form">Request a Page to be Syndicated</g:link></li>
             <li><g:link controller="syndicateThis" action="badgeSnippet">Get the Syndicate This button</g:link></li>
+            <li><a href="https://github.com/HHS/syndication">Open Source</a></li>
             <li><g:link controller="storefront" action="releaseInfo">Release Notes</g:link></li>
         </ul>
     </div>
 
     <div class="sidebar_box_blue_bottom"></div>
-
 </div>

@@ -4,19 +4,19 @@ import com.ctacorp.syndication.authentication.UserRole
 import grails.transaction.Transactional
 import com.ctacorp.syndication.metric.MediaMetric
 import com.ctacorp.syndication.media.MediaItem
+import groovy.sql.Sql
 
 /**
  * Created by nburk on 11/6/14.
  */
 @Transactional(readOnly = true)
 class ViewMetricService {
-
     def springSecurityService
+    def dataSource
 
-    def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id}
+    def publisherItems = { MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id }
 
     def findTotalViews(def params) {
-
         def metrics = MediaMetric.createCriteria().list{
             projections {
                 groupProperty("media", "media")
@@ -105,7 +105,6 @@ class ViewMetricService {
                 noData = false
             }
         }
-//        labels << [label: "Other", value:(MediaMetric.findAllByDayBetween(today - range, today)."${whichData}".sum() ?: 0) - (labels.value.sum() ?: 0)]
         if(noData){
             labels = [[label:"No Data", value: 0]]
         }
@@ -131,7 +130,6 @@ class ViewMetricService {
                 }
                 labels << [label:"${metric[0].id + "-" + checkLength(metric[0].name)}", value:metric[1]]
             }
-//            labels << [label: "other", value:(MediaMetric.findAllByDayBetween(today - params.int("range"), today)."${params.whichData}".sum() ?: 0) - (labels.value.sum() ?: 0)]
             if(noData){
                 labels = [[label:"No Data", value: 0]]
             }
@@ -186,7 +184,6 @@ class ViewMetricService {
                 noData = false
                 labels << [label:"${metric[0]}", value:metric[1]]
             }
-//            labels << [label: "other", value:(MediaMetric.findAllByDayBetween(today - params.int("range"), today)."${params.whichData}".sum() ?: 0) - (labels.value.sum() ?: 0)]
             if(noData){
                 labels = [[label:"No Data", value: 0]]
             }
@@ -196,6 +193,7 @@ class ViewMetricService {
     }
 
     def findAgencyViews(params){
+        def viewCount = ""
         params.max = 10
         params.offset = 0
         params.sort = params.whichData
@@ -220,11 +218,25 @@ class ViewMetricService {
                 data.data << monthData
                 agencies.each{Source agency ->
                     def totals = 0
-                    MediaItem.findAllBySource(agency).each{ MediaItem mediaItem ->
-                        totals += getMetricBetweenDateAndMedia(params.whichData, date, mediaItem)
+
+                    def sql = new Sql(dataSource)
+                    def responseRows
+                    try{
+                        if(params.whichData == "apiViewCount"){
+                            responseRows = sql.rows("select sum(media_metric.api_view_count) from media_metric JOIN media_item ON media_item.id=media_metric.media_id AND media_metric.day>=${date.firstDay as Date} AND media_metric.day<=${date.lastDay + 1 as Date} AND media_item.source_id=${agency.id}")
+                            totals = responseRows[0].'sum(media_metric.api_view_count)'
+                        } else{
+                            responseRows = sql.rows("select sum(media_metric.storefront_view_count) from media_metric JOIN media_item ON media_item.id=media_metric.media_id AND media_metric.day>=${date.firstDay as Date} AND media_metric.day<=${date.lastDay + 1 as Date} AND media_item.source_id=${agency.id}")
+                            totals = responseRows[0].'sum(media_metric.storefront_view_count)'
+                        }
+                    }catch (e){
+                        println e
+                    } finally {
+                        sql.close()
                     }
+
                     monthData << [
-                            "${agency.name}":totals
+                            "${agency.name}":totals ?: 0
                     ]
                 }
             }

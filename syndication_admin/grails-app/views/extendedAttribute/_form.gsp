@@ -38,10 +38,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <label class="col-md-4 control-label" for="mediaItem">Media Item<span class="required-indicator">*</span></label>
     <div class="col-md-6">
         <sec:ifAnyGranted roles="ROLE_PUBLISHER">
-            <g:select from="${com.ctacorp.syndication.media.MediaItem.findAllByIdInList(MediaItemSubscriber?.findAllBySubscriberId(user.subscriberId)?.mediaItem?.id)}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${extendedAttributeInstance?.mediaItem?.id}"/>
+            <g:select from="${com.ctacorp.syndication.media.MediaItem.findAllByIdInList(MediaItemSubscriber?.findAllBySubscriberId(user.subscriberId)?.mediaItem?.id, [sort: "name"])}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${extendedAttributeInstance?.mediaItem?.id}"/>
         </sec:ifAnyGranted>
         <sec:ifNotGranted roles="ROLE_PUBLISHER">
-            <g:select from="${com.ctacorp.syndication.media.MediaItem.list()}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${extendedAttributeInstance?.mediaItem?.id}"/>
+            <g:select from="${com.ctacorp.syndication.media.MediaItem.list([sort: "name"])}" name="mediaItem.id" id="media" class="form-control" optionValue="name" optionKey="id" value="${extendedAttributeInstance?.mediaItem?.id}"/>
         </sec:ifNotGranted>
     </div>
 </div>

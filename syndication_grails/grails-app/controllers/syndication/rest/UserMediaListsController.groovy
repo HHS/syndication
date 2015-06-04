@@ -36,7 +36,9 @@ import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.media.Video
 import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.storefront.UserMediaList
+import org.codehaus.groovy.grails.web.mime.MimeType
 import syndication.api.ApiResponse
+import syndication.api.Embedded
 import syndication.api.Message
 import syndication.api.Meta
 import syndication.api.Pagination
@@ -95,6 +97,7 @@ import syndication.api.Pagination
     ]
 )
 class UserMediaListsController {
+    def mediaService
     static responseFormats = ['json']
 
     def beforeInterceptor = {
@@ -106,18 +109,79 @@ class UserMediaListsController {
             @ResponseMessage(code = 400, description = "Invalid ID"),
             @ResponseMessage(code = 500, description = "Internal Server Error")
         ], parameters = [
-            @Parameter(name="id", type="integer", format="int64", description="The id of the record to look up", required=true, paramType = "path")
+            @Parameter(name="id", type="integer", format="int64", description="The id of the record to look up", required=true, paramType = "path"),
+            @Parameter(name="displayMethod", type="string", description="Method used to render an html request. Accepts one: [mv, list, feed]", required=false, paramType = "query")
         ])
     ])
     def show(Long id){
+        def userMediaList = UserMediaList.read(id)
+        if(!userMediaList){
+            response.status = 400
+            respond ApiResponse.get400NotFoundResponse().autoFill(params)
+            return
+        }
+        respond ApiResponse.get200Response(userMediaList.mediaItems).autoFill(params)
+        return
+    }
+
+    def syndicate(Long id){
         def userMediaList = UserMediaList.get(id)
         if(!userMediaList){
             response.status = 400
             respond ApiResponse.get400NotFoundResponse().autoFill(params)
             return
         }
+        params.controllerContext = { model ->
+            g.render template: "/media/mediaViewer", model:model
+        }
+        String content = mediaService.renderUserMediaList(userMediaList, params)
+        def resp = new Embedded(id:id, name: userMediaList.name, description: userMediaList.description)
+        response.withFormat {
+            html{
+                render text: content, contentType: MimeType.HTML.name
+            }
+            json{
+                resp.mediaType = "UserMediaList"
+                resp.content = content
+                respond ApiResponse.get200Response([resp]).autoFill(params)
+            }
+        }
+    }
 
-        def items = userMediaList.mediaItems ?: []
-        respond ApiResponse.get200Response(items).autoFill(params)
+    def embed(Long id){
+        def userMediaList = UserMediaList.get(id)
+        if(!userMediaList){
+            response.status = 400
+            respond ApiResponse.get400NotFoundResponse().autoFill(params)
+            return
+        }
+        String renderedResponse
+        String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/userMediaLists/${id}"
+
+        switch(params.displayMethod ? params.displayMethod.toLowerCase() : "feed"){
+            case "mv":
+                renderedResponse = mediaService.renderMediaViewerSnippet(userMediaList, params)
+                break
+            case "feed":
+            case "list":
+            default:
+                if(params.flavor && params.flavor.toLowerCase() == "iframe") {
+                    renderedResponse = mediaService.renderIframeSnippet(url, params)
+                } else{
+                    renderedResponse = mediaService.renderJSSnippet(url, userMediaList, params)
+                }
+        }
+
+        withFormat {
+            html {
+                render renderedResponse
+                return
+            }
+            json {
+                response.contentType = 'application/json'
+                respond ApiResponse.get200Response([[snippet:renderedResponse]]).autoFill(params)
+                return
+            }
+        }
     }
 }

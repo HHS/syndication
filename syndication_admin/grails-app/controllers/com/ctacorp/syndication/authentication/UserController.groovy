@@ -42,7 +42,6 @@ class UserController {
         return userService.indexResponse(params)
     }
 
-    @Secured(["ROLE_ADMIN"])
     def breakdown(){
         def emails = User.list()*.username
         emails = emails.collect{(it =~ /@([\w\W]+)/)[0][1]}
@@ -50,22 +49,24 @@ class UserController {
 
         def totalEmails = emails.size()
 
-        def org = emails.findAll{it.contains(".org")}
-        def gov = emails.findAll{it.contains(".gov")}
-        def net = emails.findAll{it.contains(".net")}
-        def edu = emails.findAll{it.contains(".edu")}
-        def com = emails.findAll{it.contains(".com")}
-        def evElse = emails - org - gov - net - edu - com
+        def org = emails.findAll{it.toLowerCase().endsWith(".org")}
+        def gov = emails.findAll{it.toLowerCase().endsWith(".gov")}
+        def net = emails.findAll{it.toLowerCase().endsWith(".net")}
+        def edu = emails.findAll{it.toLowerCase().endsWith(".edu")}
+        def com = emails.findAll{it.toLowerCase().endsWith(".com")}
+        def us = emails.findAll{it.toLowerCase().endsWith(".us")}
+        def evElse = emails - org - gov - net - edu - com - us
 
         emails = emails.unique()
         def totalUniqueEmails = emails.size()
 
-        def uorg = emails.findAll{it.contains(".org")}
-        def ugov = emails.findAll{it.contains(".gov")}
-        def unet = emails.findAll{it.contains(".net")}
-        def uedu = emails.findAll{it.contains(".edu")}
-        def ucom = emails.findAll{it.contains(".com")}
-        def uevElse = emails - org - gov - net - edu - com
+        def uorg = emails.findAll{it.toLowerCase().endsWith(".org")}
+        def ugov = emails.findAll{it.toLowerCase().endsWith(".gov")}
+        def unet = emails.findAll{it.toLowerCase().endsWith(".net")}
+        def uedu = emails.findAll{it.toLowerCase().endsWith(".edu")}
+        def ucom = emails.findAll{it.toLowerCase().endsWith(".com")}
+        def uus = emails.findAll{it.toLowerCase().endsWith(".us")}
+        def uevElse = emails - org - gov - net - edu - com - us
 
         [
                 totalEmails         : totalEmails,
@@ -75,17 +76,18 @@ class UserController {
                 net                 : net,
                 edu                 : edu,
                 com                 : com,
+                us                  : us,
                 evElse              : evElse,
                 uorg                : uorg,
                 ugov                : ugov,
                 unet                : unet,
                 uedu                : uedu,
                 ucom                : ucom,
+                uus                 : uus,
                 uevElse             : uevElse
         ]
     }
 
-    @Secured(["ROLE_ADMIN"])
     def domainDistribution(){
         def emails = User.list()*.username
         emails = emails.collect{(it =~ /@([\w\W]+)/)[0][1]}
@@ -147,12 +149,26 @@ class UserController {
 
     @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
     @Transactional
-    def save(User userInstance) {
+    def save(UserRegistrationCommand urc) {
+        urc.passwordRepeat = params.passwordVerify
+        urc.validate()
+        if(urc.hasErrors()) {
+            flash.errors = urc.errors.allErrors.collect{[message:g.message([error : it])]}
+            if(Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId){flash.errors << [message:"Select a Key"]}
+            def roles = Role.list()
+            if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER"){
+                roles = Role.findAllByAuthorityInList(userService.getManagersAuthorityRoles())
+            }
+            render view:"create", model:[userInstance:new User(params), subscribers:cmsManagerKeyService.listSubscribers(), roles:roles, currentRoleId: params?.authority]
+            return
+        }
+        User userInstance = new User(params)
         if (userInstance == null) {
             notFound()
             return
         }
 
+        userInstance.validate()
         if (userInstance.hasErrors() || (Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId)) {
             flash.errors = []
             flash.errors = userInstance.errors.allErrors.collect{[message:g.message([error : it])]}
@@ -198,12 +214,22 @@ class UserController {
     }
 
     @Transactional
-    def updateMyAccount(User userInstance){
+    def updateMyAccount(UserRegistrationCommand urc){
+        urc.passwordRepeat = params.passwordVerify
+        urc.validate()
+        if(urc.hasErrors()) {
+            flash.errors = urc.errors.allErrors.collect{[message:g.message([error : it])]}
+            respond urc.errors, view:"editMyAccount", model:[userInstance: urc]
+            return
+        }
+        User userInstance = springSecurityService.currentUser
+        userInstance.properties = params
         if (userInstance == null) {
             notFound()
             return
         }
 
+        userInstance.validate()
         if (userInstance.hasErrors()) {
             flash.errors = userInstance.errors.allErrors.collect{[message:g.message([error : it])]}
             respond userInstance.errors, view: 'editMyAccount'
@@ -224,7 +250,21 @@ class UserController {
 
     @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
     @Transactional
-    def update(User userInstance) {
+    def update(UserRegistrationCommand urc) {
+        urc.passwordRepeat = params.passwordVerify
+        urc.validate()
+        if(urc.hasErrors()) {
+            flash.errors = urc.errors.allErrors.collect{[message:g.message([error : it])]}
+            if(Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId){flash.errors << [message:"Select a Key"]}
+            def roles = Role.list()
+            if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER"){
+                roles = Role.findAllByAuthorityInList(userService.getManagersAuthorityRoles())
+            }
+            render view:"edit", model:[userInstance:new User(params), subscribers:cmsManagerKeyService.listSubscribers(), roles:roles, currentRoleId: params?.authority]
+            return
+        }
+        User userInstance = User.read(params.id)
+        userInstance.properties = params
         if (userInstance == null) {
             notFound()
             return
@@ -245,7 +285,7 @@ class UserController {
             return
         }
 
-        userService.saveUserAndRole(userInstance, params.long('authority'))
+        userInstance.save()
 
         request.withFormat {
             form multipartForm {
@@ -283,6 +323,41 @@ class UserController {
                 redirect action: "index", method: "GET"
             }
             '*' { render status: NOT_FOUND }
+        }
+    }
+}
+
+class UserRegistrationCommand{
+    String name
+    String username
+    String password
+    String passwordRepeat
+
+    def passwordService
+
+    static constraints = {
+        importFrom User
+        name            nullable: false, blank: false
+        username        email: true
+        password        minSize: 8, validator: { passwd, urc ->
+            def passwordValidation = urc.passwordService.validatePassword(passwd)
+            if(!passwordValidation.valid){
+                if(!passwordValidation.uppercaseValid){
+                    return ["requires.uppercase"]
+                }
+                if(!passwordValidation.lowercaseValid){
+                    return ["requires.lowercase"]
+                }
+                if(!passwordValidation.numberValid){
+                    return ["requires.number"]
+                }
+            }
+        }
+
+        passwordRepeat  nullable: false, validator: { passwd2, urc ->
+            if(passwd2 != urc.password){
+                return ["mismatch"]
+            }
         }
     }
 }

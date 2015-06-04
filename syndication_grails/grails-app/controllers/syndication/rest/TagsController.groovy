@@ -17,10 +17,13 @@ package syndication.rest
 import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.ExtendedAttribute
+import com.ctacorp.syndication.data.TagHolder
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Source
 import grails.transaction.NotTransactional
+import org.codehaus.groovy.grails.web.mime.MimeType
 import syndication.api.ApiResponse
+import syndication.api.Embedded
 import syndication.api.Message
 import syndication.api.Meta
 import syndication.api.Pagination
@@ -70,6 +73,7 @@ class TagsController {
     static responseFormats = ['json']
 
     def tagsService
+    def mediaService
 
     def beforeInterceptor = {
         response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
@@ -162,7 +166,6 @@ class TagsController {
             @Parameter(name = "max", type="integer", format="int32", description="The maximum number of records to return", required=false, paramType = "query"),
             @Parameter(name = "offset", type="integer", format="int32", description="The offset of the records set to return for pagination", required=false, paramType = "query"),
             @Parameter(name = "sort", type = "string", description = "The name of the property to which sorting will be applied", required = false, paramType = "query")
-
         ])
     ])
     def listMediaForTagId(){
@@ -171,6 +174,76 @@ class TagsController {
         params.total = result?.totalCount ?: 0
         params.maxOverride = true
         respond ApiResponse.get200Response(result).autoFill(params)
+    }
+
+    @APIResource(path="/resources/tags/{id}/syndicate.{format}", description="MediaItem", operations=[
+            @Operation(httpMethod="GET", notes="Renders the list of MediaItems associated with the Tag identified by the 'id'.", nickname="syndicate", type = "MediaItems", summary = "Get MediaItems for Tag", responseMessages=[
+                    @ResponseMessage(code = 400, description = "Bad Request"),
+                    @ResponseMessage(code = 500, description = "Internal Server Error")
+            ], parameters = [
+                    @Parameter(name = "id",          type="integer", format="int64", description = "The id of the record to look up", required = true, paramType = "path"),
+                    @Parameter(name="displayMethod", type="string",                  description="Method used to render an html request. Accepts one: [mv, list, feed]", required=false, paramType = "query")
+            ])
+    ])
+    def syndicate(Long id){
+        String tagName
+        if(!id || !(tagName = tagsService.getTagName(id))){
+            response.status = 400
+            respond ApiResponse.get400NotFoundResponse().autoFill(params)
+            return
+        }
+
+        params.controllerContext = { model ->
+            g.render template: "/media/mediaViewer", model:model
+        }
+        String content = mediaService.renderMediaForTag(id, params)
+
+        response.withFormat {
+            html{
+                render text: content, contentType: MimeType.HTML.name
+            }
+            json{
+                def resp = new Embedded(id:id, content:content ,name: tagName, description: "Media tagged with '${tagName}'")
+                respond ApiResponse.get200Response([resp]).autoFill(params)
+            }
+        }
+    }
+
+    def embed(Long id){
+        String tagName
+        if(!id || !(tagName = tagsService.getTagName(id))){
+            response.status = 400
+            respond ApiResponse.get400NotFoundResponse().autoFill(params)
+            return
+        }
+        String renderedResponse
+        String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/tags/${id}"
+        TagHolder tag = new TagHolder(id:id, name:tagName)
+        switch(params.displayMethod ? params.displayMethod.toLowerCase() : "feed"){
+            case "mv":
+                renderedResponse = mediaService.renderMediaViewerSnippet(tag, params)
+                break
+            case "feed":
+            case "list":
+            default:
+                if(params.flavor && params.flavor.toLowerCase() == "iframe") {
+                    renderedResponse = mediaService.renderIframeSnippet(url, params)
+                } else{
+                    renderedResponse = mediaService.renderJSSnippet(url, tag, params)
+                }
+        }
+
+        withFormat {
+            html {
+                render renderedResponse
+                return
+            }
+            json {
+                response.contentType = 'application/json'
+                respond ApiResponse.get200Response([[snippet:renderedResponse]]).autoFill(params)
+                return
+            }
+        }
     }
 
     @APIResource(path="/resources/tags/tagTypes.{format}", description = "List of Types", operations=[

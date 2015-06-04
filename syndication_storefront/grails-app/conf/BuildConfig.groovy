@@ -67,7 +67,7 @@ grails.project.dependency.resolution = {
 
     plugins {
         compile ":rest-client-builder:2.1.1"
-        compile "org.grails.plugins:syndication-model:1.8.1"
+        compile "org.grails.plugins:syndication-model:2.0.3"
 
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
         compile ":recaptcha:0.6.9"
@@ -79,14 +79,17 @@ grails.project.dependency.resolution = {
         compile ":quartz:1.0.2"
 
         compile ":spring-security-core:2.0-RC4"
-        compile ":rest-client-builder:2.0.1"
+        compile ":rest-client-builder:2.1.1"
 
         //Email Support
         compile ":mail:1.0.7"
         compile ":greenmail:1.3.4"
 
+        //pagination
+        compile ":remote-pagination:0.4.8"
+
         // plugins needed at runtime but not for compilation
-        runtime ":hibernate4:4.3.8.1" // or ":hibernate4:4.1.11.2"
+        runtime ":hibernate4:4.3.8.1"
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
 

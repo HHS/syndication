@@ -1,6 +1,7 @@
 package com.ctacorp.syndication.storefront
 
 import com.ctacorp.syndication.Language
+import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.authentication.User
@@ -19,7 +20,12 @@ class StorefrontController {
     def mediaListService
 
     def index() {
-        mediaTagHelper()
+        def model = mediaTagHelper()
+        model
+    }
+
+    def embedCodeForTag(Long id){
+        [tagName:params.tagName, id:id, renderTagList:true]
     }
 
     def listMediaForTag(Long id) {
@@ -31,10 +37,11 @@ class StorefrontController {
             tagsForMedia[it.id] = allTags.collect { [name: it.name, id: it.id] }
         }
         [
-                mediaItemInstanceList: mediaItemInstanceList,
-                tagsForMedia         : tagsForMedia,
-                tagName              : params.tagName,
-                likeInfo             : likeService.getAllMediaLikeInfo(mediaItemInstanceList)
+            mediaItemInstanceList: mediaItemInstanceList,
+            tagsForMedia         : tagsForMedia,
+            tagName              : params.tagName,
+            tagId                : id,
+            likeInfo             : likeService.getAllMediaLikeInfo(mediaItemInstanceList)
         ]
     }
 
@@ -125,26 +132,6 @@ class StorefrontController {
         render template: "requestSyndication"
     }
 
-    def browse(String selectedMediaType) {
-        params.max = params.max ? Math.min(params.int('max'), 100) : 15
-        if (!selectedMediaType) {
-            selectedMediaType = "Html"
-        }
-        params.mediaTypes = selectedMediaType
-
-        def allMediaTypes = mediaService.getMediaTypes()
-        def mediaList = MediaItem.facetedSearch(params).list(params)
-
-        [
-                selectedMediaType    : selectedMediaType,
-                mediaTypes           : allMediaTypes,
-                apiBaseUrl           : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
-                mediaItemInstanceList: mediaList,
-                tagsForMedia         : getTagsForMediaItems(mediaList),
-                total                : mediaList.totalCount
-        ]
-    }
-
     def showContent(MediaItem mediaItemInstance) {
         User currentUser = springSecurityService.currentUser as User
         boolean alreadyLiked = false
@@ -206,7 +193,8 @@ class StorefrontController {
 
         tagsForMedia
     }
-@Transactional
+
+    @Transactional
     def Map mediaTagHelper() {
         params.max = params.max ? Math.min(params.int('max'), 100) : 15
         def mediaItemInstanceList = mediaService.listNewestMedia(params)
@@ -248,7 +236,7 @@ class StorefrontController {
                 total                : total,
                 apiBaseUrl           : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
                 tagsForMedia         : getTagsForMediaItems(mediaItemInstanceList),
-                featuredMedia        : mediaService.getFeaturedMedia(max: 20),
+                featuredMedia        : mediaService.getFeaturedMedia(max: 10),
                 userMediaLists       : UserMediaList.findAllByUser(currentUser),
                 contentTitle         : contentTitle,
                 searchQuery          : searchQuery,

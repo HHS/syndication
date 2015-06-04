@@ -79,7 +79,7 @@ SyndicationAdmin.healthReportEmailAddresses = ["syndication@ctacorp.com"]
 rabbitmq {
 
     connection = {
-        connection host: 'localhost', username: 'syndication', password: 'syndication', virtualHost: '/syndication', requestedHeartbeat: 10
+        connection host: 'localhost', username: 'mqUsername', password: 'mqPassword', virtualHost: '/syndication', requestedHeartbeat: 10
     }
 
     queues = {

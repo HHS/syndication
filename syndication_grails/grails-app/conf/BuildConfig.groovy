@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -24,6 +23,7 @@ grails.project.source.level = 1.6
 
 def home = System.getProperty('user.home')
 def config = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedBuildConfig.groovy").toURI().toURL())
+def runtimeConfig = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedConfig.groovy").toURI().toURL())
 
 //grails.project.fork = false
 grails.project.fork = [
@@ -111,15 +111,21 @@ grails.project.dependency.resolution = {
         }
 
         // plugins for the compile step --------------------------------------------------------------------------------
-        compile "org.grails.plugins:syndication-model:1.8.1"   //syndication domain models
-        compile "org.grails.plugins:content-extraction-services:1.3.8"   //syndication content extraction tools
+        compile "org.grails.plugins:syndication-model:2.0.3"   //syndication domain models
+        compile "org.grails.plugins:content-extraction-services:1.4.9"   //syndication content extraction tools
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
         compile ":asset-pipeline:2.1.5"
         compile ":release:3.1.1"
         compile ":rest-client-builder:2.1.1"
         compile ":spring-security-core:2.0-RC4"
-        compile ":rabbitmq-native:2.0.10"                       //mq
+        if(runtimeConfig.mq.disableRabbitMQPlugin){
+            //do nothing
+            println ("MQ Disabled")
+        } else{
+            println ("MQ Enabeled")
+            compile ":rabbitmq-native:2.0.10"                       //mq
+        }
         compile ":quartz:1.0.2"                                 //quartz
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
 
@@ -138,7 +144,7 @@ grails.project.dependency.resolution = {
         // Solr --------------------------------------------------------------------------------------------------------
         // |  Leave this at the bottom, moving it causes dependency problems at the moment                             |
         // -------------------------------------------------------------------------------------------------------------
-        compile ":solr-operations:1.2"      //syndication solr stuff
+        compile ":solr-operations:1.2.0"      //syndication solr stuff
 
         // uncomment these to enable additional asset-pipeline capabilities
         //compile ":sass-asset-pipeline:1.5.5"

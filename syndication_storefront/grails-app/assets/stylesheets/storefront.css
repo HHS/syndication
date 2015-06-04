@@ -9,7 +9,7 @@
 *
 *= require magnific-popup.css
 *= require_self
-*= require_tree font-awesome-4.2.0
+*= require font-awesome.min.css
 */
 
 @charset "UTF-8";
@@ -290,6 +290,10 @@ div.pop{
     margin-right: auto;
     margin-left: auto;
     padding:25px;
+}
+
+.syndicate object{
+    height:380px;
 }
 
 div.popAdditional{
@@ -1539,4 +1543,12 @@ img.btn_close {
 
 #roadMap-rightBlock{
     float:right;
+}
+
+#snippetPreview{
+    border: 1px solid lightgray;
+    padding:10px;
+}
+#snippetPreview iframe{
+    border: 1px dashed lightgray;
 }

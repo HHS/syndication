@@ -6,6 +6,7 @@
 // to create separate JavaScript files as needed.
 //
 //= require jquery
+//= require bootstrap.min.js
 //= require jquery.magnific-popup.min.js
 //= require_self
 

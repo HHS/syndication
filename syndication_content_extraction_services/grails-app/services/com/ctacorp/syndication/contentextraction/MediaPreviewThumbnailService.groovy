@@ -9,6 +9,7 @@ import com.ctacorp.syndication.media.Html
 
 import com.ctacorp.syndication.preview.MediaThumbnail
 import com.ctacorp.syndication.preview.MediaPreview
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import grails.util.Holders
 import org.apache.commons.io.IOUtils
@@ -42,6 +43,12 @@ class MediaPreviewThumbnailService {
         previewAndThumbnail(mi)
     }
 
+    @NotTransactional
+    String getThumbnailUrl(Long id){
+        grailsApplication.config.syndication.contentExtraction.urlBase + "/${id}/thumbnail.jpg"
+    }
+
+    @Transactional(readOnly = true)
     def previewAndThumbnail(MediaItem m) {
         return [preview: MediaPreview.findByMediaItem(m), thumbnail: MediaThumbnail.findByMediaItem(m)]
     }

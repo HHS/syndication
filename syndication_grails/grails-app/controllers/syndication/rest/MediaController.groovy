@@ -94,7 +94,6 @@ class MediaController {
     def mediaValidationService
     def contentRetrievalService
     def grailsApplication
-    def fileService
     def urlService
     def likeService
     def youtubeService
@@ -187,18 +186,21 @@ class MediaController {
             @Parameter(name="iframeName",   type="string",                  description="The name of the iframe element",                               required=false, paramType = "query"),
             @Parameter(name="excludeJquery",type="boolean",                 description="Should a reference to the JQuery Library be omitted?",         required=false, paramType = "query", defaultValue = "false"),
             @Parameter(name="excludeDiv",   type="boolean",                 description="Should the div to insert content into be omitted?",            required=false, paramType = "query", defaultValue = "false"),
-            @Parameter(name="divId",        type="string",                  description="Should the div to insert content into have a specific name?",  required=false, paramType = "query")
+            @Parameter(name="divId",        type="string",                  description="Should the div to insert content into have a specific name?",  required=false, paramType = "query"),
+            @Parameter(name="displayMethod", type="string",                 description="Method used to render an html request. Accepts one: [mv, list, feed]", required=false, paramType = "query")
         ])
     ])
     def embed(long id){
         MediaItem mi = mediaService.getMediaItem(id)
-        if(!mi || mi.active == false){
+
+        if(!mi || !mi.active){
             response.status = 400
             render ApiResponse.get400NotFoundResponse().autoFill(params) as JSON
             return
         }
 
         def paramsHaveErrors = mediaValidationService.embedValidation(params)
+
         if(paramsHaveErrors){
             Message message = new Message([errorCode:"400",errorMessage:"Bad Request",userMessage:paramsHaveErrors])
             response.status = 400
@@ -206,93 +208,33 @@ class MediaController {
             return
         }
 
-        if(params.flavor?.toLowerCase() == "iframe"){
-            String queryParams = "stripStyles="+    Util.isTrue(params.stripStyles)
-            queryParams += "&stripScripts="+        Util.isTrue(params.stripScripts)
-            queryParams += "&stripBreaks="+         Util.isTrue(params.stripBreaks)
-            queryParams += "&stripImages="+         Util.isTrue(params.stripImages)
-            queryParams += "&stripClasses="+        Util.isTrue(params.stripClasses)
+        String renderedResponse
+        String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/media/$mi.id"
 
-            String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/media/$mi.id/syndicate.html?${queryParams}"
-            String width = params.width ?: "660"
-            String height = params.height ?: "480"
-            String iframeName = params.iframeName ?: "Syndicated Content"
-            String iframeSnippet =  "<iframe src=\"${url}\" width=\"${width}\" height=\"${height}\" name=\"${iframeName}\" frameborder=\"0\"></iframe>".encodeAsHTML()
-
-            withFormat {
-                html {
-                    render iframeSnippet
-                    return
+        switch(params.displayMethod ? params.displayMethod.toLowerCase() : "feed"){
+            case "mv":
+                renderedResponse = mediaService.renderMediaViewerSnippet(mi, params)
+                break
+            case "feed":
+            case "list":
+            default:
+                if(params.flavor && params.flavor.toLowerCase() == "iframe") {
+                    renderedResponse = mediaService.renderIframeSnippet(url, params)
+                } else{
+                    renderedResponse = mediaService.renderJSSnippet(url, mi, params)
                 }
-                json {
-                    response.contentType = 'application/json'
-                    respond ApiResponse.get200Response([[snippet:iframeSnippet]]).autoFill(params)
-                    return
-                }
-            }
-        } else{
-            String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/media/$mi.id/javascriptContent?${urlService.aggregateSupportedCommands(params)}"
-            if(url.endsWith("?")){
-                url = url[0..-1-1]
-            }
-
-            String jqeuryEmbed = """<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>"""
-            String divId = params.divId ?: "syndicatedContent_${mi.id}_${System.nanoTime()}"
-            String includedDiv = """<div id="${divId}"></div>"""
-            boolean excludeJquery = Util.isTrue(params.excludeJquery)
-            boolean excludeDiv = Util.isTrue(params.excludeDiv)
-
-            String queryParams = "stripStyles="+    Util.isTrue(params.stripStyles)
-            queryParams += "&stripScripts="+        Util.isTrue(params.stripScripts)
-            queryParams += "&stripBreaks="+         Util.isTrue(params.stripBreaks)
-            queryParams += "&stripImages="+         Util.isTrue(params.stripImages)
-            queryParams += "&stripClasses="+        Util.isTrue(params.stripClasses)
-
-            String jsSnippet = """${excludeJquery ? "" : jqeuryEmbed}<script>\$(document).ready(function(){\$.ajax({url: '${grailsApplication.config.grails.serverURL}/api/v2/resources/media/${id}/syndicate.json?${queryParams}',type: "GET",dataType:'jsonp',success: function(data){\$('#${divId}').html(data.results[0].content);}});});</script>${excludeDiv ? "" : includedDiv}"""
-                .encodeAsHTML()
-
-            withFormat {
-                html {
-                    render jsSnippet
-                    return
-                }
-                json {
-                    response.contentType = 'application/json'
-                    respond ApiResponse.get200Response([[snippet:jsSnippet]]).autoFill(params)
-                    return
-                }
-            }
-        }
-    }
-
-    def javascriptContent(Long id){
-        MediaItem mediaItem = mediaService.getMediaItem(id)
-        if(!mediaItem){
-            response.sendError(400, "Invalid ID specified")
-            return
         }
 
-        DelayedMetricAddJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId:mediaItem.id])
-
-        switch(mediaItem){
-            case Html:
-                Html html = mediaItem as Html
-                String extractedContent = contentRetrievalService.extractSyndicatedContent(html.sourceUrl, params)
-                response.contentType = "application/javascript"
-                StringReader sr = new StringReader(extractedContent)
-                sr.eachLine { String line ->
-                    render "document.write('${line}');\n\r"
-                }
+        withFormat {
+            html {
+                render renderedResponse
                 return
-            case Image:
-                Image image = mediaItem as Image
-                renderImage(image.sourceUrl)
+            }
+            json {
+                response.contentType = 'application/json'
+                respond ApiResponse.get200Response([[snippet:renderedResponse]]).autoFill(params)
                 return
-            case Infographic:
-                Infographic infographic = mediaItem as Infographic
-                renderImage(infographic.sourceUrl)
-                return
-            default: render ApiResponse.get400ResponseCustomMessage("The requested media type does not support browser rendering/display.").autoFill(params)
+            }
         }
     }
 
@@ -481,7 +423,6 @@ class MediaController {
                 response.contentType = "application/json"
                 render ApiResponse.get400ContentUnretrievableResponse() as JSON
         }
-
     }
 
     @APIResource(path="/resources/media/{id}/syndicate.{format}", description = "Get syndicated content.", operations = [
@@ -518,147 +459,95 @@ class MediaController {
 
         switch(mi){
             case Html:
-                String extractedContent = getExtractedContent(mi)
-                resp.mediaType = "Html"
-
-                response.withFormat {
-                    html{
-                        render text: extractedContent, contentType: MimeType.HTML.name
-                    }
-                    json{
-                        resp.content = extractedContent
-                        respond ApiResponse.get200Response([resp]).autoFill(params)
-                    }
-                }
-                break
-            case PDF:
-                PDF pdf = mi as PDF
-                resp.mediaType = "PDF"
-                String content
-                if(Util.isTrue(params.thumbnailGeneration)){
-                    println "thumbnail generation"
-                    content = "<object data='${pdf.sourceUrl}' width='100%' height='350px'></object>"
-                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                } else{
-                    content = "<object data='${pdf.sourceUrl}' width='100%' height='350px'></object>"
-                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                    content = contentRetrievalService.addAttributionToExtractedContent(pdf.id, content)
-                    content += analyticsService.getGoogleAnalyticsString(mi)
-                }
-
+                String content = mediaService.renderHtml(mi as Html, params)
                 response.withFormat {
                     html{
                         render text: content, contentType: MimeType.HTML.name
                     }
                     json{
+                        resp.mediaType = "Html"
+                        resp.content = content
+                        respond ApiResponse.get200Response([resp]).autoFill(params)
+                    }
+                }
+                break
+            case PDF:
+                String content = mediaService.renderPdf(mi as PDF, params)
+                response.withFormat {
+                    html{
+                        render text: content, contentType: MimeType.HTML.name
+                    }
+                    json{
+                        resp.mediaType = "PDF"
                         resp.content = content
                         respond ApiResponse.get200Response([resp]).autoFill(params)
                     }
                 }
                 break
             case Periodical:
-                String extractedContent = getExtractedContent(mi)
-                resp.mediaType = "Periodical"
-
-                response.withFormat {
-                    html{
-                        render text: extractedContent, contentType: MimeType.HTML.name
-                    }
-                    json{
-                        resp.content = extractedContent
-                        respond ApiResponse.get200Response([resp]).autoFill(params)
-                    }
-                }
-                break
-            case Image:
-                Image img = mi as Image
-                resp.mediaType = "Image"
-                String content
-                if(Util.isTrue(params.thumbnailGeneration)){
-                    content = "<html><body style='padding:0px; margin:0px;'><img style='width:100%' src='${img.sourceUrl}' alt='${img.altText}'/></body></html>"
-                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                } else{
-                    content = "<img src='${img.sourceUrl}' alt='${img.altText}'/>"
-                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                    content = contentRetrievalService.addAttributionToExtractedContent(img.id, content)
-                    content += analyticsService.getGoogleAnalyticsString(mi)
-                }
-
+                String content = mediaService.renderPeriodical(mi as Periodical, params)
                 response.withFormat {
                     html{
                         render text: content, contentType: MimeType.HTML.name
                     }
                     json{
+                        resp.mediaType = "Periodical"
+                        resp.content = content
+                        respond ApiResponse.get200Response([resp]).autoFill(params)
+                    }
+                }
+                break
+            case Image:
+                String content = mediaService.renderImage(mi as Image, params)
+                response.withFormat {
+                    html{
+                        render text: content, contentType: MimeType.HTML.name
+                    }
+                    json{
+                        resp.mediaType = "Image"
                         resp.content = content
                         respond ApiResponse.get200Response([resp]).autoFill(params)
                     }
                 }
                 break
             case Infographic:
-                Infographic ig = mi as Infographic
-                resp.mediaType = "Infographic"
-                String content
-                if(Util.isTrue(params.thumbnailGeneration)){
-                    content = "<html><body style='padding:0px; margin:0px;'><img style='width:100%' src='${ig.sourceUrl}' alt='${ig.altText}'/></body></html>"
-                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                } else{
-                    content = "<img src='${ig.sourceUrl}' alt='${ig.altText}'/>"
-                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                    content = contentRetrievalService.addAttributionToExtractedContent(ig.id, content)
-                    content += analyticsService.getGoogleAnalyticsString(mi)
-                }
-
+                String content = mediaService.renderInfographic(mi as Infographic, params)
                 response.withFormat {
                     html{
                         render text: content, contentType: MimeType.HTML.name
                     }
                     json{
+                        resp.mediaType = "Infographic"
                         resp.content = content
                         respond ApiResponse.get200Response([resp]).autoFill(params)
                     }
                 }
                 break
             case Video:
-                Video video = mi as Video
-                resp.mediaType = "Video"
-                String content
-
-                if(Util.isTrue(params.thumbnailGeneration)){
-                    content = "<html><body style='padding:0px; margin:0px;'><img style='width:100%' src='${youtubeService.thumbnailLinkForUrl(video.sourceUrl)}'/></body></html>"
-                } else{
-                    content = youtubeService.getIframeEmbedCode(video.sourceUrl, params)
-                    content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                    content = contentRetrievalService.addAttributionToExtractedContent(video.id, content)
-                }
-
+                String content = mediaService.renderVideo(mi as Video, params)
                 response.withFormat {
                     html{
                         render text: content, contentType: MimeType.HTML.name
                     }
                     json{
+                        resp.mediaType = "Video"
                         resp.content = content
                         respond ApiResponse.get200Response([resp]).autoFill(params)
                     }
                 }
                 break
             case com.ctacorp.syndication.media.Collection:
-                com.ctacorp.syndication.media.Collection collection = mi as com.ctacorp.syndication.media.Collection
-                resp.mediaType = "Collection"
-                def items = collection.mediaItems.sort{it.name}.collect{ item ->
-                    "<li>${item.name} <a href='${item.sourceUrl}'>${item.sourceUrl}</a> [${item.id}]</li>"
+                params.controllerContext = { model ->
+                    g.render template: "mediaViewer", model:model
                 }
-                String content = "<ul>"
-                items.each{
-                    content += it
-                }
-                content += "</ul>"
-                content = contentRetrievalService.wrapWithSyndicateDiv(content)
-                content = contentRetrievalService.addAttributionToExtractedContent(collection.id, content)
+                String content = mediaService.renderCollection(mi as com.ctacorp.syndication.media.Collection, params)
+
                 response.withFormat {
                     html{
                         render text: content, contentType: MimeType.HTML.name
                     }
                     json{
+                        resp.mediaType = "Collection"
                         resp.content = content
                         respond ApiResponse.get200Response([resp]).autoFill(params)
                     }

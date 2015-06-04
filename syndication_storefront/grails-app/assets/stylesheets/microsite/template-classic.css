@@ -1,0 +1,64 @@
+/* Extra small devices (phones, less than 768px) */
+/* No media query since this is the default in Bootstrap */
+
+.microsite-classic-content.row {
+	margin-bottom: 15px;
+	margin-top: 15px;}
+
+.microsite-classic-left-col h2 {color: #133C55;}
+
+.microsite-classic-right-col.col-xs-5 {padding-right: 0;}
+
+.microsite-classic-left-col > div#accordion {margin-bottom: 0 !important;}
+
+.microsite-classic-right-col-top.row a,
+.microsite-classic-right-col-top.row h2,
+.microsite-classic-right-col-bottom.row a,
+.microsite-classic-right-col-bottom.row p,
+.microsite-classic-right-col-bottom.row h2,
+.microsite-classic-right-col-bottom.row ul li a{
+  color: #fff;
+}
+
+.microsite-classic-right-col-top.row {
+	background-color: #386FA4;
+	color: #fff;
+	margin-bottom: 5px;
+  	padding: 30px;
+}
+
+.microsite-classic-right-col-top.row .microsite-article h2 {
+	margin-top: 0;
+	margin-left: 15px;
+}
+
+.microsite-classic-right-col-bottom.row {
+	background-color: #59A5D8;
+	padding: 30px;
+}
+
+.microsite-classic-right-col-bottom.row h2 {margin-left: 15px;}
+
+.microsite-classic-right-col-top.row .microsite-article.row {border: none;}
+
+.microsite-classic-content .btn-default {background-color: #efefef;}
+
+.microsite-classic-content .btn-default:hover {background-color: #134c78;}
+
+ /* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) { 
+
+	.microsite-classic-left-col {margin-left: -15px; margin-right: 15px;}
+
+	.microsite-classic-right-col-top.row,
+	.microsite-classic-right-col-bottom.row {
+		border-radius: 5px;
+		margin-bottom: 15px;
+
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { ... }
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) { ... }

@@ -148,7 +148,7 @@ button::-moz-focus-inner {
     height: 44px;
     line-height: 44px;
     position: absolute;
-    right: 0;
+    right: 0px;
     top: 0;
     text-decoration: none;
     text-align: center;
@@ -160,6 +160,7 @@ button::-moz-focus-inner {
     font-size: 28px;
     font-family: Arial, Baskerville, monospace;
 }
+
 
 .mfp-close:hover, .mfp-close:focus {
     opacity: 1;

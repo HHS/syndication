@@ -28,12 +28,14 @@ import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.authentication.UserRole
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import grails.plugins.rest.client.RestBuilder
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_PUBLISHER'])
 class MediaItemController {
     def tagService
     def mediaItemsService
     def springSecurityService
+    RestBuilder rest = new RestBuilder()
 
     def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id}
 
@@ -137,5 +139,31 @@ class MediaItemController {
 
         flash.message = "The Media Items owner has been updated."
         redirect action: 'show', id: mediaItem.id
+    }
+
+    def checkUrlContentType(){
+        def contentType = rest.head(params.sourceUrl).headers.'Content-Type'[0]
+        switch(params.initController){
+            case ~/infographic|image/:
+                if(contentType.contains("jpeg") || contentType.contains("jpg") || contentType.contains("png")){
+                    render "true"
+                    return
+                } else {
+                    render "false"
+                    return
+                }
+                break;
+            case "PDF":
+                if(contentType.contains("pdf")){
+                    render "true"
+                    return
+                } else {
+                    render "false"
+                    return
+                }
+                break;
+        }
+
+        return true
     }
 }

@@ -126,7 +126,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <dd class="word_wrap"><g:formatBoolean boolean="${periodicalInstance?.manuallyManaged}"/></dd>
 
                 <g:if test="${periodicalInstance?.externalGuid}">
-                    <dt id="externalGuid-label" class="word_wrap"><g:message code="periodical.externalGuid.label" default="External Guide"/></dt>
+                    <dt id="externalGuid-label" class="word_wrap"><g:message code="periodical.externalGuid.label" default="External GUID"/></dt>
                     <dd class="word_wrap"><g:fieldValue bean="${periodicalInstance}" field="externalGuid"/></dd>
                 </g:if>
 

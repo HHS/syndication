@@ -50,7 +50,7 @@ class DeliveryHandler implements IPSDeliveryHandler {
 
             if (status == 200) {
                 log.info("Content published to syndication successfully")
-                log.info("POST body was: \n${content}")
+                postBodyWas(content)
                 return new PSDeliveryResult(IPSDeliveryResult.Outcome.DELIVERED, null, itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
             }
 
@@ -69,16 +69,24 @@ class DeliveryHandler implements IPSDeliveryHandler {
         def genericFailureMessage = "Exception occured when publishing to ${Config.PUBLISH_URL}"
         log.severe(genericFailureMessage)
         log.severe("Exception was: ${ex.message}\n\n${ex.stackTrace.join("\n\t")}\n")
-        log.severe("Delivery path was '${deliveryPath}'")
-        log.severe("POST body was was: \n'${content}'")
+        deliveryPathWas(deliveryPath)
+        postBodyWas(content)
         return new PSDeliveryResult(IPSDeliveryResult.Outcome.FAILED, genericFailureMessage, itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
+    }
+
+    private static deliveryPathWas(String deliveryPath) {
+        log.severe("Delivery path was '${deliveryPath}'")
+    }
+
+    private static postBodyWas(String content) {
+        log.severe("POST body was was: \n'${content}'")
     }
 
     static PSDeliveryResult handleGeneralFailure(response, String content, IPSGuid itemId, long jobId, long referenceId, String deliveryPath) {
 
-        log.info("Error occurred when publishing conent to syndication")
-        log.severe("Delivery path was '${deliveryPath}'")
-        log.severe("POST body was was: \n'${content}'")
+        log.info("Error occurred when publishing content to syndication")
+        deliveryPathWas(deliveryPath)
+        postBodyWas(content)
         return new PSDeliveryResult(IPSDeliveryResult.Outcome.FAILED, "Repsonse was ${response.properties.toString()}", itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
     }
 

@@ -15,6 +15,10 @@ import org.springframework.core.io.ClassPathResource
 def userHome = userHome ?: System.getProperty("user.home")
 grails.config.locations = ["file:${userHome}/syndicationConfig.groovy", "file:${userHome}/syndicationSharedConfig.groovy"]
 
+grails.war.resources = { stagingDir, args ->
+    copy(file: "MetaData.groovy", tofile: "${stagingDir}/MetaData.groovy")
+}
+
 // if (System.properties["${appName}.config.location"]) {
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
@@ -199,49 +203,6 @@ syndication.contentExtraction.supportedImageTypes = [
     "Image",
     "Infographic"
 ]
-
-//__________________________
-// Rabbit MQ Settings       \____________________________________________________________
-//_______________________________________________________________________________________
-rabbitmq {
-
-    connection = {
-        connection host: 'localhost', username: 'syndication', password: 'syndication', virtualHost: '/syndication', requestedHeartbeat: 10
-    }
-
-    queues = {
-
-        exchange name: "updateExchange", type: "fanout", {
-            queue name: "emailUpdateQueue", durable: true
-            queue name: "restUpdateQueue", durable: true
-            queue name: "rhythmyxUpdateQueue", durable: true
-        }
-
-        exchange name: "errorExchange", type: "direct", {
-            queue name: "emailErrorQueue", durable: true, binding: "emailError"
-            queue name: "restErrorQueue", durable: true, binding: "restError"
-            queue name: "rhythmyxErrorQueue", durable: true, binding: "rhythmyxError"
-        }
-
-        queue name: "emailErrorDelayQueue", durable: true, arguments: [
-                'x-message-ttl' : 60*60*1000,
-                'x-dead-letter-exchange' : 'errorExchange',
-                'x-dead-letter-routing-key' : 'emailError'
-        ]
-
-        queue name: "restErrorDelayQueue", durable: true, arguments: [
-                'x-message-ttl' : 60*60*1000,
-                'x-dead-letter-exchange' : 'errorExchange',
-                'x-dead-letter-routing-key' : 'restError'
-        ]
-
-        queue name: "rhythmyxErrorDelayQueue", durable: true, arguments: [
-                'x-message-ttl' : 60*60*1000,
-                'x-dead-letter-exchange' : 'errorExchange',
-                'x-dead-letter-routing-key' : 'rhythmyxError'
-        ]
-    }
-}
 
 syndication.mq.updateExchangeName = "updateExchange"
 //-----------------------------------------------------------------

@@ -1,0 +1,89 @@
+/* Extra small devices (phones, less than 768px) */
+/* No media query since this is the default in Bootstrap */
+
+/** Positioning & Sizing **/
+html, body, p {font-size: 16px !important;}
+ 
+ /* header */
+
+.microsite-header {
+  margin-bottom: 15px;
+  padding: 10px;
+}
+
+.header-left {}
+.microsite-logo {}
+
+.header-right img{
+  width: 100%;
+  margin: 10px;
+  max-height: 180px;
+}
+
+.microsite-header, 
+.microsite-footer {
+  background-color: #133C55;
+  color: white;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.5)
+}
+
+.microsite-header a,
+.microsite-header h1,
+.microsite-footer a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.microsite-header a:hover, 
+.microsite-footer a:hover {
+  text-decoration: underline;
+}
+
+.footer-left,
+.footer-right {
+  padding: 30px;
+}
+
+.microsite-footer .ownership-blirp {
+  background-color: transparent;
+  color: #59A5D8;
+  font-size: 12px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.microsite-footer .ownership-blirp a {
+  color: #59A5D8;
+  text-decoration: underline;
+}
+
+/*side panels*/
+
+.side-panels img, iframe {
+  max-width: 100%;
+}
+
+.side-panels a{
+  word-wrap: break-word;
+}
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) { 
+
+.microsite-header, 
+.microsite-footer {
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+.container-fluid .microsite-footer {margin: 0 15px 5px;}
+
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { ... }
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) { ... }
+
+

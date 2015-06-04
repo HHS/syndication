@@ -17,79 +17,89 @@
     <div id="home_left">
         <div id="contentListBox">
             <div class="purplebox">
+                <a name="pageContent"></a>
                 %{--===================================================================--}%
-                <h2 id="05-04-2015-release-">05-04-2015 Release:</h2>
-                <h3 id="api">API</h3>
+                <h1 id="june-01-2015-release-">June-01-2015 Release:</h1>
+                <h2 id="api">API</h2>
                 <ul>
                     <li>New Features<ul>
-                        <li>Added keyTest controller to allow outside parties to verify if their keys are valid or not</li>
-                        <li>Thumbnail generation has been completely overhauled, and has a robust backend to allow the ad-hoc regeneration of thumbnails (for admin users)</li>
-                        <li>Support for new PDF media type</li>
-                        <li>Updated grails to version 2.4.5</li>
+                        <li>Media Viewer Support</li>
+                        <li>View aggregate types as a “feed” (userMediaList, collection, tag, source, etc...)</li>
+                        <li>Embed code for userMediaLists, tags, collections, etc...</li>
                     </ul>
                     </li>
                     <li>Bug Fixes / Improvements<ul>
-                        <li>JSONP wasn’t working for some limited endpoints, this has been corrected</li>
-                        <li>Better error messages for users that are unauthorized to publish content</li>
+                        <li>Some bad requests now correctly return a 400 instead of 500 error</li>
+                        <li>Whitespace in thumbnails/previews removed by centering/cropping long or wide content</li>
+                        <li>Collections no longer show hidden content</li>
                     </ul>
                     </li>
                 </ul>
-                <h3 id="storefront">Storefront</h3>
+                <h2 id="storefront">Storefront</h2>
                 <ul>
                     <li>New Features<ul>
-                        <li>Updated grails to version 2.4.5</li>
-                        <li>Documentation has been expanded and bundled with the source code</li>
-                        <li>Added support for new PDF type</li>
-                    </ul>
-                    </li>
-                    <li>Bug Fixes / Improvements</li>
-                </ul>
-                <h3 id="cms-manager">CMS Manager</h3>
-                <ul>
-                    <li>New Features<ul>
-                        <li>Updated grails to version 2.4.5</li>
+                        <li>Do-it-yourself microsites are now available to publishers (beta release)</li>
+                        <li>Embeddable media viewers now available for aggregate types</li>
+                        <li>Media Viewers &amp; Feed view available for all aggregate types (tags, lists, etc)</li>
+                        <li>FAQ (Q&amp;A), roadmap, and other static pages have been updated to be relevant</li>
                     </ul>
                     </li>
                     <li>Bug Fixes / Improvements<ul>
-                        <li>Fixed a character encoding issue with flash notifications for subscribers</li>
+                        <li>Fixed an http vs https mixed mode error for previewing youtube videos in chrome</li>
+                        <li>Added some missing “skip to content” page anchors for 508</li>
+                        <li>Hidden media items are no longer visible in collections</li>
                     </ul>
                     </li>
                 </ul>
-                <h3 id="admin-dashboard">Admin Dashboard</h3>
+                <h2 id="cms-manager">CMS Manager</h2>
                 <ul>
                     <li>New Features<ul>
-                        <li>Updated grails to version 2.4.5</li>
-                        <li>Admin GUI for managing missing thumbnails has been added.</li>
-                        <li>Thumbnails generation subsystem has undergone a complete rewrite</li>
-                        <li>Auto-Tagger is a little smarter than before</li>
-                        <li>New user breakdown view for admins allows seeing account distribution by domain</li>
-                        <li>Support for new PDF type</li>
+                        <li>Field error checking on rhythmyx subscriber creations</li>
+                    </ul>
+                    </li>
+                    <li>Bug Fixes / Improvements<ul>
+                        <li>User passwords no longer appear as a string of question marks in user show page</li>
+                    </ul>
+                    </li>
+                </ul>
+                <h2 id="admin-dashboard">Admin Dashboard</h2>
+                <ul>
+                    <li>New Features<ul>
+                        <li>Dashboard timeline now shows thumbnails and links to storefront</li>
+                        <li>User breakdown has been made available to all users, and includes additional breakdown information for other domains besides .gov .edu and .org.</li>
+                        <li>You can now specify a list size for media metrics views</li>
+                        <li>Class stripping enabled by default for media</li>
                     </ul>
                     </li>
                     <li>Bugs / Improvements<ul>
-                        <li>Date Range for metrics displayed some erroneous values, this has been corrected</li>
-                        <li>Youtube links in the .com/embed/&lt;some id&gt; format are now supported</li>
+                        <li>Expanded auto-tagger exclusion wordlist</li>
+                        <li>Improved query performance for certain media metric views</li>
+                        <li>Better error messages for private/disabled youtube videos</li>
+                        <li>Fixed a bug where the syndicate class got stripped from media items</li>
+                        <li>Source/Subscriber lists are now sorted alphabetically</li>
                     </ul>
                     </li>
                 </ul>
-                <h3 id="tagcloud">TagCloud</h3>
+                <h2 id="tagcloud">TagCloud</h2>
                 <ul>
                     <li>New Features<ul>
-                        <li>Updated grails to version 2.4.5</li>
-                        <li>Documentation has been expanded and bundled with the source code</li>
-                    </ul>
-                    </li>
-                    <li>Bug Fixes / Improvements</li>
-                </ul>
-                <h3 id="tinyurl">TinyUrl</h3>
-                <ul>
-                    <li>New Features<ul>
-                        <li>Updated grails to version 2.4.5</li>
-                        <li>Documentation has been expanded and bundled with the source code</li>
+                        <li>Nothing significant</li>
                     </ul>
                     </li>
                     <li>Bug Fixes / Improvements<ul>
-                        <li>Known Issues</li>
+                        <li>Nothing significant</li>
+                    </ul>
+                    </li>
+                </ul>
+                <h2 id="tinyurl">TinyUrl</h2>
+                <ul>
+                    <li>New Features<ul>
+                        <li>Nothing significant</li>
+                    </ul>
+                    </li>
+                    <li>Bug Fixes / Improvements<ul>
+                        <li>Nothing significant
+                        Known Issues</li>
                     </ul>
                     </li>
                     <li>No significant issues at this time</li>

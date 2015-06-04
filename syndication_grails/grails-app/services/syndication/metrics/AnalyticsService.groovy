@@ -21,21 +21,47 @@ class AnalyticsService {
 
     def grailsApplication
 
-    String getGoogleAnalyticsString(MediaItem mi){
-//        String analyticsBlock = """\
-//<!-- Google Tag Manager -->
-//<noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-PCQMPL" title="hhsgoogletagmanager"
-//height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-//<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-//new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-//j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-//'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-//})(window,document,'script','dataLayer','GTM-PCQMPL');</script>
-//<!-- End Google Tag Manager -->"""
+    /*
+        Following are currently unused, but can be added in the future:
+        - userId: add an ID for the user generating a snippet
+        - campaignId: add the campaign this item belongs to
+        - campaignName: add the name of the campaign this item belongs to
+     */
 
-        //Old image based beacon
-        String analyticsBlock = """<img src="http://www.google-analytics.com/collect?v=1&tid=UA-28750072-6&cid=1&t=pageview&cs=${mi?.source?.acronym}&cm=${mi?.name?.encodeAsURL()}&cn=${mi?.id}&z=${System.nanoTime()}&dl=${grailsApplication.config.grails.serverURL}"/>"""
+    String getGoogleAnalyticsString(MediaItem mi){
+        def mediaId = mi.id
+        def mediaType = mi.getClass().simpleName.toLowerCase()
+        def sourceUrl = URLEncoder.encode(mi.sourceUrl, "UTF-8")
+        def sourceId = mi.source.id
+        def sourceAcronym = mi.source.acronym
+        def languageId = mi.language.id
+        def isoCode = mi.language.isoCode
+
+        String iframe = """\
+<iframe src="//www.googletagmanager.com/ns.html?id=GTM-KT9TM9&\
+mediaId=${mediaId}&\
+mediaType=${mediaType}&\
+sourceUrl=${sourceUrl}&\
+userId=-1&\
+sourceId=${sourceId}&\
+sourceAcronym=${sourceAcronym}&\
+campaignId=-1&\
+campaignName=null&\
+languageId=${languageId}\
+&isoCode=${isoCode}" \
+height="0" width="0" style="display:none;visibility:hidden"></iframe>"""
+
+        String analyticsBlock = """\
+${iframe}<noscript>${iframe}</noscript>"""
 
         analyticsBlock
+    }
+
+    String encode(String toEncode){
+        URLEncoder.encode(toEncode, "UTF-8")
+    }
+
+    String uuid(){
+        encode("${UUID.randomUUID()}")
     }
 }

@@ -30,20 +30,51 @@ class TagService {
                 })
     }
 
+    def getTag(Long tagId){
+        restGet("${serverAddress}/tags/show/${tagId}.json") ?: []
+    }
+    
     def getTagsForMediaId(Long id) {
         cache.get(id)
+    }
+
+    def getAllActiveTagLanguages() {
+        restGet("${serverAddress}/languages/getActive.json") ?: []
     }
 
     def getTagsByType(String type){
         restGet("${serverAddress}/tags/getTagsByTypeName.json?typeName=${type}") ?: []
     }
 
+    def listTags(params = [:]) {
+        params.languageId = params.languageId ?: 1
+        params.typeId = params.typeId ?: 1
+        def offset = params.offset ?: 0
+        def max = params.max ?: 10
+        def sort = params.sort ?: "id"
+        params.name = params.name ?: ""
+        if (params.order?.toLowerCase() == "desc") {
+            sort = "-${sort}"
+        }
+        restGet("${serverAddress}/tags.json?languageId=${params.languageId}&typeId=${params.typeId}&includePaginationFields=1&offset=${offset}&max=${max}&sort=${sort}&nameContains=${params.name}")
+    }
+
+    def getTagTypes(params = [:]) {
+        def include = params.includePaginationFields ?: 0
+        def offset = params.offset ?: 0
+        def max = params.max ?: 10
+        def sort = params.sort ?: "id"
+        if (params.order?.toLowerCase() == "desc") {
+            sort = "-${sort}"
+        }
+        restGet("${serverAddress}/tagTypes/index.json?offset=${offset}&max=${max}&sort=${sort}&includePaginationFields=${include}") ?: []
+    }
+
     def getMediaForTagId(Long id, params) {
-        params.tagId = id
-        def contentList = restGet("${serverAddress}/content/getContentForTagId.json", params)
+        def contentList = restGet("${serverAddress}/content/getContentForTagId.json", [tagId:id])
         if(!contentList) { return [] }
 
-        MediaItem.facetedSearch([restrictToSet:contentList*.syndicationId.join(",")]).list()
+        MediaItem.facetedSearch([restrictToSet:contentList*.syndicationId.join(",")]).list(params)
     }
 
     private restGet(String url, params = null) {

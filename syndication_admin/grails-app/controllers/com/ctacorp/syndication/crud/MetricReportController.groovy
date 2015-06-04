@@ -9,6 +9,7 @@ import com.ctacorp.syndication.authentication.UserRole
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
+import static java.util.Calendar.*
 
 /**
  * Created by nburk on 11/13/14.
@@ -41,17 +42,38 @@ class MetricReportController {
             case "alltime": mostPopular = queryAuditService.getMostPopularAllTime(); break
         }
 
+        def googleOverview = null
+        try{
+            def googleResponse = googleAnalyticsService.getDashboardOverviewData(overviewMeta?.start)
+//            println ((googleResponse as JSON).toString(true))
+            googleOverview = [
+                    stats : [:],
+                    error : googleResponse.error
+            ]
+            if(googleResponse?.rows && googleResponse?.rows[0]?.size() > 0){
+                for(def i = 0; i < googleResponse.rows[0].size(); i++){
+                    googleOverview.stats[googleResponse.columnHeaders[i].name-'ga:'] = googleResponse.rows[0][i]
+                }
+            } else{
+                googleOverview.error = "There are no metrics available for the select date range."
+            }
+
+        }catch(e){
+            log.error "Couldn't retrieve google anayltics info"
+            e.printStackTrace()
+        }
+
         [
-                start:overviewMeta.start,
-                googleOverview: googleAnalyticsService.getDashboardOverviewData(overviewMeta?.start),
-                mostPopular: mostPopular,
-                subscribers: UserRole.findAllByRole(Role.findByAuthority("ROLE_STOREFRONT_USER"))*.user,
-                popularRange: overviewMeta.popularRange
+            start:overviewMeta.start,
+            googleOverview: googleOverview,
+            mostPopular: mostPopular,
+            subscribers: UserRole.findAllByRole(Role.findByAuthority("ROLE_STOREFRONT_USER"))*.user,
+            popularRange: overviewMeta.popularRange
         ]
     }
 
     def mediaViewMetrics(Integer max){
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 10, 1000)
         def mediaItems
         def count = MediaItem.count()
 
@@ -89,11 +111,11 @@ class MetricReportController {
             }
         }
 
-        render view:"mediaViewMetrics", model:[mediaItemInstanceList:mediaItems, day: day, mediaItemInstanceCount: count]
+        [mediaItemInstanceList:mediaItems, day: day, mediaItemInstanceCount: count]
     }
 
     def mediaRangeViewMetrics(Integer max){
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 10, 1000)
         params.offset = params.offset ?: 0
         Date fromDay
         Date toDay
@@ -103,26 +125,53 @@ class MetricReportController {
         if(params.fromDay && params.toDay) {
             fromDay = params.fromDay instanceof Date ? params.fromDay : new Date(params.fromDay as Long)
             toDay = params.toDay instanceof Date ? params.toDay : new Date(params.toDay as Long)
-        } else if(params.month) {
-            fromDay = new Date() - 30
-            toDay = new Date()
-        } else if(params.year) {
-            fromDay = new Date() - 365
-            toDay = new Date()
-        } else {
-            fromDay = new Date() - 6
-            toDay = new Date()
+        } else{
+            switch(params.rangePreset){
+                case "week":
+                    fromDay = new Date() - 6
+                    toDay = new Date()
+                    break
+                case "month":
+                    fromDay = new Date() - 30
+                    toDay = new Date()
+                    break
+                case "year":
+                    fromDay = new Date() - 365
+                    toDay = new Date()
+                    break
+                case "ytd":
+                    GregorianCalendar cal = new GregorianCalendar()
+                    cal.set(DAY_OF_YEAR, 1)
+                    fromDay = cal.time
+                    toDay = new Date()
+                    break
+                default:
+                    fromDay = new Date() - 6
+                    toDay = new Date()
+            }
         }
+
         fromDay = fromDay.clearTime()
         toDay = toDay.clearTime()
 
         if(params.sort == "storefrontViewCount" || params.sort == "apiViewCount") {
             if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
-                mediaItems = MediaMetric.findAllByDayBetweenAndMediaInList(fromDay, toDay, MediaItem.findAllByIdInList(publisherItems()), params).media.unique()
-                count = MediaMetric.findAllByDayBetweenAndMediaInList(fromDay, toDay, MediaItem.findAllByIdInList(publisherItems())).media.unique().size
+                mediaItems = viewMetricService.findRangeOfViews(params, fromDay, toDay)
+                count = MediaMetric.createCriteria().listDistinct {
+                    projections {
+                        groupProperty("media", "media")
+                        between("day", fromDay, toDay)
+                        'in'("media", MediaItem.findAllByIdInList(publisherItems()))
+                    }
+                }.size()
             } else {
-                mediaItems = MediaMetric.findAllByDayBetween(fromDay, toDay, params).media.unique()
-                count = MediaMetric.findAllByDayBetween(fromDay, toDay).media.unique().size
+                mediaItems = viewMetricService.findRangeOfViews(params, fromDay, toDay).collect{it[0]}
+                count = MediaMetric.createCriteria().listDistinct {
+                    projections {
+                        groupProperty("media", "media")
+                        between("day", fromDay, toDay)
+                    }
+                }.size()
             }
         } else {
             if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
@@ -142,7 +191,7 @@ class MetricReportController {
     }
 
     def totalViews(Integer max){
-        params.max = Math.min(max ?: 10, 100)
+        params.max = Math.min(max ?: 10, 1000)
         params.offset = params.offset ?: 0
         def count = MediaItem.count()
         def mediaItems
@@ -220,13 +269,12 @@ class MetricReportController {
     def getTopTen(){
         params.range = params.range ?: 1
         def data = viewMetricService.findTopTen(params)
-        
+
         render data as JSON
     }
 
     def getAgencyTopTen(){
         def data = viewMetricService.findAgencyTopTen(params)
-
         render data as JSON
     }
 

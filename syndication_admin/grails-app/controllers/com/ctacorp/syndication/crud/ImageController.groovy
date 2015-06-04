@@ -14,6 +14,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
+import grails.plugins.rest.client.RestBuilder
+import org.springframework.web.multipart.commons.CommonsMultipartFile
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -63,7 +66,7 @@ class ImageController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Image(params), model: [subscribers:subscribers]
+        respond new Image(params), model: [subscribers:subscribers, formats:["jpg", "png"]]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
@@ -77,7 +80,7 @@ class ImageController {
         def status =  mediaItemsService.updateItemAndSubscriber(imageInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            respond imageInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers() ]
+            respond imageInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers(), formats:["jpg", "png"]]
             return
         }
 
@@ -94,7 +97,7 @@ class ImageController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
     def edit(Image imageInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond imageInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(imageInstance)?.subscriberId)]
+        respond imageInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(imageInstance)?.subscriberId), formats:["jpg", "png"]]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])

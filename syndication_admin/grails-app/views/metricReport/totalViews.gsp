@@ -31,49 +31,60 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </g:if>
     <div class="row">
         <div class="col-lg-12">
-            <!-- /.panel-heading -->
-            <div class="panel-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover">
-                        <thead>
-                        <tr>
+            <form>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="pull-right-md">
+                            <label for="max">Max records to display</label>
+                            <g:select name="max" from="[10,50,100,250,500,1000]" value="${params.max}"/>
+                            <g:actionSubmit action="totalViews" class="btn btn-default btn-xs" name="Apply Limit" value="Apply Limit"/>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                    <tr>
 
-                            <g:sortableColumn class="idTables" property="id" title="${message(code: 'mediaItem.id.label', default: 'ID')}"/>
+                        <g:sortableColumn class="idTables" property="id" title="${message(code: 'mediaItem.id.label', default: 'ID')}"/>
 
-                            <g:sortableColumn property="name" title="${message(code: 'mediaItem.name.label', default: 'Name')}"/>
+                        <g:sortableColumn property="name" title="${message(code: 'mediaItem.name.label', default: 'Name')}"/>
 
-                            <g:sortableColumn property="storefrontViewCount" title="${message(code: 'mediaMetric.apiViewCount.label', default: 'Total Storefront Views')}"/>
+                        <g:sortableColumn property="storefrontViewCount" title="${message(code: 'mediaMetric.apiViewCount.label', default: 'Total Storefront Views')}"/>
 
-                            <g:sortableColumn property="apiViewCount" title="${message(code: 'mediaMetric.apiViewCount.label', default: 'Total Api Views')}"/>
+                        <g:sortableColumn property="apiViewCount" title="${message(code: 'mediaMetric.apiViewCount.label', default: 'Total Api Views')}"/>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <g:each in="${mediaItemInstanceList}" status="i" var="mediaItemInstance">
+                        <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+
+                            <td>${mediaItemInstance?.id}</td>
+
+                            <td><g:link controller="mediaItem" action="show" id="${mediaItemInstance.id}">${fieldValue(bean: mediaItemInstance, field: "name")}</g:link></td>
+
+                            <td>${MediaMetric.findAllByMedia(mediaItemInstance)?.storefrontViewCount?.sum() ?: 0}</td>
+
+                            <td>${MediaMetric.findAllByMedia(mediaItemInstance)?.apiViewCount?.sum() ?: 0}</td>
 
                         </tr>
-                        </thead>
-                        <tbody>
-
-                        <g:each in="${mediaItemInstanceList}" status="i" var="mediaItemInstance">
-                            <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-
-                                <td>${mediaItemInstance?.id}</td>
-
-                                <td><g:link controller="mediaItem" action="show" id="${mediaItemInstance.id}">${fieldValue(bean: mediaItemInstance, field: "name")}</g:link></td>
-
-                                <td>${MediaMetric.findAllByMedia(mediaItemInstance)?.storefrontViewCount?.sum() ?: 0}</td>
-
-                                <td>${MediaMetric.findAllByMedia(mediaItemInstance)?.apiViewCount?.sum() ?: 0}</td>
-
-                            </tr>
-                        </g:each>
-                        </tbody>
-                    </table>
-                </div>
+                    </g:each>
+                    </tbody>
+                </table>
+            </div>
+            <g:if test="${mediaItemInstanceCount > mediaItemInstanceList.size()}">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <div class="pagination">
                             <g:paginate total="${mediaItemInstanceCount ?: 0}"/>
                         </div>
                     </div>
                 </div>
-            </div>
+            </g:if>
+            <br/>
         </div>
     </div>
 </div>

@@ -33,12 +33,4 @@ class SystemEventService {
             type: "system_stop"
         ).save()
     }
-
-    SystemEvent adminLoggedIn(){
-        new SystemEvent(
-            name: "Content updated",
-            type: "update",
-            message: "link to item here"
-        ).save()
-    }
 }

@@ -63,7 +63,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     </ul>
                 </div>
             </div>
-
         </div>
 
         <div class="col-lg-4">
@@ -79,17 +78,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     ${subscribers.size()}
                 </div>
             </div>
-            %{--<div class="panel panel-primary">--}%
-                %{--<div class="panel-heading">--}%
-                    %{--<h1 class="panel-title">--}%
-                        %{--Subscribers by Domain--}%
-                    %{--</h1>--}%
-                %{--</div>--}%
-
-                %{--<div class="panel-body">--}%
-                    %{--Placeholder - we don't collect this information in the user account--}%
-                %{--</div>--}%
-            %{--</div>--}%
         </div>
 
         <div class="col-lg-4">
@@ -116,17 +104,19 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         </div>
                     </g:if>
                     <g:else>
-                        <g:each in="${googleOverview?.columnHeaders}" var="title" status="i">
-                            <li class="searchQuery list-group-item">
-                                <strong>${title.name - 'ga:'}</strong><br/>
-                                <g:if test="${title.name == 'ga:avgTimeOnPage'}">
-                                    <span>${googleOverview?.rows[0][i].split("\\.")[0]} Seconds</span>
-                                </g:if>
-                                <g:else>
-                                    <span>${googleOverview?.rows[0][i]}</span>
-                                </g:else>
-                            </li>
-                        </g:each>
+                        <g:if test="${googleOverview.stats}">
+                            <g:each in="${googleOverview.stats}" var="stat">
+                                <li class="searchQuery list-group-item">
+                                    <strong>${stat.key}</strong><br/>
+                                    <g:if test="${stat.key == 'avgTimeOnPage'}">
+                                        <span>${stat.value} Seconds</span>
+                                    </g:if>
+                                    <g:else>
+                                        <span>${stat.value}</span>
+                                    </g:else>
+                                </li>
+                            </g:each>
+                        </g:if>
                     </g:else>
                 </div>
             </div>

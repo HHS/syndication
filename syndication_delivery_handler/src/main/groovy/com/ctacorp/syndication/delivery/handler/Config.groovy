@@ -37,8 +37,8 @@ class Config {
         SERVER_BASE_URL = config.server?.base?.url ?: ""
         API_KEY_NAME = config?.api?.key?.name ?: ""
         API_KEY_HEADER = config?.api?.key?.header ?: ""
-        HTTP_CONNECTION_TIMEOUT = (config?.http?.connection?.timeout ?: 30) * 1000
-        HTTP_SOCKET_TIMEOUT = (config?.http?.socket?.timeout ?: 30) * 1000
+        HTTP_CONNECTION_TIMEOUT = (config?.http?.connection?.timeout ?: 90) * 1000
+        HTTP_SOCKET_TIMEOUT = (config?.http?.socket?.timeout ?: 90) * 1000
 
         log.info("PUBLISH_URL is: ${PUBLISH_URL}")
         log.info("SERVER_BASE_URL is: ${SERVER_BASE_URL}")

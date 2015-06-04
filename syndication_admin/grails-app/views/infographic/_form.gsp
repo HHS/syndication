@@ -180,7 +180,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="source">Source<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <g:select from="${com.ctacorp.syndication.Source.list()}" name="source.id" id="source" class="form-control" optionValue="name" optionKey="id" value="${infographicInstance?.source?.id}"/>
+        <g:select from="${com.ctacorp.syndication.Source.list([sort: "name"])}" name="source.id" id="source" class="form-control" optionValue="name" optionKey="id" value="${infographicInstance?.source?.id}"/>
     </div>
 </div>
 
@@ -204,7 +204,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="format">infographic Format<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <input id="format" name="imageFormat" required="" value="${infographicInstance?.imageFormat}">
+        <g:select id="format" name="imageFormat" from="${formats}" class="form-control" required="" value="${infographicInstance?.imageFormat}" noSelection="${['null':'-Choose a Format-']}"/>
     </div>
 </div>
 
@@ -217,3 +217,29 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 </div>
 
 <g:render template="/mediaItem/owner"/>
+
+<script>
+    $("form").submit(function(e){
+        e.preventDefault();
+        var self =this;
+        $.ajax({
+            data:{sourceUrl:document.getElementById("sourceUrl").value, initController:'${params.controller}'},
+            url:'${g.createLink(controller: 'mediaItem', action: 'checkUrlContentType')}',
+            success:function(response){
+                if(response == "true"){
+                    self.submit()
+                } else {
+                    var dialog = $('<p>Source Url is not of the correct content type. Are you sure you want to continue?</p>').dialog({
+                        buttons: {
+                            "Yes": function() {self.submit()},
+                            "No":  function() {dialog.dialog('close')},
+                            "Cancel":  function() {
+                                dialog.dialog('close');
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    })
+</script>

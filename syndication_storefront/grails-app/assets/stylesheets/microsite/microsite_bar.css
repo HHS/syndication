@@ -1,0 +1,51 @@
+/* Extra small devices (phones, less than 768px) */
+/* No media query since this is the default in Bootstrap */
+
+
+.microsite-bar {
+  background-color: #666;
+  padding-top: 50px;
+  padding-bottom: 10px;
+}
+
+
+.microsite-bar .inline-form {text-align: center;}
+
+.microsite-bar label {
+  color: gold;
+  font-size: 18px;
+}
+
+.microsite-bar input {
+  background-color: #ddd;
+  border: none;
+  color: #000;
+  font-size: 1em;
+  height: 50px;
+  margin-left: 15px;
+  text-indent: 15px;
+  width: 80%;
+}
+
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) { 
+
+.microsite-bar label {
+  font-size: 28px;
+}
+
+.microsite-bar input {width: 500px;}
+
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { ... }
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200) { 
+
+ }
+
+
+

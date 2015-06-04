@@ -69,7 +69,7 @@ class UserMediaListController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'userMediaListInstance.label', default: 'UserMediaList'), userMediaListInstance.name])
+                flash.message = message(code: 'default.created.message', args: [message(code: 'userMediaListInstance.label', default: 'List'), userMediaListInstance.name])
                 redirect userMediaListInstance
             }
             '*' { respond userMediaListInstance, [status: CREATED] }
@@ -94,7 +94,7 @@ class UserMediaListController {
         }
 
         if(userMediaListInstance.user != springSecurityService.getCurrentUser() as User){
-            userMediaListInstance.errors.reject("invalid.ownership", "You tried to update a media list you don't own, has your login expired?")
+            userMediaListInstance.errors.reject("invalid.ownership", "You tried to update a list you don't own, has your login expired?")
             respond userMediaListInstance.errors, view: 'edit'
             return
         }
@@ -110,7 +110,7 @@ class UserMediaListController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'UserMediaList.label', default: 'UserMediaList'), userMediaListInstance.name])
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'UserMediaList.label', default: 'List'), userMediaListInstance.name])
                 redirect userMediaListInstance
             }
             '*' { respond userMediaListInstance, [status: OK] }
@@ -124,11 +124,17 @@ class UserMediaListController {
             return
         }
 
+        if(UserMediaList.findAllByUser(springSecurityService.currentUser).size() <= 1){
+            flash.error = "You cannot delete your only media list. Please create another one first."
+            respond userMediaListInstance, view: 'show'
+            return
+        }
+
         userMediaListInstance.delete flush: true
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'UserMediaList.label', default: 'UserMediaList'), userMediaListInstance.name])
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'UserMediaList.label', default: 'List'), userMediaListInstance.name])
                 redirect action: "index", method: "GET"
             }
             '*' { render status: NO_CONTENT }
@@ -138,7 +144,7 @@ class UserMediaListController {
     protected void notFound() {
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'userMediaListInstance.label', default: 'UserMediaList'), params.id])
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'userMediaListInstance.label', default: 'List'), params.id])
                 redirect action: "index", method: "GET"
             }
             '*' { render status: NOT_FOUND }

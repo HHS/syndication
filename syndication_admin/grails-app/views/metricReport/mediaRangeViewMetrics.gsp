@@ -20,6 +20,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <meta name="layout" content="main">
     <g:set var="entityName" value="Date Ranges"/>
     <title><g:message code="default.list.label" args="[entityName]"/></title>
+    <style>
+        label.padded{
+            width: 50px;
+        }
+    </style>
 </head>
 
 <body>
@@ -32,103 +37,98 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <div class="col-lg-12">
             <!-- /.panel-heading -->
             <div class="panel-body">
-                <g:if test="${!mediaItemInstanceList}">
-                    There are no views for any content on these day(s).
-                    <br>
-                    <br>
-                </g:if>
-                <g:else>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered table-hover">
-                            <thead>
-                            <tr>
-
-                                <g:sortableColumn class="idTables" params="[toDay:toDay?.time, fomDay:fromDay?.time]" property="id" title="${message(code: 'mediaItem.id.label', default: 'ID')}"/>
-
-                                <g:sortableColumn property="name" params="[toDay:toDay?.time, fromDay:fromDay?.time]" title="${message(code: 'mediaItem.name.label', default: 'Name')}"/>
-
-                                <g:sortableColumn property="storefrontViewCount" params="[toDay:toDay?.time, fromDay:fromDay?.time]" title="${message(code: 'mediaMetric.apiViewCount.label', default: 'Storefront Views')}"/>
-
-                                <g:sortableColumn property="apiViewCount" params="[toDay:toDay?.time, fromDay:fromDay?.time]" title="${message(code: 'mediaMetric.apiViewCount.label', default: 'Api Views')}"/>
-
-
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <g:each in="${mediaItemInstanceList}" status="i" var="mediaItemInstance">
-                                <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-
-                                    <td>${mediaItemInstance?.id}</td>
-
-                                    <td><g:link controller="mediaItem" action="show" id="${mediaItemInstance.id}">${fieldValue(bean: mediaItemInstance, field: "name")}</g:link></td>
-
-                                    <g:if test="${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.storefrontViewCount}">
-                                        <td>${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.storefrontViewCount?.sum() ?: 0}</td>
-                                    </g:if>
-                                    <g:else>
-                                        <td>0</td>
-                                    </g:else>
-                                    <g:if test="${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.apiViewCount}">
-                                        <td>${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.apiViewCount?.sum() ?: 0}</td>
-                                    </g:if>
-                                    <g:else>
-                                        <td>0</td>
-                                    </g:else>
-
-                                </tr>
-                            </g:each>
-                            </tbody>
-                        </table>
-                    </div>
-                </g:else>
                 <div class="row">
+                    <form>
                     <div class="col-md-6">
-                        <div class="pagination">
-                            <g:paginate total="${mediaItemInstanceCount ?: 0}" params="[fromDay:fromDay?.time, toDay: toDay?.time]"/>
+                        <h4>Select a Time Range</h4>
+                        <div class="form-group">
+                            <label for="fromDay" class="padded">From:</label>
+                            <g:datePicker name="fromDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${fromDay}"/>
+                            <br/>
+                            <label for="toDay" class="padded">To:</label>
+                            <g:datePicker name="toDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${toDay}"/>
+                            <g:actionSubmit action="mediaRangeViewMetrics" class="btn btn-success btn-xs" value="Apply Range"/>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="pull-right hidden-sm hidden-xs">
-                            <g:link action="mediaRangeViewMetrics" class="btn-sm btn-success" params="[week: 'week']">Past Week</g:link>
-                            <g:link action="mediaRangeViewMetrics" class="btn-sm btn-success" params="[month: 'month']">Past Month</g:link>
-                            <g:link action="mediaRangeViewMetrics" class="btn-sm btn-success" params="[year: 'year']">Past Year</g:link>
+                        <div class="pull-right-md">
+                            <div class="pull-right-md" style="margin-bottom: 10px;">
+                                <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'week' , sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Past Week</g:link>
+                                <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'month', sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Past Month</g:link>
+                                <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'year' , sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Past Year</g:link>
+                                <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'ytd'  , sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Year to Date</g:link>
+                            </div>
+                            <div class="hidden-sm hidden-xs"><br/><br/><br/></div>
+                            <label for="max">Max records to display</label>
+                            <g:select name="max" from="[10,50,100,250,500,1000]" value="${params.max}"/>
+                            <g:actionSubmit action="mediaRangeViewMetrics" class="btn btn-default btn-xs" name="Apply Limit" value="Apply Limit"/>
                         </div>
-                        <div class="hidden-lg hidden-md">
-                            <br>
-                            <g:link action="mediaRangeViewMetrics" class="btn-sm btn-success" params="[week: 'week']">Past Week</g:link>
-                            <g:link action="mediaRangeViewMetrics" class="btn-sm btn-success" params="[month: 'month']">Past Month</g:link>
-                            <g:link action="mediaRangeViewMetrics" class="btn-sm btn-success" params="[year: 'year']">Past Year</g:link>
+                    </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive" style="margin-top:5px;">
+                            <table class="table table-striped table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <g:sortableColumn class="idTables" params="[toDay:toDay?.time, fomDay:fromDay?.time]" property="id" title="${message(code: 'mediaItem.id.label', default: 'ID')}"/>
+
+                                    <g:sortableColumn property="name" params="[toDay:toDay?.time, fromDay:fromDay?.time]" title="${message(code: 'mediaItem.name.label', default: 'Name')}"/>
+
+                                    <g:sortableColumn property="storefrontViewCount" params="[toDay:toDay?.time, fromDay:fromDay?.time]" title="${message(code: 'mediaMetric.apiViewCount.label', default: 'Storefront Views')}"/>
+
+                                    <g:sortableColumn property="apiViewCount" params="[toDay:toDay?.time, fromDay:fromDay?.time]" title="${message(code: 'mediaMetric.apiViewCount.label', default: 'Api Views')}"/>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <g:each in="${mediaItemInstanceList}" status="i" var="mediaItemInstance">
+                                    <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+
+                                        <td>${mediaItemInstance?.id}</td>
+
+                                        <td><g:link controller="mediaItem" action="show" id="${mediaItemInstance.id}">${fieldValue(bean: mediaItemInstance, field: "name")}</g:link></td>
+
+                                        <g:if test="${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.storefrontViewCount}">
+                                            <td>${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.storefrontViewCount?.sum() ?: 0}</td>
+                                        </g:if>
+                                        <g:else>
+                                            <td>0</td>
+                                        </g:else>
+                                        <g:if test="${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.apiViewCount}">
+                                            <td>${MediaMetric.findAllByDayBetweenAndMedia(fromDay, toDay, mediaItemInstance)?.apiViewCount?.sum() ?: 0}</td>
+                                        </g:if>
+                                        <g:else>
+                                            <td>0</td>
+                                        </g:else>
+
+                                    </tr>
+                                </g:each>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6 hidden-lg hidden-md">
-                        <br>
-                        * If sorting by total views, than items with no views will not be shown.
-                    </div>
-                    <div class="col-md-6">
-                        <g:form class="form" action="mediaRangeViewMetrics">
-                            <div class="form-group">
-                                <h2>Select a Time Range</h2>
-                            </div>
-                            <div class="form-group">
-                                <label for="fromDay">From:</label>
-                                <g:datePicker name="fromDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${fromDay}"/>
-                            </div>
-                            <div class="form-group">
-                                <label for="toDay">To:</label>
-                                <g:datePicker name="toDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${toDay}"/>
-                            </div>
-                            <div class="form-group pull-left">
-                                <g:actionSubmit action="mediaRangeViewMetrics" class="btn btn-success" value="Submit Date Range"/>
-                            </div>
-                        </g:form>
-                    </div>
-                    <div class="col-md-6 hidden-sm hidden-xs">
-                        <div class="pull-right">
-                            <br>
-                            * If sorting by total views, than items with no views will not be shown.
+                <g:if test="${!mediaItemInstanceList}">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong>There are no recorded metrics for this date range.</strong>
                         </div>
+                    </div>
+                </g:if>
+                <g:if test="${mediaItemInstanceCount > mediaItemInstanceList.size()}">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="pagination">
+                                <g:paginate total="${mediaItemInstanceCount ?: 0}" params="[fromDay:fromDay?.time, toDay: toDay?.time]"/>
+                            </div>
+                        </div>
+                    </div>
+                </g:if>
+                <div class="row">
+                    <div class="col-md-12">
+                        <br/>
+                        <p>* If sorting by view count, items with 0 views for the specified day are omitted.</p>
                     </div>
                 </div>
             </div>

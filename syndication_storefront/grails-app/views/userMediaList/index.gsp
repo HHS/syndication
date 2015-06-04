@@ -5,13 +5,13 @@
 <head>
     <meta name="layout" content="storefront"/>
 
-    <title>Media Lists</title>
+    <title>Lists</title>
 </head>
 
 <body>
 <div id="home">
     <div id="home_left">
-        <h2><g:link class="create" action="create">Create Media List</g:link></h2>
+        <h2><g:link class="create" action="create">Create List</g:link></h2>
         <div id="list-userMediaList" class="content scaffold-list" role="main">
             <g:if test="${flash.message}">
                 <div class="message" role="status">${flash.message}</div>
@@ -19,7 +19,7 @@
             <div id="contentListBox">
                     <div class="purplebox">
                         %{--<h3><g:message code="default.my.label" args="[entityName]" /></h3>--}%
-                        <h3>My Media List</h3>
+                        <h3>My Lists</h3>
                         <table>
                             <thead>
                             <tr>

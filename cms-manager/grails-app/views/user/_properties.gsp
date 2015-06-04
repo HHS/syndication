@@ -19,7 +19,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <g:if test="${instance?.password}">
     <dt><g:message code="user.password.label" default="Password" /></dt>
-    <dd>${RandomStringUtils.random(20,'•')}</dd>
+    <dd>${RandomStringUtils.random(20,'*')}</dd>
 </g:if>
 
 <dt><g:message code="role.label" /></dt>

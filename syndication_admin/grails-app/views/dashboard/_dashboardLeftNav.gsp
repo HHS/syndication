@@ -176,10 +176,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                 <g:link controller="user" action="index"><i
                                         class="fa fa-users fa-fw"></i> List Users</g:link>
                             </li>
-                            <li>
-                                <g:link controller="user" action="breakdown"><i class="fa fa-map-marker fa-fw"></i> User Breakdown</g:link>
-                            </li>
                         </sec:ifAnyGranted>
+                        <li>
+                            <g:link controller="user" action="breakdown"><i class="fa fa-map-marker fa-fw"></i> User Breakdown</g:link>
+                        </li>
                         <li>
                             <g:link controller="user" action="editMyAccount">
                                 <i class="fa fa-edit fa-fw"></i> My Account

@@ -11,8 +11,6 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCcDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-import clover.org.apache.commons.lang.SystemUtils
 import com.ctacorp.syndication.*
 import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.authentication.*
@@ -43,8 +41,6 @@ class BootStrap {
         //Previews and Caching
         createScratchDirectories()
 
-        //verify that necessary programs are executable
-        verifyPrograms()
         // verify scratch directories
         verifyDirectories()
         //Custom Object Marshalling
@@ -58,6 +54,8 @@ class BootStrap {
         if (config.syndication.loadExampleRealData) {
             if (MediaItem.count() == 0) {
                 td.seedRealExamples()
+                td.seedMicrositeData()
+                td.seedNihContent()
             }
         } else{
             td.seedSources()
@@ -87,6 +85,7 @@ class BootStrap {
     private void initUsers() {
         def adminRole = Role.findOrSaveByAuthority('ROLE_ADMIN')
         def userRole = Role.findOrSaveByAuthority('ROLE_USER')
+        def storefrontRole = Role.findOrSaveByAuthority('ROLE_STOREFRONT_USER')
 
         String adminUsername = config.springsecurity.syndication.adminUsername
         if (User.findByUsername(adminUsername)) { return }
@@ -177,36 +176,6 @@ class BootStrap {
 
         marshallers.each { marshaller ->
             marshaller.services = services
-        }
-    }
-
-    private verifyProgram(String path, String fileName, String versionCall, String versionAnswer) {
-        def programExists = true
-        def programRunnable = true
-        File executableFile = new File(path, fileName)
-        if (!executableFile.exists()) {
-            programExists = false
-        } else {
-            def process = "${executableFile.getAbsolutePath()} ${versionCall}".execute()
-            String retVal = process.text
-            programRunnable = retVal.contains(versionAnswer)
-            process.destroy()
-        }
-        if (!(programExists && programRunnable)) {
-            log.error("exiting on startup: ${fileName} cannot be found. Are you sure it's installed?")
-            throw new Exception("Exiting on startup: ${fileName} cannot be found. Are you sure it's installed?")
-        }
-    }
-
-    private verifyPrograms() {
-        //Image Magick
-        def path = config.imageMagick.location
-        verifyProgram(path, "convert", "-version", "Version")
-
-        //cutycapt
-        path = config.cutycapt.location
-        if (SystemUtils.IS_OS_MAC) {
-            verifyProgram(path, 'cutycapt', '--help', 'help') //note the capitalization
         }
     }
 }

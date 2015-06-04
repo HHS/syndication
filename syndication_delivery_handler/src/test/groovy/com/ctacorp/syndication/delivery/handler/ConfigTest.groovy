@@ -24,10 +24,10 @@ class ConfigTest extends Specification {
 
         and: 'SERVER_BASE_URL is not null'
 
-        Config.HTTP_CONNECTION_TIMEOUT == 30000
+        Config.HTTP_CONNECTION_TIMEOUT == 90000
 
         and: 'SERVER_BASE_URL is not null'
 
-        Config.HTTP_SOCKET_TIMEOUT == 30000
+        Config.HTTP_SOCKET_TIMEOUT == 90000
     }
 }

@@ -198,9 +198,35 @@
         <span class="required-indicator">*</span>
     </label>
     <div class="col-md-8">
-        <g:select id="source" name="source.id" from="${com.ctacorp.syndication.Source.list()}" optionKey="id" required=""
+        <g:select id="source" name="source.id" from="${com.ctacorp.syndication.Source.list([sort: "name"])}" optionKey="id" required=""
                   value="${PDFInstance?.source?.id}" class="form-control"/>
     </div>
 </div>
 
 <g:render template="/mediaItem/owner"/>
+
+<script>
+    $("form").submit(function(e){
+        e.preventDefault();
+        var self =this;
+        $.ajax({
+            data:{sourceUrl:document.getElementById("sourceUrl").value, initController:'${params.controller}'},
+            url:'${g.createLink(controller: 'mediaItem', action: 'checkUrlContentType')}',
+            success:function(response){
+                if(response == "true"){
+                    self.submit()
+                } else {
+                    var dialog = $('<p>Source Url is not of the correct content type. Are you sure you want to continue?</p>').dialog({
+                        buttons: {
+                            "Yes": function() {self.submit()},
+                            "No":  function() {dialog.dialog('close')},
+                            "Cancel":  function() {
+                                dialog.dialog('close');
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    })
+</script>

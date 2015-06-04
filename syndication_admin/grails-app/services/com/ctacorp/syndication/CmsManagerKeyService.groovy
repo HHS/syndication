@@ -19,7 +19,7 @@ class CmsManagerKeyService {
 
     def listSubscribers(){
         try{
-            def resp = authorizationService.getRest(grailsApplication.config.cmsManager.serverUrl + "/api/v1/subscribers.json")
+            def resp = authorizationService.getRest(grailsApplication.config.cmsManager.serverUrl + "/api/v1/subscribers.json?sort=name")
             def validSubscribers = resp.findAll{ subscriber ->
                 subscriber.id as String != "null"
             }

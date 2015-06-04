@@ -153,6 +153,10 @@ class UrlMappings {
             action = [POST: "savePeriodical"]
         }
 
+        "$v2/resources/media/pdfs"(controller: "media", parseRequest: true) {
+            action = [POST: "savePDF"]
+        }
+
 // =================================================================================================
 // |       ###    ##       ########       #### ##     ##    ###     ######   ########  ######      |
 // |      ## ##   ##          ##           ##  ###   ###   ## ##   ##    ##  ##       ##    ##     |
@@ -242,6 +246,12 @@ class UrlMappings {
         "$v2/resources/tags/$id/media(.$format)?"(controller: "tags", parseRequest: true) {
             action = [GET: "listMediaForTagId"]
         }
+        "$v2/resources/tags/$id/syndicate(.$format)?"(controller: "tags", parseRequest: true) {
+            action = [GET: "syndicate"]
+        }
+        "$v2/resources/tags/$id/embed(.$format)?"(controller: "tags", parseRequest: true) {
+            action = [GET: "embed"]
+        }
         "$v2/resources/tags/tagLanguages(.$format)?"(controller: "tags", parseRequest: true) {
             action = [GET: "listLanguages"]
         }
@@ -318,6 +328,12 @@ class UrlMappings {
         "$v2/resources/userMediaLists/$id(.$format)?"(controller:"userMediaLists", parseRequest: true){
             action = [GET: "show"]
         }
+        "$v2/resources/userMediaLists/$id/syndicate(.$format)?"(controller:"userMediaLists", parseRequest: true){
+            action = [GET: "syndicate"]
+        }
+        "$v2/resources/userMediaLists/$id/embed(.$format)?"(controller:"userMediaLists", parseRequest: true){
+            action = [GET: "embed"]
+        }
 
 
 // ==============================================================================
@@ -333,9 +349,11 @@ class UrlMappings {
         "$v2/resources/sources(.$format)?"(controller: "sources", parseRequest: true){
             action = [GET: "list"]
         }
-
         "$v2/resources/sources/$id(.$format)?"(controller: "sources", parseRequest: true){
             action = [GET: "show"]
+        }
+        "$v2/resources/sources/$id/syndicate(.$format)?"(controller: "sources", parseRequest: true){
+            action = [GET: "syndicate"]
         }
 
 // ====================================================
@@ -376,6 +394,7 @@ class UrlMappings {
 
         "/init/$action?"(controller:'init')
         "/test/$action?"(controller:'test')
+        "/micrositeTestData/$action?/$id?"(controller: "micrositeTestData", parseRequest: true)
 
 // ==========================================================
 // |     ######     ###     ######  ##     ## ########      |
@@ -388,6 +407,18 @@ class UrlMappings {
 // ==========================================================
 
         "/cacheAccess/$action?"(controller:'cacheAccess')
+
+// =================================================================================================================
+// |    ##     ## ######## ########  ####    ###       ##     ## #### ######## ##      ## ######## ########        |
+// |    ###   ### ##       ##     ##  ##    ## ##      ##     ##  ##  ##       ##  ##  ## ##       ##     ##       |
+// |    #### #### ##       ##     ##  ##   ##   ##     ##     ##  ##  ##       ##  ##  ## ##       ##     ##       |
+// |    ## ### ## ######   ##     ##  ##  ##     ##    ##     ##  ##  ######   ##  ##  ## ######   ########        |
+// |    ##     ## ##       ##     ##  ##  #########     ##   ##   ##  ##       ##  ##  ## ##       ##   ##         |
+// |    ##     ## ##       ##     ##  ##  ##     ##      ## ##    ##  ##       ##  ##  ## ##       ##    ##        |
+// |    ##     ## ######## ########  #### ##     ##       ###    #### ########  ###  ###  ######## ##     ##       |
+// =================================================================================================================
+
+        "/mediaViewer/$action?/$id?"(controller:'mediaViewer', parseRequest: true)
 
 // ==================================================================================================================
 // |       ###    ########  ########         ######   #######  ##    ## ######## ########   #######  ##             |

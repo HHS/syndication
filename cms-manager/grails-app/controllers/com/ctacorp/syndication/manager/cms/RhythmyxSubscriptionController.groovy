@@ -96,7 +96,6 @@ class RhythmyxSubscriptionController {
 
     @Transactional
     def save(RhythmyxSubscription rhythmyxSubscription) {
-
         if (!rhythmyxSubscription) {
             return notFound()
         }
@@ -104,8 +103,7 @@ class RhythmyxSubscriptionController {
         def sourceUrl = rhythmyxSubscription.sourceUrl
         def rhythmyxSubscriber = rhythmyxSubscription.rhythmyxSubscriber
 
-        if(!sourceUrl || !rhythmyxSubscriber) {
-            rhythmyxSubscription.validate()
+        if(!sourceUrl || !rhythmyxSubscriber || !rhythmyxSubscription.validate()) {
             flash.rhythmyxSubscribers = userSubscriberService.listRhythmyxSubscribers()
             respond rhythmyxSubscription.errors, view: 'create'
             return

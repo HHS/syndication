@@ -1,57 +1,28 @@
 package com.ctacorp.syndication.delivery.handler
-
 import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import groovy.json.JsonSlurper
 import groovy.util.logging.Log
-
-import java.util.logging.Level
 
 @Log
 class AuthHeader {
 
     static final String KEY_AGREEMENT_FILENAME = 'syndication_key_agreement.json'
-    static final String KEY_AGREEMENT_ENCRYPTED_FILENAME = 'syndication_key_agreement.dat'
-    static final String PRIVATE_KEY = 'syndication.pem'
     static final String USER_HOME = Config.USER_HOME
+    static final File KEY_AGREEMENT_FILE = new File(USER_HOME + File.separator + KEY_AGREEMENT_FILENAME)
 
     static authHeaderGenerator
 
     static {
 
-        def keyAgreementText = null
+        def keyAgreementText = {
 
-        def encryptedKeyAgreement = new File(USER_HOME + File.separator + KEY_AGREEMENT_ENCRYPTED_FILENAME)
-        def privateKey = new File(USER_HOME + File.separator + '.ssh' + File.separator + PRIVATE_KEY)
-
-        try {
-
-            if(!encryptedKeyAgreement.exists()) {
-                log.warning("external key agreement (${encryptedKeyAgreement.path}) not found")
+            if (!KEY_AGREEMENT_FILE.exists()) {
+                log.info("Using internal key agreement as '${USER_HOME + File.separator + KEY_AGREEMENT_FILENAME}' was not found or could not be loaded")
+                return Thread.currentThread().getContextClassLoader().getResourceAsStream(KEY_AGREEMENT_FILENAME).text
             }
 
-            if(!privateKey.exists()) {
-                log.warning("private key (${privateKey.path}) not found")
-            }
-
-            if(encryptedKeyAgreement.exists() && privateKey.exists()) {
-
-                def command = "openssl smime -decrypt -in ${encryptedKeyAgreement.path} -binary -inform DEM -inkey ${privateKey.path}"
-
-                def proc = command.execute()
-                proc.waitFor()
-                if(proc.exitValue() == 0) {
-                    keyAgreementText = proc.in.text
-                }
-            }
-
-        } catch (exception) {
-            log.log(Level.SEVERE, "Encountered an error when trying to load external key agreement (${encryptedKeyAgreement.path})", exception)
-        }
-
-        if(!keyAgreementText) {
-            log.info("Using internal key agreement as '${USER_HOME + File.separator + KEY_AGREEMENT_ENCRYPTED_FILENAME}' was not found or could not be loaded")
-            keyAgreementText = Thread.currentThread().getContextClassLoader().getResourceAsStream(KEY_AGREEMENT_FILENAME).text
-        }
+            KEY_AGREEMENT_FILE.text
+        }()
 
         def jsonKeyAgreement = new JsonSlurper().parseText(keyAgreementText)
 

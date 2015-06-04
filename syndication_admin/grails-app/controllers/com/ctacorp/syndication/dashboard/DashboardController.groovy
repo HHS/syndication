@@ -47,16 +47,16 @@ class DashboardController {
         def mediaList
         params.max = 10
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
-            mediaList = MediaItem.facetedSearch([restrictToSet:publisherItems().join(","),sort:"-id"]).list([max:10])
+            mediaList = MediaItem.facetedSearch([visibleInStorefront:true,restrictToSet:publisherItems().join(","),sort:"-id"]).list([max:10])
         } else {
-            mediaList = MediaItem.facetedSearch([sort:"-id"]).list([max:10])
+            mediaList = MediaItem.facetedSearch([visibleInStorefront:true,sort:"-id"]).list([max:10])
         }
-
 
         def timelineEvents = []
         mediaList.each{ mi ->
             timelineEvents << [
                 title:mi.name,
+                id:mi.id,
                 type:mi.getClass().simpleName.toLowerCase(),
                 message:mi.description,
                 timestamp:mi.dateSyndicationCaptured

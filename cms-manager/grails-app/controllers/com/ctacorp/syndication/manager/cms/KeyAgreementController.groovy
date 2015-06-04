@@ -54,7 +54,8 @@ class KeyAgreementController {
         def entity2Name = params.entity2 as String
         def subscriber = Subscriber.findByName(entity2Name)
         if(subscriber && subscriber.keyAgreement?.entity2 == entity2Name) {
-            flash.errors = [message(code: 'keyAgreement.create.integrity.error.message', args: [subscriber.name])]
+            flash.errors = [[message:message(code: 'keyAgreement.create.integrity.error.message', args: [subscriber.name])]]
+            println flash.errors
             redirect action: "create", method: "GET"
             return
         }

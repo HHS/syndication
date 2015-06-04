@@ -39,8 +39,14 @@ class UserService {
                 user {
                     if(params.search) {
                         switch (params.searchSelector) {
-                            case "user.name": ilike 'name', "${params.search}%"; break
-                            case "user.username": ilike 'username', "${params.search}%"; break;
+                            case "user.name": ilike 'name', "%${params.search}%"; break
+                            case "user.username": ilike 'username', "%${params.search}%"; break;
+                            case "user.both":
+                                or{
+                                    ilike 'name', "%${params.search}%"
+                                    ilike 'username', "%${params.search}%"
+                                }
+                                break;
                             default: break;
                         }
                     }
@@ -61,8 +67,14 @@ class UserService {
             user {
                 if(params.search) {
                     switch (params.searchSelector) {
-                        case "user.name": ilike 'name', "${params.search}%"; break
-                        case "user.username": ilike 'username', "${params.search}%"; break;
+                        case "user.name": ilike 'name', "%${params.search}%"; break
+                        case "user.username": ilike 'username', "%${params.search}%"; break;
+                        case "user.both":
+                            or{
+                                ilike 'name', "%${params.search}%"
+                                ilike 'username', "%${params.search}%"
+                            }
+                             break;
                         default: break;
                     }
                 }

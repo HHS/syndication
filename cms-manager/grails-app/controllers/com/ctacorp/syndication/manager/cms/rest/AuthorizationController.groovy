@@ -87,10 +87,9 @@ class AuthorizationController {
     }
 
     def getSubscribers() {
-
         def subscriberInfos = []
 
-        Subscriber.list().each { subscriber ->
+        Subscriber.list(params).each { subscriber ->
             subscriberInfos.add(subscriber)
         }
 

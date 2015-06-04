@@ -47,7 +47,7 @@ class DeliverIntegrationTest extends Specification {
 
         and: 'get the delivery path from the delivery item'
 
-        deliveryItem.getDeliveryPath() >> '/news/sgr50.html'
+        deliveryItem.getDeliveryPath() >> '/opa/about-opa-and-initiatives/index.html'
 
         expect: "the delivery result will be a success"
 

@@ -30,12 +30,16 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="radio-inline col-md-4" for="searchSelector-0">
-                            <input type="radio" name="searchSelector" id="searchSelector-0" value="user.name" ${params.searchSelector ? params?.searchSelector == 'user.name' ? "checked='true'" : "" : "checked='true'"}>
+                        <label class="radio-inline col-md-3" for="searchSelector-0">
+                            <input type="radio" name="searchSelector" id="searchSelector-0" value="user.both" ${params.searchSelector ? params?.searchSelector == 'user.both' ? "checked='true'" : "" : "checked='true'"}>
+                            Both
+                        </label>
+                        <label class="radio-inline col-md-3" for="searchSelector-1">
+                            <input type="radio" name="searchSelector" id="searchSelector-1" value="user.name" ${params?.searchSelector == 'user.name' ? "checked='true'" : ""}>
                             Name
                         </label>
-                        <label class="radio-inline col-md-4" for="searchSelector-1">
-                            <input type="radio" name="searchSelector" id="searchSelector-1" value="user.username" ${params?.searchSelector == 'user.username' ? "checked='true'" : ""}>
+                        <label class="radio-inline col-md-3" for="searchSelector-2">
+                            <input type="radio" name="searchSelector" id="searchSelector-2" value="user.username" ${params?.searchSelector == 'user.username' ? "checked='true'" : ""}>
                             Username
                         </label>
                     </div>

@@ -14,8 +14,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <%@ page import="com.ctacorp.syndication.media.Video" %>
 
-
-
 <!-- Text input-->
 <div class="form-group">
     <label class="col-md-4 control-label" for="name">Name<span class="required-indicator">*</span></label>
@@ -181,7 +179,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="source">Source<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <g:select from="${com.ctacorp.syndication.Source.list()}" name="source.id" id="source" class="form-control" optionValue="name" optionKey="id" value="${videoInstance?.source?.id}"/>
+        <g:select from="${com.ctacorp.syndication.Source.list([sort: "name"])}" name="source.id" id="source" class="form-control" optionValue="name" optionKey="id" value="${videoInstance?.source?.id}"/>
     </div>
 </div>
 
@@ -189,7 +187,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="duration">Duration (Seconds)<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <input id="duration" name="duration" type="number" min="1" max="2147483646" value="${videoInstance.duration}" required="">
+        <input id="duration" name="duration" type="number" min="1" max="2147483646" value="${videoInstance?.duration}" required="">
     </div>
 </div>
 
@@ -197,7 +195,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="width">Width</label>
     <div class="col-md-8">
-        <input id="width" name="width" type="number" min="1" max="2147483646" value="${videoInstance.width}">
+        <input id="width" name="width" type="number" min="1" max="2147483646" value="${videoInstance?.width}">
     </div>
 </div>
 
@@ -205,7 +203,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="height">Height</label>
     <div class="col-md-8">
-        <input id="height" name="height" type="number" min="1" max="2147483646" value="${videoInstance.height}">
+        <input id="height" name="height" type="number" min="1" max="2147483646" value="${videoInstance?.height}">
     </div>
 </div>
 

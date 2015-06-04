@@ -143,17 +143,13 @@ class MediaItemsService {
         params.order = params.order ?: "asc"
         params.title = params.title ?: ""
         params.url = params.url ?: ""
+        params.nameContains = params.title.replace('%', '\\%')
+        params.languageName = Language.get(params.language)
+        params.sourceUrlContains = params.url
+        params.restrictToSet = params.inList
+        params.mediaTypes = params.mediaType
 
-            def mediaItems = MediaItem.facetedSearch([
-                    id:params.int("id"),
-                    nameContains:params.title.replace('%', '\\%'),
-                languageName:Language.get(params.language),
-//                sourceName:params.source,
-                    sourceUrlContains:params.url,
-                    restrictToSet: params.inList,
-                mediaTypes:params.mediaType
-//                restrictToSet: params.topicItems
-            ]).list(max:params.max, offset:params.offset,sort:params.sort, order:params.order)
+        def mediaItems = MediaItem.facetedSearch(params).list(max:params.max, offset:params.offset,sort:params.sort, order:params.order)
 
         return mediaItems
     }

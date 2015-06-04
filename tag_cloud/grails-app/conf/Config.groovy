@@ -19,6 +19,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 def userHome = userHome ?: System.getProperty("user.home")
 grails.config.locations = [ "file:${userHome}/syndicationSharedConfig.groovy", "file:${userHome}/syndicationTagCloud.groovy" ]
 
+grails.war.resources = { stagingDir, args ->
+    copy(file: "MetaData.groovy", tofile: "${stagingDir}/MetaData.groovy")
+}
+
 //scratch directory defaults
 tagCloud.scratch.root = "${userHome}/.tagCloud"
 

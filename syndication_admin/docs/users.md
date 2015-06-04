@@ -1,6 +1,7 @@
+
 # Users
 
-## View User List
+## List Users
 
 + From Syndication Dashboard, click Users menu and List Users submenu.  
  
@@ -10,7 +11,7 @@
 
 ![User List screen.png](https://bitbucket.org/repo/X7nKza/images/3553373096-User%20List%20screen.png)
 
-## Create User
+##### Create User
 
 + From Syndication Dashboard, click Users menu Create User submenu.  
 
@@ -42,7 +43,7 @@
 
 ![User List screen.png](https://bitbucket.org/repo/X7nKza/images/1065353026-User%20List%20screen.png)
 
-## Edit User
+##### Edit User
 
 + From User List screen, click desired username link.
 
@@ -52,7 +53,7 @@
 
 ![Show User screen with edit highlighted.png](images/Show_User_screen_with_edit_highlighted.png)
  
-+  Click Edit button.  Edit User screen will appear.
++ Click Edit button. Edit User screen will appear.
 
 ![Edit user screen.png](images/Edit_User_screen.png)
  
@@ -60,13 +61,13 @@
 
 + Either click Update or cancel button.
 
-## Sort User List
+##### Sort User List
 
 + From User List screen, click desired sortable heading (ID, Username, Name, Account Expired, Account Locked, Enabled) to sort. 
 
 + Click again, order will be changed (descending to ascending).
 
-## Delete User
+##### Delete User
 
 + From User List screen, click desired Username link.
  
@@ -85,6 +86,9 @@
 ![User List with deleted confimation message.png](https://bitbucket.org/repo/X7nKza/images/1666473297-User%20List%20with%20deleted%20confimation%20message.png)
 
 
+###
+[TOC]
+
 ## Search User
 
 + At User List page, enter Name/Username.
@@ -97,7 +101,17 @@
 
 + Click on Clear Filter, search query will go away & full list will appear.
 
-# My Account
+## User Breakdown
+
++ From Syndication Dashboard, click Users menu and User Breakdown
+
+![User_List_User_Breakdown](images/User_List_User_Breakdown.png)
+
++ User Breakdown page will open with two table & pie chart.
+
+![User_Breakdown_Page](images/User_Breakdown_Page.png)
+
+## My Account
 
 + From Syndication Dashboard, click Users menu and My Account submenu.
 

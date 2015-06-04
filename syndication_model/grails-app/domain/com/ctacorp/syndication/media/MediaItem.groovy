@@ -577,7 +577,7 @@ class MediaItem {
                 }
                 // ------------------------------------------------------------------
                 if (params.id) {
-                    idIs((Long)params.id)
+                    idIs((Long) params.long('id'))
                 }
                 if (params.collectionId) {
                     mediaForCollection(params.long('collectionId'))

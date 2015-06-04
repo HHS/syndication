@@ -45,9 +45,10 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         runtime 'org.jsoup:jsoup:1.8.1'                 //html extraction/manipulation
         runtime 'com.ctacorp:syndication-commons:1.1.7',
-                'com.google.guava:guava:18.0'
+                'com.google.guava:guava:18.0',
+                'joda-time:joda-time:2.7'
         //Misc http
-        compile('org.codehaus.groovy.modules.http-builder:http-builder:0.6') {
+        compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
             excludes 'xalan'
             excludes 'xml-apis'
             excludes 'groovy'
@@ -55,12 +56,16 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        runtime ("org.grails.plugins:syndication-model:1.7.4"){
+        runtime ("org.grails.plugins:syndication-model:2.0.3"){
             export = false
         }
 
-        compile(":release:3.1.1",
-              ":rest-client-builder:1.0.3") {
+        build(":release:3.1.1") {
+            excludes "rest-client-builder"
+            export = false
+        }
+
+        build(":rest-client-builder:2.1.1") {
             export = false
         }
 

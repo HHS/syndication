@@ -30,6 +30,6 @@
         </label>
     </div>
     <div class="right_side">
-        <g:textField name="mediaItemIds" id="mediaItemIds" value=""/>
+        <g:textField name="mediaItemIds" id="mediaItemIds"/>
     </div>
 </div>

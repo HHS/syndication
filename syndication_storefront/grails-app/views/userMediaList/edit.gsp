@@ -5,7 +5,7 @@
 <head>
     <meta name="layout" content="storefront"/>
 
-    <title>Edit Media List</title>
+    <title>Edit List</title>
     <asset:stylesheet src="tokenInput.css"/>
     <asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
     <g:javascript>
@@ -22,6 +22,9 @@
 <g:if test="${flash.message}">
     <div class="message" role="status">${flash.message}</div>
 </g:if>
+<g:if test="${flash.error}">
+    <div class="errors" role="status"><li>${flash.error}</li></div>
+</g:if>
 <g:hasErrors bean="${userMediaListInstance}">
     <div class="errors">
         <g:renderErrors bean="${userMediaListInstance}" as="list" />
@@ -31,12 +34,12 @@
     <div id="home_left">
         %{--<h2><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]"/></g:link></h2>--}%
         %{--<h2><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]"/></g:link></h2>--}%
-        <h2><g:link class="list" action="index">View Media List</g:link>&#160;&#160;&#160;
-        <g:link class="create" action="create">Create Media List</g:link></h2>
+        <h2><g:link class="list" action="index">View List</g:link>&#160;&#160;&#160;
+        <g:link class="create" action="create">Create List</g:link></h2>
         <div id="contentListBox">
             <div class="purplebox">
                 <div id="edit-userMediaList" class="content scaffold-edit" role="main">
-                    <h3>Edit Media List</h3>
+                    <h3>Edit List</h3>
                 %{--<h3><g:message code="default.edit.label" args="[entityName]"/></h3>--}%
 
                     <g:form url="[resource: userMediaListInstance, action: 'update']" method="PUT">

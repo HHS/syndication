@@ -4,7 +4,7 @@
     <head>
         <meta name="layout" content="storefront"/>
 
-        <title>Create Media List</title>
+        <title>Create List</title>
         <asset:stylesheet src="tokenInput.css"/>
         <asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
         <g:javascript>
@@ -27,12 +27,11 @@
     </g:hasErrors>
         <div id="home">
             <div id="home_left">
-                <h2><g:link class="list" action="index">View Media Lists</g:link></h2>
+                <h2><g:link class="list" action="index">View Lists</g:link></h2>
                 <div id="contentListBox">
                         <div class="purplebox">
                             <img class="spinner" id="spinner" src="${assetPath(src: 'ajax-loader.gif')}" alt="spinner"/>
-                            <h3>Create Media List</h3>
-                            %{--<h3><g:message code="default.create.label" args="[entityName]" /></h3>--}%
+                            <h3>Create List</h3>
 
                             <div id="create-userMediaList" class="content scaffold-create" role="main">
 

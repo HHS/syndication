@@ -1,12 +1,10 @@
 #!/bin/bash
 
-version="0.2.5"
+version="0.3.0"
 configFile="${HOME}/syndication_delivery_handler_config.groovy"
 springConfig="${HOME}/Rhythmyx/AppServer/server/rx/deploy/rxapp.ear/rxapp.war/WEB-INF/config/user/spring/syndication_delivery_handler.xml"
 jarFile="${HOME}/Rhythmyx/AppServer/server/rx/deploy/rxapp.ear/rxapp.war/WEB-INF/lib/syndication-delivery-handler-${version}.jar"
-keyAgreementEncrypted="${HOME}/syndication_key_agreement.dat"
-publicKey="${HOME}/.ssh/syndication_pub.pem"
-privateKey="${HOME}/.ssh/syndication.pem"
+keyAgreement="${HOME}/syndication_key_agreement.json"
 
 echo ""
 
@@ -34,9 +32,7 @@ fi
 rm ${jarFile} > /dev/null 2>&1
 rm ${springConfig} > /dev/null 2>&1
 mv ${configFile} "${configFile}.backup" > /dev/null 2>&1
-rm ${keyAgreementEncrypted} > /dev/null 2>&1
-rm ${publicKey} > /dev/null 2>&1
-rm ${privateKey} > /dev/null 2>&1
+rm ${keyAgreement} > /dev/null 2>&1
 
 echo ""
 echo "Uninstall finished!"

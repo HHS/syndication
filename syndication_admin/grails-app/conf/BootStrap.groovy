@@ -33,7 +33,6 @@ class BootStrap {
         System.setProperty("jsse.enableSNIExtension", "false");
 
         MediaItemChangeListener.initialize(grailsApplication, queueService, mediaPreviewThumbnailJobService)
-        warmUpMq()
         createScratchDirectories()
         String systemRunningMessage = """
 ==========================================
@@ -43,12 +42,6 @@ class BootStrap {
     }
 
     def destroy = {
-    }
-
-    //TODO this might not be needed anymore with the new rabbit mq client plugin
-    private warmUpMq(){
-        //First time a message is sent to MQ, it bombs. No idea why. Warming it up will prevent a failure later!
-        queueService.sendMessage(new Message(messageType: MessageType.UPDATE))
     }
 
     private createScratchDirectories(){

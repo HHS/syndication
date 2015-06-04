@@ -129,7 +129,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <dd class="word_wrap"><g:formatBoolean boolean="${socialMediaInstance?.manuallyManaged}"/></dd>
 
             <g:if test="${socialMediaInstance?.externalGuid}">
-                <dt id="externalGuid-label" class="word_wrap"><g:message code="socialMedia.externalGuid.label" default="External Guide"/></dt>
+                <dt id="externalGuid-label" class="word_wrap"><g:message code="socialMedia.externalGuid.label" default="External GUID"/></dt>
                 <dd class="word_wrap"><g:fieldValue bean="${socialMediaInstance}" field="externalGuid"/></dd>
             </g:if>
 

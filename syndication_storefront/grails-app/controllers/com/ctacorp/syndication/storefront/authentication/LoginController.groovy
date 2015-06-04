@@ -272,9 +272,13 @@ class LoginController {
      * Create a new user account (with all required info)
      * @return
      */
-    def createUserAccount(User urc) {
-        User userInstance = new User(params)
-        userInstance.name = params.name
+    def createUserAccount(UserRegistrationCommand urc) {
+        if(urc.hasErrors()) {
+            respond urc.errors, view:"register", model:[userInstance: urc]
+            return
+        }
+         User userInstance = new User(params)
+         userInstance.name = params.name
         if(userInstance.hasErrors()) {
             render view:"register", model:[userInstance: userInstance]
             return
@@ -294,8 +298,6 @@ class LoginController {
                     return
                 }
                 UserRole.create userInstance, Role.findByAuthority("ROLE_STOREFRONT_USER"), true
-
-                UserMediaList uml = new UserMediaList(name: "My List", description:"Default list", user: userInstance).save(flush:true)
 
                 def name = userInstance?.name ?: ""
                 flash.message =  name + " your account has been created"
@@ -343,8 +345,14 @@ class LoginController {
      * @return
      */
     @Secured(['ROLE_STOREFRONT_USER', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_STATS'])
-    def updateUserAccount(User urc) {
+    def updateUserAccount(UserRegistrationCommand urc) {
         User userInstance = User.get(springSecurityService.principal.id)
+        urc.username = userInstance.username
+        urc.validate()
+        if(urc.hasErrors()) {
+            respond urc.errors, view:"userAccount", model:[userInstance: urc]
+            return
+        }
         userInstance.name = params.name ?: null
         userInstance.password = params.password
         if (springSecurityService.isLoggedIn()) {

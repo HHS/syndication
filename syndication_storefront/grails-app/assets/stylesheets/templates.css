@@ -1,0 +1,259 @@
+/*
+* This is a manifest file that'll be compiled into application.css, which will include all the files
+* listed below.
+*
+* Any CSS file within this directory can be referenced here using a relative path.
+*
+* You're free to add application-wide styles to this file and they'll appear at the top of the
+* compiled file, but it's generally better to create a new file per style scope.
+*
+*= require_self
+*/
+
+.templateBox{
+    background-color: #ffffff;
+    border: 1px solid #cdcdcd;
+    margin: 10px 0px;
+    padding: 10px 5px 5px;
+    *padding: 10px 5px 15px;
+    vertical-align: top;
+
+}
+
+.pinterestHeader{
+    background-color: #f0eff7;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    margin: 0px 10px;
+    padding: 5px 10px;
+}
+
+.pinterestTitle{
+    background-color: #f0eff7;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    width: 450px;
+    margin: 0px 13px;
+    padding: 5px 10px;
+    display:inline-block;
+}
+
+.pinterestLogo{
+    background-color: #f0eff7;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    width: 50px;
+    margin: 0px 10px;
+    padding: 5px 10px;
+    display:inline-block;
+}
+
+
+.pinterestLeftPane{
+    display:inline-block;
+}
+
+.pinterestPane1{
+    background-color: #f0eff7;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    width: 50px;
+    height: 70px;
+    margin: 10px 10px;
+    padding: 5px 10px;
+}
+
+.pinterestPane2{
+    background-color: #f0eff7;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    height: 70px;
+    width: 50px;
+    margin: 0 10px 10px 10px;
+    padding: 5px 10px;
+}
+
+.pinterestFeed{
+    vertical-align: top;
+    background-color: #f0eff7;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    height: 200px;
+    width: 477px;
+    margin: 10px 0px;
+    padding: 5px 10px;
+    display:inline-block;
+}
+
+.pinterestFooter{
+    background-color: #f0eff7;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    margin: 0px 10px;
+    padding: 5px 10px;
+}
+
+/*Builder*/
+
+/*.pinterestBoxBuild{*/
+    /*background-color: #ffffff;*/
+    /*border: 1px solid #cdcdcd;*/
+    /*margin: 10px 0px;*/
+    /*padding: 10px 5px 5px;*/
+    /**padding: 10px 5px 15px;*/
+    /*vertical-align: top;*/
+
+/*}*/
+
+.pinterestHeaderBuild{
+    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    margin: 0px 10px;
+    padding: 5px 10px;
+}
+
+.pinterestTitleBuild{
+    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    width: 500px;
+    margin: 0px 13px;
+    padding: 5px 10px;
+    display:inline-block;
+}
+
+.pinterestTitleBuild input[type=text]{
+    width:90%;
+}
+
+.pinterestLogoBuild{
+    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    width: 270px;
+    margin: 0px 10px;
+    padding: 5px 10px;
+    display:inline-block;
+}
+
+
+.pinterestLeftPaneBuild{
+    display:inline-block;
+    width:350px;
+}
+
+.pinterestPane1Build{
+    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    height: 80px;
+    margin: 10px 10px;
+    padding: 5px 10px;
+}
+
+.pinterestPane2Build{
+    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    height: 70px;
+    margin: 0 10px 10px 10px;
+    padding: 5px 10px;
+}
+
+.pinterestFeedBuild{
+    vertical-align: top;
+    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    height: 200px;
+    width: 567px;
+    margin: 10px 0px;
+    padding: 5px 10px;
+    display:inline-block;
+}
+
+.pinterestFooterBuild{
+    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+    margin: 0px 10px;
+    padding: 5px 10px;
+}
+
+.pinterestFooterBuildLeft{
+    /*vertical-align: top;*/
+    display:inline-block;
+}
+
+.pinterestFooterBuildRight{
+    display: inline-block;
+}
+
+textarea{
+    display:block;
+}
+
+.pinterestBoxBuild {
+    background-color: #f0eff7;
+    border: 1px solid #cdcdcd;
+    margin: 10px 0px;
+    padding: 10px 5px 5px;
+    *padding: 10px 5px 15px;
+    vertical-align: top;
+}
+
+/*Microsite*/
+
+.page-wrapper{
+    /*background-color: #b6b6b6;*/
+}
+
+.pinterest-header{
+    background-color: rgb(27, 102, 147);
+    height:100px;
+}
+
+.panel-pinterest {
+    border-color: rgb(155, 154, 122);;
+}
+
+.panel-pinterest > .panel-heading {
+    color: rgb(27, 102, 147);
+    background-color:  rgb(243, 243, 228);
+    border-top-color: rgb(155, 154, 122);
+    border-bottom-color: rgb(155, 154, 122);
+}
+
+.pinterest-footer{
+    color: white;
+    background-color: #535353;
+}

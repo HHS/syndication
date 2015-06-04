@@ -61,15 +61,22 @@ class AuthorizationService {
         ],
                 requestUrl, "POST", authorizationRequest)
 
-        def resp = rest.post(requestUrl) {
-            header 'Date', date
-            header 'Authorization', apiKeyHeaderValue
+        def resp
 
-            json thirdPartyRequest
-        }
+        try{
+            resp = rest.post(requestUrl) {
+                header 'Date', date
+                header 'Authorization', apiKeyHeaderValue
 
-        if(resp?.status == 204) {
-            return true
+                json thirdPartyRequest
+            }
+
+            if(resp?.status == 204) {
+                return true
+            }
+        }catch(e){
+            log.error "Error posting to ${requestUrl}"
+            return false
         }
 
         log.error "The response status from the authentication service was ${resp.status}"

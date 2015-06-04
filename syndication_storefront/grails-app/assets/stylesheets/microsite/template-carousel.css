@@ -1,0 +1,31 @@
+/* Extra small devices (phones, less than 768px) */
+/* No media query since this is the default in Bootstrap */
+
+.microsite-carousel-content.row {margin-bottom: 15px;}
+
+.microsite-carousel-left-col.col-sm-6.col-xs-12 {padding-left: 0;}
+
+.microsite-carousel-left-col > div {
+  background-color: #386FA4;
+}
+
+.microsite-carousel-right-col.col-sm-6.col-xs-12 {padding-right: 0;}
+
+.microsite-carousel-right-col > div {
+    background-color: #59A5D8;
+}
+
+.microsite-carousel-left-col > div,
+.microsite-carousel-right-col > div {
+  border-radius: 5px;
+  padding: 15px;
+}
+
+ /* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) { ... }
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { ... }
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) { ... }

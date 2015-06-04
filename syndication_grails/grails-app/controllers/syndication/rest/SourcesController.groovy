@@ -19,8 +19,11 @@ package syndication.rest
 
 import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.Source
+import com.ctacorp.syndication.media.MediaItem
 import grails.transaction.Transactional
+import org.codehaus.groovy.grails.web.mime.MimeType
 import syndication.api.ApiResponse
+import syndication.api.Embedded
 import syndication.api.Message
 import syndication.api.Meta
 import syndication.api.Pagination
@@ -42,6 +45,7 @@ class SourcesController {
     static defaultAction = "list"
 
     def sourceService
+    def mediaService
 
     def beforeInterceptor = {
         response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
@@ -56,7 +60,7 @@ class SourcesController {
         ])
     ])
     def show(Long id) {
-        def sourceInstance = Source.get(id)
+        def sourceInstance = Source.read(id)
         if(!sourceInstance){
             response.setStatus(400)
             respond ApiResponse.get400NotFoundResponse()
@@ -79,5 +83,26 @@ class SourcesController {
         def sourceList = sourceService.listSources(params)
         params.total = sourceList.totalCount
         respond ApiResponse.get200Response(sourceList).autoFill(params)
+    }
+
+    def syndicate(Long id){
+        def sourceInstance = Source.read(id)
+        if(!sourceInstance){
+            response.setStatus(400)
+            respond ApiResponse.get400NotFoundResponse()
+            return
+        }
+
+        String content = mediaService.renderMediaForSource(sourceInstance, params)
+        response.withFormat {
+            html{
+                render text: content, contentType: MimeType.HTML.name
+            }
+            json{
+                def resp = new Embedded(id:id, content:content, name: sourceInstance.name, description: "Media belonging to '${sourceInstance.name}'")
+                respond ApiResponse.get200Response([resp]).autoFill(params)
+            }
+        }
+
     }
 }

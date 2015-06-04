@@ -27,7 +27,6 @@ class HealthReportController {
         } else {
             MediaValidationJob.triggerNow()
         }
-
         flash.message = "Health report re-scan has started, it may take several hours to complete."
         redirect action: "index"
         return

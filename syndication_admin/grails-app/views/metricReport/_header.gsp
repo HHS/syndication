@@ -25,5 +25,4 @@
         </div>
         <h1 class="page-header">${entityName}</h1>
     </div>
-    <div class="hidden-sm hidden-xs"><br></div>
 </div>

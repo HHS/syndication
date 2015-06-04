@@ -8,6 +8,8 @@ import com.ctacorp.syndication.media.Video
 
 import com.ctacorp.syndication.health.FlaggedMedia
 import com.ctacorp.syndication.health.HealthReport
+import com.ctacorp.syndication.preview.MediaPreview
+import com.ctacorp.syndication.preview.MediaThumbnail
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
@@ -110,6 +112,8 @@ class MediaValidationService {
             return new HealthReport(mediaId: mi.id, statusCode: 404, details:error, failureType: FlaggedMedia.FailureType.UNREACHABLE)
         }
         
+        def thumbnail = MediaThumbnail.findByMediaItem(mi)
+        def preview = MediaPreview.findByMediaItem(mi)
 
         if(sourceUrlCode in OK_STATUSES) {
             switch(mi) {
@@ -122,13 +126,13 @@ class MediaValidationService {
                     if(!(youtubeMetaData.status in OK_STATUSES)){
                         return new HealthReport(mediaId: mi.id, statusCode: youtubeMetaData.status, FlaggedMedia.FailureType.SERVER_ERROR)
                     }
-                    if(!mi.mediaThumbnail || !mi.mediaPreview){
+                    if(!thumbnail || !preview){
                         return new HealthReport(mediaId: mi.id, failureType: FlaggedMedia.FailureType.NO_PREVIEW_THUMBNAIL)
                     }
                     return new HealthReport(mediaId: mi.id, valid: true)
                 case Image:
                 case Infographic:
-                    if(!mi.mediaThumbnail || !mi.mediaPreview){
+                    if(!thumbnail || !preview){
                         return new HealthReport(mediaId: mi.id, failureType: FlaggedMedia.FailureType.NO_PREVIEW_THUMBNAIL)
                     }
                     return new HealthReport(mediaId: mi.id, valid: true)
@@ -152,7 +156,7 @@ class MediaValidationService {
                         return new HealthReport(mediaId: mi.id, failureType: FlaggedMedia.FailureType.SHORT_CONTENT)
                     }
 
-                    if(!mi.mediaThumbnail || !mi.mediaPreview){
+                    if(!thumbnail || !preview){
                         return new HealthReport(mediaId: mi.id, failureType: FlaggedMedia.FailureType.NO_PREVIEW_THUMBNAIL)
                     }
                     return new HealthReport(mediaId: mi.id, valid: true)

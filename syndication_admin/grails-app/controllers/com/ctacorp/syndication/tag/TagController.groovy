@@ -71,12 +71,12 @@ class TagController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def save(String name, Long tagType, Long language){
         def tag = tagService.createTag(name, tagType, language)
-        if (!tag.errors) {
+        if (tag && !tag.errors) {
             def createdTags = tagService.findTagsByTagName(name, [languageId: language, tagTypeId: tagType])
             solrIndexingService.inputTag(String.valueOf(createdTags[0].id), name)
             flash.message = "Tag [${params.name}] created!"
         } else {
-            flash.errors = tag.errors
+            flash.errors = tag?.errors
             redirect action:'create'
             return
         }

@@ -1,16 +1,28 @@
 package com.ctacorp.syndication.delivery.handler
 
+import org.springframework.core.io.ClassPathResource
 import spock.lang.Specification
 
 class AuthHeaderTest extends Specification {
 
-    def authHeaders = new AuthHeader()
+    def authHeader
+
+    def setup() {
+
+        def keyAgreementFile = new File(AuthHeader.USER_HOME + File.separator + AuthHeader.KEY_AGREEMENT_FILENAME)
+
+        if(!keyAgreementFile.exists()) {
+            keyAgreementFile.write(new ClassPathResource('syndication_key_agreement.json').inputStream.text)
+        }
+
+        authHeader = new AuthHeader()
+    }
 
     def 'generate the required header fields'() {
 
         when: "generating the required headers for API key authentication"
 
-        def headers = authHeaders.create('spamburger!')
+        def headers = authHeader.create('spamburger!')
 
         then: "the headers should contain the required values"
 

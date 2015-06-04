@@ -63,6 +63,7 @@ class VideoController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
+        flash.error = null
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond new Video(params), model: [subscribers:subscribers]
     }
@@ -153,6 +154,7 @@ class VideoController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def importVideo(String videoUrl) {
+        flash.error = null
         if (!videoUrl) {
             notFound()
             return
@@ -160,7 +162,8 @@ class VideoController {
         Video videoInstance = youtubeService.getVideoInstanceFromUrl(videoUrl)
 
         if (!videoInstance) {
-            notFound()
+            flash.error = "The video could not be imported, either it doesn't exist or is private. Please verify the video url is correct and the visibility on the video is public."
+            render view: "create"
             return
         }
         respond videoInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]

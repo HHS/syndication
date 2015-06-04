@@ -124,7 +124,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <dd class="word_wrap"><g:formatBoolean boolean="${audioInstance?.manuallyManaged}"/></dd>
 
             <g:if test="${audioInstance?.externalGuid}">
-                <dt id="externalGuid-label" class="word_wrap"><g:message code="audio.externalGuid.label" default="External Guide"/></dt>
+                <dt id="externalGuid-label" class="word_wrap"><g:message code="audio.externalGuid.label" default="External GUID"/></dt>
                 <dd class="word_wrap"><g:fieldValue bean="${audioInstance}" field="externalGuid"/></dd>
             </g:if>
 

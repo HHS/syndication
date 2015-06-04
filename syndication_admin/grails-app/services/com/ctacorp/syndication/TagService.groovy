@@ -212,7 +212,7 @@ class TagService {
             return authorizationService.post(grailsApplication.config.tagCloud.serverAddress + path, params)
         } catch (e) {
             log.error "Could not connect to: ${path}"
-            return null
+            return [errors:"Could not connect to: ${path}"]
         }
     }
 
@@ -577,6 +577,7 @@ class TagService {
                                                'crafty',
                                                'crazy',
                                                'creamy',
+                                               'creating',
                                                'creative',
                                                'creepy',
                                                'criminal',
@@ -725,6 +726,8 @@ class TagService {
                                                'ethical',
                                                'euphoric',
                                                'even',
+                                               'event',
+                                               'ever',
                                                'evergreen',
                                                'everlasting',
                                                'every',
@@ -910,6 +913,7 @@ class TagService {
                                                'guilty',
                                                'gullible',
                                                'gummy',
+                                               'had',
                                                'hairy',
                                                'half',
                                                'hand',
@@ -1281,6 +1285,7 @@ class TagService {
                                                'outrageous',
                                                'outstanding',
                                                'oval',
+                                               'over',
                                                'overcooked',
                                                'overdue',
                                                'overjoyed',
@@ -1342,6 +1347,7 @@ class TagService {
                                                'present',
                                                'prestigious',
                                                'pretty',
+                                               'prevent',
                                                'preventing',
                                                'previous',
                                                'previously',
@@ -1405,6 +1411,7 @@ class TagService {
                                                'reflecting',
                                                'regal',
                                                'regular',
+                                               'regularly',
                                                'related',
                                                'reliable',
                                                'relieved',
@@ -1835,6 +1842,7 @@ class TagService {
                                                'well-off',
                                                'well-to-do',
                                                'well-worn',
+                                               'were',
                                                'wet',
                                                'what',
                                                'when',
@@ -1889,6 +1897,7 @@ class TagService {
                                                'wry',
                                                'yawning',
                                                'yearly',
+                                               'years',
                                                'yellow',
                                                'yellowish',
                                                'yet',

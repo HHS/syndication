@@ -1,0 +1,42 @@
+/* Extra small devices (phones, less than 768px) */
+/* No media query since this is the default in Bootstrap */
+
+.microsite-blog-content {margin-bottom: 15px;}
+
+.microsite-blog-left-col.col-sm-8.col-xs-12 {padding-left: 0;}
+
+.microsite-blog-right-col.col-sm-4.col-xs-12 {padding-right: 0;}
+
+.microsite-blog-right-col {
+    color: #fff;
+}
+
+.microsite-blog-right-col-top,
+.microsite-blog-right-col-bottom {
+  border-radius: 5px;
+  padding: 15px;}
+
+.microsite-blog-right-col-top {
+  margin-bottom: 15px;
+}
+
+.microsite-blog-right-col-top {
+  background-color: #386FA4;
+  border-radius: 5px;
+}
+
+.microsite-blog-right-col-bottom {
+  background-color: #59A5D8;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+
+ /* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) { ... }
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { ... }
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) { ... }

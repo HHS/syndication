@@ -1,0 +1,105 @@
+@import url(http://fonts.googleapis.com/css?family=Raleway:500,400,300);
+/*
+ SLICK CSS THEME
+ ===================================
+*/
+
+/* ================================= */
+body{
+  font-family: 'Raleway';
+  font-weight: 400;	
+}
+a{
+  color: #000;	
+}
+h1,h2,h2 > a,h3,h4,h5,h6, strong{
+  color: #c59e6f;
+  font-weight: 300;
+}
+
+img{
+
+}
+
+.slick-slide img {
+  max-height: 400px !important;
+}
+
+#HHSSFMV{
+  background: #eeeeef;
+  border: 1px solid #000;
+  box-sizing: border-box;
+  height: 500px;
+  /*margin-left: 20px;*/
+  position: relative;
+  /*overflow: hidden;*/
+  /*width: 670px;*/
+  width: auto;
+}
+#HHSSFMV > .slick-container{
+  /*border: 1px solid #000;*/
+  box-sizing: border-box;
+}
+#HHSSFMV .slick-slide {
+  height: 499px; 
+  width: 757px;
+}
+#HHSSFMV .slick-prev, 
+#HHSSFMV .slick-next {
+  background: transparent;
+  border: none;
+  color: transparent;
+  cursor: pointer;
+  display: block;
+  font-size: 0;
+  height: 20px;
+  line-height: 0;
+  margin-top: -10px;
+  outline: none;
+  padding: 0;
+  position: absolute;
+  top: 10%;
+  width: 20px;
+}
+#HHSSFMV .slick-prev:before, 
+#HHSSFMV .slick-next:before {
+  color: peru;
+}
+#HHSSFMV .syndicate{
+  margin: 0 auto;
+  width: 90%;
+}
+#HHSSFMV .html{
+  overflow-y: scroll;
+}
+#HHSSFMV .html > .syndicate{
+/*  margin-left: 10px;
+  width: 650px;*/
+}
+#HHSSFMV .image > h2{
+  margin-left: 10px;	
+}
+#HHSSFMV .image > .syndicate{
+  max-width: 80%;
+}
+#HHSSFMV .slick-slider .image img
+#HHSSFMV .slick-slider .infographic img{
+  /*max-width: 100%;*/
+  max-height: 400px;
+}
+#HHSSFMV .image > img{
+  margin: 0 auto;
+}
+#HHSSFMV .video h2,
+#HHSSFMV #ytplayer
+{
+  /*margin-left: 10px;*/
+}
+#HHSSFMV .slick-navigation{
+  margin: 0 auto;
+  width: 700px;
+}
+#HHSSFMV .slick-navigation img{
+  height: 106px;
+  width: 141px;
+}

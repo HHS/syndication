@@ -63,7 +63,7 @@ class InfographicController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Infographic(params), model: [subscribers:subscribers]
+        respond new Infographic(params), model: [subscribers:subscribers, formats:["jpg", "png"]]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
@@ -77,7 +77,7 @@ class InfographicController {
         def status =  mediaItemsService.updateItemAndSubscriber(infographicInstance, params.long('subscriberId'))
         if(status){
             flash.errors = status
-            respond infographicInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]
+            respond infographicInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers(), formats:["jpg", "png"]]
             return
         }
 
@@ -94,7 +94,7 @@ class InfographicController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
     def edit(Infographic infographicInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond infographicInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(infographicInstance)?.subscriberId)]
+        respond infographicInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(infographicInstance)?.subscriberId), formats:["jpg", "png"]]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])

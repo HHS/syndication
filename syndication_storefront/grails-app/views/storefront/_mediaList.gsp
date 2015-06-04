@@ -21,7 +21,7 @@
                 <p>${mediaItemInstance.description}</p>
                 <div class="mediaLinkButtons" id="medialinkbuttons_${mediaItemInstance.id}">
                     <div class="mediaPreview">
-                        <a href="${apiBaseUrl + '/resources/media/'+ mediaItemInstance.id +'/syndicate.json'}" onclick="addStorefrontPreviewHit(${mediaItemInstance.id})" class="syndButton popup-link">Preview</a>
+                        <a href="${apiBaseUrl + '/resources/media/'+ mediaItemInstance.id +'/syndicate.json?ignoreHiddenMedia=1'}" onclick="addStorefrontPreviewHit(${mediaItemInstance.id})" class="syndButton popup-link">Preview</a>
                         <span>
                             <sec:ifLoggedIn>
                                 <g:if test="${!likeInfo."${mediaItemInstance.id}".alreadyLiked}">

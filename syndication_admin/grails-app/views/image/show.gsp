@@ -129,7 +129,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <dd class="word_wrap"><g:formatBoolean boolean="${imageInstance?.manuallyManaged}"/></dd>
 
             <g:if test="${imageInstance?.externalGuid}">
-                <dt id="externalGuid-label" class="word_wrap"><g:message code="image.externalGuid.label" default="External Guide"/></dt>
+                <dt id="externalGuid-label" class="word_wrap"><g:message code="image.externalGuid.label" default="External GUID"/></dt>
                 <dd class="word_wrap"><g:fieldValue bean="${imageInstance}" field="externalGuid"/></dd>
             </g:if>
 

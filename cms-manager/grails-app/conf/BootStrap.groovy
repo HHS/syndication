@@ -277,13 +277,8 @@ class BootStrap {
     }
 
     private printReadyMessage(){
-
         log.info("==========================================")
         log.info("| -> CMS Manager Ready.                  |")
         log.info("==========================================")
-
-        println("==========================================")
-        println("| -> CMS Manager Ready.                  |")
-        println("==========================================")
     }
 }
