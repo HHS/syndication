@@ -32,6 +32,7 @@ class UserController {
     def userService
     def springSecurityService
     def cmsManagerKeyService
+    def passwordService
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -149,28 +150,19 @@ class UserController {
 
     @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
     @Transactional
-    def save(UserRegistrationCommand urc) {
-        urc.passwordRepeat = params.passwordVerify
-        urc.validate()
-        if(urc.hasErrors()) {
-            flash.errors = urc.errors.allErrors.collect{[message:g.message([error : it])]}
-            if(Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId){flash.errors << [message:"Select a Key"]}
-            def roles = Role.list()
-            if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER"){
-                roles = Role.findAllByAuthorityInList(userService.getManagersAuthorityRoles())
-            }
-            render view:"create", model:[userInstance:new User(params), subscribers:cmsManagerKeyService.listSubscribers(), roles:roles, currentRoleId: params?.authority]
-            return
-        }
-        User userInstance = new User(params)
+    def save(User userInstance) {
         if (userInstance == null) {
             notFound()
             return
         }
 
+        def passwordValidationMessage = passwordService.validatePassword(params.password, params.passwordRepeat)
         userInstance.validate()
-        if (userInstance.hasErrors() || (Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId)) {
+        if (userInstance.hasErrors() || (Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId) || passwordValidationMessage) {
             flash.errors = []
+            if(passwordValidationMessage){
+                userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidationMessage)
+            }
             flash.errors = userInstance.errors.allErrors.collect{[message:g.message([error : it])]}
             if(Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId){flash.errors << [message:"Select a Key"]}
             def roles = Role.list()
@@ -179,12 +171,6 @@ class UserController {
             }
 
             respond userInstance, view:'create', model: [subscribers:cmsManagerKeyService.listSubscribers(), roles:roles, currentRoleId: params?.authority]
-            return
-        }
-
-        if(params.passwordVerify != params.password){
-            flash.error = "Both passwords mush match!"
-            redirect action: 'create', params:params, model: [subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
 
@@ -214,31 +200,21 @@ class UserController {
     }
 
     @Transactional
-    def updateMyAccount(UserRegistrationCommand urc){
-        urc.passwordRepeat = params.passwordVerify
-        urc.validate()
-        if(urc.hasErrors()) {
-            flash.errors = urc.errors.allErrors.collect{[message:g.message([error : it])]}
-            respond urc.errors, view:"editMyAccount", model:[userInstance: urc]
-            return
-        }
-        User userInstance = springSecurityService.currentUser
-        userInstance.properties = params
+    def updateMyAccount(User userInstance){
         if (userInstance == null) {
             notFound()
             return
         }
 
+        def passwordValidationMessage = passwordService.validatePassword(params.password, params.passwordRepeat)
         userInstance.validate()
-        if (userInstance.hasErrors()) {
+        if (userInstance.hasErrors() || passwordValidationMessage) {
+            if(passwordValidationMessage){
+                userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidationMessage)
+            }
             flash.errors = userInstance.errors.allErrors.collect{[message:g.message([error : it])]}
             respond userInstance.errors, view: 'editMyAccount'
-            return
-        }
-        if(params.passwordVerify != params.password){
-            flash.error = "Both passwords mush match!"
-            userInstance.discard()
-            respond userInstance.errors, view: 'editMyAccount'
+            transactionStatus.setRollbackOnly()
             return
         }
 
@@ -250,42 +226,27 @@ class UserController {
 
     @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
     @Transactional
-    def update(UserRegistrationCommand urc) {
-        urc.passwordRepeat = params.passwordVerify
-        urc.validate()
-        if(urc.hasErrors()) {
-            flash.errors = urc.errors.allErrors.collect{[message:g.message([error : it])]}
-            if(Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId){flash.errors << [message:"Select a Key"]}
-            def roles = Role.list()
-            if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER"){
-                roles = Role.findAllByAuthorityInList(userService.getManagersAuthorityRoles())
-            }
-            render view:"edit", model:[userInstance:new User(params), subscribers:cmsManagerKeyService.listSubscribers(), roles:roles, currentRoleId: params?.authority]
-            return
-        }
-        User userInstance = User.read(params.id)
-        userInstance.properties = params
+    def update(User userInstance) {
         if (userInstance == null) {
             notFound()
             return
         }
 
-        if (userInstance.hasErrors() || (Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId)) {
+        def passwordValidationMessage = passwordService.validatePassword(params.password, params.passwordRepeat)
+        userInstance.validate()
+        if (userInstance.hasErrors() || (Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId) || passwordValidationMessage) {
             flash.errors = []
+            if(passwordValidationMessage){
+                userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidationMessage)
+            }
             flash.errors = userInstance.errors.allErrors.collect{[message:g.message([error : it])]}
             if(Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId){flash.errors << [message:"Select a Key"]}
-            userInstance.discard()
             redirect action:'edit', id:userInstance.id, model: [subscribers:cmsManagerKeyService.listSubscribers()]
+            transactionStatus.setRollbackOnly()
             return
         }
 
-        if(params.passwordVerify != params.password){
-            flash.error = "Both passwords mush match!"
-            respond userInstance.errors, view: 'edit', model: [subscribers:cmsManagerKeyService.listSubscribers()]
-            return
-        }
-
-        userInstance.save()
+        userService.saveUserAndRole(userInstance, params.long('authority'))
 
         request.withFormat {
             form multipartForm {
@@ -323,41 +284,6 @@ class UserController {
                 redirect action: "index", method: "GET"
             }
             '*' { render status: NOT_FOUND }
-        }
-    }
-}
-
-class UserRegistrationCommand{
-    String name
-    String username
-    String password
-    String passwordRepeat
-
-    def passwordService
-
-    static constraints = {
-        importFrom User
-        name            nullable: false, blank: false
-        username        email: true
-        password        minSize: 8, validator: { passwd, urc ->
-            def passwordValidation = urc.passwordService.validatePassword(passwd)
-            if(!passwordValidation.valid){
-                if(!passwordValidation.uppercaseValid){
-                    return ["requires.uppercase"]
-                }
-                if(!passwordValidation.lowercaseValid){
-                    return ["requires.lowercase"]
-                }
-                if(!passwordValidation.numberValid){
-                    return ["requires.number"]
-                }
-            }
-        }
-
-        passwordRepeat  nullable: false, validator: { passwd2, urc ->
-            if(passwd2 != urc.password){
-                return ["mismatch"]
-            }
         }
     }
 }

@@ -71,7 +71,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             </label>
 
                             <div class="col-sm-5">
-                                <g:passwordField autocomplete="off" placeholder="re-type password" id="pass2" onkeyup="checkPass(); return false;" name="passwordVerify" required="" value="${userInstance?.password}" class="form-control"/>
+                                <g:passwordField autocomplete="off" placeholder="re-type password" id="pass2" onkeyup="checkPass(); return false;" name="passwordRepeat" required="" value="${userInstance?.password}" class="form-control"/>
                                 <span id="confirmMessage" class="confirmMessage"></span>
                             </div>
                         </div>

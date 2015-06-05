@@ -19,6 +19,7 @@ import org.springframework.security.authentication.LockedException
 import org.springframework.security.core.context.SecurityContextHolder as SCH
 import org.springframework.security.web.WebAttributes
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import grails.transaction.Transactional
 
 @Secured('permitAll')
 class LoginController {
@@ -30,6 +31,7 @@ class LoginController {
 
     def recaptchaService
     def accountService
+    def passwordService
     /**
      * Dependency injection for the authenticationTrustResolver.
      */
@@ -272,14 +274,15 @@ class LoginController {
      * Create a new user account (with all required info)
      * @return
      */
-    def createUserAccount(UserRegistrationCommand urc) {
-        if(urc.hasErrors()) {
-            respond urc.errors, view:"register", model:[userInstance: urc]
-            return
-        }
-         User userInstance = new User(params)
-         userInstance.name = params.name
-        if(userInstance.hasErrors()) {
+    def createUserAccount() {
+        User userInstance = new User(params)
+        userInstance.name = params.name
+        def passwordValidationMessage = passwordService.validatePassword(params.password, params.passwordRepeat)
+        userInstance.validate()
+        if(userInstance.hasErrors() || passwordValidationMessage) {
+            if(passwordValidationMessage){
+                userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidationMessage)
+            }
             render view:"register", model:[userInstance: userInstance]
             return
         }else if(params.password != params.passwordRepeat){
@@ -345,30 +348,24 @@ class LoginController {
      * @return
      */
     @Secured(['ROLE_STOREFRONT_USER', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_STATS'])
-    def updateUserAccount(UserRegistrationCommand urc) {
-        User userInstance = User.get(springSecurityService.principal.id)
-        urc.username = userInstance.username
-        urc.validate()
-        if(urc.hasErrors()) {
-            respond urc.errors, view:"userAccount", model:[userInstance: urc]
-            return
-        }
+    @Transactional
+    def updateUserAccount() {
+        User userInstance = springSecurityService.currentUser
         userInstance.name = params.name ?: null
         userInstance.password = params.password
         if (springSecurityService.isLoggedIn()) {
-//            def userInstance = User.get(springSecurityService.principal.id)
             if (!userInstance) {
                 flash.errors << "You are not signed in!"
                 redirect action: "authenticate"
                 return
             }
-            if(params.password != params.passwordRepeat){
-                flash.error = "The passwords do not match."
-                render view:"userAccount", model:[userInstance: userInstance]
-                return
-            }
+            def passwordValidationMessage = passwordService.validatePassword(params.password, params.passwordRepeat)
             userInstance.validate()
-            if(userInstance.hasErrors()) {
+            if(userInstance.hasErrors() || passwordValidationMessage) {
+                if(passwordValidationMessage){
+                    userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidationMessage)
+                }
+                userInstance.discard()
                 render view:"userAccount", model:[userInstance: userInstance]
                 return
             }
@@ -396,40 +393,5 @@ class LoginController {
                 redirect controller:"storefront", action: "index"
             }
         }
-    }
-}
-
-class UserRegistrationCommand{
-    String name
-    String username
-    String password
-    String passwordRepeat
-
-    def passwordService
-
-    static constraints = {
-        importFrom User
-        name            nullable: false, blank: false
-        username        email: true
-        password        minSize: 8, validator: { passwd, urc ->
-                            def passwordValidation = urc.passwordService.validatePassword(passwd)
-                            if(!passwordValidation.valid){
-                                if(!passwordValidation.uppercaseValid){
-                                    return ["requires.uppercase"]
-                                }
-                                if(!passwordValidation.lowercaseValid){
-                                    return ["requires.lowercase"]
-                                }
-                                if(!passwordValidation.numberValid){
-                                    return ["requires.number"]
-                                }
-                            }
-                        }
-
-        passwordRepeat  nullable: false, validator: { passwd2, urc ->
-                            if(passwd2 != urc.password){
-                                return ["mismatch"]
-                            }
-                        }
     }
 }
