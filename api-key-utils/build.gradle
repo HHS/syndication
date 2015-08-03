@@ -1,0 +1,16 @@
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'groovy'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = project['ext']['gradleWrapperVersion']
+}
+
+dependencies {
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+
+    compile 'org.bouncycastle:bcprov-jdk16:1.46'
+    compile 'org.codehaus.groovy:groovy-all:2.1.9'
+}
