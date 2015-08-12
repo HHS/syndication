@@ -1,8 +1,8 @@
-# Syndication Delivery Handler 0.2.6 Installation and Configuration Guide
+# Syndication Delivery Handler 0.3.0 Installation and Configuration Guide
 
 ## Build Number
 
-The build number associated with this release of the *Syndication Delivery Handler* is **0.2.6**. This number should be indicated when requesting support or administration of this release.
+The build number associated with this release of the *Syndication Delivery Handler* is **0.3.0**. This number should be indicated when requesting support or administration of this release.
 
 ## Nomenclature
 
