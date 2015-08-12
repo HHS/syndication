@@ -6,6 +6,11 @@ task wrapper(type: Wrapper) {
     gradleVersion = project['ext']['gradleWrapperVersion']
 }
 
+repositories {
+  maven { url 'http://repo.jfrog.org/artifactory/gradle-plugins' }
+  maven { url 'http://ctacdev.com:8080/artifactory/repo' }
+}
+
 configurations {
     fatjar
     itTestsCompile.extendsFrom testCompile
@@ -38,7 +43,7 @@ dependencies {
 
     fatjar 'org.codehaus.groovy:groovy-all:2.1.9'
     fatjar 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
-    fatjar ('com.ctacorp.commons:api-key-utils:1.4.2') {
+    fatjar ('com.ctacorp.commons:api-key-utils:1.5.1') {
         exclude group: 'org.bouncycastle'
     }
 
