@@ -1,1 +1,0 @@
-<object data='${pdf.sourceUrl}' width='100%' height="90%"></object>
