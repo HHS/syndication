@@ -23,7 +23,7 @@
 <div class="template container">
 
     <div class="microsite blog">
-
+        <a id="pageContent"></a>
         <g:render template="/microsite/templateHeader"/>
 
         <div class="microsite-blog-content row">
@@ -34,7 +34,7 @@
                        
                     <h2 class="microsite-article-title">Your first Syndication content article here.</h2>
 
-                    <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                    <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 1"/>
 
                     <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -48,7 +48,7 @@
                        
                     <h2 class="microsite-article-title">Your second Syndication content article here.</h2>
 
-                    <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                    <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 2"/>
 
                     <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -62,7 +62,7 @@
                        
                     <h2 class="microsite-article-title">Your third Syndication content article here.</h2>
 
-                    <asset:image src="microsite/fpo2.png" class="microsite-article-pic" alt="pic"/>     
+                    <asset:image src="microsite/fpo2.png" class="microsite-article-pic" alt="example picture 3"/>
 
                 </div><!-- end microsite-article  -->
 
@@ -70,7 +70,7 @@
                        
                     <h2 class="microsite-article-title">Your fourth Syndication content article here.</h2>
 
-                    <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                    <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 4"/>
 
                     <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -106,18 +106,18 @@
 
                         <div class="microsite-article on-color">
 
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 5" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 6" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 7" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 8" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 9" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 10" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 11" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 12" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 13" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 14" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 15" />
+                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 16" />
 
                         </div>
 

@@ -17,8 +17,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <head>
     <title>Tag List</title>
     <meta name="layout" content="dashboard"/>
-    <asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
-    <asset:stylesheet src="/tokenInput/token-input.css"/>
+    <asset:javascript src="tokenInput/jquery.tokeninput.js"/>
+    <asset:stylesheet src="tokenInput/token-input.css"/>
     <g:javascript>
         $(document).ready(function () {
            $("#mediaIds").tokenInput("${g.createLink(controller: 'tag', action: 'mediaSearch')}");

@@ -7,13 +7,18 @@ import grails.util.Environment
 class AppInfoController {
 
     def index() {
-        def metaData
-        if(Environment.current == Environment.PRODUCTION){
-            metaData = new ConfigSlurper().parse(new File(grailsApplication.parentContext.servletContext.getRealPath("/WEB-INF/MetaData.groovy")).toURI().toURL())
+        def configFile
+        if(Environment.getCurrent() == Environment.PRODUCTION){
+            String filePath = grailsApplication.parentContext.servletContext.getRealPath("/WEB-INF/MetaData.groovy")
+            if(!filePath){
+                return
+            }
+            configFile = new File(filePath)?.toURI()?.toURL()
         } else{
-            metaData = new ConfigSlurper().parse(new File("web-app/WEB-INF/MetaData.groovy").toURI().toURL())
+            configFile = new File("web-app/WEB-INF/MetaData.groovy")?.toURI()?.toURL()
         }
 
+        def metaData = new ConfigSlurper().parse(configFile)
         [metaData:metaData]
     }
 }

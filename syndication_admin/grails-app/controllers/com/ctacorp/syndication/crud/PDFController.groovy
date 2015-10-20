@@ -60,9 +60,9 @@ class PDFController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(pdfInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        pdfInstance =  mediaItemsService.updateItemAndSubscriber(pdfInstance, params.long('subscriberId'))
+        if(pdfInstance.hasErrors()){
+            flash.errors = pdfInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             respond pdfInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers() ]
             return
         }
@@ -91,9 +91,9 @@ class PDFController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(pdfInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        pdfInstance =  mediaItemsService.updateItemAndSubscriber(pdfInstance, params.long('subscriberId'))
+        if(pdfInstance.hasErrors()){
+            flash.errors = pdfInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             redirect action:'edit', id:params.id
             return
         }

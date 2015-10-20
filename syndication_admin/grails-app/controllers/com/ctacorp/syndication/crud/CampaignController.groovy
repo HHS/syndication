@@ -77,9 +77,9 @@ class CampaignController {
             }
         }
         
-        def status =  campaignService.updateCampaignAndSubscriber(campaignInstance, params.subscriberId)
-        if (status) {
-            flash.errors = status
+        campaignInstance =  campaignService.updateCampaignAndSubscriber(campaignInstance, params.subscriberId)
+        if (campaignInstance.hasErrors()) {
+            flash.errors = campaignInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             def featuredMedia = campaignInstance?.mediaItems
             String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
             respond campaignInstance, view:'create', model:[featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput, subscribers:cmsManagerKeyService.listSubscribers()]
@@ -123,9 +123,9 @@ class CampaignController {
         }
 
         campaignInstance.validate()
-        def status =  campaignService.updateCampaignAndSubscriber(campaignInstance, params.subscriberId)
-        if (status) {
-            flash.errors = status
+        campaignInstance =  campaignService.updateCampaignAndSubscriber(campaignInstance, params.subscriberId)
+        if (campaignInstance.hasErrors()) {
+            flash.errors = campaignInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             def subscribers = cmsManagerKeyService.listSubscribers()
             def featuredMedia = campaignInstance.mediaItems
             String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON

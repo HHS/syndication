@@ -27,9 +27,8 @@ class AuthHeaderTest extends Specification {
         then: "the headers should contain the required values"
 
         headers['Date'] != null
-        headers['Content-Type'] == null
-        headers['Content-Length'] == null
-        headers['Referer'] == 'http://localhost:9992'
+        headers['Content-Type'] == 'application/json; charset=utf-8'
+        headers['Content-Length'] == '11'
         (headers['Authorization'] as String).startsWith('syndication_api_key 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000=:')
     }
 }

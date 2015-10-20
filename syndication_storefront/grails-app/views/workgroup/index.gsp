@@ -93,7 +93,7 @@
             <ul>
                 <li>
                     HHS Office of the Assistant Secretary for Public Affairs<br/>
-                    Craig Lafond, <a href="mailto:Craig.Lafond@hhs.gov">Craig.Lafond@hhs.gov</a>
+                    Yvette Alonso, <a href="mailto:Yvette.Alonso@hhs.gov">Yvette.Alonso@hhs.gov</a>
                 </li>
                 <li>
                     CDC Office of the Associate Director for Communications<br/>

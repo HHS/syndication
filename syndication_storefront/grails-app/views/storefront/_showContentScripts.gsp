@@ -85,6 +85,7 @@
                 queryParams += "&height=" + height;
                 queryParams += "&flavor=" + flavor;
                 queryParams += "&displayMethod=" + displayMethod;
+                queryParams += "&userId=" + ${userId};
                 queryParams += "&callback=?";
 
                 return getCollectionType() + queryParams

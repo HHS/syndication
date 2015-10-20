@@ -21,6 +21,7 @@
                     <g:render template="form"/>
                 </fieldset>
                 <fieldset class="buttons">
+                    <i id="creationSpinner" class="fa fa-refresh fa-spin" style="display: none;"></i>
                     <g:submitButton name="create" class="btn btn-success"
                                     value="${message(code: 'default.button.create.label', default: 'Create')}"/>
                     <g:link class="button" action="index">

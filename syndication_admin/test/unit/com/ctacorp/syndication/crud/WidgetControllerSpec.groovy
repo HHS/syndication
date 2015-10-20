@@ -25,7 +25,7 @@ class WidgetControllerSpec extends Specification {
 
     def setup(){
         controller.mediaItemsService = mediaItemsService
-        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {widget, subId ->if(widget.save(flush:true)){return null} else{return "errors"}}
+        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {Widget widget, subId ->if(widget.save(flush:true)){return widget} else{return widget}}
 
         controller.cmsManagerKeyService = cmsManagerKeyService
         controller.solrIndexingService = solrIndexingService

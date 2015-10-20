@@ -71,8 +71,8 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build(":release:3.1.1",
-              ":rest-client-builder:1.0.3") {
+        compile(":release:3.1.1",
+                ":rest-client-builder:2.1.0") {
             export = false
         }
 
@@ -87,14 +87,19 @@ grails.project.dependency.resolution = {
 }
 //_____________________
 // Release plugin info \_________________________________________________________________
-//
-// | to release, just run 'grails publish-plugin'
+// |
+// | to push a snapshot, run 'grails publish-plugin'
+// | to release, run 'grails publish-plugin --repository=plugin-release'
 // | to install locally, run 'grails maven-install'
 //_______________________________________________________________________________________
-grails.project.repos.default = "myRepo"
-grails.project.repos.myRepo.url = config.artifactory.deploymentAddress
-grails.project.repos.myRepo.username = config.artifactory.username
-grails.project.repos.myRepo.password = config.artifactory.password
+grails.project.repos.default = "plugin_snap"
+grails.project.repos.plugin_snap.url = config.artifactory.plugin_snap.url
+grails.project.repos.plugin_snap.username = config.artifactory.username
+grails.project.repos.plugin_snap.password = config.artifactory.password
+
+grails.project.repos.plugin_rel.url = config.artifactory.plugin_rel.url
+grails.project.repos.plugin_rel.username = config.artifactory.username
+grails.project.repos.plugin_rel.password = config.artifactory.password
 
 //Localize the grails work folder
 grails.work.dir="target/work"

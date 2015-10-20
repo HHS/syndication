@@ -62,15 +62,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         })
     </script>
 </head>
-
-<body>
 <div id="page-wrapper">
     <div class="row">
         <div class="col-lg-12">
             <h1 class="page-header">Auto Tagging</h1>
         </div>
     </div>
-
     <g:if test='${flash.message}'>
         <div class="alert alert-info alert-dismissable">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -88,27 +85,28 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <g:submitButton name="applyLanguage" value="Apply" class="btn btn-xs btn-success"/>
             </g:form>
         </div>
-
-        <div class="col-sm-2">
-            %{--Tag all button--}%
-            <g:form action="tagAll">
-                <g:each in="${untaggedMedia}" var="mediaItemInstance">
-                    <g:each in="${suggestedTags[mediaItemInstance.id]}" var="tag">
-                        <g:hiddenField name="media_tag_${mediaItemInstance.id}" id="media_tag_${mediaItemInstance.id}_${tag}" value="${tag}"/>
+        <g:if test="${untaggedMedia}">
+            <div class="col-sm-2">
+                %{--Tag all button--}%
+                <g:form action="tagAll">
+                    <g:each in="${untaggedMedia}" var="mediaItemInstance">
+                        <g:each in="${suggestedTags[mediaItemInstance.id]}" var="tag">
+                            <g:hiddenField name="media_tag_${mediaItemInstance.id}" id="media_tag_${mediaItemInstance.id}_${tag}" value="${tag}"/>
+                        </g:each>
                     </g:each>
-                </g:each>
-                <g:hiddenField name="lastIndex" value="${lastIndex}"/>
-                <g:hiddenField name="languageId" value="${language.id}"/>
-                <g:submitButton class="btn btn-lg btn-warning"
-                                name="tagAllButton"
-                                value="Tag All"
-                                onclick="return confirm('Are you sure? Will apply all suggested tags on this page, and may take several seconds to complete.');"/>
-            </g:form>
-        </div>
+                    <g:hiddenField name="languageId" value="${language.id}"/>
+                    <g:submitButton class="btn btn-lg btn-warning"
+                                    name="tagAllButton"
+                                    value="Tag All"
+                                    onclick="return confirm('Are you sure? Will apply all suggested tags on this page, and may take several seconds to complete.');"/>
+                </g:form>
+            </div>
+        </g:if>
     </div>
 
     <div class="row">
         <div class="col-lg-12">
+            <g:if test="${untaggedMedia}">
             <div class="row">
                 <div class="col-sm-1"></div>
                 <div class="col-sm-4">
@@ -122,7 +120,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <g:each in="${untaggedMedia}" var="mediaItemInstance">
                 <div class="row top-buffer">
                     <g:form action="tagSingle">
-                        %{--Tag single item submit button--}%
+                    %{--Tag single item submit button--}%
                         <div class="col-sm-1 tagSingleButton">
                             <g:hiddenField name="firstIndex" value="${firstIndex}"/>
                             <g:hiddenField name="languageId" value="${language.id}"/>
@@ -137,7 +135,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             </g:link>
                         </div>
                         <div class="col-sm-7">
-                            %{--Suggested Tags--}%
+                        %{--Suggested Tags--}%
                             <g:if test="${suggestedTags[mediaItemInstance.id]}">
                                 <g:each in="${suggestedTags[mediaItemInstance.id]}" var="tag">
                                     <button type="button" class="btn btn-info btn-xs tag-btn" data-tagName="${tag}">
@@ -145,7 +143,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <g:hiddenField name="tags" value="${tag}" data-mediaId="${mediaItemInstance.id}"/>
                                     </button>
                                 </g:each>
-                                </g:if>
+                            </g:if>
                             <g:else>
                                 <button type="button" class="btn btn-warning btn-xs">No Tag Suggestions</button>
                             </g:else>
@@ -153,29 +151,41 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     </g:form>
                 </div>
             </g:each>
+            </g:if>
+            <g:else>
+                <h1>There are no media items without tags</h1>
+            </g:else>
         </div>
     </div>
     <br/>
-    <div class="row">
-            <div class="col-lg-12">
-                <g:if test="${untaggedMedia.size() >= 50}">
-                        <g:form action="suggestedTags" style="display: inline-block">
-                            <g:hiddenField name="lastIndex" value="${lastIndex}"/>
-                            <g:hiddenField name="languageId" value="${language.id}"/>
-                            <g:submitButton name="next50" value="Load next 50" class="btn btn-warning"/>
-                        </g:form>
+    <g:if test="${untaggedMedia}">
+        <div class="row">
+            <div class="col-md-10">
+                <g:if test="${total > untaggedMedia.size()}">
+                    <div class="pagination">
+                        <g:paginate total="${total}" max="${max ?: 50}"/>
+                    </div>
                 </g:if>
-                <g:form action="suggestedTags" style="display: inline-block">
-                    <g:hiddenField name="lastIndex" value="0"/>
+            </div>
+            <div class="col-md-2">
+                <g:form action="tagAll">
+                    <g:each in="${untaggedMedia}" var="mediaItemInstance">
+                        <g:each in="${suggestedTags[mediaItemInstance.id]}" var="tag">
+                            <g:hiddenField name="media_tag_${mediaItemInstance.id}" id="media_tag_${mediaItemInstance.id}_${tag}" value="${tag}"/>
+                        </g:each>
+                    </g:each>
                     <g:hiddenField name="languageId" value="${language.id}"/>
-                    <g:submitButton name="startOver" value="Start From Beginning" class="btn btn-default"/>
+                    <g:submitButton class="btn btn-lg btn-warning"
+                                    name="tagAllButton"
+                                    value="Tag All"
+                                    onclick="return confirm('Are you sure? Will apply all suggested tags on this page, and may take several seconds to complete.');"/>
                 </g:form>
             </div>
         </div>
-        <br/>
-        <br/>
-        <br/>
-    </div>
+    </g:if>
+    <br/>
+    <br/>
+    <br/>
 </div>
 </body>
 </html>

@@ -14,6 +14,7 @@ class AlternativeImageService {
             return "Image not found"
         }
 
+        ai.validate()
         if (ai.hasErrors()) {
             return "You must include a valid Name and Url"
         }

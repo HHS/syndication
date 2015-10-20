@@ -50,4 +50,25 @@ class SubscriberService {
         subscriber.delete(flush: true)
         keyAgreement?.delete(flush: true)
     }
+
+    def indexResponse(params){
+        def subscribers = Subscriber.createCriteria().list(params){
+
+            if(params.search) {
+                switch (params.searchSelector) {
+                    case "user.name": ilike 'name', "%${params.search}%"; break
+                    case "user.email": ilike 'email', "%${params.search}%"; break;
+                    case "user.both":
+                        or{
+                            ilike 'name', "%${params.search}%"
+                            ilike 'email', "%${params.search}%"
+                        }
+                        break;
+                    default: break;
+                }
+            }
+        }
+
+        [instanceCount: subscribers.getTotalCount(), subscriberInstanceList:subscribers, currentRole: params.role, maxList:[10,20,50,100]]
+    }
 }

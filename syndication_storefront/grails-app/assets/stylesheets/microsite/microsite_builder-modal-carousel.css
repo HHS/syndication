@@ -43,7 +43,7 @@ h1.modal-title .section {
 
 .builder-form-header .form-group p {color: #666;}
 
-.builder-form-media-area .nav-pills>li.active>a 
+.builder-form-media-area .nav-pills>li.active>a
  {
 	background-color: #134c78;
 	color: #fff;
@@ -53,20 +53,15 @@ h1.modal-title .section {
 	margin-bottom: 50px;
 }
 
-.builder-form-media-area .nav-pills>li.active>a:hover, 
-.builder-form-media-area .nav-pills>li.active>a:focus {
-	background-color: #196293;
-	color: #fff;
-	transition: background-color .3s;
-}
-
 .builder-form-media-area .nav-pills>li>a {
 	background-color: transparent;
 	color: #134c78;
 	transition: background-color .3s;
 }
 
-.builder-form-media-area .nav-pills>li>a:hover {
+.builder-form-media-area .nav-pills>li>a:hover,
+.builder-form-media-area .nav-pills>li>a:focus
+{
 	background-color: #196293;
 	color: #fff;
 	transition: background-color .3s;
@@ -80,7 +75,6 @@ h1.modal-title .section {
 	margin-bottom: 50px;
 	padding: 10px;
 	width: 100%;
-	height:450px;
 }
 
 .tab-content .row {width: initial;}
@@ -94,8 +88,8 @@ h1.modal-title .section {
 
 .choose-media-source > a.choose-user-media-list div,
 .choose-media-source > a.choose-collection div,
-.choose-media-source > a.choose-tag div, 
-.choose-media-source > a.choose-source div, 
+.choose-media-source > a.choose-tag div,
+.choose-media-source > a.choose-source div,
 .choose-media-source > a.choose-campaign div {
 	background: url('syn_ms_icons.png') no-repeat 0 0;
 	display: inline-block;
@@ -105,7 +99,7 @@ h1.modal-title .section {
 }
 
 .choose-media-source a,
-.choose-media-source a:visited {	
+.choose-media-source a:visited {
 	color: #134c78;
  	text-decoration: none;
  }
@@ -117,18 +111,23 @@ h1.modal-title .section {
 }
 
 .choose-media-source > a.choose-user-media-list:hover > div {background-position: 0 -64px;}
+.choose-media-source > a.choose-user-media-list:focus > div {background-position: 0 -64px;}
 
 .choose-media-source > a.choose-collection div {background-position: -64px 0;}
 .choose-media-source > a.choose-collection:hover > div {background-position: -64px -64px;}
+.choose-media-source > a.choose-collection:focus > div {background-position: -64px -64px;}
 
 .choose-media-source > a.choose-tag div {background-position: -128px 0;}
 .choose-media-source > a.choose-tag:hover > div {background-position: -128px -64px;}
+.choose-media-source > a.choose-tag:focus > div {background-position: -128px -64px;}
 
 .choose-media-source > a.choose-source div {background-position: -192px 0;}
 .choose-media-source > a.choose-source:hover > div {background-position: -192px -64px;}
+.choose-media-source > a.choose-source:focus > div {background-position: -192px -64px;}
 
 .choose-media-source > a.choose-campaign div {background-position: -256px 0;}
 .choose-media-source > a.choose-campaign:hover > div {background-position: -256px -64px;}
+.choose-media-source > a.choose-campaign:focus > div {background-position: -256px -64px;}
 
 
 .choose-media-source div,
@@ -145,10 +144,15 @@ h1.modal-title .section {
 }
 
 .choose-media-source > a.choose-user-media-list:hover > p i,
+.choose-media-source > a.choose-user-media-list:focus > p i,
 .choose-media-source > a.choose-collection:hover > p i,
+.choose-media-source > a.choose-collection:focus > p i,
 .choose-media-source > a.choose-tag:hover > p i,
+.choose-media-source > a.choose-tag:focus > p i,
 .choose-media-source > a.choose-source:hover > p i,
-.choose-media-source > a.choose-campaign:hover > p i {
+.choose-media-source > a.choose-source:focus > p i,
+.choose-media-source > a.choose-campaign:hover > p i,
+.choose-media-source > a.choose-campaign:focus > p i {
 	margin-left: 25px;
 	transition: .2s;
 }
@@ -167,15 +171,12 @@ h1.modal-title .section {
 
 .builder-form-footer .form-group label {
 	display: block;
-	height: 0;
-	text-indent: 100%;
-	overflow: hidden;
 	white-space: nowrap;
 }
 
 .builder-form-footer input {
 	color: #333;
-} 
+}
 
 button.close {
 	background-color: #fff;
@@ -203,11 +204,11 @@ button.close:hover {
   padding-bottom: 25px;
 }
 
-.carousel-control .icon-prev, 
-.carousel-control .icon-next, 
+.carousel-control .icon-prev,
+.carousel-control .icon-next,
 .carousel-control .glyphicon-chevron-left,
 .carousel-control .glyphicon-chevron-right {
-	
+
 	width: 150px;
 
 }
@@ -215,11 +216,9 @@ button.close:hover {
 .carousel-control.left,
 .carousel-control.right {background-image: none;}
 
-.carousel-control,
-.carousel-control:active,
-.carousel-control:visited {
+.carousel-control {
   color: #4c8bb8;
-  opacity: 1.0;
+  opacity: 2.0;
   text-shadow: none;
   top: 90%;
   width: 5%;
@@ -227,7 +226,14 @@ button.close:hover {
 
 .carousel-control:hover,
 .carousel-control:focus {
-  color: #134c78;
+	color: black;
 }
 
 .builder-direction p {margin-top: 15px;}
+
+.left.carousel-control{
+	filter: progid:none !important;
+}
+.right.carousel-control{
+	filter: progid:none !important;
+}

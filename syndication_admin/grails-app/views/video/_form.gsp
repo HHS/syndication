@@ -14,180 +14,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <%@ page import="com.ctacorp.syndication.media.Video" %>
 
-<!-- Text input-->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="name">Name<span class="required-indicator">*</span></label>
-    <div class="col-md-8">
-        <input id="name" name="name" required="" value="${videoInstance?.name}" type="text" placeholder="video name" class="form-control input-md">
-    </div>
-</div>
-
-<!-- Textarea -->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="description">Description</label>
-    <div class="col-md-8">
-        <textarea class="form-control" id="description" name="description" maxlength="2000">${videoInstance?.description}</textarea>
-    </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="sourceUrl">Source Url<span class="required-indicator">*</span></label>
-    <div class="col-md-6">
-        <input id="sourceUrl" name="sourceUrl" maxlength="2000" required="" value="${videoInstance?.sourceUrl}" type="url" placeholder="source url" class="form-control input-md">
-    </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="targetUrl">targetUrl</label>
-    <div class="col-md-8">
-        <input id="targetUrl" name="targetUrl" maxlength="2000" value="${videoInstance?.targetUrl}" type="url" placeholder="target url" class="form-control input-md">
-    </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="customThumbnailUrl">Custom Thumbnail Url</label>
-    <div class="col-md-8">
-        <input id="customThumbnailUrl" name="customThumbnailUrl" maxlength="2000" value="${videoInstance?.customThumbnailUrl}" type="url" placeholder="thumbnail url" class="form-control input-md">
-    </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="customThumbnailUrl">Custom Preview Url</label>
-    <div class="col-md-8">
-        <input id="customPreviewUrl" name="customPreviewUrl" maxlength="2000" value="${videoInstance?.customPreviewUrl}" type="url" placeholder="preview url" class="form-control input-md">
-    </div>
-</div>
-
-<div class="form-group ${hasErrors(bean: videoInstance, field: 'dateSyndicationCaptured', 'error')} required">
-    <label class="col-md-4 control-label" for="dateSyndicationCaptured">
-        <g:message code="video.dateSyndicationCaptured.label" default="Date Syndication Captured"/>
-        <span class="required-indicator">*</span>
-    </label>
-    <div class="col-md-8">
-        <g:datePicker name="dateSyndicationCaptured" precision="minute" relativeYears="[-20..1]" value="${videoInstance?.dateSyndicationCaptured}"/>
-    </div>
-</div>
-
-<div class="form-group ${hasErrors(bean: videoInstance, field: 'dateSyndicationUpdated', 'error')} required">
-    <label class="col-md-4 control-label" for="dateSyndicationUpdated">
-        <g:message code="video.dateSyndicationUpdated.label" default="Date Syndication Updated"/>
-        <span class="required-indicator">*</span>
-    </label>
-    <div class="col-md-8">
-        <g:datePicker name="dateSyndicationUpdated" precision="minute" relativeYears="[-20..1]" value="${videoInstance?.dateSyndicationUpdated}"/>
-    </div>
-</div>
-
-<div class="form-group ${hasErrors(bean: videoInstance, field: 'dateSyndicationVisible', 'error')} required">
-    <label class="col-md-4 control-label" for="dateSyndicationVisible">
-        <g:message code="video.dateSyndicationVisible.label" default="Date Syndication Visible"/>
-        <span class="required-indicator">*</span>
-    </label>
-    <div class="col-md-8">
-        <g:datePicker name="dateSyndicationVisible" precision="minute" relativeYears="[-20..1]" value="${videoInstance?.dateSyndicationVisible}"/>
-    </div>
-</div>
-
-<div class="form-group ${hasErrors(bean: videoInstance, field: 'dateContentAuthored', 'error')} ">
-    <label class="col-md-4 control-label" for="dateContentAuthored">
-        <g:message code="video.dateContentAuthored.label" default="Date Content Authored"/>
-    </label>
-    <div class="col-md-8">
-        <g:datePicker name="dateContentAuthored" precision="minute" relativeYears="[-20..1]" value="${videoInstance?.dateContentAuthored}" default="none" noSelection="['': '']"/>
-    </div>
-</div>
-
-<div class="form-group ${hasErrors(bean: videoInstance, field: 'dateContentUpdated', 'error')} ">
-    <label class="col-md-4 control-label" for="dateContentUpdated">
-        <g:message code="video.dateContentUpdated.label" default="Date Content Updated"/>
-    </label>
-    <div class="col-md-8">
-        <g:datePicker name="dateContentUpdated" precision="minute" relativeYears="[-20..1]" value="${videoInstance?.dateContentUpdated}" default="none" noSelection="['': '']"/>
-    </div>
-</div>
-
-<div class="form-group ${hasErrors(bean: videoInstance, field: 'dateContentPublished', 'error')} ">
-    <label class="col-md-4 control-label" for="dateContentPublished">
-        <g:message code="video.dateContentPublished.label" default="Date Content Published"/>
-    </label>
-    <div class="col-md-8">
-        <g:datePicker name="dateContentPublished" precision="minute" relativeYears="[-20..1]" value="${videoInstance?.dateContentPublished}" default="none" noSelection="['': '']"/>
-    </div>
-</div>
-
-<div class="form-group ${hasErrors(bean: videoInstance, field: 'dateContentReviewed', 'error')} ">
-    <label class="col-md-4 control-label" for="dateContentReviewed">
-        <g:message code="video.dateContentReviewed.label" default="Date Content Reviewed"/>
-    </label>
-    <div class="col-md-8">
-        <g:datePicker name="dateContentReviewed" precision="minute" relativeYears="[-20..1]" value="${videoInstance?.dateContentReviewed}" default="none" noSelection="['': '']"/>
-    </div>
-</div>
-
-<!-- Select Basic -->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="language">Language<span class="required-indicator">*</span></label>
-    <div class="col-md-8">
-        <g:select from="${com.ctacorp.syndication.Language.findAllByIsActive(true, [sort: "name"])}" name="language.id" id="language" optionKey="id" optionValue="name" value="${videoInstance?.language?.id}" class="form-control" noSelection="${['null':'-Choose a Language-']}"/>
-    </div>
-</div>
-
-<!-- Radio Buttons -->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="active">
-        <g:message code="video.active.label" default="Active"/>
-
-    </label>
-    <div class="col-md-8">
-        <g:checkBox name="active" value="${videoInstance?.active}"/>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-4 control-label" for="visibleInStorefront">
-        <g:message code="video.visibleInStorefront.label" default="Visible In Storefront"/>
-
-    </label>
-    <div class="col-md-8">
-        <g:checkBox name="visibleInStorefront" value="${videoInstance?.visibleInStorefront}"/>
-    </div>
-</div>
-
-<div class="form-group">
-    <label class="col-md-4 control-label" for="manuallyManaged">
-        <g:message code="video.manuallyManaged.label" default="Manually Managed"/>
-
-    </label>
-    <div class="col-md-8">
-        <g:checkBox name="manuallyManaged" value="${videoInstance?.manuallyManaged}"/>
-    </div>
-</div>
-
-<!-- Text input-->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="externalGuid">External Guid</label>
-    <div class="col-md-8">
-        <input id="externalGuid" name="externalGuid" value="${videoInstance?.externalGuid}" placeholder="guid" class="form-control input-md">
-    </div>
-</div>
-
-<!-- Select Basic -->
-<div class="form-group">
-    <label class="col-md-4 control-label" for="source">Source<span class="required-indicator">*</span></label>
-    <div class="col-md-8">
-        <g:select from="${com.ctacorp.syndication.Source.list([sort: "name"])}" name="source.id" id="source" class="form-control" optionValue="name" optionKey="id" value="${videoInstance?.source?.id}"/>
-    </div>
-</div>
+<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:videoInstance]"/>
 
 <!-- Text input-->
 <div class="form-group">
     <label class="col-md-4 control-label" for="duration">Duration (Seconds)<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <input id="duration" name="duration" type="number" min="1" max="2147483646" value="${videoInstance?.duration}" required="">
+        <input id="duration" name="duration" type="number" min="1" max="2147483646" value="${videoInstance?.duration}" required="" placeholder="Duration in Seconds" class="form-control input-md">
     </div>
 </div>
 
@@ -195,7 +28,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="width">Width</label>
     <div class="col-md-8">
-        <input id="width" name="width" type="number" min="1" max="2147483646" value="${videoInstance?.width}">
+        <input id="width" name="width" type="number" min="1" max="2147483646" value="${videoInstance?.width}" placeholder="Width in Pixels" class="form-control input-md">
     </div>
 </div>
 
@@ -203,8 +36,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="height">Height</label>
     <div class="col-md-8">
-        <input id="height" name="height" type="number" min="1" max="2147483646" value="${videoInstance?.height}">
+        <input id="height" name="height" type="number" min="1" max="2147483646" value="${videoInstance?.height}" placeholder="Height in Pixels" class="form-control input-md">
     </div>
 </div>
-
-<g:render template="/mediaItem/owner"/>

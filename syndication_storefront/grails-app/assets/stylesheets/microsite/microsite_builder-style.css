@@ -53,7 +53,7 @@
   transition: transform .5s;
 }
 
-#pick-classic:hover {
+#pick-classic:hover, #pick-classic:focus{
   background: url("thumbnails.png") -600px 0 no-repeat;
   box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
   transform: scale(1.05);
@@ -70,7 +70,7 @@
   transition: transform .5s;
 }
 
-#pick-blog:hover {
+#pick-blog:hover, #pick-blog:focus {
   background: url("thumbnails.png") no-repeat -200px 0;
   box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
   transform: scale(1.05);
@@ -87,7 +87,7 @@
   transition: transform .5s;
 }
 
-#pick-carousel:hover {
+#pick-carousel:hover, #pick-carousel:focus {
   background: url("thumbnails.png") -200px -275px no-repeat;
   box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
   transform: scale(1.05);
@@ -104,7 +104,7 @@
   transition: transform .5s;
 }
 
-#pick-grid:hover {
+#pick-grid:hover, #pick-grid:focus {
   background: url("thumbnails.png") -600px -275px no-repeat;
   box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
   transform: scale(1.05);
@@ -358,11 +358,12 @@
   transition: all .5s;
 }
 
-.outlined:hover {
+.outlined:hover, .outlined:focus {
   opacity: 1.0;
   transform: scale(1.02);
   -webkit-transform: scale(1.02);
-  -mis-transform: scale(1.02);  
+  -mis-transform: scale(1.02);
+  -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=1.02, M12=0, M21=0, M22=1.02, SizingMethod='auto expand')";
   transition: all .3s;
 }
 
@@ -494,11 +495,15 @@
   bottom: -5px;
 }*/
 
-.checked {
-  position: absolute;
-  bottom: 11px;
-  right: 5px;
+.check-image{
   width: 50px;
+}
+.checked {
+  position: relative;
+  bottom: 0px;
+  /*top:10px;*/
+  right: 0px;
+  /*left: 50px;*/
 }
 
 

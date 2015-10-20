@@ -24,7 +24,7 @@ class CollectionControllerSpec extends Specification {
 
     def setup(){
         controller.mediaItemsService = mediaItemsService
-        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {collection, subId ->if(collection.save(flush:true)){return null} else{return "errors"}}
+        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {Collection collection, subId ->if(collection.save(flush:true)){return collection} else{return collection}}
 
         controller.cmsManagerKeyService = cmsManagerKeyService
         controller.solrIndexingService = solrIndexingService

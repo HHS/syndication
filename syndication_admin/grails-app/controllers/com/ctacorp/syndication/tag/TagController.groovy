@@ -8,7 +8,7 @@ import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.PDF
 import com.ctacorp.syndication.media.Periodical
-import com.ctacorp.syndication.media.SocialMedia
+import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.media.Video
 import com.ctacorp.syndication.media.Widget
 import grails.converters.JSON
@@ -41,7 +41,7 @@ class TagController {
             case Image:       redirect controller: "image",       action: "show", id: mi.id; break
             case PDF:         redirect controller: "PDF",         action: "show", id: mi.id; break
             case Infographic: redirect controller: "infographic", action: "show", id: mi.id; break
-            case SocialMedia: redirect controller: "socialMedia", action: "show", id: mi.id; break
+            case Tweet:       redirect controller: "tweet",       action: "show", id: mi.id; break
             case Video:       redirect controller: "video",       action: "show", id: mi.id; break
             case Widget:      redirect controller: "widget",      action: "show", id: mi.id; break
             default: println "default";
@@ -70,9 +70,15 @@ class TagController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def save(String name, Long tagType, Long language){
-        def tag = tagService.createTag(name, tagType, language)
+        def tag
+        if(tagService.checkTagExistence(name, tagType, language)){
+            flash.message = "Tag [${params.name}] has already been created."
+        } else {
+            tag = tagService.createTag(name, tagType, language)
+        }
         if (tag && !tag.errors) {
             def createdTags = tagService.findTagsByTagName(name, [languageId: language, tagTypeId: tagType])
+
             solrIndexingService.inputTag(String.valueOf(createdTags[0].id), name)
             flash.message = "Tag [${params.name}] created!"
         } else {
@@ -159,7 +165,7 @@ class TagController {
             case Infographic: redirect controller: "infographic", action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
             case PDF:         redirect controller: "PDF",         action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
             case Periodical:  redirect controller: "periodical",  action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
-            case SocialMedia: redirect controller: "socialMedia", action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
+            case Tweet:       redirect controller: "tweet",       action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
             case Video:       redirect controller: "video",       action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
             case Widget:      redirect controller: "widget",      action: "show", id: mi.id, params:[languageId:languageId, tagTypeId:tagTypeId]; break
         }

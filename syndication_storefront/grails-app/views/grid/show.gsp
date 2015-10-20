@@ -21,7 +21,7 @@
 <div class="template container-fluid">
 
     <div class="microsite grid">
-
+        <a id="pageContent"></a>
         <g:render template="/microsite/templateHeader"/>
 
         <div class="microsite-grid-content row">
@@ -57,7 +57,7 @@
                                 <div class="microsite-article on-white panel">
                                         <div class="pin">
                                             <h2 class="microsite-article-title">${mediaItemInstance?.name}</h2>
-                                            <img class="microsite-article-pic" src="${apiBaseUrl}/resources/media/${mediaItemInstance?.id}/thumbnail.jpg"/>
+                                            <img class="microsite-article-pic" src="${apiBaseUrl}/resources/media/${mediaItemInstance?.id}/thumbnail.jpg" alt="thumbnail for ${mediaItemInstance.name}"/>
 
                                             <p>${mediaItemInstance?.description}</p>
                                             <br/>

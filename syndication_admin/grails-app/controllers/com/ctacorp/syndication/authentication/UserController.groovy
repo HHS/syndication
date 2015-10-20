@@ -29,7 +29,7 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 @Secured(["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_USER", "ROLE_BASIC", "ROLE_STATS", "ROLE_PUBLISHER"])
 class UserController {
-    def userService
+    def adminUserService
     def springSecurityService
     def cmsManagerKeyService
     def passwordService
@@ -40,7 +40,7 @@ class UserController {
     def index(Integer max) {
         params.max = Math.min(max ?: 20, 100)
         params.sort = params.sort ?: "user.id"
-        return userService.indexResponse(params)
+        return adminUserService.indexResponse(params)
     }
 
     def breakdown(){
@@ -141,7 +141,7 @@ class UserController {
     def create() {
         def roles = Role.list()
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER"){
-            roles = Role.findAllByAuthorityInList(userService.getManagersAuthorityRoles())
+            roles = Role.findAllByAuthorityInList(adminUserService.getManagersAuthorityRoles())
         }
         
         def subscribers = cmsManagerKeyService.listSubscribers()
@@ -156,25 +156,25 @@ class UserController {
             return
         }
 
-        def passwordValidationMessage = passwordService.validatePassword(params.password, params.passwordRepeat)
+        def passwordValidation = passwordService.validatePassword(params.password, params.passwordRepeat)
         userInstance.validate()
-        if (userInstance.hasErrors() || (Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId) || passwordValidationMessage) {
+        if (userInstance.hasErrors() || (Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId) || !passwordValidation.valid) {
             flash.errors = []
-            if(passwordValidationMessage){
-                userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidationMessage)
+            if(passwordValidation.validationMessage){
+                userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidation.validationMessage)
             }
             flash.errors = userInstance.errors.allErrors.collect{[message:g.message([error : it])]}
             if(Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId){flash.errors << [message:"Select a Key"]}
             def roles = Role.list()
             if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER"){
-                roles = Role.findAllByAuthorityInList(userService.getManagersAuthorityRoles())
+                roles = Role.findAllByAuthorityInList(adminUserService.getManagersAuthorityRoles())
             }
 
             respond userInstance, view:'create', model: [subscribers:cmsManagerKeyService.listSubscribers(), roles:roles, currentRoleId: params?.authority]
             return
         }
 
-        userService.saveUserAndRole(userInstance, params.long('authority'))
+        adminUserService.saveUserAndRole(userInstance, params.long('authority'))
 
         request.withFormat {
             form multipartForm {
@@ -189,7 +189,7 @@ class UserController {
     def edit(User userInstance) {
         def roles = Role.list()
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER"){
-            roles = Role.findAllByAuthorityInList(userService.getManagersAuthorityRoles())
+            roles = Role.findAllByAuthorityInList(adminUserService.getManagersAuthorityRoles())
         }
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond userInstance, model: [subscribers:subscribers, currentSubscriber:subscribers.find{it.id as Long == userInstance?.subscriberId}?.id, roles: roles, currentRoleId:userInstance?.authorities?.getAt(0)?.id, fake:userInstance?.username]
@@ -206,11 +206,11 @@ class UserController {
             return
         }
 
-        def passwordValidationMessage = passwordService.validatePassword(params.password, params.passwordRepeat)
+        def passwordValidation = passwordService.validatePassword(params.password, params.passwordRepeat)
         userInstance.validate()
-        if (userInstance.hasErrors() || passwordValidationMessage) {
-            if(passwordValidationMessage){
-                userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidationMessage)
+        if (userInstance.hasErrors() || !passwordValidation.valid) {
+            if(passwordValidation.validationMessage){
+                userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidation.validationMessage)
             }
             flash.errors = userInstance.errors.allErrors.collect{[message:g.message([error : it])]}
             respond userInstance.errors, view: 'editMyAccount'
@@ -232,12 +232,12 @@ class UserController {
             return
         }
 
-        def passwordValidationMessage = passwordService.validatePassword(params.password, params.passwordRepeat)
+        def passwordValidation = passwordService.validatePassword(params.password, params.passwordRepeat)
         userInstance.validate()
-        if (userInstance.hasErrors() || (Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId) || passwordValidationMessage) {
+        if (userInstance.hasErrors() || (Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId) || !passwordValidation.valid) {
             flash.errors = []
-            if(passwordValidationMessage){
-                userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidationMessage)
+            if(passwordValidation.validationMessage){
+                userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidation.validationMessage)
             }
             flash.errors = userInstance.errors.allErrors.collect{[message:g.message([error : it])]}
             if(Role.get(params.authority).authority == "ROLE_PUBLISHER" && !params.subscriberId){flash.errors << [message:"Select a Key"]}
@@ -246,7 +246,7 @@ class UserController {
             return
         }
 
-        userService.saveUserAndRole(userInstance, params.long('authority'))
+        adminUserService.saveUserAndRole(userInstance, params.long('authority'))
 
         request.withFormat {
             form multipartForm {
@@ -266,7 +266,7 @@ class UserController {
             return
         }
 
-        userService.deleteUser(userInstance)
+        adminUserService.deleteUser(userInstance)
 
         request.withFormat {
             form multipartForm {

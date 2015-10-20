@@ -14,7 +14,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
-import grails.plugins.rest.client.RestBuilder
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import static org.springframework.http.HttpStatus.CREATED
@@ -77,9 +76,9 @@ class ImageController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(imageInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        imageInstance =  mediaItemsService.updateItemAndSubscriber(imageInstance, params.long('subscriberId'))
+        if(imageInstance.hasErrors()){
+            flash.errors = imageInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             respond imageInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers(), formats:["jpg", "png"]]
             return
         }
@@ -108,9 +107,9 @@ class ImageController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(imageInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        imageInstance =  mediaItemsService.updateItemAndSubscriber(imageInstance, params.long('subscriberId'))
+        if(imageInstance.hasErrors()){
+            flash.errors = imageInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             redirect action:'edit', id:params.id
             return
         }

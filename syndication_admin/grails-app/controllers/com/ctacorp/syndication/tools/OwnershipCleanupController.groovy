@@ -1,5 +1,6 @@
 package com.ctacorp.syndication.tools
 
+import com.ctacorp.syndication.commons.util.Util
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import grails.plugin.springsecurity.annotation.Secured
@@ -19,7 +20,9 @@ class OwnershipCleanupController {
         def foundMediaItems = MediaItem.findAllBySourceUrlIlike("${query}%")
         def unownedItems = []
         foundMediaItems.each{ mi->
-            if(!subscribed.contains(mi.id)){
+            if(!subscribed.contains(mi.id) && params.restrictToUnowned){
+                unownedItems << mi
+            } else{
                 unownedItems << mi
             }
         }
@@ -32,7 +35,9 @@ class OwnershipCleanupController {
         def foundMediaItems = MediaItem.list()
         def unownedItems = []
         foundMediaItems.each{ mi->
-            if(!subscribed.contains(mi.id)){
+            if(!subscribed.contains(mi.id) && params.restrictToUnowned){
+                unownedItems << mi
+            } else{
                 unownedItems << mi
             }
         }

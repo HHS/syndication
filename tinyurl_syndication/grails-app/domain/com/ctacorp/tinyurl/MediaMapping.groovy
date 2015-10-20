@@ -22,4 +22,8 @@ class MediaMapping {
     public String getTinyUrl(){
         "${grailsApplication.config.grails.serverURL}/${getToken()}"
     }
+
+    String toString(){
+        "MediaMapping:  targetUrl: ${targetUrl}\nsyndicationId: ${syndicationId}\nguid: ${guid}"
+    }
 }

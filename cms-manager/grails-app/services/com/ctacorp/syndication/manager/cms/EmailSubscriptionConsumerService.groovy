@@ -25,7 +25,6 @@ class EmailSubscriptionConsumerService implements RabbitMqConsumerService {
     def queueService
 
     void handleMessage(Message message, String rabbitQueue) {
-
         int attempts = message.meta?.attempts ?: 0
 
         String mediaId = message.mediaId
@@ -37,9 +36,7 @@ class EmailSubscriptionConsumerService implements RabbitMqConsumerService {
         if (subscriptionId && messageType == MessageType.IMPORT) {
             importSubscription(subscriptionId, attempts)
         } else {
-
             if (subscriptionId) {
-
                 def subscription = EmailSubscription.findById(subscriptionId)
                 if (!subscription) {
                     log.warn("Could not find emailSubscription '${subscriptionId}'")
@@ -61,7 +58,6 @@ class EmailSubscriptionConsumerService implements RabbitMqConsumerService {
     }
 
     void queueSubscriptions(String mediaId, MessageType messageType, String rabbitQueue) {
-
         def subscription = Subscription.findByMediaId(mediaId)
         if (!subscription) {
             log.info("No subscriptions found for mediaId '${mediaId}'")
@@ -81,7 +77,6 @@ class EmailSubscriptionConsumerService implements RabbitMqConsumerService {
     }
 
     void deleteSubscription(EmailSubscription emailSubscription, int attempts) {
-
         def success = emailSubscriptionUpdateService.deleteEmailSubscription(emailSubscription)
         if(!success) {
             queueService.sendToEmailErrorQueue(MessageType.DELETE, emailSubscription.id, null, attempts)
@@ -89,7 +84,6 @@ class EmailSubscriptionConsumerService implements RabbitMqConsumerService {
     }
 
     void importSubscription(long emailSubscriptionId, int attempts) {
-
         def success = emailSubscriptionUpdateService.importEmailSubscription(emailSubscriptionId)
 
         if (!success) {
@@ -98,7 +92,6 @@ class EmailSubscriptionConsumerService implements RabbitMqConsumerService {
     }
 
     void updateSubscription(EmailSubscription emailSubscription, int attempts) {
-
         def success = emailSubscriptionUpdateService.updateEmailSubscription(emailSubscription)
         if (!success) {
             log.error("Update of emailSubscription '${emailSubscription.id}' was unsuccessful")

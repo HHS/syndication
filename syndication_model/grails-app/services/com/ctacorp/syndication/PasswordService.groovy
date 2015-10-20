@@ -27,7 +27,10 @@ class PasswordService {
         if(passwd == passwdRepeat){
             repeat = true
         }
-        return validationMessage([valid:u && l && n && repeat, uppercaseValid:u, lowercaseValid:l, numberValid:n, passwordsMatch:repeat])
+        def validationResults = [valid:u && l && n && repeat, uppercaseValid:u, lowercaseValid:l, numberValid:n, passwordsMatch:repeat]
+        String validationMessage = validationMessage(validationResults)
+        validationResults.validationMessage = validationMessage
+        validationResults
     }
 
     def getRandomPassword(){

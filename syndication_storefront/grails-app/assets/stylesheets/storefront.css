@@ -42,7 +42,7 @@ img {
     max-height: 100%;
 }
 
-h2, p{
+h2, p, li{
     word-wrap: break-word;
 }
 

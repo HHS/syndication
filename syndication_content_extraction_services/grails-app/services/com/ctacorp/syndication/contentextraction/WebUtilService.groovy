@@ -21,7 +21,6 @@ class WebUtilService {
     def contentCacheService
 
     String getPage(String url) {
-//        System.setProperty("jsse.enableSNIExtension", "false"); //ignore ssl errors - these bomb on certain partners
         String content
 
         try{
@@ -43,6 +42,8 @@ class WebUtilService {
         }
 
         HttpURLConnection con = (HttpURLConnection) (new URL(url).openConnection());
+        con.setConnectTimeout(5000)
+        con.setReadTimeout(5000)
         con.connect();
         int status = con.getResponseCode();
         boolean redirected = false

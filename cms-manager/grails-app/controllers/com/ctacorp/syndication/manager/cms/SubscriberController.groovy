@@ -35,8 +35,9 @@ class SubscriberController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        respond Subscriber.list(params), model: [instanceCount: Subscriber.count()], view: 'index'
+        params.max = Math.min(max ?: 20, 100)
+        params.sort = params.sort ?: "name"
+        return subscriberService.indexResponse(params)
     }
 
     def show(Subscriber subscriber) {
@@ -75,6 +76,7 @@ class SubscriberController {
             subscriber.keyAgreement = keyAgreement
         }
 
+        makeOnlyPrivilegedSubscriber(subscriber)
         subscriber.save(flush: true)
 
         if (params.sendKeyAgreement) {
@@ -165,5 +167,17 @@ class SubscriberController {
     def showInstance(Subscriber subscriber, code) {
         flash.message = message(code: code, args: [message(code: 'subscriber.label'), subscriber.name])
         redirect(action: "show", id: subscriber.id)
+    }
+
+    @SuppressWarnings("GrMethodMayBeStatic")
+    private void makeOnlyPrivilegedSubscriber(Subscriber subscriber) {
+        def isPrivileged = subscriber.isPrivileged
+        if (isPrivileged) {
+            Subscriber.list().each {
+                it.isPrivileged = false
+                it.save(flush: true)
+            }
+        }
+        subscriber.setIsPrivileged(isPrivileged)
     }
 }

@@ -19,8 +19,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <meta name="layout" content="main">
     <g:set var="entityName" value="${message(code: 'audio.label', default: 'Audio')}"/>
     <title><g:message code="default.show.label" args="[entityName]"/></title>
-    <asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
-    <asset:stylesheet src="/tokenInput/token-input.css"/>
+    <asset:javascript src="tokenInput/jquery.tokeninput.js"/>
+    <asset:stylesheet src="tokenInput/token-input.css"/>
 </head>
 
 <body>
@@ -178,7 +178,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     </g:link>
                 </sec:ifAnyGranted>
                 <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_PUBLISHER">
-                    <g:actionSubmit class="btn btn-danger" action="delete" onclick="return confirm('Are you sure?');" value="Delete"/>
+                    <g:actionSubmit class="btn btn-danger" action="delete" onclick="return confirm('${message(code: 'default.button.delete.mediaItem.confirm', default: 'Are you sure?')}');" value="Delete"/>
                 </sec:ifAnyGranted>
 
                 <g:link class="button" action="index">

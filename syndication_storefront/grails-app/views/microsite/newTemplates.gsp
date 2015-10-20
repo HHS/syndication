@@ -32,7 +32,7 @@
         <div class="classic-builder col-xs-6">
 
             <div class="header">
-
+                <a id="pageContent"></a>
                 <a><div class="outlined">
                         <div class="section"><span>header</span></div>
                     </div></a>

@@ -17,6 +17,7 @@ class UpdateSolrIndexJob {
             def mediaContent
             try {
                 String apiUrl = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+                rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
                 mediaContent = rest.get("${apiUrl}/resources/media/${mi.id}/syndicate.html").text
             }catch(org.springframework.web.client.ResourceAccessException e){
                 log.error "Syndication api server could not be reached!\n${e}"

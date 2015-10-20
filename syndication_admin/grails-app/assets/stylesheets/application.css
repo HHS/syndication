@@ -8,3 +8,9 @@
         float: right;
     }
 }
+
+@media (max-width: 1000px) {
+    #urlModal{
+        margin-top: 10px;
+    }
+}

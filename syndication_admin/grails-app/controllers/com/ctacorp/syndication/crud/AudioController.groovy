@@ -75,9 +75,9 @@ class AudioController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(audioInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        audioInstance =  mediaItemsService.updateItemAndSubscriber(audioInstance, params.long('subscriberId'))
+        if(audioInstance.hasErrors()){
+            flash.errors = audioInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             respond audioInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
@@ -106,9 +106,9 @@ class AudioController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(audioInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        audioInstance =  mediaItemsService.updateItemAndSubscriber(audioInstance, params.long('subscriberId'))
+        if(audioInstance.hasErrors()){
+            flash.errors = audioInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             redirect action:"edit", id:params.id
             return
         }

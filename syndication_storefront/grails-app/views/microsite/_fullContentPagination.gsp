@@ -3,4 +3,3 @@
         ${raw(syndicateResponse?.json?.results?.content[0])}
     </g:if>
 </div>
-

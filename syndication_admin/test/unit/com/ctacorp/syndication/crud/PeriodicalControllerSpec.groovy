@@ -29,7 +29,7 @@ class PeriodicalControllerSpec extends Specification {
     def setup(){
         // all mediaItems
         controller.mediaItemsService = mediaItemsService
-        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {periodical, subId ->if(periodical.save(flush:true)){return null} else{return "errors"}}
+        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {Periodical periodical, subId ->if(periodical.save(flush:true)){return periodical} else{return periodical}}
 
         controller.cmsManagerKeyService = cmsManagerKeyService
         controller.solrIndexingService = solrIndexingService

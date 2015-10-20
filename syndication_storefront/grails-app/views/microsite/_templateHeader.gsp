@@ -6,11 +6,14 @@
                 
     </div>
 
-    <div class="header-right col-xs-6">
+    <g:if test="${microSite?.logoUrl}">
+        <div class="header-right col-xs-6">
 
-        <div class=""><img class="microsite-logo" src="${microSite?.logoUrl}" alt=""/></div>
+            <div class=""><img class="microsite-logo" src="${microSite?.logoUrl}" alt="Custom microsite logo"/></div>
 
-    </div>
+        </div>
+    </g:if>
+
 
     <div class="header-right col-xs-6">
         <div class=""></div>

@@ -9,7 +9,7 @@ import spock.lang.Specification
 @Mock([User, Role, User, UserRole])
 class UserControllerSpec extends Specification {
 
-    def userService = Mock(UserService)
+    def adminUserService = Mock(AdminUserService)
     def cmsManagerKeyService = Mock(CmsManagerKeyService)
 
     void setup() {
@@ -18,7 +18,7 @@ class UserControllerSpec extends Specification {
         UserRole.create user, role, true
         controller.springSecurityService = [currentUser:User.get(1)]
 
-        def userMockService = mockFor(UserService, true)
+        def userMockService = mockFor(AdminUserService, true)
         userMockService.demand.saveUserAndRole {User userInstance, String authority ->
             userInstance.save flush:true
         }
@@ -26,7 +26,7 @@ class UserControllerSpec extends Specification {
             userInstance.delete flush: true
         }
         controller.cmsManagerKeyService = cmsManagerKeyService
-        controller.userService = userService
+        controller.adminUserService = adminUserService
         User.metaClass.encodePassword = { -> }
     }
 
@@ -46,7 +46,7 @@ class UserControllerSpec extends Specification {
             controller.index()
 
         then: "The model is correct"
-            1 * userService.indexResponse(params)
+            1 * adminUserService.indexResponse(params)
     }
 
     void "Test the create action returns the correct model"() {
@@ -59,8 +59,9 @@ class UserControllerSpec extends Specification {
 
     void "Test the save action correctly persists an instance"() {
         setup:
-        populateValidParams(params)
-        def user1 = new User(params).save()
+            controller.passwordService = [validatePassword:{ p1, p2 -> [valid:true]}]
+            populateValidParams(params)
+            def user1 = new User(params).save()
 
         when: "The save action is executed with an invalid instance"
             request.method = 'POST'
@@ -74,17 +75,16 @@ class UserControllerSpec extends Specification {
             view == 'create'
             model.userInstance != null
 
-
         when: "The save action is executed with a valid instance"
             response.reset()
             params.authority = 1
             params.password = "match"
-            params.passwordVerify = "match"
+            params.passwordRepeat = "match"
             controller.save(user1)
 
         then: "A redirect is issued to the show action"
             response.redirectedUrl == "/user/show/$user1.id"
-            1 * controller.userService.saveUserAndRole(user1, 1)
+            1 * controller.adminUserService.saveUserAndRole(user1, 1)
     }
 
     void "Test that the show action returns the correct model"() {
@@ -119,8 +119,47 @@ class UserControllerSpec extends Specification {
             model.userInstance == user
     }
 
-    void "Test the update action performs an update on a valid domain instance"() {
+    void "updateMyAccount action performs an update on the current users account"() {
         setup:
+            controller.passwordService = [validatePassword:{ p1, p2 -> [valid:true]}]
+            populateValidParams(params)
+            def user1 = new User(params).save(flush: true)
+
+        when: "Update is called for a domain instance that doesn't exist"
+            request.method = 'PUT'
+            params.authority = 1
+            request.contentType = FORM_CONTENT_TYPE
+            controller.updateMyAccount(null)
+
+        then: "A 404 error is returned"
+            response.redirectedUrl == '/user/index'
+            flash.message != null
+
+
+        when: "An invalid domain instance is passed to the update action"
+            response.reset()
+            def user = new User()
+            user.validate()
+            controller.updateMyAccount(user)
+
+        then: "The edit view is rendered again with the invalid instance"
+            flash.errors != null
+            view == 'editMyAccount'
+
+        when: "A valid domain instance is passed to the update action"
+            response.reset()
+            params.password = "match"
+            params.passwordRepeat = "match"
+            controller.updateMyAccount(user1)
+
+        then: "A redirect is issues to the show action"
+            flash.message != null
+            response.redirectedUrl == "/dashboard/syndDash"
+    }
+
+    void "update action performs an update on a valid domain instance"() {
+        setup:
+            controller.passwordService = [validatePassword:{ p1, p2 -> [valid:true]}]
             populateValidParams(params)
             def user1 = new User(params).save(flush: true)
 
@@ -142,12 +181,13 @@ class UserControllerSpec extends Specification {
             controller.update(user)
 
         then: "The edit view is rendered again with the invalid instance"
+            flash.errors != null
             response.redirectedUrl == '/user/edit'
 
         when: "A valid domain instance is passed to the update action"
             response.reset()
             params.password = "match"
-            params.passwordVerify = "match"
+            params.passwordRepeat = "match"
             controller.update(user1)
 
         then: "A redirect is issues to the show action"
@@ -176,8 +216,8 @@ class UserControllerSpec extends Specification {
         when: "The domain instance is passed to the delete action"
             controller.delete(user)
 
-        then: "The userService delete method is called"
-            1 * controller.userService.deleteUser(user)
+        then: "The adminUserService delete method is called"
+            1 * controller.adminUserService.deleteUser(user)
             response.redirectedUrl == '/user/index'
             flash.message != null
     }

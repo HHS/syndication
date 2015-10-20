@@ -37,7 +37,6 @@ class AuthorizationHeaderServiceSpec extends Specification {
     private static AuthorizationHeaderGenerator.KeyAgreement keyAgreememnt() {
         def keyAgreement = new AuthorizationHeaderGenerator.KeyAgreement()
         keyAgreement.secret = "xjY3i4AnsZ9wWuDKboD1XbAdtX1hgOh2tYMnwCWnXhweO94IKrbVJuPZIQsyO5Sa40CjAMF9tG5ciI+cXITjVw=="
-        keyAgreement.privateKey = "UxMt4OpdAZhJFMOF/kmv/lZAYXjE4hV8EI9UdmQP71J9VbbIvmR0DEhX2D3He7AKTq1IQz4tAqDX+Jy1Svxlqw=="
         keyAgreement.publicKey = "9k+x8vDQJBcEYcEb/y/iipg8kXMU7sFfk1klV3PqMZkUBuJ/rDgVZtHmJGBydEKfnGKPAf6y9DBb7a+1tAz9Bg=="
         keyAgreement
     }

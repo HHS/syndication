@@ -15,7 +15,7 @@ grails.project.fork = [
     //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 
     // configure settings for the test-app JVM, uses the daemon by default
-    test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
+    test: false,
     // configure settings for the run-app JVM
     run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
     // configure settings for the run-war JVM
@@ -35,14 +35,10 @@ grails.project.dependency.resolution = {
     checksums true // Whether to verify checksums on resolve
     legacyResolve false // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
     repositories {
-        inherits true // Whether to inherit repository definitions from plugins
+        inherits("global") {}
 
         mavenRepo(config.artifactory.repo){
-            auth([
-                    username: config.artifactory.username,
-                    password: config.artifactory.password
-            ])
-
+            auth username: config.artifactory.username, password: config.artifactory.password
             updatePolicy "always"
         }
         mavenLocal()
@@ -61,17 +57,17 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
         runtime 'mysql:mysql-connector-java:5.1.27'
         //CMS Manager security libs
-        compile('com.ctacorp.commons:api-key-utils:1.5.1'){
+        compile('com.ctacorp.commons:api-key-utils:1.6.0'){
             excludes 'groovy'
         }
-        compile "com.google.guava:guava:12.0"
+        compile "com.google.guava:guava:18.0"
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
     }
 
     plugins {
         // plugins for the build system only
-        build ":tomcat:7.0.55"
-        build (":release:3.0.1"){
+        build ":tomcat:7.0.55.2"
+        build (":release:3.1.1"){
             excludes "rest-client-builder"
         }
 
@@ -79,23 +75,22 @@ grails.project.dependency.resolution = {
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.8'
 
-        compile ":rest-client-builder:2.0.1"
+        compile ":rest-client-builder:2.1.1"
 
-        compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
+        compile ":bruteforce-defender:1.1"
 
         // plugins needed at runtime but not for compilation
-        runtime ":hibernate4:4.3.6.1" // or ":hibernate:3.6.10.18"
-        runtime ":database-migration:1.4.0"
+        runtime ":hibernate4:4.3.8.1" // or ":hibernate:3.6.10.18"
+        runtime ":database-migration:1.4.1"
         runtime ":jquery:1.11.1"
-//        runtime ":resources:1.2.7"
-        compile ":asset-pipeline:1.9.9"
+        compile ":asset-pipeline:2.5.9"
 
-        compile ":spring-security-core:2.0-RC4"
+        compile ":spring-security-core:2.0-RC5"
 
         test ":auto-test:1.0.1"
 
         //Artifactory integration
-        build (":release:3.0.1"){
+        build (":release:3.1.1"){
             excludes "rest-client-builder"
         }
 
@@ -110,12 +105,17 @@ grails.project.dependency.resolution = {
 grails.work.dir = "target/work"
 
 //_____________________
-// Release plugin info \_________________________________________________________________
-//
-// | to release, just run 'grails maven-deploy'
+// Release War info    \_________________________________________________________________
+// |
+// | to push a snapshot, run 'grails prod maven-deploy'
+// | to release, run 'grails prod maven-deploy --repository=plugin-release'
 // | to install locally, run 'grails maven-install'
 //_______________________________________________________________________________________
-grails.project.repos.default = "myRepo"
-grails.project.repos.myRepo.url = config.artifactory.deploymentAddress
-grails.project.repos.myRepo.username = config.artifactory.username
-grails.project.repos.myRepo.password = config.artifactory.password
+grails.project.repos.default = "app_snap"
+grails.project.repos.app_snap.url = config.artifactory.app_snap.url
+grails.project.repos.app_snap.username = config.artifactory.username
+grails.project.repos.app_snap.password = config.artifactory.password
+
+grails.project.repos.app_rel.url = config.artifactory.app_rel.url
+grails.project.repos.app_rel.username = config.artifactory.username
+grails.project.repos.app_rel.password = config.artifactory.password

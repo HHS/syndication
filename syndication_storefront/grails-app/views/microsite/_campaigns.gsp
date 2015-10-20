@@ -2,7 +2,7 @@
 <div class="form-group">
     <label class="col-lg-4 control-label" for="pane${area}ListId">Campaign</label>
     <div class="col-lg-8">
-        <g:select class="form-control" name="pane${area}ListId"  from="${campaigns}" value="${currentCampaign}" optionKey="id"/>
+        <g:select class="form-control" name="pane${area}ListId"  from="${campaigns}" value="${currentCampaign}" optionKey="id" aria-label="choose a Campaign"/>
     </div>
 </div>
 

@@ -21,21 +21,21 @@
 <div class="template container independent">
 
     <div class="microsite classic">
-
+        <a id="pageContent"></a>
         <g:render template="/microsite/templateHeader"/>
 
         <div class="microsite-classic-content row">
 
             <div class="microsite-classic-left-col col-sm-7 col-xs-12">
-                
+
                 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                     <g:set var="firstPanel" value="${true}"/>
                     <g:each in="${pane1MediaItems}" var="media">
                         <g:if test="${firstPanel}">
                             <div class="panel panel-default">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse${media.id}"
+                                <a class="collapsable-link" data-toggle="collapse" data-parent="#accordion" href="#collapse${media.id}"
                                            aria-expanded="true" aria-controls="collapse${media.id}">
-                                    <div class="panel-heading microsite-article" role="tab" id="${media.id}">
+                                    <div class="panel-heading microsite-article" role="button" id="${media.id}">
                                         <h2 class="microsite-article-title panel-title">
                                             ${media.name}
 
@@ -48,7 +48,7 @@
                                      aria-labelledby="${media.id}">
 
                                     <div class="panel-body">
-                                            <img style="width:100%" class="microsite-article-pic"
+                                            <img style="width:100%" alt="Thumbnail for ${media.name}" class="microsite-article-pic"
                                                  src="${apiBaseUrl}/resources/media/${media?.id}/preview.jpg"/>
 
                                         <p>${media.description}</p>
@@ -65,11 +65,11 @@
                         <g:else>
                             <div class="panel panel-default">
 
-                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion"
+                                <a class="collapsed collapsable-link" data-toggle="collapse" data-parent="#accordion"
                                            href="#collapse${media.id}" aria-expanded="false"
                                            aria-controls="collapse${media.id}">
 
-                                    <div class="panel-heading" role="tab" id="${media.id}">
+                                    <div class="panel-heading" role="button" id="${media.id}">
                                         <h2 class="microsite-article-title panel-title">
                                             ${media.name}
                                         </h2>
@@ -80,7 +80,7 @@
 
                                     <div class="panel-body">
                                         <div class="microssite-article on-white col-md-3 col-xs-4">
-                                            <img style="width:100%" class="microsite-article-pic"
+                                            <img style="width:100%" alt="thumbnail for ${media.name}" class="microsite-article-pic"
                                                  src="${apiBaseUrl}/resources/media/${media?.id}/thumbnail.jpg"/>
                                         </div>
 
@@ -122,6 +122,30 @@
     <g:render template="/microsite/templateFooter"/>
 
 </div>
+<script>
+    $(document).ready(function(){
+        $(".collapsable-link").on("click", function(){
+            if(this.getAttribute("aria-expanded") == "true") {
+                this.setAttribute("aria-expanded", false);
+            } else {
+                var tabs
+                if(!document.getElementsByClassName) {//for IE browsers
+                    document.getElementsByClassName = function(className) {
+                        return this.querySelectorAll("." + className);
+                    };
+                    tabs = document.getElementsByClassName("collapsable-link");
+                } else {//if not IE than getElementsBuClassName already works
+                    tabs = document.getElementsByClassName("collapsable-link");
+                }
+                for(var index = 0;index < tabs.length;index++) {
+                    tabs[index].setAttribute("aria-expanded", false)
+                }
+                this.setAttribute("aria-expanded", true);
+            }
+        })
+    })
 
+
+</script>
 </body>
 </html>

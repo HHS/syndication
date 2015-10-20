@@ -28,6 +28,7 @@ class TinyUrlService {
 
     @PostConstruct
     void init() {
+        rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
         tServer = grailsApplication.config.syndication.tinyUrl.serverAddress + grailsApplication.config.syndication.tinyUrl.mappingBase
     }
 

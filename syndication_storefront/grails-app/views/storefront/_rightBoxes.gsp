@@ -55,6 +55,7 @@
             <li><g:link controller="storefront" action="requestSyndication" class="popup-form">Request a Page to be Syndicated</g:link></li>
             <li><g:link controller="syndicateThis" action="badgeSnippet">Get the Syndicate This button</g:link></li>
             <li><a href="https://github.com/HHS/syndication">Open Source</a></li>
+            <li><g:link controller="storefront" action="fiveOhEight">508 Disclaimer</g:link></li>
             <li><g:link controller="storefront" action="releaseInfo">Release Notes</g:link></li>
         </ul>
     </div>

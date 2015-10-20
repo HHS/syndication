@@ -21,7 +21,8 @@
 <div class="landing container">
 
     <div class="heading">
-        <h1>Microsite Builder<span class="beta-badge"></span></h1>
+        <a id="pageContent"></a>
+        <h1>Microsite Builder<span class="beta-badge"><asset:image src="microsite/beta-badge.png" alt="Currently in beta"/></span></h1>
 
         <p class="instructions">Build your own personalized site populated with rich media from the HHS Syndication Network.<br/> Choose a template below to start.
         </p>

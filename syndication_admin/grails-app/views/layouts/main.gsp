@@ -47,43 +47,67 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <a href="#list-html" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
             <br/>
             <sec:ifAnyGranted roles="ROLE_ADMIN">
-                <g:if test="${!params.controller.equals("metricReport") && !params.controller.equals("mediaPreviewThumbnail")}">
+                <g:if test="${!(params.controller in ["metricReport", "mediaPreviewThumbnail"])}">
                     <nav class="navbar navbar-default" role="navigation">
                         <div class="container-fluid">
                             <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
-                            <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                            <g:if test="${params.controller == "tweet"}">
+                                <g:link class="navbar-brand" action="importTweets"><i class="fa fa-cloud-download"></i> Import Tweets</g:link>
+                                <g:link class="navbar-brand" controller="twitterAccount" action="create"><i class="fa fa-plus"></i> Add Twitter Account</g:link>
+                            </g:if>
+                            <g:else>
+                                <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                            </g:else>
                         </div>
                     </nav>
                 </g:if>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_PUBLISHER">
-                <g:if test="${!params.controller.equals("metricReport") && !params.controller.equals("extendedAttribute") && !params.controller.equals("alternateImage") && !params.controller.equals("publisher") || params.controller.equals('audio') || params.controller.equals('collection') || params.controller.equals('html') || params.controller.equals('image') || params.controller.equals('infographic') || params.controller.equals('periodical') || params.controller.equals('socialMedia') || params.controller.equals('video') || params.controller.equals('widget')}">
+                <g:if test="${params.controller in ["audio","collection","html","image","infographic","periodical","tweet","twitterAccount","video","widget"]}">
                     <nav class="navbar navbar-default" role="navigation">
                         <div class="container-fluid">
                             <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
-                            <g:if test="${params.controller.equals("campaign") || params.controller.equals('audio') || params.controller.equals('collection') || params.controller.equals('html') || params.controller.equals('image') || params.controller.equals('infographic') || params.controller.equals('periodical') || params.controller.equals('socialMedia') || params.controller.equals('video') || params.controller.equals('widget')}">
+                            <g:if test="${params.controller in ["campaign", "audio", "collection", "html", "image", "infographic", "periodical", "twitterAccount", "video", "widget"]}">
                                 <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
                             </g:if>
+                            <g:elseif test="${params.controller == "tweet"}">
+                                <g:link class="navbar-brand" action="importTweets"><i class="fa fa-cloud-download"></i> Import Tweets</g:link>
+                                <g:link class="navbar-brand" controller="twitterAccount" action="create"><i class="fa fa-plus"></i> Add Twitter Account</g:link>
+                            </g:elseif>
                         </div>
                     </nav>
                 </g:if>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_MANAGER">
-                <g:if test="${params.controller.equals('alternateImage') || params.controller.equals('campaign') || params.controller.equals('language') || params.controller.equals('extendedAttribute') || params.controller.equals('source') || params.controller.equals('user') || params.controller.equals('audio') || params.controller.equals('collection') || params.controller.equals('html') || params.controller.equals('image') || params.controller.equals('infographic') || params.controller.equals('periodical') || params.controller.equals('socialMedia') || params.controller.equals('video') || params.controller.equals('widget')}">
+                <g:if test="${params.controller in ["alternateImage", "campaign", "language", "extendedAttribute", "twitterAccount", "source", "user", "audio", "collection", "html", "image", "infographic", "periodical", "tweet", "video", "widget"]}">
                 <nav class="navbar navbar-default" role="navigation">
                     <div class="container-fluid">
-                        <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
-                        <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                        <g:if test="${params.controller == "tweet"}">
+                            <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
+                            <g:link class="navbar-brand" action="importTweets"><i class="fa fa-cloud-download"></i> Import Tweets</g:link>
+                            <g:link class="navbar-brand" controller="twitterAccount" action="create"><i class="fa fa-plus"></i> Add Twitter Account</g:link>
+                        </g:if>
+                        <g:else>
+                            <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
+                            <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                        </g:else>
+
                     </div>
                 </nav>
             </g:if>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_USER">
-                <g:if test="${params.controller.equals('campaign') || params.controller.equals('source') || params.controller.equals('audio') || params.controller.equals('collection') || params.controller.equals('html') || params.controller.equals('image') || params.controller.equals('infographic') || params.controller.equals('periodical') || params.controller.equals('socialMedia') || params.controller.equals('video') || params.controller.equals('widget')}">
+                <g:if test="${params.controller in ["campaign", "source", "audio", "collection", "html", "image", "infographic", "periodical", "tweet", "video", "widget"]}">
                     <nav class="navbar navbar-default" role="navigation">
                         <div class="container-fluid">
-                            <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
-                            <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                            <g:if test="${params.controller == "tweet"}">
+                                <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
+                                <g:link class="navbar-brand" action="importTweets"><i class="fa fa-cloud-download"></i> Import Tweets</g:link>
+                            </g:if>
+                            <g:else>
+                                <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
+                                <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                            </g:else>
                         </div>
                     </nav>
                 </g:if>

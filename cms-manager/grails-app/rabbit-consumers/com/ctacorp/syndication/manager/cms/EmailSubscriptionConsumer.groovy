@@ -1,5 +1,5 @@
 package com.ctacorp.syndication.manager.cms
-import com.budjb.rabbitmq.MessageContext
+import com.budjb.rabbitmq.consumer.MessageContext
 import com.ctacorp.syndication.manager.cms.utils.mq.MqUtils
 import com.ctacorp.syndication.manager.cms.utils.mq.RabbitMqConsumer
 import org.apache.commons.logging.LogFactory
@@ -17,7 +17,7 @@ class EmailSubscriptionConsumer implements RabbitMqConsumer {
     def emailSubscriptionConsumerService
 
     @Override
-    void handleMessage(String message, MessageContext messageContext) {
+    void handleMessage(def message, MessageContext messageContext) {
         MqUtils.handleMessage(message, rabbitConfig.queue, emailSubscriptionConsumerService)
     }
 }

@@ -53,7 +53,7 @@
 
             <ul class="links">
                 <li><a href="http://www.hhs.gov/answers/">FAQs</a></li>
-                <li><a href="https://oig.hhs.gov/">Inspector General</a></li>
+                <li><a href="http://oig.hhs.gov/">Inspector General</a></li>
                 <li><a href="https://forms.oig.hhs.gov/hotlineoperations/">Report Fraud</a></li>
                 <li><a href="http://www.paymentaccuracy.gov">PaymentAccuracy.gov</a></li>
                 <li class="last"><a href="http://www.hhs.gov/contactus.html">Contact HHS</a></li>

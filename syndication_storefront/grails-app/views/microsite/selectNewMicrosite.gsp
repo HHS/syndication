@@ -23,6 +23,7 @@
     <nav style="box-shadow: none" class="navbar navbar-default" role="navigation">
         <div class="container">
             <div class="navbar-header">
+                <a id="pageContent"></a>
                 <span class="navbar-brand" href="#">Pick a Microsite Template</span>
             </div>
         </div>

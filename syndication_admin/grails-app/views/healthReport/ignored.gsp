@@ -27,6 +27,18 @@
       </div>
   </g:if>
 
+  <div class="progress">
+    <div class="progress-bar progress-bar-success" title = "${stableItems} stable items" style="width: ${percentStable}%">
+      <span class="">${stableItems} Stable Items</span>
+    </div>
+    <div class="progress-bar progress-bar-warning" title="${ignoredCount} ignored items" style="width: ${percentIgnored}%">
+      <span class="">${ignoredCount} Ignored Items</span>
+    </div>
+    <div class="progress-bar progress-bar-danger" title="${flaggedCount} flagged items" style="width: ${percentFlagged}%">
+      <span class="">${flaggedCount} Flagged Items</span>
+    </div>
+  </div>
+
   <ul class="nav nav-pills">
     <li role="presentation"><g:link action="index">Flagged Media</g:link></li>
     <li role="presentation" class="active"><g:link action="ignored">Ignored Media</g:link></li>

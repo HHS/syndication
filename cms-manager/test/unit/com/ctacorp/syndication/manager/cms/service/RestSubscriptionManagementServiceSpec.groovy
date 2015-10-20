@@ -29,6 +29,7 @@ import grails.buildtestdata.mixin.Build
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.web.ControllerUnitTestMixin
+import groovy.json.JsonSlurper
 import spock.lang.Specification
 
 @TestMixin(ControllerUnitTestMixin)
@@ -216,7 +217,7 @@ class RestSubscriptionManagementServiceSpec extends Specification {
         and: "return a 200 status with success message"
 
         result.status == 201
-        result.message.startsWith("{\n" + "   \"id\": ${restSubscription.id},")
+        restSubscription.id == new JsonSlurper().parseText(result.message).id
     }
 
     void "create subscription saves a new rest subscription for a new subscription"() {
@@ -250,7 +251,7 @@ class RestSubscriptionManagementServiceSpec extends Specification {
         and: "return a 200 status with the created subscriptions"
 
         result.status == 201
-        result.message.startsWith("{\n" + "   \"id\": ${restSubscription.id},")
+        restSubscription.id == new JsonSlurper().parseText(result.message).id
     }
 
     void "create subscription skips an existing rest subscription"() {
@@ -274,7 +275,7 @@ class RestSubscriptionManagementServiceSpec extends Specification {
         and: "return a 200 status with the created subscriptions"
 
         result.status == 201
-        result.message.startsWith("{\n" + "   \"id\": ${restSubscription.id},")
+        restSubscription.id == new JsonSlurper().parseText(result.message).id
     }
 
     void "create subscription skips creation when no rest subscribers are associated with the subscriber"() {
@@ -330,7 +331,7 @@ class RestSubscriptionManagementServiceSpec extends Specification {
         then: "return a 200 status with all subscriptions"
 
         result.status == 200
-        result.message.startsWith("[{\n" + "   \"id\": ${restSubscription.id},")
+        restSubscription.id == new JsonSlurper().parseText(result.message)[0].id
     }
 
     void "get all subscriptions correctly handles when no rest subscribers exist"() {
@@ -399,7 +400,7 @@ class RestSubscriptionManagementServiceSpec extends Specification {
         then: "return a 200 status with all subscriptions"
 
         result.status == 200
-        result.message.startsWith("{\n" + "   \"id\": ${restSubscription.id},")
+        restSubscription.id == new JsonSlurper().parseText(result.message).id
     }
 
     void "get subscription correctly handles when no rest subscribers exist"() {

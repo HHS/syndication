@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 @Transactional
 class AccountService {
     def grailsApplication
+    def groovyPageRenderer
+    def mailService
 
     private static final PASSWORD_POLICY = [
             "upper"  : ('A'..'Z').toList(),
@@ -18,10 +20,7 @@ class AccountService {
             "numbers": ('0'..'9').toList()
     ]
 
-    def passwordReset(email, renderer) throws Exception {
-        if(!email){
-            throw new UsernameNotFoundException("Provided username was null!")
-        }
+    def passwordReset(email) throws Exception {
         //Find the referenced user
         User user = User.findByUsername(email)
         if (!user) {
@@ -37,17 +36,18 @@ class AccountService {
         def randomPassword = PasswordGenerator.randomPassword
         user.password = randomPassword
         //Update user account with new rand password
+
         if (user.save(flush: true, failOnError: true)) {
             //if the save worked, send an email
-            sendMail {
+            mailService.sendMail {
                 async true
                 to user.username
                 subject "Your password has been reset"
-                html renderer(randomPassword)
+                html groovyPageRenderer.render(template: "/login/passwordResetEmail", model:[randomPassword:randomPassword, user:user])
             }
             return true
         }
-        return false
+        false
     }
 
     @NotTransactional
@@ -86,7 +86,7 @@ class AccountService {
         //Update user account with new rand password
         if (user.save(flush: true, failOnError: true)) {
             //if the save worked, send an email
-            sendMail {
+            mailService.sendMail {
                 multipart true
                 async true
                 to user.username
@@ -95,6 +95,6 @@ class AccountService {
             }
             return true
         }
-        return false
+        false
     }
 }

@@ -20,17 +20,11 @@ body {
 h1, h2, h3 {font-family: 'Droid Serif', serif;}
 
 h1 {
-  color: #555;
   font-size: 2em;
 }
 
 h2 {
-  color: #555;
   font-size: 24px;
-}
-
-h3 {
-  color: #aaa;
 }
 
 body, p {
@@ -56,7 +50,7 @@ input {color: #333;}
 
 .navbar-inverse .navbar-nav>li>a {color: #fff;}
 
-.navbar-inverse .navbar-nav>li>a:hover {color: #ffc014;}
+.navbar-inverse .navbar-nav>li>a:hover, .navbar-inverse .navbar-nav>li>a:focus {color: #ffc014;}
 
 ul.nav.navbar-nav {}
 
@@ -66,7 +60,7 @@ ul.nav.navbar-nav {}
   color: #ffa506;
 }
 
-.navbar-inverse .navbar-nav>li.last>a:hover {
+.navbar-inverse .navbar-nav>li.last>a:hover,.navbar-inverse .navbar-nav>li.last>a:focus {
   color: #ffbb06;
   text-decoration: none;
 }
@@ -108,7 +102,7 @@ ul.nav.navbar-nav {}
   transition: background-color .5s;
 }
 
-.btn-submit:hover {
+.btn-submit:hover, .btn-submit:focus {
   background-color: #ffc014;
   color: #000;
 }
@@ -135,7 +129,6 @@ ul.nav.navbar-nav {}
 .template {margin-top: 35px;}
 
 .beta-badge {
-  background: url('beta-badge.png') no-repeat;
   height: 101px;
   position: absolute;
   width: 100px;

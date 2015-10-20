@@ -25,7 +25,7 @@ class MediaMappingRestController {
 
     @Transactional
     def save(MediaMapping mediaMappingInstance) {
-        println "Mapping save for ${params}"
+        log.info "Mapping save for ${mediaMappingInstance}"
         if (mediaMappingInstance == null) {
             notFound()
             return

@@ -49,10 +49,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                 <div class="panel-body">
                     <div class="btn-group btn-group-sm btn-group-justified" role="group" aria-label="...">
-                        <g:link action="overview" params="[popularRange:'week']"    class="btn btn-default${popularRange == 'week' ?' active':''}">Week</g:link>
-                        <g:link action="overview" params="[popularRange:'month']"   class="btn btn-default${popularRange == 'month' ?' active':''}">Month</g:link>
-                        <g:link action="overview" params="[popularRange:'year']"    class="btn btn-default${popularRange == 'year' ?' active':''}">Year</g:link>
-                        <g:link action="overview" params="[popularRange:'alltime']" class="btn btn-default${popularRange == 'alltime' ?' active':''}">All Time</g:link>
+                        <g:link params="[popularRange:'week']"    class="btn btn-default${popularRange == 'week' ?' active':''}">Week</g:link>
+                        <g:link params="[popularRange:'month']"   class="btn btn-default${popularRange == 'month' ?' active':''}">Month</g:link>
+                        <g:link params="[popularRange:'year']"    class="btn btn-default${popularRange == 'year' ?' active':''}">Year</g:link>
+                        <g:link params="[popularRange:'alltime']" class="btn btn-default${popularRange == 'alltime' ?' active':''}">All Time</g:link>
                     </div>
                     <br/>
                     <ul class="list-group">
@@ -66,16 +66,47 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         </div>
 
         <div class="col-lg-4">
-            <h4>Subscribers</h4>
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h1 class="panel-title">
-                        Total Subscribers
-                    </h1>
-                </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <h4>General</h4>
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h1 class="panel-title">
+                                Total Subscribers
+                            </h1>
+                        </div>
 
-                <div class="panel-body">
-                    ${subscribers.size()}
+                        <div class="panel-body">
+                            ${subscribers.size()}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h1 class="panel-title">
+                                Total Hits
+                            </h1>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="btn-group btn-group-sm btn-group-justified" role="group" aria-label="...">
+                                <a href="#" id="totalWeek" data-totalrange="week" class="btn totalRange btn-default active">Week</a>
+                                <a href="#" id="totalMonth" data-totalrange="month" class="btn totalRange btn-default">Month</a>
+                                <a href="#" id="totalYear" data-totalrange="year" class="btn totalRange btn-default">Year</a>
+                                <a href="#" id="totalAll" data-totalrange="all" class="btn totalRange btn-default">All Time</a>
+                            </div>
+                            <br/>
+                            <ul class="list-group">
+                                <li  class="searchQuery list-group-item">
+                                    <strong>Storefront</strong><br/><span id="storefrontTotal">1</span>
+                                </li>
+                                <li class="searchQuery list-group-item">
+                                    <strong>API</strong><br/><span id="apiTotal">1</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -104,7 +135,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         </div>
                     </g:if>
                     <g:else>
-                        <g:if test="${googleOverview.stats}">
+                        <g:if test="${googleOverview?.stats}">
                             <g:each in="${googleOverview.stats}" var="stat">
                                 <li class="searchQuery list-group-item">
                                     <strong>${stat.key}</strong><br/>
@@ -123,5 +154,32 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function(){
+        updateTotalHits(document.getElementById("totalWeek"));
+    });
+
+
+    $(".totalRange").on("click", function(){
+        document.getElementById("totalWeek").className = "btn totalRange btn-default";
+        document.getElementById("totalMonth").className = "btn totalRange btn-default";
+        document.getElementById("totalYear").className = "btn totalRange btn-default";
+        document.getElementById("totalAll").className = "btn totalRange btn-default";
+        updateTotalHits(this);
+    });
+
+    function updateTotalHits(currentTag){
+        currentTag.className = "btn totalRange btn-default active";
+        $.ajax({
+            method: "POST",
+            url: "${g.createLink(controller: 'metricReport', action: 'generalOverviewAjax')}",
+            data: {totalRange:currentTag.getAttribute('data-totalrange')},
+            success: function(data) {
+                document.getElementById("storefrontTotal").innerHTML = data.storefrontCount;
+                document.getElementById("apiTotal").innerHTML = data.apiCount;
+            }
+        })
+    }
+</script>
 </body>
 </html>

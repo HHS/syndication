@@ -32,7 +32,12 @@ class BootStrap {
 
         System.setProperty("jsse.enableSNIExtension", "false");
 
-        MediaItemChangeListener.initialize(grailsApplication, queueService, mediaPreviewThumbnailJobService)
+        if(grailsApplication.config.mq.disableRabbitMQPlugin){
+            log.info "mediaItemchangelistener skipped for testing"
+        } else {
+            MediaItemChangeListener.initialize(grailsApplication, queueService, mediaPreviewThumbnailJobService)
+        }
+
         createScratchDirectories()
         String systemRunningMessage = """
 ==========================================
@@ -63,6 +68,16 @@ class BootStrap {
         def userRole       = Role.findOrSaveByAuthority('ROLE_USER')
         def storefrontRole = Role.findOrSaveByAuthority('ROLE_STOREFRONT_USER')
         def publisherRole  = Role.findOrSaveByAuthority('ROLE_PUBLISHER')
+
+        if(Environment.getCurrent() == Environment.DEVELOPMENT){
+            if(!User.findByUsername("publisher@example.com")){
+                def publisher = new User(username: "publisher@example.com",
+                        enabled: true,
+                        password: config.springsecurity.syndicationAdmin.initialAdminPassword,
+                        subscriberId:config.testPublisherSubscriberKey).save(flush:true)
+                UserRole.create publisher, publisherRole
+            }
+        }
 
         //noinspection GroovyAssignabilityCheck
         String adminUserName = config.springsecurity.syndicationAdmin.adminUsername

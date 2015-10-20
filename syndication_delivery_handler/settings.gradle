@@ -1,6 +1,6 @@
 def projectName = 'syndication-delivery-handler'
 def projectGroup = 'com.ctacorp.syndication'
-def projectVersion = '0.3.0'
+def projectVersion = '0.4.0'
 
 def sourceLevel = JavaVersion.VERSION_1_6
 def targetLevel = JavaVersion.VERSION_1_6

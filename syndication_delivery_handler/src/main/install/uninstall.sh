@@ -1,6 +1,6 @@
 #!/bin/bash
 
-version="0.3.0"
+version="0.4.0"
 configFile="${HOME}/syndication_delivery_handler_config.groovy"
 springConfig="${HOME}/Rhythmyx/AppServer/server/rx/deploy/rxapp.ear/rxapp.war/WEB-INF/config/user/spring/syndication_delivery_handler.xml"
 jarFile="${HOME}/Rhythmyx/AppServer/server/rx/deploy/rxapp.ear/rxapp.war/WEB-INF/lib/syndication-delivery-handler-${version}.jar"

@@ -1,7 +1,7 @@
 package com.ctacorp.syndication.manager.cms.utils.mq
 
-import com.budjb.rabbitmq.MessageContext
+import com.budjb.rabbitmq.consumer.MessageContext
 
 interface RabbitMqConsumer {
-    void handleMessage(String message, MessageContext messageContext)
+    void handleMessage(def message, MessageContext messageContext)
 }

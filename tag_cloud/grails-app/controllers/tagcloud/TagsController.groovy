@@ -39,7 +39,7 @@ class TagsController {
     def contentItemService
 
     def index() {
-        params.max = Util.getMax(params)
+        params.max = Math.min(params.int('max') ?: 20, 100000)
         JSON.use("tagList") {
             if (Util.isTrue(params.includePaginationFields, false)) {
                 def tags = tagService.listTags(params)
@@ -48,6 +48,12 @@ class TagsController {
             } else {
                 respond tagService.listTags(params) ?: []
             }
+        }
+    }
+
+    def allSyndicationIds(){
+        JSON.use("syndicationIdList") {
+            render ContentItem.list() as JSON
         }
     }
 
@@ -62,7 +68,7 @@ class TagsController {
     }
 
     def findOrSaveTag(Tag tagInstance){
-        Tag existing = Tag.find(tagInstance)
+        Tag existing = Tag.findByNameAndLanguage(tagInstance.name, tagInstance.language)
         if(!existing){
             if(tagInstance.hasErrors()){
                 respond tagInstance.errors
@@ -172,29 +178,48 @@ class TagsController {
         }
     }
 
+    def bulkTag(){
+        def data = request.JSON
+        log.info "Bulk tag request for: ${data}"
+        def taggedItems = []
+        data.bulkTags.each{ tagEntry ->
+            log.debug tagEntry
+            tagEntry.value.tagNames.each{ String tagName ->
+                log.debug tagName
+                taggedItems << tagService.tagSyndicatedItemByName(
+                        tagName,
+                        tagEntry.value.url as String,
+                        tagEntry.key as Long,
+                        data.language as Long,
+                        data.tagType as Long)
+            }
+        }
+        JSON.use("showContentItem") {
+            render taggedItems as JSON
+        }
+    }
+
     def tagSyndicatedItemByTagName() {
         def data = request.JSON
 
-        Long syndicationId = data.syndicationId as Long
-        String url = data.url
-        String tagName = data.tagName
-        Long typeId = data.typeId as Long
-        Long languageId = data.languageId as Long
-        Tag tag = tagService.findOrSaveTag(tagName, Language.load(languageId), TagType.load(typeId))
-
-        ContentItem ci = contentItemService.findOrSaveContentItem(url, syndicationId)
-        if(!tag || !ci){
-            response.sendError(400, "Tag or Content item could not be created")
+        ContentItem ci = tagService.tagSyndicatedItemByName(
+                data.tagName as String,
+                data.url as String,
+                data.syndicationId as Long,
+                data.languageId as Long,
+                data.typeId as Long)
+        if(!ci){
+            response.sendError(400, "item could not be created")
             String code = Long.toString(System.nanoTime(), 32)
-            log.error("${code} tagSyndicatedItemByName failed with syndicationId:${syndicationId}, url:${url}, tagName:${tagName}, typeId:${typeId}, languageId:${languageId}\nTag:${tag}\nContentItem${ci}")
+            log.error("${code} tagSyndicatedItemByName failed with syndicationId:${data.syndicationId}," +
+                    " url:${data.url}, " +
+                    "tagName:${data.tagName}, " +
+                    "typeId:${data.typeId}, " +
+                    "languageId:${data.languageId}")
             return
         }
         JSON.use("showContentItem") {
-            if (!ci?.tags?.contains(tag)) {
-                respond tagService.tagContentItem(ci, tag)
-            } else {
-                respond ci
-            }
+            respond ci
         }
     }
 
@@ -260,6 +285,17 @@ class TagsController {
             } else {
                 respond tags
             }
+        }
+    }
+
+    def checkTagExistence(){
+        Tag existing = Tag.findByNameAndLanguage("${params.name}", Language.get(params.language))
+        if(!existing){
+            respond null
+            return
+        }
+        JSON.use("showTag") {
+            respond existing
         }
     }
 }

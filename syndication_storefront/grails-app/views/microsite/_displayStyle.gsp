@@ -11,10 +11,10 @@
     <div class="microsite-article on-color">
     <g:each in="${mediaItems}" var="mediaItemInstance">
         <div class="row-fluid">
-            <div class="col-md-6" style="padding-left: 10px;padding-right: 0px;padding-bottom: 10px;padding-top: 0;">
+            <div class="col-md-6" style="padding-left: 0px;padding-right: 0px;padding-bottom: 0px;padding-top: 0;">
                 %{--<div class="thumbnail" style="margin: 0 0 0 0">--}%
                     <a href="#" class="list-group-item display-thumbnail" data-media_id="${mediaItemInstance.id}" data-toggle="modal" data-target="#preview_popup">
-                        <img style="width:100%" class="img-responsive" src="${apiBaseUrl}/resources/media/${mediaItemInstance?.id}/thumbnail.jpg"/>
+                        <img style="width:100%" class="img-responsive" src="${apiBaseUrl}/resources/media/${mediaItemInstance?.id}/thumbnail.jpg" alt="thumbnail for ${mediaItemInstance.name}"/>
                     </a>
                 %{--</div>--}%
             </div>
@@ -42,7 +42,7 @@
 
 <g:if test="${mediaArea.displayStyle.name == "Full Content"}">
     <div class="microsite-article on-color">
-    <a id="prevFullContent${panel}"><i class="fa fa-arrow-left fa-3x"></i></a> <a id="nextFullContent${panel}" class="pull-right" ><i class="fa fa-arrow-right fa-3x"></i></a>
+    <a tabindex="0" aria-label="view previous Media Item" id="prevFullContent${panel}"><i class="fa fa-arrow-left fa-3x"></i></a> <a tabindex="0" aria-label="view next Media Item" id="nextFullContent${panel}" class="pull-right" ><i class="fa fa-arrow-right fa-3x"></i></a>
     <div id="fullContentView${panel}">
         %{--loads fullContentPagination with ajax call--}%
     </div>
@@ -53,8 +53,8 @@
     });
 
     $('#nextFullContent' + ${panel}).click(function(){
-        var mediaSize = parseInt(document.getElementById("full-content-data${panel}").dataset.mediacount,10);
-        var offset = parseInt(document.getElementById("full-content-data${panel}").dataset.offset,10);
+        var mediaSize = parseInt(document.getElementById("full-content-data${panel}").getAttribute('data-mediacount'),10);
+        var offset = parseInt(document.getElementById("full-content-data${panel}").getAttribute('data-offset'),10);
         if(offset < (mediaSize - 1)) {
             loadContent(offset + 1, ${panel});
         } else {
@@ -63,10 +63,10 @@
     });
 
     $('#prevFullContent' + ${panel}).click(function(){
-        if(parseInt(document.getElementById("full-content-data${panel}").dataset.offset,10) > 0) {
-            loadContent(parseInt(document.getElementById("full-content-data${panel}").dataset.offset,10) - 1, ${panel});
+        if(parseInt(document.getElementById("full-content-data${panel}").getAttribute('data-offset'),10) > 0) {
+            loadContent(parseInt(document.getElementById("full-content-data${panel}").getAttribute('data-offset'),10) - 1, ${panel});
         } else {
-            loadContent(parseInt(document.getElementById("full-content-data${panel}").dataset.mediacount,10) - 1, ${panel});
+            loadContent(parseInt(document.getElementById("full-content-data${panel}").getAttribute('data-mediacount'),10) - 1, ${panel});
         }
     });
 

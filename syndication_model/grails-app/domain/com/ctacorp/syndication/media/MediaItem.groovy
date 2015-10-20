@@ -124,7 +124,7 @@ class MediaItem {
         "infographic" : "com.ctacorp.syndication.media.Infographic",
         "pdf" : "com.ctacorp.syndication.media.PDF",
         "periodical" : "com.ctacorp.syndication.media.Periodical",
-        "socialmedia" : "com.ctacorp.syndication.media.SocialMedia",
+        "tweet" : "com.ctacorp.syndication.media.Tweet",
         "video" : "com.ctacorp.syndication.media.Video",
         "widget" : "com.ctacorp.syndication.media.Widget"
     ]
@@ -577,10 +577,10 @@ class MediaItem {
                 }
                 // ------------------------------------------------------------------
                 if (params.id) {
-                    idIs((Long) params.long('id'))
+                    idIs(params.id.toLong())
                 }
                 if (params.collectionId) {
-                    mediaForCollection(params.long('collectionId'))
+                    mediaForCollection(params.collectionId.toLong())
                 }
                 if (params.mediaTypes) {
                     mediaTypes((Map) params)
@@ -637,7 +637,7 @@ class MediaItem {
 
                 // Collaborators
                 if (params.sourceId) {
-                    sourceIdIs((Long) params.long('sourceId'))
+                    sourceIdIs(params.sourceId.toLong())
                 }
                 if (params.sourceName) {
                     sourceNameIs((String) params.sourceName)
@@ -652,7 +652,7 @@ class MediaItem {
                     sourceAcronymContains((String) params.sourceAcronymContains)
                 }
                 if (params.languageId) {
-                    languageIdIs((Long) params.long('languageId'))
+                    languageIdIs(params.languageId.toLong())
                 }
                 if (params.languageName) {
                     languageNameIs((String) params.languageName)

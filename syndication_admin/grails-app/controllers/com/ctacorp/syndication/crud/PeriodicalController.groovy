@@ -67,9 +67,9 @@ class PeriodicalController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(periodicalInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        periodicalInstance =  mediaItemsService.updateItemAndSubscriber(periodicalInstance, params.long('subscriberId'))
+        if(periodicalInstance.hasErrors()){
+            flash.errors = periodicalInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             respond periodicalInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
@@ -99,9 +99,9 @@ class PeriodicalController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(periodicalInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        periodicalInstance =  mediaItemsService.updateItemAndSubscriber(periodicalInstance, params.long('subscriberId'))
+        if(periodicalInstance.hasErrors()){
+            flash.errors = periodicalInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             redirect action:"edit", id:params.id
             return
         }

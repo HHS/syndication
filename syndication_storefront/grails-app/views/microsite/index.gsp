@@ -28,7 +28,7 @@
                 <div class="errors">${flash.error}</div>
             </g:if>
             <g:else>
-                <a name="pageContent"></a>
+                <a id="pageContent"></a>
                 <g:render template="micrositeNav"/>
                 <div class="purplebox">
                     <div id="show-userMediaList" class="content scaffold-show" role="main">

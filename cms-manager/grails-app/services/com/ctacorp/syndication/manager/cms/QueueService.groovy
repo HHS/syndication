@@ -13,7 +13,6 @@ Redistribution and use in source and binary forms, with or without modification,
 */
 package com.ctacorp.syndication.manager.cms
 
-import com.budjb.rabbitmq.RabbitMessageBuilder
 import com.ctacorp.syndication.commons.mq.Message
 import com.ctacorp.syndication.commons.mq.MessageType
 import com.ctacorp.syndication.manager.cms.utils.mq.SubscriptionType
@@ -25,10 +24,9 @@ import javax.annotation.PostConstruct
 
 @Transactional
 class QueueService {
+    def rabbitMessagePublisher
 
     Integer maxAttempts
-
-    def rabbitSender = new RabbitSender()
 
     @PostConstruct
     def init() {
@@ -129,26 +127,23 @@ class QueueService {
 
     void sendToQueue(String queueName, String message) {
 
-        def exception = rabbitSender.sendMessage(queueName, message)
+        def exception = sendMessage(queueName, message)
 
         if(exception) {
             log.error("Error occured when trying to send a message to the '${queueName}'", exception)
         }
     }
 
-    static class RabbitSender {
-
-        @SuppressWarnings("GrMethodMayBeStatic")
-        def sendMessage(String queueName, String message) {
-            try {
-                new RabbitMessageBuilder().send {
-                    routingKey = queueName
-                    body = message
-                }
-                null
-            } catch (t) {
-                return t
+    @SuppressWarnings("GrMethodMayBeStatic")
+    def sendMessage(String queueName, String message) {
+        try {
+            rabbitMessagePublisher.send {
+                routingKey = queueName
+                body = message
             }
+            null
+        } catch (t) {
+            return t
         }
     }
 }

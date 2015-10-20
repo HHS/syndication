@@ -19,90 +19,114 @@
             <div class="purplebox">
                 <a name="pageContent"></a>
                 %{--===================================================================--}%
-                <h1 id="june-01-2015-release-">June-01-2015 Release:</h1>
-                <h2 id="api">API</h2>
+                <h1><a id="October192015_Release_0"></a>October-19-2015 Release:</h1>
+                <h1><a id="API_2"></a>API</h1>
                 <ul>
-                    <li>New Features<ul>
-                        <li>Media Viewer Support</li>
-                        <li>View aggregate types as a “feed” (userMediaList, collection, tag, source, etc...)</li>
-                        <li>Embed code for userMediaLists, tags, collections, etc...</li>
-                    </ul>
+                    <li>New Features
+                        <ul>
+                            <li>Support for new Tweet media type</li>
+                            <li>Add full suite of twitter data fields to API</li>
+                            <li>Custom thumbnails &amp; previews are now cached and database-backed</li>
+                            <li>Custom thumbnails and preview links now included in API results</li>
+                            <li>Upgrade to Grails 2.5.1</li>
+                        </ul>
                     </li>
-                    <li>Bug Fixes / Improvements<ul>
-                        <li>Some bad requests now correctly return a 400 instead of 500 error</li>
-                        <li>Whitespace in thumbnails/previews removed by centering/cropping long or wide content</li>
-                        <li>Collections no longer show hidden content</li>
-                    </ul>
+                    <li>Bug Fixes / Improvements
+                        <ul>
+                            <li>Correct titles on documentation</li>
+                            <li>Embedded PDFs now include content type, warning about mixed security links included</li>
+                            <li>Tweet media type incorrectly displayed as “social media” - fixed</li>
+                            <li>Google analytics userId fix</li>
+                            <li>Better thumbnails for missing images and tweets</li>
+                            <li>Update RabbitMQ Libraries</li>
+                            <li>Additional Logging</li>
+                            <li>Typo corrections in Swagger</li>
+                        </ul>
                     </li>
                 </ul>
-                <h2 id="storefront">Storefront</h2>
+                <h1><a id="Storefront_18"></a>Storefront</h1>
                 <ul>
-                    <li>New Features<ul>
-                        <li>Do-it-yourself microsites are now available to publishers (beta release)</li>
-                        <li>Embeddable media viewers now available for aggregate types</li>
-                        <li>Media Viewers &amp; Feed view available for all aggregate types (tags, lists, etc)</li>
-                        <li>FAQ (Q&amp;A), roadmap, and other static pages have been updated to be relevant</li>
-                    </ul>
+                    <li>New Features
+                        <ul>
+                            <li>Upgrade to Grails 2.5.1</li>
+                        </ul>
                     </li>
-                    <li>Bug Fixes / Improvements<ul>
-                        <li>Fixed an http vs https mixed mode error for previewing youtube videos in chrome</li>
-                        <li>Added some missing “skip to content” page anchors for 508</li>
-                        <li>Hidden media items are no longer visible in collections</li>
-                    </ul>
+                    <li>Bug Fixes / Improvements
+                        <ul>
+                            <li>Fixed and IE 10 &amp; 11 bug preventing embed code from displaying properly</li>
+                            <li>Hidden collections are now properly hidden when building microsites</li>
+                            <li>Publishers logged into storefront couldn’t change their passwords there, now they can</li>
+                            <li>Correct titles on documentation</li>
+                            <li>Microsites beta 508 Improvements</li>
+                            <li>Organization listings are now alphabetical</li>
+                        </ul>
                     </li>
                 </ul>
-                <h2 id="cms-manager">CMS Manager</h2>
+                <h1><a id="CMS_Manager_28"></a>CMS Manager</h1>
                 <ul>
-                    <li>New Features<ul>
-                        <li>Field error checking on rhythmyx subscriber creations</li>
-                    </ul>
+                    <li>New Features
+                        <ul>
+                            <li>Upgrade to Grails 2.5.1</li>
+                        </ul>
                     </li>
-                    <li>Bug Fixes / Improvements<ul>
-                        <li>User passwords no longer appear as a string of question marks in user show page</li>
-                    </ul>
+                    <li>Bug Fixes / Improvements
+                        <ul>
+                            <li>Better support for windows character encoding</li>
+                            <li>Correct titles on documentation</li>
+                        </ul>
                     </li>
                 </ul>
-                <h2 id="admin-dashboard">Admin Dashboard</h2>
+                <h1><a id="Admin_Dashboard_34"></a>Admin Dashboard</h1>
                 <ul>
-                    <li>New Features<ul>
-                        <li>Dashboard timeline now shows thumbnails and links to storefront</li>
-                        <li>User breakdown has been made available to all users, and includes additional breakdown information for other domains besides .gov .edu and .org.</li>
-                        <li>You can now specify a list size for media metrics views</li>
-                        <li>Class stripping enabled by default for media</li>
-                    </ul>
+                    <li>New Features
+                        <ul>
+                            <li>Support for Tweets (Twitter)</li>
+                            <li>Additional metrics reported in admin dashboard: totals and totals graphs</li>
+                            <li>Tagging is now UTF-8 aware</li>
+                            <li>Upgrade to Grails 2.5.1</li>
+                        </ul>
                     </li>
-                    <li>Bugs / Improvements<ul>
-                        <li>Expanded auto-tagger exclusion wordlist</li>
-                        <li>Improved query performance for certain media metric views</li>
-                        <li>Better error messages for private/disabled youtube videos</li>
-                        <li>Fixed a bug where the syndicate class got stripped from media items</li>
-                        <li>Source/Subscriber lists are now sorted alphabetically</li>
-                    </ul>
+                    <li>Bugs / Improvements
+                        <ul>
+                            <li>Correct titles on documentation</li>
+                            <li>Auto-tagger is now thousands of times faster due to native handling of bulk tagging</li>
+                            <li>Ownership cleanup tool now supports items that are already owned</li>
+                            <li>Google Analytics errors handled better - no more 500s when request is denied</li>
+                            <li>Caching for metrics graph data for performance</li>
+                            <li>Broken image links in docs fixed</li>
+                        </ul>
                     </li>
                 </ul>
-                <h2 id="tagcloud">TagCloud</h2>
+                <h1><a id="Tag_Cloud_47"></a>Tag Cloud</h1>
                 <ul>
-                    <li>New Features<ul>
-                        <li>Nothing significant</li>
-                    </ul>
+                    <li>New Features
+                        <ul>
+                            <li>Upgrade to Grails 2.5.1</li>
+                        </ul>
                     </li>
-                    <li>Bug Fixes / Improvements<ul>
-                        <li>Nothing significant</li>
-                    </ul>
+                    <li>Bug Fixes / Improvements
+                        <ul>
+                            <li>Correct titles on documentation</li>
+                            <li>Auto-tagger is now thousands of times faster due to native handling of bulk tagging</li>
+                        </ul>
                     </li>
                 </ul>
-                <h2 id="tinyurl">TinyUrl</h2>
+                <h1><a id="Tiny_Url_53"></a>Tiny Url</h1>
                 <ul>
-                    <li>New Features<ul>
-                        <li>Nothing significant</li>
-                    </ul>
+                    <li>New Features
+                        <ul>
+                            <li>Upgrade to Grails 2.5.1</li>
+                        </ul>
                     </li>
-                    <li>Bug Fixes / Improvements<ul>
-                        <li>Nothing significant
-                        Known Issues</li>
-                    </ul>
+                    <li>Bug Fixes / Improvements
+                        <ul>
+                            <li>Correct titles on documentation</li>
+                        </ul>
                     </li>
-                    <li>No significant issues at this time</li>
+                </ul>
+                <h1><a id="Known_Issues_58"></a>Known Issues</h1>
+                <ul>
+                    <li>“SocialMedia” type has been replaced with “Tweet”. All references to “SocialMedia” should be replaced</li>
                 </ul>
                 %{--===================================================================--}%
             </div>

@@ -28,6 +28,18 @@
         </div>
     </g:if>
 
+    <div class="progress">
+        <div class="progress-bar progress-bar-success" title = "${stableItems} stable items" style="width: ${percentStable}%">
+            <span class="">${stableItems} Stable Items</span>
+        </div>
+        <div class="progress-bar progress-bar-warning" title="${ignoredCount} ignored items" style="width: ${percentIgnored}%">
+            <span class="">${ignoredCount} Ignored Items</span>
+        </div>
+        <div class="progress-bar progress-bar-danger" title="${flaggedCount} flagged items" style="width: ${percentFlagged}%">
+            <span class="">${flaggedCount} Flagged Items</span>
+        </div>
+    </div>
+
     <g:link action="checkAllMedia" onclick="return confirm('Are you sure? This can take several hours to run.');"><button class="btn btn-danger pull-right">Check All Media</button></g:link>
 
     <ul class="nav nav-pills">

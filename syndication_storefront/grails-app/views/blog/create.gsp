@@ -16,19 +16,21 @@
 </head>
 
 <body>
-
 <g:render template="/microsite/topNav"/>
-<g:form action="save" class="form-horizontal helps-footer">
+<g:form action="save" name="micrositeForm" method="post" class="form-horizontal helps-footer">
 <div class="microsite-builder container ">
 
   <div class="row">
 
     <div class="microsite-builder-header col-sm-4">
-      <h1>Microsite Builder<span class="beta-badge"></span></h1>
+      <a id="pageContent"></a>
+      <h1>Microsite Builder<span class="beta-badge"><asset:image src="microsite/beta-badge.png" alt="Currently in beta"/></span></h1>
 
       <h2>Blog Site</h2>
 
       <p>You've chosen the blog template.<br/>Click on any section to get started...</p>
+
+        <g:render template="../microsite/formDirections"/>
 
     </div><!-- end microsite-builder-header col-sm-4 -->
 
@@ -40,59 +42,50 @@
     <div class="blog-builder col-sm-7 center-block">
 
         <div class="header">
-
-            <a data-toggle="modal" data-target="#modal-header" data-slide-to="0">
-              <div class="outlined">
-                  <div class="section"><span>header</span>
-                    <img id="check-title" hidden src="${assetPath(src: '/microsite/check.png')}" alt="This section contains content" class="checked"/>
-                  </div>
-              </div>
-            </a>
-
+            <a id="head-modal" tabIndex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="0"></a>
+                <div onkeypress="if(event.keyCode==13){$('#head-modal').click();return false;}" class="outlined" data-toggle="modal" data-target="#modal-header" data-slide-to="0" tabindex="0" role="link">
+                    <div class="section"><span>header</span>
+                        <span id="check-title" class="checked"></span>
+                    </div>
+                </div>
         </div>
 
         <div class="content clearfix">
 
-          <a data-toggle="modal" data-target="#modal-header" data-slide-to="1">
-            <div class="outlined main">
-              <div class="section"><span>main content</span></div>
-                <img id="check-area1" hidden src="${assetPath(src: '/microsite/check.png')}" alt="This section contains content" class="checked"/>
-            </div>
-          </a>
-
-          <a data-toggle="modal" data-target="#modal-header" data-slide-to="2">
-            <div class="outlined top">
-              <div class="section"><span>sidebar<br/>one</span>
-                <img id="check-area2" hidden src="${assetPath(src: '/microsite/check.png')}" alt="This section contains content" class="checked"/>
+            <a id="main-modal" tabindex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="1"></a>
+              <div onkeypress="if(event.keyCode==13){$('#main-modal').click();return false;}" class="outlined main" tabindex="0" data-toggle="modal" data-target="#modal-header" data-slide-to="1" role="link">
+                <div class="section"><span>main content</span>
+                    <span id="check-area1" class="checked"></span>
+                </div>
               </div>
-            </div>
-          </a>
 
-          <a data-toggle="modal" data-target="#modal-header" data-slide-to="3">
-            <div class="outlined bottom">
-              <div class="section"><span>sidebar<br>two</span>
-                <img id="check-area3" hidden src="${assetPath(src: '/microsite/check.png')}" alt="This section contains content" class="checked"/>
+            <a id="right-top-modal" tabIndex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="2"></a>
+              <div onkeypress="if(event.keyCode==13){$('#right-top-modal').click();return false;}" tabindex="0" class="outlined top" data-toggle="modal" data-target="#modal-header" data-slide-to="2" role="link">
+                <div class="section"><span>sidebar<br/>one</span>
+                    <span id="check-area2" class="checked"></span>
+                </div>
               </div>
-            </div>
-          </a>
 
+            <a id="right-bottom-modal" tabIndex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="3"></a>
+              <div onkeypress="if(event.keyCode==13){$('#right-bottom-modal').click();return false;}" tabindex="0" class="outlined bottom" data-toggle="modal" data-target="#modal-header" data-slide-to="3" role="link">
+                <div class="section"><span>sidebar<br>two</span>
+                    <span id="check-area3" class="checked"></span>
+                </div>
+              </div>
         </div>
 
         <div class="footer">
-
-          <a data-toggle="modal" data-target="#modal-header" data-slide-to="4">
-            <div class="outlined">
-              <div class="section"><span>footer</span>
-                <img id="check-footer" hidden src="${assetPath(src: '/microsite/check.png')}" alt="This section contains content" class="checked"/>
+            <a id="foot-modal" tabIndex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="4"></a>
+              <div onkeypress="if(event.keyCode==13){$('#foot-modal').click();return false;}" tabindex="0" class="outlined" data-toggle="modal" data-target="#modal-header" data-slide-to="4" role="link">
+                <div class="section"><span>footer</span>
+                    <span id="check-footer" class="checked"></span>
+                </div>
               </div>
-            </div>
-          </a>
-
         </div>
 
         <div class="builder-actions">
 
-          <g:actionSubmit class="btn btn-submit" action="save" value="Save"/>
+          <input type="button" onclick="submitClick()" class="btn btn-submit" value="Save"/>
           <g:link class="btn btn-default" controller="microsite" action="microsite">Cancel</g:link>
 
         </div>
@@ -102,7 +95,6 @@
   </div><!-- end row -->
 
 </div><!-- end container -->
-
 
 
   <g:render template="formModal"/>

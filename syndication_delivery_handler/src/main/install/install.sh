@@ -2,7 +2,7 @@
 
 echo ""
 
-version="0.3.0"
+version="0.4.0"
 configFile="syndication_delivery_handler_config.groovy"
 keyAgreement="syndication_key_agreement.json"
 springConfig="syndication_delivery_handler.xml"

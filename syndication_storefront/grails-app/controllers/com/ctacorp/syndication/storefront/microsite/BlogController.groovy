@@ -14,8 +14,8 @@ class BlogController {
     def tagService
     def micrositeService
 
-    def sort = ["name", "dateContentAuthored", "dateContentPublished"]
-    def order = [[name:"ascending", value:"asc"],[name:"descending", value:"desc"]]
+    def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
+    def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
     Closure displayStyles = {MediaSelector.DisplayStyle.values()}
 
     def index() {}
@@ -80,8 +80,7 @@ class BlogController {
     def show(){
         def microSite = MicroSite.get(params.long("id"))
 
-
-        def pane3MediaItems = micrositeService.getMediaItems(microSite.mediaArea3, 50)
+        def pane3MediaItems = micrositeService.getMediaItems(microSite.mediaArea3)
         def pane2MediaItems = micrositeService.getMediaItems(microSite.mediaArea2)
         def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, 50)
 
@@ -98,7 +97,7 @@ class BlogController {
     def update(MicroSite microSite){
         if(!microSite?.id){
             flash.error = "Could not find microSite"
-            redirect action:"edit"
+            redirect controller: "microsite", action:"index"
             return
         }
 
@@ -134,8 +133,8 @@ class BlogController {
         }
 
         def name = microSite.title
-        microSite.delete(flush: true)
-        flash.message = "Microsite ${name} has been deleted!"
+            microSite.delete(flush: true)
+            flash.message = "Microsite ${name} has been deleted!"
 
         redirect controller:"microsite", action: "index"
     }

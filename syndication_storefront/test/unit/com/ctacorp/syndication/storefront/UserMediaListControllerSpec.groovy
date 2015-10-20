@@ -22,18 +22,18 @@ class UserMediaListControllerSpec extends Specification {
         params["user"] = controller.springSecurityService.getCurrentUser()
     }
 
-    def setup(){
-        controller.springSecurityService = [getCurrentUser:{User.get(1)}]
-        controller.mediaService = [getFeaturedMedia:{max -> []}]
+    def setup() {
+        controller.springSecurityService = [getCurrentUser: { User.get(1) }]
+        controller.mediaService = [getFeaturedMedia: { max -> [] }]
 
-        new MediaItem(name:"Item 1", sourceUrl: "http://www.example.com/a", source:new Source(), language: new Language()).save()
-        new MediaItem(name:"Item 2", sourceUrl: "http://www.example.com/b", source:new Source(), language: new Language()).save()
-        new MediaItem(name:"Item 3", sourceUrl: "http://www.example.com/c", source:new Source(), language: new Language()).save()
+        new MediaItem(name: "Item 1", sourceUrl: "http://www.example.com/a", source: new Source(), language: new Language()).save()
+        new MediaItem(name: "Item 2", sourceUrl: "http://www.example.com/b", source: new Source(), language: new Language()).save()
+        new MediaItem(name: "Item 3", sourceUrl: "http://www.example.com/c", source: new Source(), language: new Language()).save()
 
         new User(username: "person@example.com", password: "ABC123def").save()
     }
 
-    void "Test the index action returns the correct model"() {
+    def "Test the index action returns the correct model"() {
         when: "The index action is executed"
             controller.index()
 
@@ -42,7 +42,7 @@ class UserMediaListControllerSpec extends Specification {
             model.userMediaListInstanceCount == 0
     }
 
-    void "Test the create action returns the correct model"() {
+    def "Test the create action returns the correct model"() {
         when: "The create action is executed"
             controller.create()
 
@@ -50,7 +50,7 @@ class UserMediaListControllerSpec extends Specification {
             model.userMediaListInstance != null
     }
 
-    void "Test the save action correctly persists an instance"() {
+    def "Test the save action correctly persists an instance"() {
         when: "The save action is executed with an invalid instance"
             request.contentType = FORM_CONTENT_TYPE
             request.method = 'POST'
@@ -75,7 +75,7 @@ class UserMediaListControllerSpec extends Specification {
             UserMediaList.count() == 1
     }
 
-    void "Test that the show action returns the correct model"() {
+    def "Test that the show action returns the correct model"() {
         when: "The show action is executed with a null domain"
             controller.show(null)
 
@@ -91,7 +91,7 @@ class UserMediaListControllerSpec extends Specification {
             model.userMediaListInstance == userMediaList
     }
 
-    void "Test that the edit action returns the correct model"() {
+    def "Test that the edit action returns the correct model"() {
         when: "The edit action is executed with a null domain"
             controller.edit(null)
 
@@ -107,7 +107,7 @@ class UserMediaListControllerSpec extends Specification {
             model.userMediaListInstance == userMediaList
     }
 
-    void "Test the update action performs an update on a valid domain instance"() {
+    def "Test the update action performs an update on a valid domain instance"() {
         when: "Update is called for a domain instance that doesn't exist"
             request.contentType = FORM_CONTENT_TYPE
             request.method = 'PUT'
@@ -140,7 +140,7 @@ class UserMediaListControllerSpec extends Specification {
             flash.message != null
     }
 
-    void "Test that the delete action deletes an instance if it exists"() {
+    def "delete action deletes an instance if it exists"() {
         when: "The delete action is called for a null instance"
             request.contentType = FORM_CONTENT_TYPE
             request.method = "DELETE"
@@ -151,21 +151,36 @@ class UserMediaListControllerSpec extends Specification {
             response.redirectedUrl == '/userMediaList/index'
             flash.message != null
 
-        when: "A domain instance is created"
+        when: "Two media lists are created"
             response.reset()
             populateValidParams(params)
             def userMediaList = new UserMediaList(params)
             userMediaList.save(flush: true)
+            def userMediaList2 = new UserMediaList(params)
+            userMediaList2.save(flush: true)
 
-        then: "It exists"
-            UserMediaList.count() == 1
+        then: "They exist"
+            UserMediaList.count() == 2
 
         when: "The domain instance is passed to the delete action"
-            controller.delete(userMediaList)
+            controller.delete(userMediaList2)
 
         then: "The instance is deleted"
-            UserMediaList.count() == 0
+            UserMediaList.count() == 1
             response.redirectedUrl == '/userMediaList/index'
             flash.message != null
+    }
+
+    def "a user should not be able to delete their last list"() {
+        given: "the user's last list"
+            populateValidParams(params)
+            def userMediaList = new UserMediaList(params)
+            userMediaList.save(flush: true)
+        when: "the delete action is called"
+            request.contentType = FORM_CONTENT_TYPE
+            request.method = "DELETE"
+            controller.delete(userMediaList)
+        then: "the item should still exist"
+            UserMediaList.count() == 1
     }
 }

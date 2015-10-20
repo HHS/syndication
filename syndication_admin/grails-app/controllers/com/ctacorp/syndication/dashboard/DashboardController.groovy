@@ -21,7 +21,9 @@ import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
-import com.ctacorp.syndication.media.SocialMedia
+import com.ctacorp.syndication.media.Tweet
+import com.ctacorp.syndication.media.Periodical
+import com.ctacorp.syndication.media.PDF
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.media.Video
 import com.ctacorp.syndication.media.Widget
@@ -83,7 +85,9 @@ class DashboardController {
             [label:"Collection", value:com.ctacorp.syndication.media.Collection.count()],
             [label:"Audio", value:Audio.count()],
             [label:"Widget",value:Widget.count()],
-            [label:"Social Media", value:SocialMedia.count()]
+            [label:"Tweet", value:Tweet.count()],
+            [label:"Periodical", value:Periodical.count()],
+            [label:"pdf", value:PDF.count()]
         ]
 
         render data as JSON

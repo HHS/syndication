@@ -33,12 +33,14 @@ class YoutubeService {
     def getMetaDataForVideo(Long id) {
         MediaItem mi = MediaItem.get(id)
         if (mi?.getClass().simpleName == "Video") {
+            rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
             return rest.get(getVideoFeedUrl(mi.sourceUrl)).json
         }
     }
 
     def getMetaDataForVideoUrl(String url) {
         log.info getVideoFeedUrl(url)
+        rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
         rest.get(getVideoFeedUrl(url)).json
     }
 

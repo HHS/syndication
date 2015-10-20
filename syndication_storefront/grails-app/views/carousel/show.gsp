@@ -12,7 +12,7 @@
     <asset:javascript src="resize/jquery.resize.js"/>
     <asset:javascript src="waitForImages/jquery.waitforimages.js"/>
     <asset:javascript src="modernizr/modernizr.js"/>
-    <asset:javascript src="carousel3d/jquery.carousel-3d.min.js"/>
+    <asset:javascript src="carousel3d/jquery.carousel-3d.js"/>
     <asset:stylesheet src="carousel3d/jquery.carousel-3d.default.css"/>
     <asset:stylesheet src="microsite/microsite_bar.css"/>
     <!--[if IE]>
@@ -28,7 +28,7 @@
 <div class="template container">
 
     <div class="microsite carousel">
-
+        <a id="pageContent"></a>
         <g:render template="/microsite/templateHeader"/>
 
         <div class="microsite-carousel-content row">
@@ -39,7 +39,7 @@
 
                     <g:each in="${pane1MediaItems}" var="media">
                         <img style="width:100%" class="microsite-article-pic"
-                             src="${apiBaseUrl}/resources/media/${media?.id}/preview.jpg"/>
+                             src="${apiBaseUrl}/resources/media/${media?.id}/preview.jpg" alt="thumbnail for ${media.name}"/>
                     </g:each>
 
                 </div>

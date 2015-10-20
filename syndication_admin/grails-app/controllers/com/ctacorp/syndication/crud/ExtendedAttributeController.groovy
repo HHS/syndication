@@ -29,7 +29,7 @@ import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.PDF
 import com.ctacorp.syndication.media.Periodical
-import com.ctacorp.syndication.media.SocialMedia
+import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.media.Video
 import com.ctacorp.syndication.media.Widget
 
@@ -196,7 +196,7 @@ class ExtendedAttributeController {
             case Infographic: redirect controller: "infographic", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case PDF: redirect controller: "PDF", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Periodical: redirect controller: "periodical", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
-            case SocialMedia: redirect controller: "socialMedia", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
+            case Tweet: redirect controller: "tweet", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Video: redirect controller: "video", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Widget: redirect controller: "widget", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
         }

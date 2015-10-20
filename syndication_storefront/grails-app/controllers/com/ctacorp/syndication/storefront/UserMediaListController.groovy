@@ -124,12 +124,11 @@ class UserMediaListController {
             return
         }
 
-        if(UserMediaList.findAllByUser(springSecurityService.currentUser).size() <= 1){
+        if(UserMediaList.findAllByUser(springSecurityService.getCurrentUser() as User).size() <= 1){
             flash.error = "You cannot delete your only media list. Please create another one first."
             respond userMediaListInstance, view: 'show'
             return
         }
-
         userMediaListInstance.delete flush: true
 
         request.withFormat {

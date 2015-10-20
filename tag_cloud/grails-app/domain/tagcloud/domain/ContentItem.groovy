@@ -45,6 +45,12 @@ class ContentItem{
             shouldOutputIdentifier true
             shouldOutputClass true
         }
+
+        syndicationIdList{
+            shouldOutputIdentifier false
+            shouldOutputClass false
+            ignore "tags", "dateCreated", "lastUpdated", "url", "externalUID"
+        }
     }
 
     String toString() { "(${id}) - ${url}" }

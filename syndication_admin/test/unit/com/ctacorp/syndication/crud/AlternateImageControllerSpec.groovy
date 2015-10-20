@@ -168,11 +168,12 @@ class AlternateImageControllerSpec extends Specification {
             flash.message != null
 
         when:"The domain instance is passed to the delete action"
+            response.reset()
             controller.delete(alternateImage)
 
         then:"The instance is deleted"
             AlternateImage.count() == 0
-//            response.redirectedUrl == '/alternateImage/index'
+            response.redirectedUrl == '/alternateImage/index'
             flash.message != null
     }
 }

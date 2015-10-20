@@ -38,10 +38,10 @@
     }.bind(this));
 
     //create prev/next buttons
-    this._prevButton = $('<div data-prev-button></div>')[0];
+    this._prevButton = $('<div tabindex="0" aria-label="carousel previous button" data-prev-button></div>')[0];
     $(this.el).append(this._prevButton);
     $(this._prevButton).click(this.prev.bind(this));
-    this._nextButton = $('<div data-next-button></div>')[0];
+    this._nextButton = $('<div tabindex="0" aria-label="carousel next button" data-next-button></div>')[0];
     $(this.el).append(this._nextButton);
     $(this._nextButton).click(this.next.bind(this));
 

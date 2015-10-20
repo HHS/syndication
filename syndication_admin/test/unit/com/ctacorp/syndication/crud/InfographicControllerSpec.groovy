@@ -25,7 +25,7 @@ class InfographicControllerSpec extends Specification {
 
     def setup(){
         controller.mediaItemsService = mediaItemsService
-        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {infographic, subId ->if(infographic.save(flush:true)){return null} else{return "errors"}}
+        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {Infographic infographic, subId ->if(infographic.save(flush:true)){return infographic} else{return infographic}}
 
         controller.cmsManagerKeyService = cmsManagerKeyService
         controller.solrIndexingService = solrIndexingService

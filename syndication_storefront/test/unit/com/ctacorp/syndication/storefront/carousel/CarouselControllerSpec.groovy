@@ -1,5 +1,6 @@
 package com.ctacorp.syndication.storefront.carousel
 
+import com.ctacorp.syndication.storefront.microsite.CarouselController
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 

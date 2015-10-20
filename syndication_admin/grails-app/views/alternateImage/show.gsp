@@ -65,7 +65,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             </div>
 
             <div class="col-sm-8">
-                <g:form url="[resource:alternateImageInstance, action:'delete']" method="DELETE">
+                <g:form resource="${alternateImageInstance}" method="DELETE">
                     <g:hiddenField name="mediaId" value="${params.mediaId}"/>
                     <fieldset class="buttons">
                         <g:link class="btn btn-success" action="edit" params="[mediaId:params.mediaId]" resource="${alternateImageInstance}"><g:message code="default.button.edit.label" default="Edit" /></g:link>

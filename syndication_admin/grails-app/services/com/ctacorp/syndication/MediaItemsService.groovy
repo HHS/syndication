@@ -14,6 +14,8 @@ import com.ctacorp.syndication.preview.MediaPreview
 import com.ctacorp.syndication.preview.MediaThumbnail
 import grails.util.Environment
 import grails.transaction.Transactional
+import org.springframework.transaction.interceptor.TransactionAspectSupport
+import org.springframework.transaction.support.DefaultTransactionStatus
 
 @Transactional
 class MediaItemsService {
@@ -31,7 +33,7 @@ class MediaItemsService {
     def delete(Long mediaId) {
         MediaItem mi = MediaItem.get(mediaId)
         def campaigns = []
-        campaigns.addAll(mi.campaigns)
+        campaigns.addAll(mi.campaigns ?: [])
 
         for(campaign in campaigns){
             campaign.removeFromMediaItems(mi)
@@ -56,7 +58,7 @@ class MediaItemsService {
         users.each { col ->
             col.removeFromLikes(mi)
         }
-        
+
         // Media Preview and thumbnails --------------------------------
         MediaPreview.where{
             mediaItem == mi
@@ -101,12 +103,13 @@ class MediaItemsService {
 
     //returns the model at index 0 and and the error message if at index 1
     String addExtendedAttribute(MediaItem mi, ExtendedAttribute attributeInstance){
-        attributeInstance.mediaItem = mi
+        attributeInstance?.mediaItem = mi
 
         if (attributeInstance == null) {
             return "attribute doesn't exist"
         }
 
+        attributeInstance.validate()
         if (attributeInstance.hasErrors()) {
             return "Enter a Attribute and Value"
         }
@@ -148,8 +151,11 @@ class MediaItemsService {
         params.sourceUrlContains = params.url
         params.restrictToSet = params.inList
         params.mediaTypes = params.mediaType
+        if(params.order == "desc" && params.sort[0] != '-'){
+            params.sort = "-" + params.sort
+        }
 
-        def mediaItems = MediaItem.facetedSearch(params).list(max:params.max, offset:params.offset,sort:params.sort, order:params.order)
+        def mediaItems = MediaItem.facetedSearch(params).list(max:params.max, offset:params.offset)
 
         return mediaItems
     }
@@ -158,17 +164,13 @@ class MediaItemsService {
         def mediaTypes = []
         grailsApplication.domainClasses.each {
             if (it.clazz.superclass.name == "com.ctacorp.syndication.media.MediaItem") {
-                def simpleName = it.clazz.simpleName
-                if(simpleName == "SocialMedia"){
-                    mediaTypes << "Social Media"
-                }else{
-                    mediaTypes << simpleName
-                }
+                mediaTypes << it.clazz.simpleName
             }
         }
         mediaTypes.sort()
     }
 
+    @Transactional
     def ifPublisherValid(MediaItem mediaItem){
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER" && !publisherItems()?.contains(mediaItem?.id)){
             return false
@@ -177,15 +179,11 @@ class MediaItemsService {
     }
 
     def updateItemAndSubscriber(MediaItem mediaItem, Long subscriberId){
-        def errors = []
         def mediaItemSubscriber = null
         mediaItem.validate()
-        if (mediaItem.hasErrors()) {
-            def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib');
-            errors = mediaItem.errors.allErrors.collect { [message: g.message([error: it])] }
-            return errors
+        if(isDuplicateUrl(mediaItem)){
+            mediaItem.errors.rejectValue("sourceUrl", "Duplicate Url", "The Source Url is already in use.")
         }
-        
         if(mediaItem instanceof Html || mediaItem instanceof Periodical){
             def extractedContent
             try {
@@ -193,27 +191,23 @@ class MediaItemsService {
                 extractedContent = contentAndHash.content
                 mediaItem.hash = contentAndHash.hash
                 if(!extractedContent){
-                    errors = [[message:  "The system could not find syndication markup at the provided URL. Please verify the media source to ensure it contains at least one <div> element containing the 'syndicate' class."]]
-                    return errors
+                    mediaItem.errors.rejectValue("sourceUrl", "SourceUrl invalid","The system could not find syndication markup at the provided URL. Please verify the media source to ensure it contains at least one <div> element containing the 'syndicate' class.")
                 }
             } catch(e){
-                errors = [[message:  "The provided URL doesn't appear to be accessible, perhaps it's invalid? Please make " +
-                        "sure it is fully qualified and correct."]]
-                return errors
+                mediaItem.errors.rejectValue("sourceUrl", "SourceUrl invalid", "The provided URL doesn't appear to be accessible, perhaps it's invalid? Please make " +
+                        "sure it is fully qualified and correct.")
             }
         }
-
         //TODO this needs to be renamed, it makes it sound like it removes this item from all user media lists
         removeMediaItemsFromUserMediaLists(mediaItem)
 
         if(Environment.current != Environment.DEVELOPMENT || (Environment.current == Environment.DEVELOPMENT && cmsManagerKeyService.listSubscribers()) || UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
-
             if(mediaItem.id){
                 mediaItemSubscriber = MediaItemSubscriber.findByMediaItem(mediaItem)
             }
             if (UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
                 if (!springSecurityService.currentUser.subscriberId) {
-                    errors << [message: "You do not have a valid subscriber. For help contact " + grailsApplication.config.grails.mail.default.from]
+                    mediaItem.errors.reject("SubscriberId invalid","You do not have a valid subscriber. For help contact " + grailsApplication.config.grails.mail.default.from)
                     log.error("The publisher " + springSecurityService.currentUser.name)
                 }
                 if (mediaItemSubscriber) {
@@ -223,7 +217,7 @@ class MediaItemsService {
                 }
             } else if (["ROLE_ADMIN","ROLE_USER","ROLE_MANAGER"].contains(UserRole.findByUser(springSecurityService.currentUser).role.authority)) {
                 if (!subscriberId) {
-                    errors << [message: "You did not select a valid subscriber."]
+                    mediaItem.errors.reject("SubscriberId invalid","You did not select a valid subscriber.")
                     log.error("The publisher " + springSecurityService.currentUser.name)
                 } else if (mediaItemSubscriber) {
                     mediaItemSubscriber.subscriberId = subscriberId as Long
@@ -232,16 +226,23 @@ class MediaItemsService {
                 }
             }
         }
-        
-        if(errors != []){
-            transactionStatus.setRollbackOnly()
-            return errors
+
+        if(mediaItem.hasErrors()){
+            MediaItem.withTransaction {status ->
+                //more explicit for testing purposes
+                status.setRollbackOnly()
+            }
+            MediaItemSubscriber.withTransaction {status ->
+                status.setRollbackOnly()
+            }
+//            transactionStatus.setRollbackOnly()
+            return mediaItem
         }
-        
+
         mediaItem.save(flush: true)
         mediaItemSubscriber?.save(flush: true)
 
-        return null
+        return mediaItem
     }
 
     @Transactional
@@ -272,5 +273,14 @@ class MediaItemsService {
         }
         //remote cache flushed in syndication model MediaItemChangeListener
     }
-    
+
+    def isDuplicateUrl(MediaItem mediaItem){
+        if(!mediaItem.id && MediaItem.facetedSearch(sourceUrl:mediaItem.sourceUrl).count() == 1){
+            return true
+        } else if(mediaItem.id && MediaItem.facetedSearch(sourceUrl:mediaItem.sourceUrl).count() == 2) {
+            return true
+        }
+        return false
+    }
+
 }

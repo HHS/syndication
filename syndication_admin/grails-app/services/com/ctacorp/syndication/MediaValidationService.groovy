@@ -21,17 +21,16 @@ class MediaValidationService {
     def OK_STATUSES = [200, 301, 302]
     def messageSource
     def mediaItemsService
-    def mailService
     def springSecurityService
-    def mediaValidationService
-    
+
     @NotTransactional
     HealthReport performValidation(Long mediaId) {
-        def mediaItem = MediaItem.get(mediaId)
+        MediaItem mediaItem = MediaItem.get(mediaId)
         if(!mediaItem) {
             log.error "Tried to validate a media item that doesn't exist ${mediaId}"
             return null
         }
+
         processValidation(mediaItem)
     }
 
@@ -69,7 +68,7 @@ class MediaValidationService {
     @NotTransactional
     def rescanItem(Long mediaId){
         HealthReport report = performValidation(mediaId)
-        if(!report.valid){
+        if(report != null && !report.valid){
             flagMediaItem(report)
         } else{
             removeFlag(mediaId)
@@ -103,8 +102,10 @@ class MediaValidationService {
         }
     }
 
+//TODO: These private methods do not have units tests for them
     private HealthReport processValidation(MediaItem mi){
         rest = new RestBuilder()
+        rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
         def sourceUrlCode = null
         try{
             sourceUrlCode = rest.head(URI.decode(mi.sourceUrl)).getStatus()
@@ -183,6 +184,7 @@ class MediaValidationService {
         String apiUrl = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
         def mediaContent
         try {
+            rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
             mediaContent = rest.get("${apiUrl}/resources/media/${mi.id}/syndicate.html")
         }catch(org.springframework.web.client.ResourceAccessException e){
             log.error "Syndication api server could not be reached!\n${e}"
@@ -198,6 +200,7 @@ class MediaValidationService {
         String apiUrl = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
         def youtubeMetaData
         try {
+            rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
             youtubeMetaData = rest.get("${apiUrl}/resources/media/${mi.id}/youtubeMetaData.json")
         }catch(org.springframework.web.client.ResourceAccessException e){
             log.error "Syndication api server could not be reached!\n${e}"

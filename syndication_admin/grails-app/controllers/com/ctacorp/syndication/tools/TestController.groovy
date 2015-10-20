@@ -1,24 +1,43 @@
 package com.ctacorp.syndication.tools
 
+import com.ctacorp.syndication.commons.mq.Message
+import com.ctacorp.syndication.commons.mq.MessageType
 import com.ctacorp.syndication.jobs.DelayedMediaPreviewThumbnailJob
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.health.FlaggedMedia
 import grails.plugin.springsecurity.annotation.Secured
+import grails.util.Holders
 
 @Secured(["ROLE_ADMIN"])
 class TestController {
     def mediaValidationService
     def contentCacheService
     def previewService
-    def mediaPreviewThumbnailService
-    def remoteCacheService
+    def rabbitMessagePublisher
 
     static allowedMethods = ["generateMissing":"POST", "regenerateThumbnailPreviewForAllMedia":"POST"]
 
     def index() {
-        println MediaItem.list().size()
+//        println MediaItem.list().size()
+    }
+
+    def putMessageOnQueue(String messageText){
+        Message msg = new Message(userMessage: messageText, messageType: MessageType.INFO)
+
+        log.info("Sending message: ${msg.toJsonString()}")
+
+        try {
+            rabbitMessagePublisher.send {
+                exchange = Holders.config.syndication.mq.updateExchangeName
+                body = msg.toJsonString()
+            }
+        } catch(e){
+            log.error "A rabbitMQ error occurred on message ${msg.toJsonString()}"
+            e.printStackTrace()
+        }
+        redirect action: "index"
     }
 
     def flagItems(){

@@ -14,8 +14,8 @@ class CarouselController {
     def tagService
     def micrositeService
 
-    def sort = ["name", "dateContentAuthored", "dateContentPublished"]
-    def order = [[name:"ascending", value:"asc"],[name:"descending", value:"desc"]]
+    def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
+    def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
     Closure displayStyles = {MediaSelector.DisplayStyle.values()}
 
     def index() {}
@@ -111,7 +111,7 @@ class CarouselController {
     def update(MicroSite microSite){
         if(!microSite?.id){
             flash.error = "Could not find microSite"
-            redirect action:"edit"
+            redirect controller: "microsite", action:"index"
             return
         }
 

@@ -19,6 +19,7 @@ class TagService {
 
     @PostConstruct
     void init() {
+        rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
         serverAddress = grailsApplication.config.tagCloud.serverAddress
         cache = CacheBuilder.newBuilder().
                 expireAfterWrite(30, TimeUnit.SECONDS).
@@ -74,7 +75,7 @@ class TagService {
         def contentList = restGet("${serverAddress}/content/getContentForTagId.json", [tagId:id])
         if(!contentList) { return [] }
 
-        MediaItem.facetedSearch([restrictToSet:contentList*.syndicationId.join(",")]).list(params)
+        MediaItem.facetedSearch([restrictToSet:contentList*.syndicationId.join(","), active:true, visibleInStorefront:true, syndicationVisibleBeforeDate:new Date().toString()]).list(params)
     }
 
     private restGet(String url, params = null) {

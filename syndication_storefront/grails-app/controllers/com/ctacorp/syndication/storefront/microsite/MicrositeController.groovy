@@ -29,9 +29,7 @@ class MicrositeController {
         ]
     }
 
-    def selectNewMicrosite(){
-
-    }
+    def selectNewMicrosite(){ }
 
     @Secured(['permitAll'])
     def show(MicroSite microSite){
@@ -69,37 +67,67 @@ class MicrositeController {
         switch(params.listType){
             case "USER_MEDIA_LIST":
                 def userMediaLists = UserMediaList.findAllByUser(springSecurityService.currentUser as User)
-                render template: "userMediaList", model:[selectorType:"USER_MEDIA_LIST", userMediaLists:userMediaLists, area:params.mediaAreaValue, currentUserMediaList:MediaSelector.get(params.int("mediaAreaId")).selectionId]
+                render template: "userMediaList",
+                        model:[selectorType:"USER_MEDIA_LIST",
+                               userMediaLists:userMediaLists,
+                               area:params.mediaAreaValue,
+                               currentUserMediaList:MediaSelector.get(params.int("mediaAreaId")).selectionId
+                        ]
                 break
-            case "COLLECTION":flash.radio1 = "COLLECTION"
+            case "COLLECTION":
                 def currentCollection = Collection.get(MediaSelector.get(params.int("mediaAreaId")).selectionId)
-                render template: "collections", model:[selectorType:"COLLECTION", collections: Collection.findAllByLanguage(Language.get(currentCollection.language.id ?: 1)), area:params.mediaAreaValue, selectedLanguage:Collection.get(currentCollection.id).language.id, languages:Language.findAllByIsActive(true), currentCollection:currentCollection.id]
+                render template: "collections", model:[
+                        selectorType:"COLLECTION",
+                        collections: Collection.findAllByLanguage(Language.get(currentCollection.language.id ?: 1)),
+                        area:params.mediaAreaValue,
+                        selectedLanguage:Collection.get(currentCollection.id).language.id,
+                        languages:Language.findAllByIsActive(true),
+                        currentCollection:currentCollection.id]
                 break
             case "TAG":
                 def tagTypes = tagService.getTagTypes()
                 def languages = tagService.getAllActiveTagLanguages()
                 def currentTag = tagService.getTag(params.int("listId"))
 
-                def tagInfo = tagService.listTags([max:1000,languageId: currentTag.language.id ?: 1, typeId: currentTag.type.id ?: 1])
+                def tagInfo = tagService.listTags([
+                        max:1000,languageId:
+                        currentTag.language.id ?: 1,
+                        typeId: currentTag.type.id ?: 1])
                 def tags = tagInfo?.tags
 
-                render template: "tags", model:[selectorType:"TAG", tags: tags.sort{it.name}, area:params.mediaAreaValue, selectedLanguage:currentTag.language.id ?: 1, languages:languages, selectedTagType:currentTag.type.id ?: 1, tagTypes:tagTypes, currentTag:currentTag]
+                render template: "tags", model:[
+                        selectorType:"TAG",
+                        tags: tags.sort{it.name},
+                        area:params.mediaAreaValue,
+                        selectedLanguage:currentTag.language.id ?: 1,
+                        languages:languages, selectedTagType:currentTag.type.id ?: 1,
+                        tagTypes:tagTypes, currentTag:currentTag]
                 break
-            case "SOURCE": render template: "sources", model:[selectorType:"SOURCE", sources:Source.list(), area:params.mediaAreaValue, currentSource:MediaSelector.get(params.int("mediaAreaId")).selectionId]
+            case "SOURCE":
+                render template: "sources", model:[
+                                selectorType:"SOURCE",
+                               sources:Source.list(),
+                               area:params.mediaAreaValue,
+                               currentSource:MediaSelector.get(params.int("mediaAreaId")).selectionId]
                 break
             case "CAMPAIGN": render template: "campaigns", model:[selectorType:"CAMPAIGN", campaigns:Campaign.list(), area:params.mediaAreaValue, currentCampaign:MediaSelector.get(params.int("mediaAreaId")).selectionId]
                 return
+            default:
+                def code = System.nanoTime()
+                log.error("${code} - An unknown list type was specified: ${params.listType}")
+                flash.error = "An error has occurred, please notifiy an administrator with this code:${code}"
+                redirect action:"index"
         }
     }
-    
+
     def specificList(){
         switch(params.listType){
             case "USER_MEDIA_LIST":
                 def userMediaLists = UserMediaList.findAllByUser(springSecurityService.currentUser as User)
                 render template: "userMediaList", model:[selectorType:"USER_MEDIA_LIST", userMediaLists:userMediaLists, area:params.mediaAreaValue]
                 break
-            case "COLLECTION":flash.radio1 = "COLLECTION"
-                    render template: "collections", model:[selectorType:"COLLECTION", collections: Collection.findAllByLanguage(Language.get(params.long("language") ?: 1)), area:params.mediaAreaValue, selectedLanguage:params.long("language"), languages:Language.findAllByIsActive(true)]
+            case "COLLECTION":
+                    render template: "collections", model:[selectorType:"COLLECTION", collections: Collection.findAllByLanguageAndActiveAndVisibleInStorefront(Language.get(params.long("language") ?: 1),true,true), area:params.mediaAreaValue, selectedLanguage:params.long("language"), languages:Language.findAllByIsActive(true)]
                 break
             case "TAG":
                 def tagTypes = tagService.getTagTypes()
@@ -124,10 +152,11 @@ class MicrositeController {
 
         render tags as JSON
     }
-    
+
     def summary(){
         def selectorTypeItem = micrositeService.getSelectorTypeItem(params.listType,params.long("listId"))
-        render template: "summary", model:[ajaxRequest:true, listType:params.listType, header:params.panelHeader, listId:params.listId, item:selectorTypeItem, sortBy:params.sortBy, orderBy:params.orderBy, displayStyle: params.displayStyle, sidePanel:params.boolean("sidePanel")]
+        def listType = params.listType ? MediaSelector.SelectorType."${params.listType}" : null
+        render template: "summary", model:[ajaxRequest:true, listType:listType, header:params.panelHeader, listId:params.listId, item:selectorTypeItem, sortBy:params.sortBy, orderBy:params.orderBy, displayStyle: params.displayStyle, sidePanel:params.boolean("sidePanel"), area:params.area]
     }
 
     def displayStyle(){

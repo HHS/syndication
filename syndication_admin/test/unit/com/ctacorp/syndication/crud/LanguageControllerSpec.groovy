@@ -25,6 +25,12 @@ import spock.lang.Specification
 @Mock(Language)
 class LanguageControllerSpec extends Specification {
 
+    def languageService = Mock(LanguageService)
+
+    def setup(){
+        controller.languageService = languageService
+    }
+
     def populateValidParams(params) {
         assert params != null
         // TODO: Populate valid properties like...
@@ -79,35 +85,36 @@ class LanguageControllerSpec extends Specification {
 
     void "Test the setInactive fails properly with an invalid language"() {
         setup: ""
-        controller.languageService = Mock(LanguageService)
-        request.contentType = MULTIPART_FORM_CONTENT_TYPE
-        populateValidParams(params)
-        params.isActive = true
-        Language language = new Language(params).save(flush: true)
-        language.isActive
+            controller.languageService = Mock(LanguageService)
+            request.contentType = MULTIPART_FORM_CONTENT_TYPE
+            populateValidParams(params)
+            params.isActive = true
+            Language language = new Language(params).save(flush: true)
+            language.isActive
 
         when:"The setInactive is called with a null"
-        controller.setActive(null)
+            controller.setActive(null)
 
         then:"The index is properly displayed"
-        response.status == 302
-        response.redirectedUrl == "/language/index"
+            response.status == 302
+            response.redirectedUrl == "/language/index"
 
         when:"The setInactive is called with a invalid id"
-        response.reset()
-        controller.setActive(-1)
+            response.reset()
+            controller.setActive(-1)
 
         then:"the index is properly displayed"
-        response.status == 302
-        response.redirectedUrl == "/language/index"
+            response.status == 302
+            response.redirectedUrl == "/language/index"
 
         when:"The setInactive is called with a valid inactive language id"
-        response.reset()
-        println "languageId: " + language.id
-        controller.setInactive(language.id)
+            response.reset()
+            println "languageId: " + language.id
+            controller.setInactive(language.id)
 
         then:"the language is set to inactive"
-        !language.isActive
-        response.redirectedUrl == "/language/index"
+            1 * controller.languageService.mediaItemExists(Language.get(language.id))
+            !language.isActive
+            response.redirectedUrl == "/language/index"
     }
 }

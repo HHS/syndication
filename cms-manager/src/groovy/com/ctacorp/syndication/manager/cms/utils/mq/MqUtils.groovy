@@ -14,6 +14,7 @@ Redistribution and use in source and binary forms, with or without modification,
 package com.ctacorp.syndication.manager.cms.utils.mq
 
 import com.ctacorp.syndication.commons.mq.Message
+import grails.converters.JSON
 import groovy.json.JsonException
 import org.apache.commons.logging.LogFactory
 
@@ -36,12 +37,14 @@ class MqUtils {
         return null
     }
 
-    static void handleMessage(String message, String queueName, service) {
+    static void handleMessage( message, String queueName, service) {
 
         log.info("Received the message \n${message} on the '${queueName}'")
 
         try {
-            service.handleMessage(Message.messageFromJson(message), queueName)
+
+            service.handleMessage(Message.messageFromJson((message as JSON).toString()), queueName)
+
         } catch (JsonException ignored) {
             log.warn("Received an malformed message '${message}' on the '${queueName}' queue")
         } catch (t) {

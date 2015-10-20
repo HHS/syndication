@@ -18,28 +18,30 @@
 
         <div class="tab-content"> %{--Type tab--}%
             <div class="row tab-pane${!microSite ? ' active':''}" id="pane${area}Type">
+            <i tabindex="0" role="note" aria-label="Choose one media source"> Choose one Media Source </i>
                 <div class="choose-media-source">
-                    <a class="choose-user-media-list pane${area}Type source_selector_button list-type" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" data-listType="USER_MEDIA_LIST">
+
+                    <a tabindex="0" href="#pane${area}Content" class="choose-user-media-list pane${area}Type source_selector_button list-type" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" data-listType="USER_MEDIA_LIST">
                         <div></div>
-                        <p>User Media List <i class='fa fa-arrow-right'></i></p>
+                        <p>My List <i class='fa fa-arrow-right'></i></p>
                     </a>
 
-                    <a class="choose-collection pane${area}Type source_selector_button list-type" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" data-listType="COLLECTION">
+                    <a tabindex="0" href="#pane${area}Content" class="choose-collection pane${area}Type source_selector_button list-type" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" data-listType="COLLECTION">
                         <div></div>
                         <p>Collection <i class='fa fa-arrow-right'></i></p>
                     </a>
 
-                    <a class="choose-tag pane${area}Type source_selector_button list-type" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" data-listType="TAG">
+                    <a tabindex="0" href="#pane${area}Content" class="choose-tag pane${area}Type source_selector_button list-type" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" data-listType="TAG">
                         <div></div>
                         <p>Tag <i class='fa fa-arrow-right'></i></p>
                     </a>
 
-                    <a class="choose-source pane${area}Type source_selector_button list-type" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" data-listType="SOURCE">
+                    <a tabindex="0" href="#pane${area}Content" class="choose-source pane${area}Type source_selector_button list-type" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" data-listType="SOURCE">
                         <div></div>
                         <p>Source <i class='fa fa-arrow-right'></i></p>
                     </a>
 
-                    <a class="choose-campaign pane${area}Type source_selector_button list-type" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" data-listType="CAMPAIGN">
+                    <a tabindex="0" href="#pane${area}Content" class="choose-campaign pane${area}Type source_selector_button list-type" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" data-listType="CAMPAIGN">
                         <div></div>
                         <p>Campaign <i class='fa fa-arrow-right'></i></p>
                     </a>
@@ -54,8 +56,8 @@
                         Please select a Media Source first.
                     </div>
 
-                    <div class="btn pull-left" id="pane${area}SpecificLeft"><i class='socialIcons fa fa-arrow-left'></i>Change Media Source</div>
-                    <div class="btn pull-right" id="pane${area}SpecificRight">Select Content Details <i class='socialIcons fa fa-arrow-right'></i></div>
+                    <a tabindex="0" href="#pane${area}Type" class=" nav-bottom-links btn pull-left" id="pane${area}SpecificLeft"><i class='socialIcons fa fa-arrow-left'></i>Change Media Source</a>
+                    <a tabindex="0" href="#pane${area}Details" class="nav-bottom-links btn pull-right" id="pane${area}SpecificRight">Select Content Details <i class='socialIcons fa fa-arrow-right'></i></a>
 
                 </div>
             </div>
@@ -73,28 +75,28 @@
                     </g:if>
 
                     <div class="form-group">
-                        <label class="col-lg-4 control-label" for="pane${area}Sort">Sort By<span class="required-indicator">*</span></label>
+                        <label class="col-lg-4 control-label" for="pane${area}Sort">Sort By</label>
                         <div class="col-lg-8">
-                            <g:select class="form-control" name="pane${area}Sort" from="${sort}" value="${mediaArea?.sortBy}"/>
+                            <g:select class="form-control" name="pane${area}Sort" from="${sort}" optionValue="name" optionKey="value" value="${mediaArea?.sortBy}" aria-required="true"/>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="col-lg-4 control-label" for="pane${area}Order">Order<span class="required-indicator">*</span></label>
+                        <label class="col-lg-4 control-label" for="pane${area}Order">Order</label>
                         <div class="col-lg-8">
-                            <g:select class="form-control" name="pane${area}Order" from="${order}" optionValue="name" optionKey="value" value="${mediaArea?.orderBy}"/>
+                            <g:select class="form-control" name="pane${area}Order" from="${order}" optionValue="name" optionKey="value" value="${mediaArea?.orderBy}" aria-required="true"/>
                         </div>
                     </div>
                     <g:if test="${sidePanel}">
                         <div class="form-group">
-                            <label class="col-lg-4 control-label" for="pane${area}DisplayStyle">Display Style<span class="required-indicator">*</span></label>
+                            <label class="col-lg-4 control-label" for="pane${area}DisplayStyle">Display Style</label>
                             <div class="col-lg-8">
-                                <g:select class="form-control" name="pane${area}DisplayStyle" from="${displayStyle}" optionValue="name" value="${mediaArea?.displayStyle}"/>
+                                <g:select class="form-control" name="pane${area}DisplayStyle" from="${displayStyle}" optionValue="name" value="${mediaArea?.displayStyle}" aria-required="true"/>
                             </div>
                         </div>
                     </g:if>
-                    <div class="btn pull-left pane${area}-sortingLeft"><i class='socialIcons fa fa-arrow-left'></i> Change Content List</div>
-                    <div class="btn pull-right pane${area}-sortingRight">View Summary <i class='socialIcons fa fa-arrow-right'></i></div>
+                    <a tabindex="0" href="#pane${area}Content" class="nav-bottom-links btn pull-left pane${area}-sortingLeft"><i class='socialIcons fa fa-arrow-left'></i> Change Content List</a>
+                    <a tabindex="0" href="#pane${area}Details" class="nav-bottom-links btn pull-right pane${area}-sortingRight">View Summary <i class='socialIcons fa fa-arrow-right'></i></a>
                 </div>
             </div>
 
@@ -104,8 +106,8 @@
                     <div id="summary${area}">
                         <g:render template="../microsite/summary"/>
                     </div>
-                    <div class="btn pull-left pane${area}-sortingLeft"><i class='socialIcons fa fa-arrow-left'></i> Change Content Details</div>
-                    <div class="btn pull-right pane${area}-newList">Start Over <i class='socialIcons fa fa-undo'></i></div>
+                    <a tabindex="0" href="#pane${area}Details" class="nav-bottom-links btn pull-left pane${area}-sortingLeft"><i class='socialIcons fa fa-arrow-left'></i> Change Content Details</a>
+                    <a tabindex="0" href="#pane${area}Type" class="nav-bottom-links btn pull-right pane${area}-newList">Start Over <i class='socialIcons fa fa-undo'></i></a>
                 </div>
             </div>
         </div> %{--end Type tab--}%

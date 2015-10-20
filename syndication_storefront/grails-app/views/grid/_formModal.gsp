@@ -1,4 +1,4 @@
-<div class="modal fade" id="modal-header" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">
+<div class="modal fade" id="modal-header" tabindex="-1" role="form" aria-labelledby="" aria-hidden="true">
     <div class="modal-dialog modal-lg">
 
         <div class="modal-content">
@@ -10,32 +10,37 @@
            
 
                 <!-- Wrapper for slides -->
-                <div class="carousel-inner" role="listbox">
+                <div class="carousel-inner">
                     <div class="item active">
-                        <h1 class="modal-title">Your Grid Microsite<br/><span class="modal-section-title">Step One: Header</span></h1>
+                        <div tabindex="-1" id="step-one" aria-label="Step One Header"></div>
+                        <h1 class="modal-title">Step One<br/><span class="modal-section-title">Header</span></h1>
                         <g:render template="../microsite/micrositeHeader"/>
                     </div>
 
                     <div class="item">
-                        <h1 class="modal-title">Your Grid Microsite<br/><span class="modal-section-title">Step Two: Grid Section</span></h1>
+                        <div tabindex="-1" id="step-two" aria-label="Step Two Grid Section"></div>
+                        <h1 class="modal-title">Step Two<br/><span class="modal-section-title">Grid Section</span></h1>
                         <div class="panel-body">
                             <g:render template="../microsite/mediaArea" model="[area:1, mediaArea: microSite?.mediaArea1]"/>
                         </div>
                     </div>
 
                     <div class="item">
-                        <h1 class="modal-title">Your Grid Microsite<br/><span class="modal-section-title">Step Three: Left Column Top Section</span></h1>
+                        <div tabindex="-1" id="step-three" aria-label="Step Three Left Column Top Section"></div>
+                        <h1 class="modal-title">Step Three<br/><span class="modal-section-title">Left Column Top Section</span></h1>
                         <g:render template="../microsite/mediaArea" model="[area:2, mediaArea: microSite?.mediaArea2, sidePanel: true]"/>
 
                     </div>
 
                     <div class="item">
-                        <h1 class="modal-title">Your Grid Microsite<br/><span class="modal-section-title">Step Four: Left Column Bottom Section</span></h1>
+                        <div tabindex="-1" id="step-four" aria-label="Step Four Left Column Bottom Section"></div>
+                        <h1 class="modal-title">Step Four<br/><span class="modal-section-title">Left Column Bottom Section</span></h1>
                         <g:render template="../microsite/mediaArea" model="[area:3, mediaArea: microSite?.mediaArea3, sidePanel: true]"/>
                     </div>
 
                     <div class="item">
-                        <h1 class="modal-title">Your Grid Microsite<br/><span class="modal-section-title">Step Five: Footer</span></h1>
+                        <div tabindex="-1" id="step-five" aria-label="Step Five Footer"></div>
+                        <h1 class="modal-title">Step Five<br/><span class="modal-section-title">Footer</span></h1>
                         <g:render template="../microsite/formFooter"/>
                     </div>
 

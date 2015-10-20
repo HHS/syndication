@@ -1,5 +1,5 @@
 // The title of this document
-//title = "Gaiden"
+title = "Tiny Url"
 
 // The version of this document
 //version = ""

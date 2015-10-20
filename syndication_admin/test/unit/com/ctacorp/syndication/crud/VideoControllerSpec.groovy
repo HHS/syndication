@@ -28,7 +28,7 @@ class VideoControllerSpec extends Specification {
     def setup(){
         //for all mediaItems
         controller.mediaItemsService = mediaItemsService
-        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {video, subId ->if(video.save(flush:true)){return null} else{return "errors"}}
+        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {Video video, subId ->if(video.save(flush:true)){return video} else{return video}}
 
         controller.cmsManagerKeyService = cmsManagerKeyService
         controller.solrIndexingService = solrIndexingService

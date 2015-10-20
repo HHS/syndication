@@ -1,14 +1,20 @@
 package com.ctacorp.syndication.crud
 
+import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.metric.MediaMetric
 import com.ctacorp.syndication.authentication.Role
 import com.ctacorp.syndication.authentication.UserRole
+import com.ctacorp.syndication.cache.GuavaCacheService
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import grails.rest.render.RenderContext
 import grails.transaction.Transactional
+
+import java.util.concurrent.Callable
+
 import static java.util.Calendar.*
 
 /**
@@ -24,6 +30,7 @@ class MetricReportController {
     def springSecurityService
     def queryAuditService
     def googleAnalyticsService
+    def guavaCacheService
 
     static defaultAction = "overview"
 
@@ -45,7 +52,6 @@ class MetricReportController {
         def googleOverview = null
         try{
             def googleResponse = googleAnalyticsService.getDashboardOverviewData(overviewMeta?.start)
-//            println ((googleResponse as JSON).toString(true))
             googleOverview = [
                     stats : [:],
                     error : googleResponse.error
@@ -60,7 +66,11 @@ class MetricReportController {
 
         }catch(e){
             log.error "Couldn't retrieve google anayltics info"
-            e.printStackTrace()
+            StringWriter sw = new StringWriter()
+            PrintWriter pw = new PrintWriter(sw)
+            e.printStackTrace(pw)
+            log.error(sw.toString())
+            googleOverview = [stats:[:], error:"Couldn't connect to google analytics service.", exception:sw.toString()]
         }
 
         [
@@ -70,6 +80,29 @@ class MetricReportController {
             subscribers: UserRole.findAllByRole(Role.findByAuthority("ROLE_STOREFRONT_USER"))*.user,
             popularRange: overviewMeta.popularRange
         ]
+    }
+
+    def generalOverviewAjax(){
+        def totalRange = [:]
+        switch(params.totalRange){
+            case "week":    totalRange = viewMetricService.getAllHits(new Date()-7); break
+            case "month":   totalRange = viewMetricService.getAllHits(); break
+            case "year":    totalRange = viewMetricService.getAllHits(new Date()-365); break
+            case "all":     totalRange = viewMetricService.getAllHits(new Date()-36500); break
+        }
+
+        render totalRange as JSON
+    }
+
+    def getTotalLineGraph(){
+        String key = Hash.md5("generalTotal")
+        Map data = guavaCacheService.generalTotalCache.get(key, new Callable<Map>() {
+            @Override
+            public Map call(){
+                viewMetricService.getGeneralTotalLine()
+            }
+        });
+        render data as JSON
     }
 
     def mediaViewMetrics(Integer max){
@@ -199,7 +232,7 @@ class MetricReportController {
         if(params.sort == "storefrontViewCount" || params.sort == "apiViewCount") {
             if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
                 mediaItems = MediaItem.findAllByIdInList(publisherItems())
-                count = MediaItem.findAllByIdInList(publisherItems()) ?: 0
+                count = MediaItem.countByIdInList(publisherItems()) ?: 0
             } else {
                 mediaItems = viewMetricService.findTotalViews(params)
                 def metrics = MediaItem.list().metrics
@@ -230,7 +263,7 @@ class MetricReportController {
 // all graphing actions
     def viewGraphs(){
         def mediaItems = MediaItem.list()
-        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',')) ?: []
+        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',') ?: []) ?: []
         String mediaForTokenInput = mediaToGraph.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
         def secondTabActive = null
         if(params.fromSecondTab){
@@ -242,7 +275,7 @@ class MetricReportController {
 
     def mediaContent(){
         params.whichData = params.whichData ?: "apiViewCount"
-        def data = [
+        Map data = [
                 data:[],
                 xkey:"month",
                 ykeys:MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',[]') ?: []).name,
@@ -250,9 +283,8 @@ class MetricReportController {
                     it.id+" " + viewMetricService.checkLength(it.name)
                 }
         ]
-        
-        data.data = viewMetricService.getMediaData(params.mediaToGraph, params.whichData)
 
+        data.data = viewMetricService.getMediaData(params.mediaToGraph, params.whichData)
         render data as JSON
     }
 
@@ -268,20 +300,68 @@ class MetricReportController {
 
     def getTopTen(){
         params.range = params.range ?: 1
-        def data = viewMetricService.findTopTen(params)
+        String key = Hash.md5(params.agency.toString() + params.whichData.toString() + params.range.toString() + params.typeGraph?.toString())
+        def data = []
+        if(params.typeGraph == "line"){
+            data = guavaCacheService.totalTopTenCache.get(key, new Callable<Map>() {
+                @Override
+                public Map call(){
+                    viewMetricService.findTopTen(params)
+                }
+            });
+        } else {
+            data = guavaCacheService.totalTopTenCache.get(key, new Callable<ArrayList>() {
+                @Override
+                public ArrayList call(){
+                    viewMetricService.findTopTen(params)
+                }
+            });
+        }
 
         render data as JSON
     }
 
     def getAgencyTopTen(){
-        def data = viewMetricService.findAgencyTopTen(params)
+        String key = Hash.md5(params.agency.toString() + params.whichData.toString() + params.range.toString() + params.graphType?.toString())
+        def data = []
+        if(params.graphType == "line"){
+            data = guavaCacheService.agencies.get(key, new Callable<Map>() {
+                @Override
+                public Map call(){
+                    viewMetricService.findAgencyTopTen(params) ?: [:]
+                }
+            });
+        } else {
+            data = guavaCacheService.agencies.get(key, new Callable<ArrayList>() {
+                @Override
+                public ArrayList call(){
+                    viewMetricService.findAgencyTopTen(params)
+                }
+            });
+        }
+
         render data as JSON
     }
 
     def getAgencyViews(){
         params.range = params.range ?: 1
-        def data = viewMetricService.findAgencyViews(params)
-
+        String key = Hash.md5(params.range.toString() + params.whichData.toString())
+        def data
+        if(params.graphType == "line"){
+            data = guavaCacheService.agencies.get(key, new Callable<Map>() {
+                @Override
+                public Map call(){
+                    viewMetricService.findAgencyViews(params)
+                }
+            });
+        } else {
+            data = guavaCacheService.agencies.get(key, new Callable<ArrayList>() {
+                @Override
+                public ArrayList call(){
+                    viewMetricService.findAgencyViews(params)
+                }
+            });
+        }
         render data as JSON
     }
 }

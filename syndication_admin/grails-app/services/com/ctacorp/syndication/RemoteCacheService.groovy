@@ -28,7 +28,7 @@ class RemoteCacheService {
     def flushRemoteCache() {
         try{
             log.info "Flushing remote cache"
-            authorizationService.getRest(Holders.config.syndication.serverUrl + "/cacheAccess/flushCacheByName")
+            authorizationService.getRest(Holders.config.syndication.serverUrl + "/cacheAccess/flushCache")
         } catch(e){
             log.error("Could not flush API cache! ${e}")
         }

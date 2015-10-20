@@ -14,6 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.contentextraction
 
 import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.media.PDF
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.exception.ContentUnretrievableException
@@ -57,8 +58,12 @@ class ContentRetrievalService {
         desc
     }
 
-    String wrapWithSyndicateDiv(String content){
-        "<div class='syndicate'>${content}</div>"
+    String wrapWithSyndicateDiv(String content, MediaItem item = null){
+        if(item && item.instanceOf(PDF)){
+            return "<div class='syndicate' style='height: 350px;'>${content}</div>"
+        } else {
+            return "<div class='syndicate'>${content}</div>"
+        }
     }
 
     String addAttributionToExtractedContent(Long mediaId, String content){

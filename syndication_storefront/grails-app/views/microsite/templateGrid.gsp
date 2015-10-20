@@ -26,8 +26,8 @@
 
 <div class="template container-fluid">
 
-        <div class="microsite grid">
-
+    <div class="microsite grid">
+            <a id="pageContent"></a>
         <g:render template="/microsite/templateHeader"/>
 
         <div class="microsite-grid-content row">
@@ -54,18 +54,18 @@
 
                         <div class="microsite-article on-color clearfix">
                            
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
-                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 1" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 2" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 3" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 4" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 5" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 6" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 7" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 8" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 9" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 10" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 11" />
+                           <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 12" />
 
                            
 
@@ -85,7 +85,7 @@
 
                                             <h2 class="microsite-article-title">Lorem ipsum dolor</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 13"/>
                                             
                                             <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -109,7 +109,7 @@
 
                                             <h2 class="microsite-article-title">sit amet</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 14"/>
                                             
                                             <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -132,7 +132,7 @@
 
                                             <h2 class="microsite-article-title">In quod dignissim instructior eum</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 15"/>
                                             
                                             <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -157,7 +157,7 @@
 
                                             <h2 class="microsite-article-title">At est ferri facilis</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 16"/>
                                             
                                             <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -182,7 +182,7 @@
 
                                             <h2 class="microsite-article-title">Lorem ipsum dolor sit amet</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 17"/>
                                                                                                                              
                                             <p>
                                                 <button type="button" class="btn btn-default center-block modal_popup_button"
@@ -201,7 +201,7 @@
 
                                             <h2 class="microsite-article-title">Quo utamur partiendo ex</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 18"/>
                                             
                                             <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -224,7 +224,7 @@
 
                                             <h2 class="microsite-article-title">Eos no magna autem graecis</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 19"/>
                                             
                                             <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -249,7 +249,7 @@
 
                                             <h2 class="microsite-article-title">Fugit partem cu mel</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 20"/>
                                             
                                             <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -270,7 +270,7 @@
 
                                             <h2 class="microsite-article-title">Quodsi iudicabit repudiandae</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 21"/>
                                             
                                             <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -295,7 +295,7 @@
 
                                             <h2 class="microsite-article-title">Eos no magna autem graecis</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 22"/>
                                             
                                             <p>Eos no magna autem graecis, iusto ubique voluptatum ea his. Pri feugiat nonumes platonem an, autem menandri in sed. Quo utamur partiendo ex, sea eu eloquentiam definitionem. His ad nonumes probatus adipiscing, ad has quot erat quodsi, natum aeque salutandi in mel. Et adhuc mundi aliquid vix, enim indoctum ullamcorper sed et. Quodsi iudicabit repudiandae eum cu, est prompta iudicabit eu. <a>Link to Source</a></p>
                                             
@@ -316,7 +316,7 @@
 
                                             <h2 class="microsite-article-title">Lorem ipsum dolor</h2>
 
-                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                            <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 23"/>
                                             
                                             <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 

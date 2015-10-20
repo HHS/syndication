@@ -13,6 +13,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
+import com.ctacorp.syndication.media.MediaItem
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -81,14 +83,13 @@ class HtmlController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(htmlInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        htmlInstance =  mediaItemsService.updateItemAndSubscriber(htmlInstance, params.long('subscriberId'))
+        if(htmlInstance.hasErrors()){
+            flash.errors = htmlInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             respond htmlInstance, view:'create', model: [subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
 
-        htmlInstance.save flush: true
         jobService.solrUpdate10SecondDelay(htmlInstance.id)
 
         request.withFormat {
@@ -114,14 +115,13 @@ class HtmlController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(htmlInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        htmlInstance =  mediaItemsService.updateItemAndSubscriber(htmlInstance, params.long('subscriberId'))
+        if(htmlInstance.hasErrors()){
+            flash.errors = htmlInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             redirect action:"edit", id:params.id
             return
         }
 
-        htmlInstance.save flush: true
         jobService.solrUpdate10SecondDelay(htmlInstance.id)
 
         request.withFormat {

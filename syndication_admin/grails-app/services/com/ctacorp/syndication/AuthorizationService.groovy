@@ -37,9 +37,9 @@ class AuthorizationService {
         String secret = grailsApplication.config.cmsManager.secret
         if (privateKey && publicKey && secret) {
             rest
+            rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
             keyAgreement = new AuthorizationHeaderGenerator.KeyAgreement()
 
-            keyAgreement.setPrivateKey(privateKey)
             keyAgreement.setPublicKey(publicKey)
             keyAgreement.setSecret(secret)
 
@@ -78,10 +78,10 @@ class AuthorizationService {
     private sendAuthorizedRequest(String url, String body, String method){
         def requestHeaders = [
                 'Date': new Date().toString(),
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': "application/json;charset=UTF-8"
         ]
         if (body) {
-            requestHeaders['Content-Type'] = "application/json"
             requestHeaders['Content-Length'] = body.bytes.size() as String
         } else if(!grailsApplication.config.cmsManager.headerContentLength){
             requestHeaders['Content-Length'] = "0"
@@ -96,6 +96,7 @@ class AuthorizationService {
                     resp = rest.post(url) {
                         header 'Date', requestHeaders.Date
                         header 'Authorization', apiKeyHeaderValue
+                        header 'Content-Type', requestHeaders.'Content-Type'
                         accept "application/json"
 
                         json body
@@ -105,18 +106,21 @@ class AuthorizationService {
                     resp = rest.delete(url) {
                         header 'Date', requestHeaders.Date
                         header 'Authorization', apiKeyHeaderValue
+                        header 'Content-Type', requestHeaders.'Content-Type'
                     }
                     break
                 case "GET":
                     resp = rest.get(url) {
                         header 'Date', requestHeaders.Date
                         header 'Authorization', apiKeyHeaderValue
+                        header 'Content-Type', requestHeaders.'Content-Type'
                         accept "application/json"
                     }
                     break
                 default: break; //do nothing
             }
         } catch(ResourceAccessException e){
+            println e
             log.error "Couldn't reach remote server, it might be down"
         } catch(e){
             log.error "Unexpected connection error occured trying to communicated with: ${url}"

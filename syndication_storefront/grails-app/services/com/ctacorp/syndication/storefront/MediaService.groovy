@@ -6,6 +6,8 @@ import grails.transaction.Transactional
 import grails.plugins.rest.client.RestBuilder
 import groovy.time.TimeCategory
 import grails.util.Holders
+import com.ctacorp.solr.EntityType
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
 
 import javax.annotation.PostConstruct
 
@@ -15,6 +17,7 @@ class MediaService {
     RestBuilder rest = new RestBuilder()
     def config = Holders.config
     def grailsApplication
+    def solrSearchService
 
     def getFeaturedMedia(params = [:]){
         def featured = FeaturedMedia.where{
@@ -29,18 +32,21 @@ class MediaService {
     }
 
     def listNewestMedia(params){
+        params.max = params.max ?: 20
+        params.offset = params.offset ?: 0
         params.sort = "-id"
-        params['visibleInStorefront'] = true
-        params['active'] = true
-        params['languageName'] = "english"
-        params['syndicationVisibleBeforeDate'] = new Date().toString()
+        params.visibleInStorefront = true
+        params.active = true
+        params.languageName = "english"
+        params.syndicationVisibleBeforeDate = new Date().toString()
         MediaItem.facetedSearch(params).list([max:params.max, offset:params.offset])
     }
 
+    //Can't test this because case insensitive query is broken in test phase: https://jira.grails.org/browse/GRAILS-8841
     @Transactional
     def findMediaByAll(params){
         MediaItem.facetedSearch([
-                nameContains:params.title.replace('%', '\\%'),
+                nameContains:params.title?.replace('%', '\\%'),
                 languageName:params.language,
                 sourceName:params.source,
                 sourceUrlContains:params.domain,
@@ -53,43 +59,30 @@ class MediaService {
     }
 
     def mediaItemSolrSearch(String searchQuery, params=[:]){
-        def offset = params.offset ?: 0
-        def max = params.max ?: 10
-        def resp = null
-        try{
-            resp = rest.get(config.syndication.serverUrl + config.syndication.apiPath
-                    + "/resources/media/searchResults.json?q=${searchQuery}&max=${max}&offset=${offset}").json
-            def idList = resp.results.id
-            if (idList.isEmpty()) {
-                return []
-            }
-            def mediaItemsList = MediaItem.facetedSearch(restrictToSet:idList.join(','), active:true, visibleInStorefront:true,syndicationVisibleBeforeDate:new Date().toString()).list()
-            def mediaItemsMap = mediaItemsList.collectEntries{[it.id, (it)]}
-            def finalSearchResult = []
-            idList.each {
-                if(mediaItemsMap.containsKey(new Long(it))) {
-                    finalSearchResult.add(mediaItemsMap[new Long(it)])
-                }
-            }
-            resp.results = finalSearchResult
-            resp.totalCount = resp.meta.pagination.total
-        }catch(e){
-            log.error("Could not make rest call to the API from the mediaService.")
+        def solrSearchResults
+        try {
+            solrSearchResults = solrSearchService.search(searchQuery ?: "", EntityType.MEDIAITEM)
+        } catch (ex) {
+            log.error "solr is down: ${ex.getMessage()}", ex
+            return []
         }
 
-        resp
+        def mediaItemType = EntityType.MEDIAITEM.toString()
+        def ids = []
+
+        solrSearchResults.getResults().each { searchResult ->
+            ids << searchResult.id.replace("${mediaItemType}-", '')
+        }
+
+        params.offset = params.offset ?: 0
+        MediaItem.facetedSearch(restrictToSet:ids.join(','), active:true, visibleInStorefront:true, syndicationVisibleBeforeDate:new Date().toString()).list(max:params.max, offset: params.offset)
     }
 
      def getMediaTypes() {
         def mediaTypes = []
         grailsApplication.domainClasses.each {
             if (it.clazz.superclass.name == "com.ctacorp.syndication.media.MediaItem") {
-                def simpleName = it.clazz.simpleName
-                if(simpleName == "SocialMedia"){
-                    mediaTypes << "Social Media"
-                }else{
-                    mediaTypes << simpleName
-                }
+                mediaTypes << it.clazz.simpleName
             }
         }
         mediaTypes.sort()

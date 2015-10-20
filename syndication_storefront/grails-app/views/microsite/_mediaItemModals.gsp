@@ -15,12 +15,12 @@
     </div>
 </div>
 
-<script type="application/javascript">
+<script>
     function loadModal(element){
         $("#myModalLabel").html("Loading...")
         $("#modal_popup_body").html("<i class='fa fa-spinner fa-spin fa-lg fa-fw'></i> &nbsp;Loading...")
 
-        var mediaId = element.attr("data-media_id")
+        var mediaId = element.attr("data-media_id");
         $.getJSON("${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/"+mediaId+"/syndicate.json?callback=?", function(data){
             $("#modal_popup_body").html(data.results[0].content)
             $("#myModalLabel").html(data.results[0].name)
@@ -28,12 +28,12 @@
     }
 
     $(document).ready(function(){
-        $(".modal_popup_button").click(function(){
+        $(document).on("click",".modal_popup_button",function(){
             loadModal($(this))
-        })
+        });
 
-        $(".list-group-item").click(function(){
+        $(document).on("click", ".list-group-item", function(){
             loadModal($(this))
-        })
+        });
     })
 </script>

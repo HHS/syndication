@@ -30,20 +30,15 @@ class CampaignService {
     }
     
     def updateCampaignAndSubscriber(Campaign campaign, subscriberId = null){
-        def errors = []
+        def campaignSubscriber = null
         campaign.validate()
-        if (campaign.hasErrors()) {
-            def g = grailsApplication.mainContext.getBean('org.codehaus.groovy.grails.plugins.web.taglib.ApplicationTagLib');
-            errors = campaign.errors.allErrors.collect{[message:g.message([error : it])]}
-            return errors
+
+        if(campaign.id) {
+            campaignSubscriber = CampaignSubscriber.findByCampaign(campaign)
         }
-        campaign.save(flush:true)
-
-        def campaignSubscriber = CampaignSubscriber.findByCampaign(campaign)
-
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
             if(!springSecurityService.currentUser.subscriberId){
-                errors << [message:"You do not have a valid subscriber. For help contact " + grailsApplication.config.grails.mail.default.from]
+                campaign.errors.reject("Invalid Subscriber", "You do not have a valid subscriber. For help contact " + grailsApplication.config.grails.mail.default.from)
                 log.error("The publisher " + springSecurityService.currentUser.name)
             }
             if(campaignSubscriber){
@@ -51,21 +46,33 @@ class CampaignService {
             } else {
                 campaignSubscriber = new CampaignSubscriber([campaign:campaign,subscriberId:springSecurityService.currentUser.subscriberId])
             }
-            campaignSubscriber.save(flush: true)
-        } else if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_ADMIN" && subscriberId) {
-            if(campaignSubscriber){
+        } else if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_ADMIN") {
+            if (!subscriberId) {
+                campaign.errors.reject("SubscriberId invalid","You did not select a valid subscriber.")
+                log.error("The publisher " + springSecurityService.currentUser.name)
+            } else if(campaignSubscriber){
                 campaignSubscriber.subscriberId = subscriberId as Long
             } else {
                 campaignSubscriber = new CampaignSubscriber([campaign: campaign,subscriberId:subscriberId as Long])
             }
-            campaignSubscriber.save(flush: true)
+        }
+        campaign.validate()
+
+        if(campaign.hasErrors()){
+            Campaign.withTransaction {status ->
+                //more explicit for testing purposes
+                status.setRollbackOnly()
+            }
+            CampaignSubscriber.withTransaction {status ->
+                status.setRollbackOnly()
+            }
+//            transactionStatus.setRollbackOnly()
+            return campaign
         }
 
-        if(errors != []){
-            transactionStatus.setRollbackOnly()
-            return errors
-        }
+        campaign.save(flush:true)
+        campaignSubscriber?.save(flush: true)
 
-        return null
+        return campaign
     }
 }

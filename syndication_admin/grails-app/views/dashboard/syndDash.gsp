@@ -18,9 +18,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <head>
     <title>Syndication Dashboard</title>
     <meta name="layout" content="dashboard"/>
-    <asset:javascript src="/plugins/morris/raphael-2.1.0.min.js"/>
-    <asset:javascript src="/plugins/morris/morris.js"/>
-    <asset:stylesheet src="/plugins/morris/morris-0.4.3.min.css"/>
+    <asset:javascript src="plugins/morris/raphael-2.1.0.min.js"/>
+    <asset:javascript src="plugins/morris/morris.js"/>
+    <asset:stylesheet src="plugins/morris/morris-0.4.3.min.css"/>
 
     <style>
         .timeline_thumbnail{

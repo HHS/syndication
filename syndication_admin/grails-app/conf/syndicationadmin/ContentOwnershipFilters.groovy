@@ -9,7 +9,7 @@ class ContentOwnershipFilters {
     def campaignService
 
     def filters = {
-        all(controller: 'audio|collection|html|image|infographic|periodical|socialMedia|video|widget', action: 'show|edit|update|delete') {
+        all(controller: 'audio|collection|html|image|infographic|periodical|tweet|video|widget', action: 'show|edit|update|delete') {
             before = {
                 if(!mediaItemsService.ifPublisherValid(MediaItem.get(params.id))){
                     response.sendError(404)

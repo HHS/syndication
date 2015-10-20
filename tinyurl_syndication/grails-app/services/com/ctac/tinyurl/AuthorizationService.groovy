@@ -26,9 +26,9 @@ class AuthorizationService {
 
         if (privateKey && publicKey && secret) {
             rest = new RestBuilder()
+            rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
             keyAgreement = new AuthorizationHeaderGenerator.KeyAgreement()
 
-            keyAgreement.setPrivateKey(privateKey)
             keyAgreement.setPublicKey(publicKey)
             keyAgreement.setSecret(secret)
 

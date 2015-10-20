@@ -24,7 +24,10 @@
 	background-color: #386FA4;
 	color: #fff;
 	margin-bottom: 5px;
-  	padding: 30px;
+	padding-right: 35px;
+	padding-left: 30px;
+	padding-bottom: 30px;
+	padding-top: 30px;
 }
 
 .microsite-classic-right-col-top.row .microsite-article h2 {
@@ -34,7 +37,10 @@
 
 .microsite-classic-right-col-bottom.row {
 	background-color: #59A5D8;
-	padding: 30px;
+	padding-right: 20px;
+	padding-left: 15px;
+	padding-bottom: 15px;
+	padding-top: 15px;
 }
 
 .microsite-classic-right-col-bottom.row h2 {margin-left: 15px;}

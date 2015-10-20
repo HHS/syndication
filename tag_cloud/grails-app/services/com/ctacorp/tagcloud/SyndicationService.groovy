@@ -25,6 +25,7 @@ class SyndicationService {
     def listMedia(params) {
         try{
             RestBuilder rest = new RestBuilder()
+            rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
             String syndicationUrl = grailsApplication.config.syndication.serverUrl
             String path = grailsApplication.config.syndication.apiPath
             String mediaResource = "/resources/media.json"

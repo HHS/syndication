@@ -26,6 +26,7 @@ class HealthReportControllerSpec extends Specification {
         User user = new User(name:"admin", username: "test@example.com", enabled: true, password: "SomerandomPass1").save()
         Role role = new Role(authority: "ROLE_ADMIN").save()
         UserRole.create user, role, true
+        Math.metaClass.static.round = {Float num -> 1}
         controller.springSecurityService = [currentUser:User.get(1)]
         controller.mediaValidationService = mediaValidationService
     }

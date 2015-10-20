@@ -79,9 +79,9 @@ class CollectionController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(collectionInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        collectionInstance =  mediaItemsService.updateItemAndSubscriber(collectionInstance, params.long('subscriberId'))
+        if(collectionInstance.hasErrors()){
+            flash.errors = collectionInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             def subscribers = cmsManagerKeyService.listSubscribers()
             def featuredMedia = collectionInstance?.mediaItems
             String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
@@ -126,9 +126,9 @@ class CollectionController {
             return
         }
         
-        def status =  mediaItemsService.updateItemAndSubscriber(collectionInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        collectionInstance =  mediaItemsService.updateItemAndSubscriber(collectionInstance, params.long('subscriberId'))
+        if(collectionInstance.hasErrors()){
+            flash.errors = collectionInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             redirect action:"edit", id:params.id
             return
         }

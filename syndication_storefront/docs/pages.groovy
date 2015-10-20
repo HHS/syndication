@@ -1,1 +1,5 @@
 "README.md"
+"pages/UserGuide.md"
+"pages/Microsite.md"
+"pages/UseSyndicatedContent.md"
+"pages/TestingAndCoverage.md"

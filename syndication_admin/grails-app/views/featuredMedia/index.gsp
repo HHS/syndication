@@ -11,8 +11,8 @@
 <head>
     <title>Featured Media</title>
     <meta name="layout" content="dashboard"/>
-    <asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
-    <asset:stylesheet src="/tokenInput/token-input.css"/>
+    <asset:javascript src="tokenInput/jquery.tokeninput.js"/>
+    <asset:stylesheet src="tokenInput/token-input.css"/>
     <g:javascript>
         $(document).ready(function(){
             $("#featuredMedia").tokenInput("${g.createLink(controller: 'mediaItem', action: 'tokenMediaSearch')}.json?active=true&visibleInStorefront=true", {

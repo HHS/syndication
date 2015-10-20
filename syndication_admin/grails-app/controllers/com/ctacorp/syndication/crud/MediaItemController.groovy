@@ -22,7 +22,7 @@ import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.PDF
 import com.ctacorp.syndication.media.Periodical
-import com.ctacorp.syndication.media.SocialMedia
+import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.media.Video
 import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.authentication.UserRole
@@ -50,9 +50,9 @@ class MediaItemController {
             case Html: redirect controller:         "Html",        action: 'show', id: id, model:[htmlInstance:mi];         break;
             case Image: redirect controller:        "Image",       action: 'show', id: id, model:[imageInstance:mi];        break;
             case Infographic: redirect controller:  "Infographic", action: 'show', id: id, model:[infographicInstance:mi];  break;
-            case PDF:         redirect controller:  "PDF",         action: 'show', id: id, model:[PDFInstance:mi];   break;
+            case PDF:         redirect controller:  "PDF",         action: 'show', id: id, model:[PDFInstance:mi];          break;
             case Periodical:  redirect controller:  "Periodical",  action: 'show', id: id, model:[periodicalInstance:mi];   break;
-            case SocialMedia: redirect controller:  "SocialMedia", action: 'show', id: id, model:[socialMediaInstance:mi];  break;
+            case Tweet: redirect controller:        "Tweet",       action: 'show', id: id, model:[tweetInstance:mi];        break;
             case Video: redirect controller:        "Video",       action: 'show', id: id, model:[videoInstance:mi];        break;
             case Widget: redirect controller:       "Widget",      action: 'show', id: id, model:[widgetInstance:mi];       break;
         }
@@ -68,9 +68,9 @@ class MediaItemController {
             case Html: redirect controller:         "Html",        action: 'edit', id: id, model:[htmlInstance:mi];         break;
             case Image: redirect controller:        "Image",       action: 'edit', id: id, model:[imageInstance:mi];        break;
             case Infographic: redirect controller:  "Infographic", action: 'edit', id: id, model:[infographicInstance:mi];  break;
-            case PDF:         redirect controller:  "PDF",         action: 'edit', id: id, model:[PDFInstance:mi];   break;
+            case PDF:         redirect controller:  "PDF",         action: 'edit', id: id, model:[PDFInstance:mi];          break;
             case Periodical:  redirect controller:  "Periodical",  action: 'edit', id: id, model:[periodicalInstance:mi];   break;
-            case SocialMedia: redirect controller:  "SocialMedia", action: 'edit', id: id, model:[socialMediaInstance:mi];  break;
+            case Tweet: redirect controller:        "Tweet",       action: 'edit', id: id, model:[tweetInstance:mi];        break;
             case Video: redirect controller:        "Video",       action: 'edit', id: id, model:[videoInstance:mi];        break;
             case Widget: redirect controller:       "Widget",      action: 'edit', id: id, model:[widgetInstance:mi];       break;
         }
@@ -142,28 +142,35 @@ class MediaItemController {
     }
 
     def checkUrlContentType(){
-        def contentType = rest.head(params.sourceUrl).headers.'Content-Type'[0]
-        switch(params.initController){
-            case ~/infographic|image/:
-                if(contentType.contains("jpeg") || contentType.contains("jpg") || contentType.contains("png")){
-                    render "true"
-                    return
-                } else {
-                    render "false"
-                    return
-                }
-                break;
-            case "PDF":
-                if(contentType.contains("pdf")){
-                    render "true"
-                    return
-                } else {
-                    render "false"
-                    return
-                }
-                break;
+        if(!params.sourceUrl){
+            render "false"
+            return
         }
-
-        return true
+        rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
+        def imageFormat = params.imageFormat?.toLowerCase()
+        switch(params.initController){
+            case "image":
+            case "infographic":
+                if(params.sourceUrl.contains("jpeg") || params.sourceUrl.contains("jpg") || params.sourceUrl.contains("png")){
+                    if(params.sourceUrl.contains("png") && imageFormat == "png"){
+                        render true
+                        return
+                    }
+                    if((params.sourceUrl.contains("jpg") || params.sourceUrl.contains("jpeg")) && imageFormat == "jpg"){
+                        render true
+                        return
+                    }
+                }
+                    render "false"
+                    return
+            case "PDF":
+                if(params.sourceUrl.toLowerCase().contains("pdf")){
+                    if(params.sourceUrl.toLowerCase().endsWith("pdf")){
+                        render "true"
+                        return
+                    }
+                }
+        }
+        render "false"
     }
 }

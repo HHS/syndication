@@ -151,10 +151,20 @@ grails.mail.default.from="server@yourhost.com"
 
 grails.assets.minifyCss = false
 grails.assets.minifyJs = false
+
 //___________________________
 // Greenmail                 \____________________________________________________________
 //_______________________________________________________________________________________
 grails.mail.port = 3027
 greenmail.ports.smtp = 3027
 
-grails.plugins.remotepagination.enableBootstrap=true
+grails.plugins.remotepagination.enableBootstrap = true
+
+testDataConfig {
+    sampleData {
+        'com.ctacorp.syndication.Language' {
+            def i = 1
+            isoCode = {-> "ln$i++" }
+        }
+    }
+}

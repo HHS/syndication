@@ -73,10 +73,10 @@ class WidgetController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(widgetInstance, params.long('subscriberId'))
+        widgetInstance =  mediaItemsService.updateItemAndSubscriber(widgetInstance, params.long('subscriberId'))
 
-        if(status){
-            flash.errors = status
+        if(widgetInstance.hasErrors()){
+            flash.errors = widgetInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             respond widgetInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
@@ -106,9 +106,9 @@ class WidgetController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(widgetInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        widgetInstance =  mediaItemsService.updateItemAndSubscriber(widgetInstance, params.long('subscriberId'))
+        if(widgetInstance.hasErrors()){
+            flash.errors = widgetInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             redirect action:'edit', id:params.id
             return
         }

@@ -33,6 +33,12 @@
 </head>
 
 <body>
+<div id="header">
+    <a class="skipNavLink" href="#pageContent">Skip to Content</a>
+    <span class="obscure">
+        This page requires Javascript to function
+    </span>
+</div>
 <g:layoutBody/>
 </body>
 </html>

@@ -9,7 +9,7 @@ import grails.util.Holders
  */
 class MediaValidationJob {
     static triggers = {
-        cron name: 'mediaValidationTrigger', cronExpression: "0 0 0 ? * SAT" //Every Saturday
+        cron name: 'mediaValidationTrigger', cronExpression: "0 0 0 ? * *" //Every Night
     }
 
     def group = "MediaValidation"

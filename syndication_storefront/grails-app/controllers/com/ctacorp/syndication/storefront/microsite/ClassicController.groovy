@@ -14,8 +14,8 @@ class ClassicController {
     def micrositeService
     def tagService
 
-    def sort = ["name", "dateContentAuthored", "dateContentPublished"]
-    def order = [[name:"ascending", value:"asc"],[name:"descending", value:"desc"]]
+    def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
+    def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
     Closure displayStyles = {MediaSelector.DisplayStyle.values()}
 
     def index() {}
@@ -31,7 +31,7 @@ class ClassicController {
                 userMediaLists:userMediaLists,
                 collections:collections,
                 sources:sources,
-                tags:tags.sort{it.name},
+                tags:tags,
                 campaigns:campaigns,
                 sort:sort,
                 order:order,
@@ -71,7 +71,7 @@ class ClassicController {
                 userMediaLists:userMediaLists,
                 collections:collections,
                 sources:sources,
-                tags:tags.sort{it.name},
+                tags:tags,
                 campaigns:campaigns,
                 sort:sort,
                 order:order,
@@ -84,7 +84,7 @@ class ClassicController {
     def show(){
         def microSite = MicroSite.get(params.long("id"))
 
-        def pane3MediaItems = micrositeService.getMediaItems(microSite.mediaArea3, 50)
+        def pane3MediaItems = micrositeService.getMediaItems(microSite.mediaArea3)
         def pane2MediaItems = micrositeService.getMediaItems(microSite.mediaArea2)
         def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, 50)
 
@@ -99,7 +99,7 @@ class ClassicController {
     def update(MicroSite microSite){
         if(!microSite?.id){
             flash.error = "Could not find microSite"
-            redirect action:"edit"
+            redirect controller: "microsite", action:"index"
             return
         }
 

@@ -8,24 +8,23 @@ import com.percussion.rx.delivery.data.PSDeliveryResult
 import com.percussion.services.sitemgr.IPSSite
 import com.percussion.utils.guid.IPSGuid
 import groovy.util.logging.Log
-import groovyx.net.http.RESTClient
 import org.apache.commons.lang.StringEscapeUtils
 
 @Log
 class DeliveryHandler implements IPSDeliveryHandler {
 
     def authHeaders = new AuthHeader()
-    def restClientFactory = new RestClientFactory()
+    def restClient = new RestClient()
+    static logMessagePrefix = { long jobId -> "Syndication Publish - JOBID '${jobId}': " }
 
     @Override
     void init(long jobId, IPSSite ipsSite) {
-        log.info("'init' called with jobId ${jobId}")
+        log.info("${logMessagePrefix(jobId)}'init' called")
     }
 
     @Override
     boolean isTransactional() {
-        log.info("'isTransactional' called ... return false")
-        return false
+        false
     }
 
     @Override
@@ -35,28 +34,26 @@ class DeliveryHandler implements IPSDeliveryHandler {
         def referenceId = deliveryItem.getReferenceId()
         IPSGuid itemId = deliveryItem.getId()
 
-        log.info("'deliver' called with ${[jobId: jobId, referenceId: referenceId, itemId: itemId.longValue()]}")
+        log.info("${logMessagePrefix(jobId)}'deliver' called with referenceId '${referenceId}, itemId '${itemId.longValue()}'")
 
         def content = null
 
         try {
 
             content = getContent(deliveryItem)
-
             def headers = authHeaders.create(content)
 
-            def response = restClientFactory.newRestClient().post(headers: headers, body: content, requestContentType: 'application/json')
-            def status = response['status']
+            def (status, response) = restClient.post(content, headers)
+            def results = response?.results
 
-            if (status == 200) {
-                log.info("Content published to syndication successfully")
-                postBodyWas(content)
+            if (status == 200 && results && results[0].id) {
+
+                log.info("${logMessagePrefix(jobId)}Content published to syndication successfully")
+                postBodyWas(content, jobId)
                 return new PSDeliveryResult(IPSDeliveryResult.Outcome.DELIVERED, null, itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
             }
 
-            def message = response['data']
-            log.severe("Publish failed: [status: ${status}, message: ${message}]")
-
+            log.severe("${logMessagePrefix(jobId)}Publish failed with statusCode '${status}', response '${response}'")
             handleGeneralFailure(response, content, itemId, jobId, referenceId, deliveryItem.getDeliveryPath())
 
         } catch (ex) {
@@ -66,33 +63,41 @@ class DeliveryHandler implements IPSDeliveryHandler {
 
     static PSDeliveryResult handleException(Throwable ex, IPSGuid itemId, long jobId, long referenceId, String content, String deliveryPath) {
 
-        def genericFailureMessage = "Exception occured when publishing to ${Config.PUBLISH_URL}"
+        def genericFailureMessage = "${logMessagePrefix(jobId)}Exception was thrown when publishing to ${Config.PUBLISH_URL}: ${ex.message}\n\n${ex.stackTrace.join('\n\t')}\n"
         log.severe(genericFailureMessage)
-        log.severe("Exception was: ${ex.message}\n\n${ex.stackTrace.join("\n\t")}\n")
-        deliveryPathWas(deliveryPath)
-        postBodyWas(content)
-        return new PSDeliveryResult(IPSDeliveryResult.Outcome.FAILED, genericFailureMessage, itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
+        deliveryPathWas(deliveryPath, jobId)
+        postBodyWas(content, jobId, true)
+
+        new PSDeliveryResult(IPSDeliveryResult.Outcome.FAILED, genericFailureMessage, itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
     }
 
-    private static deliveryPathWas(String deliveryPath) {
-        log.severe("Delivery path was '${deliveryPath}'")
+    private static deliveryPathWas(String deliveryPath, long jobId) {
+        log.severe("${logMessagePrefix(jobId)}Delivery path was '${deliveryPath}'")
     }
 
-    private static postBodyWas(String content) {
-        log.severe("POST body was was: \n'${content}'")
+    private static postBodyWas(String content, long jobId, boolean logAsError = false) {
+
+        def msg = "${logMessagePrefix(jobId)}POST body was '${content}'"
+
+        if (logAsError) {
+            log.severe(msg)
+        } else {
+            log.info(msg)
+        }
     }
 
     static PSDeliveryResult handleGeneralFailure(response, String content, IPSGuid itemId, long jobId, long referenceId, String deliveryPath) {
 
-        log.info("Error occurred when publishing content to syndication")
-        deliveryPathWas(deliveryPath)
-        postBodyWas(content)
-        return new PSDeliveryResult(IPSDeliveryResult.Outcome.FAILED, "Repsonse was ${response.properties.toString()}", itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
+        log.severe("${logMessagePrefix(jobId)}Unexpected response received from syndication when publishing content")
+        deliveryPathWas(deliveryPath, jobId)
+        postBodyWas(content, jobId, true)
+
+        new PSDeliveryResult(IPSDeliveryResult.Outcome.FAILED, "Repsonse was ${response.properties.toString()}", itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
     }
 
     static String getContent(IPSDeliveryItem deliveryItem) {
 
-        def content = deliveryItem.getResultStream().text
+        def content = deliveryItem.getResultStream().getText('UTF-8')
         content = StringEscapeUtils.unescapeXml(content)
 
         def cDataStart = content.indexOf('<![CDATA[')
@@ -102,45 +107,27 @@ class DeliveryHandler implements IPSDeliveryHandler {
         }
 
         def sourceUrl = Config.SERVER_BASE_URL + "/${deliveryItem.getDeliveryPath()}".replaceAll('//', '/')
-        return content.replace('$source_url', sourceUrl)
+        content.replace('$source_url', sourceUrl)
     }
 
     @Override
     IPSDeliveryResult remove(IPSDeliveryItem deliveryItem) {
 
         def jobId = deliveryItem.getJobId()
-        log.info("'remove' called with jobId ${jobId}")
+        log.info("${logMessagePrefix(jobId)}'remove' called")
         def itemId = deliveryItem.getId()
         def referenceId = deliveryItem.getReferenceId()
-        return new PSDeliveryResult(IPSDeliveryResult.Outcome.DELIVERED, null, itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
+        new PSDeliveryResult(IPSDeliveryResult.Outcome.DELIVERED, null, itemId, jobId, referenceId, Config.PUBLISH_URL.bytes)
     }
 
     @Override
     Collection<IPSDeliveryResult> commit(long jobId) throws PSDeliveryException {
-        log.info("'commit' called with jobId ${jobId} ... return new ArrayList<IPSDeliveryResult>()")
+        log.info("${logMessagePrefix(jobId)}'commit' called")
         new ArrayList<IPSDeliveryResult>()
     }
 
     @Override
     void rollback(long jobId) throws PSDeliveryException {
-        log.info("'rollback' called with jobId ${jobId}")
+        log.info("${logMessagePrefix(jobId)}'rollback' called")
     }
-
-    static class RestClientFactory {
-
-        @SuppressWarnings("GrMethodMayBeStatic")
-        RESTClient newRestClient() {
-
-            def client = new RESTClient(Config.PUBLISH_URL)
-            def httpClient = client.client
-
-            client.handler.failure = { resp, data -> resp.setData(data); return resp }
-
-            httpClient.params.setIntParameter('http.connection.timeout', Config.HTTP_CONNECTION_TIMEOUT)
-            httpClient.params.setIntParameter('http.socket.timeout', Config.HTTP_SOCKET_TIMEOUT)
-
-            client
-        }
-    }
-
 }

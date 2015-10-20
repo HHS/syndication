@@ -4,6 +4,7 @@ import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.health.FlaggedMedia
 import com.ctacorp.syndication.jobs.MediaValidationJob
+import com.ctacorp.syndication.media.MediaItem
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
@@ -17,7 +18,14 @@ class HealthReportController {
     def index(Integer max) {
         setDefaultParams(max)
         def flaggedMediaItems = getFlaggedItems(false)
-        [flaggedMediaItems:flaggedMediaItems, totalCount:flaggedMediaItems.totalCount]
+
+        [flaggedMediaItems:flaggedMediaItems,totalCount:flaggedMediaItems.totalCount] << getStabilityStats()
+    }
+
+    def emailTest(){
+        def flaggedMediaItems = getFlaggedItems(false)
+        render view:"emailReport", model:[flaggedMediaItems:flaggedMediaItems, totalCount:flaggedMediaItems.totalCount]
+        return
     }
 
     @NotTransactional
@@ -42,8 +50,9 @@ class HealthReportController {
 
     def ignored(Integer max) {
         setDefaultParams(max)
-        def flaggedMediaItems = getFlaggedItems(true)
-        [flaggedMediaItems:flaggedMediaItems, totalCount:flaggedMediaItems.totalCount]
+        def ignoredItems = getFlaggedItems(true)
+
+        [flaggedMediaItems:ignoredItems, totalCount:ignoredItems.totalCount] << getStabilityStats()
     }
 
     @Transactional
@@ -77,8 +86,8 @@ class HealthReportController {
         params.sort = params.sort ?: "dateFlagged"
         params.order = params.order ?: "DESC"
     }
-    
-    private getFlaggedItems(boolean ignored){
+
+    def getFlaggedItems(boolean ignored){
         def cri = FlaggedMedia.createCriteria()
 
         cri.list(max:params.max, offset:params.offset){
@@ -94,9 +103,43 @@ class HealthReportController {
                     order('name', params.order)
                 }
             } else{
-                order params.sort, params.order
+                order params.sort ?:"dateFlagged", params.order ?: "desc"
             }
             eq 'ignored', ignored
         }
+    }
+
+    private Map getStabilityStats(){
+        def flaggedMediaItems = getFlaggedItems(false)
+        def ignoredItems = getFlaggedItems(true)
+        def totalItems = MediaItem.count()
+        if(totalItems > 0){
+            def stableItems = totalItems - flaggedMediaItems.totalCount - ignoredItems.totalCount
+            def percentStable = Math.round(100 * (1 - (flaggedMediaItems.totalCount + ignoredItems.totalCount) / totalItems) as Float)
+            def percentIgnored = Math.round(100 * (ignoredItems.totalCount / totalItems) as Float)
+            def percentFlagged = Math.round(100 * (flaggedMediaItems.totalCount / totalItems) as Float)
+            if(percentIgnored < 1){
+                percentIgnored = 1
+            }
+            if(percentFlagged < 1){
+                percentFlagged = 1
+            }
+            if(percentStable + percentIgnored + percentFlagged > 100 && percentIgnored > 0 && percentFlagged > 0) {
+                percentStable --
+            } else if(percentStable + percentIgnored + percentFlagged < 100 && percentIgnored >= 1 && percentFlagged >= 1){
+                percentStable ++
+            }
+            [
+                    percentStable:percentStable,
+                    percentIgnored:percentIgnored,
+                    percentFlagged:percentFlagged,
+                    stableItems: stableItems,
+                    flaggedCount:flaggedMediaItems.totalCount,
+                    ignoredCount:ignoredItems.totalCount
+            ]
+        } else {
+            [:]
+        }
+
     }
 }

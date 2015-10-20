@@ -34,8 +34,7 @@ grails.project.dependency.resolver = "maven"
 
 grails.project.dependency.resolution = {
 
-    inherits("global") {
-    }
+    inherits("global") {}
 
     log "error"
     checksums true
@@ -77,10 +76,10 @@ grails.project.dependency.resolution = {
         runtime 'mysql:mysql-connector-java:5.1.29'
         runtime 'com.ctacorp.commons:multi-read-servlet-filter:1.0.0'
 
-        compile 'org.springframework:spring-web:4.0.6.RELEASE'
+        compile 'org.springframework:spring-web:4.2.1.RELEASE'
         compile 'org.bouncycastle:bcprov-jdk16:1.46'
-        compile 'com.ctacorp.commons:api-key-utils:1.5.1'
-        compile 'com.ctacorp:syndication-commons:1.1.7'
+        compile 'com.ctacorp.commons:api-key-utils:1.6.0'
+        compile 'com.ctacorp:syndication-commons:1.3.0'
         compile ('com.ctacorp.syndication:rsrw:0.1.2') {
             excludes "jboss-common"
         }
@@ -92,46 +91,45 @@ grails.project.dependency.resolution = {
 
     plugins {
 
-        build ':tomcat:7.0.55.2'
-        build (":release:3.0.1"){
+        build ':tomcat:8.0.22'
+        build (":release:3.1.1"){
             excludes "rest-client-builder"
         }
 
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
-        compile ":spring-security-core:2.0-RC4"
+        compile ":spring-security-core:2.0-RC5"
         compile ":quartz:1.0.2"
         compile ":mail:1.0.7"
         compile ":rest-client-builder:2.1.1"
-        compile ":asset-pipeline:2.1.5"
-        compile ":less-asset-pipeline:2.1.0"
-        compile ":font-awesome-resources:4.3.0.1"
-        if(runtimeConfig.mq.disableRabbitMQPlugin){
-            //do nothing
-            println ("MQ Disabled")
-        } else{
-            println ("MQ Enabeled")
-            compile ":rabbitmq-native:2.0.10"                       //mq
-        }
+        compile ":asset-pipeline:2.5.9"
+        compile ":less-asset-pipeline:2.3.0"
+        compile ":font-awesome-resources:4.3.0.2"
+        compile ":rabbitmq-native:3.1.2"                       //mq
         compile ":greenmail:1.3.4"
-        compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
+        compile ":bruteforce-defender:1.1"
 
         runtime ":hibernate4:4.3.8.1"
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
         runtime ":twitter-bootstrap:3.3.1"
 
-        test ":build-test-data:2.2.2"
+        test ":build-test-data:2.4.0"
     }
 }
 
 //_____________________
-// Release plugin info \_________________________________________________________________
-//
-// | to release, just run 'grails maven-deploy'
+// Release War info    \_________________________________________________________________
+// |
+// | to push a snapshot, run 'grails prod maven-deploy'
+// | to release, run 'grails prod maven-deploy --repository=plugin_rel'
 // | to install locally, run 'grails maven-install'
 //_______________________________________________________________________________________
-grails.project.repos.default = "releases"
-grails.project.repos.releases.url = config.artifactory.deploymentAddress
-grails.project.repos.releases.username = config.artifactory.username
-grails.project.repos.releases.password = config.artifactory.password
+grails.project.repos.default = "app_snap"
+grails.project.repos.app_snap.url = config.artifactory.app_snap.url
+grails.project.repos.app_snap.username = config.artifactory.username
+grails.project.repos.app_snap.password = config.artifactory.password
+
+grails.project.repos.app_rel.url = config.artifactory.app_rel.url
+grails.project.repos.app_rel.username = config.artifactory.username
+grails.project.repos.app_rel.password = config.artifactory.password

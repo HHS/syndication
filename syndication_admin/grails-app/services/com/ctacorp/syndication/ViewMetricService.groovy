@@ -230,7 +230,7 @@ class ViewMetricService {
                             totals = responseRows[0].'sum(media_metric.storefront_view_count)'
                         }
                     }catch (e){
-                        println e
+                        log.error(e)
                     } finally {
                         sql.close()
                     }
@@ -287,5 +287,56 @@ class ViewMetricService {
             return name.substring(0, Math.min(name.length(), 20)) + "... "
         }
         name
+    }
+
+    def getAllHits(Date within = new Date()-30){
+        def sql = new Sql(dataSource)
+        def viewCounts = [:]
+        def responseRows = sql.rows("select sum(media_metric.api_view_count) AS api_count from media_metric WHERE media_metric.day>=${within}")
+        viewCounts.apiCount = responseRows[0].api_count
+        responseRows = sql.rows("select sum(media_metric.storefront_view_count) AS storefront_count from media_metric WHERE media_metric.day>=${within}")
+        viewCounts.storefrontCount =responseRows[0].storefront_count
+
+        viewCounts
+    }
+
+    def getGeneralTotalLine(){
+        Map data = [
+                data:[],
+                xkey:"month",
+                ykeys:["Storefront", "API"],
+                labels:["Storefront", "API"]
+        ]
+
+        def dates = getDateRangesForLast12Months()
+
+        dates.each{ def date ->
+            def monthData = [month:"${date.date}"]
+            data.data << monthData
+            ["Storefront", "API"].each{source ->
+                def totals = 0
+
+                def sql = new Sql(dataSource)
+                def responseRows
+                try{
+                    if(source == "Storefront"){
+                        responseRows = sql.rows("select sum(media_metric.storefront_view_count) AS sum_count from media_metric WHERE media_metric.day>=${date.firstDay as Date} AND media_metric.day<=${date.lastDay + 1 as Date}")
+                    } else {
+                        responseRows = sql.rows("select sum(media_metric.api_view_count) AS sum_count from media_metric WHERE media_metric.day>=${date.firstDay as Date} AND media_metric.day<=${date.lastDay + 1 as Date}")
+                    }
+
+                    totals = responseRows[0].sum_count
+                }catch (e){
+                    log.error(e)
+                } finally {
+                    sql.close()
+                }
+
+                monthData << [
+                        "${source}":totals ?: 0
+                ]
+            }
+        }
+        data
     }
 }

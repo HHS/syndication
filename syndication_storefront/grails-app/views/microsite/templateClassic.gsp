@@ -26,7 +26,7 @@
 <div class="template container independant">
 
     <div class="microsite classic">
-
+        <a id="pageContent"></a>
         <g:render template="/microsite/templateHeader"/>
 
         <div class="microsite-classic-content row">
@@ -43,7 +43,7 @@
                
                             <h2 class="microsite-article-title panel-title">
 
-                                Your first Syndication content article here.
+                                Your first Syndication content article title and link here.
 
                             </h2>
 
@@ -55,9 +55,9 @@
 
                             <div class="panel-body">
 
-                                <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
-                        
-                                <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
+                                <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 1"/>
+
+                                <p aria-label="example article text here">Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
                                 <p>Quot aeque quaeque ne nec. In quod dignissim instructior eum, qui at dolorem constituto. Tollit graeci quodsi eam ei, ad usu diam stet alienum. At est ferri facilis mediocrem, ex sit iusto fabulas saperet, errem populo.</p>
 
@@ -77,7 +77,7 @@
                
                             <h2 class="microsite-article-title panel-title">
 
-                                Your second Syndication content article here.
+                                Your second Syndication content article and title link here.
 
                             </h2>
 
@@ -89,7 +89,7 @@
 
                             <div class="panel-body">
                     
-                                <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 2"/>
 
                                 <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -111,7 +111,7 @@
                
                             <h2 class="microsite-article-title panel-title">
 
-                                Another Syndication content article here.
+                                Another Syndication content article and title link here.
 
                             </h2>
 
@@ -123,7 +123,7 @@
      
                             <div class="panel-body">
                     
-                                <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 3"/>
 
                                 <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -145,7 +145,7 @@
                
                             <h2 class="microsite-article-title panel-title">
 
-                                Another Syndication content article here.
+                                Another Syndication content article and title link here.
 
                             </h2>
 
@@ -157,7 +157,7 @@
 
                             <div class="panel-body">
                        
-                                <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                                <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture"/>
 
                                 <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -179,7 +179,7 @@
                
                             <h2 class="microsite-article-title panel-title">
 
-                                Another Syndication content article here.
+                                Another Syndication content article and title link here.
 
                             </h2>
 
@@ -223,7 +223,7 @@
 
                             <div class="panel-body">
 
-                                <asset:image src="microsite/fpo2.png" class="microsite-article-pic" alt="pic"/>
+                                <asset:image src="microsite/fpo2.png" class="microsite-article-pic" alt="example picture 4"/>
 
                             </div><!-- end panel-body -->
 
@@ -239,7 +239,7 @@
                
                             <h2 class="microsite-article-title panel-title">
 
-                                Another Syndication content article here.
+                                Another Syndication content article and title link here.
 
                             </h2>
 
@@ -275,7 +275,7 @@
                     <div class="microsite-article row">
 
                         <h2 class="microsite-article-title">Highlight a Syndication content article here.</h2>
-                        <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                        <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 5"/>
 
                         <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 
@@ -287,14 +287,14 @@
 
                 </div><!-- end microsite-classic-right-col-top row clearfix -->
 
-                <div class="microsite-classic-right-col-bottom row clearfix">
+                <div class="microsite-classic-right-col-bottom row clearfix" role="tablist">
 
                     <ul>
-                        <li><a>A link to a Syndication article here</a></li>
-                        <li><a>A link to a Syndication article here</a></li>
-                        <li><a>A link to a Syndication article here</a></li>
-                        <li><a>A link to a Syndication article here</a></li>
-                        <li><a>A link to a Syndication article here</a></li>
+                        <li><a>A title link to a Syndication article here</a></li>
+                        <li><a>A title link to a Syndication article here</a></li>
+                        <li><a>A title link to a Syndication article here</a></li>
+                        <li><a>A title link to a Syndication article here</a></li>
+                        <li><a>A title link to a Syndication article here</a></li>
                     </ul>
 
                 </div><!-- end microsite-classic-right-col-bottom row clearfix -->

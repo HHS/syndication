@@ -15,6 +15,27 @@ class StatusCheckControllerSpec extends Specification {
     def cleanup() {
     }
 
-    void "test something"() {
+    def "index action should reply with a json status"() {
+        when: "when the index action is called"
+            request.method = "GET"
+            controller.index()
+        then: "there should be a view rendered"
+            response.text
+        and: "it should be json"
+            response.json
+        and: "it should be running"
+            response.json.running == "roger"
+    }
+
+    def "index action is called with a callback param, it should respond with jsonp"() {
+        when: "when index action is called with callback param"
+            params.callback = "banana"
+            controller.index()
+        then: "a response should be rendered"
+            response.text
+        and: "it should start with the callback name"
+            response.text.startsWith("banana(")
+        and: "end with a semicolon"
+            response.text.endsWith(");")
     }
 }

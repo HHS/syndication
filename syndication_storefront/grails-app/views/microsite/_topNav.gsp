@@ -18,7 +18,7 @@
 
                 <g:if test="${params.controller.equals("microsite")}">
 
-                    <a href="#template" class="skip-in-page-top-nav">Skip to Main Content</a>
+                    <a href="#pageContent" class="skip-in-page-top-nav">Skip to Main Content</a>
                     <li><g:link controller="microsite" action="microsite"
                                 class="microsite-brand ${params.action == "microsite" ? " active" : ""}"><i
                                 class="fa fa-wrench"></i> Microsite Builder</g:link></li>
@@ -38,7 +38,7 @@
                 </g:if>
                 <g:else>
 
-                    <a href="#template" class="skip-in-page-top-nav">Skip to Main Content</a>
+                    <a href="#pageContent" class="skip-in-page-top-nav">Skip to Main Content</a>
 
                     <li><g:link controller="microsite" action="microsite"
                                 class="microsite-brand  ${params.action == "microsite" ? " active" : ""}"><i

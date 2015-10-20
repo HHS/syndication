@@ -51,26 +51,26 @@
 </style>
 <div class="col-md-6 col-lg-6">
     <div class="form-group">
-        <label class="col-md-4" for="languageLabel">Language</label>
+        <label class="col-md-4" for="pane${area}TagLanguageId">Language</label>
         <div class="col-md-12">
-            <g:select name="pane${area}TagLanguageId" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" value="${selectedLanguage}" from="${languages}" optionKey="id" optionValue="name" class="form-control tagSpecifics"/>
+            <g:select name="pane${area}TagLanguageId" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" value="${selectedLanguage}" from="${languages}" optionKey="id" optionValue="name" class="form-control tagSpecifics" aria-label="choose tag language"/>
         </div>
     </div>
 </div>
 <div class="col-md-6 col-lg-6">
     <div class="form-group">
-        <label class="col-md-4" for="typeLabel">Type</label>
+        <label class="col-md-4" for="pane${area}TypeId">Type</label>
         <div class="col-md-12">
-            <g:select name="pane${area}TypeId" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" value="${selectedTagType}" from="${tagTypes}" optionKey="id" optionValue="name" class="form-control tagSpecifics"/>
+            <g:select name="pane${area}TypeId" data-microSiteId="${microSite?.id}" data-mediaArea="${area}" value="${selectedTagType}" from="${tagTypes}" optionKey="id" optionValue="name" class="form-control tagSpecifics" aria-label="choose tag type"/>
         </div>
     </div>
 </div>
 
 <div class="form-group">
-    <label class="col-sm-4 control-label" for="typeahead">Tag</label>
+    <label class="col-sm-4 control-label" for="pane${area}ListId">Tag</label>
     <div class="col-sm-8">
         <span class="typeahead-query">
-        <input id="typeahead${area}" type="search" data-provide="typeahead" value="${currentTag?.name}" name="searchTag" placeholder="Search" class="form-control" autocomplete="off"/>
+        <input id="typeahead${area}" type="search" data-provide="typeahead" value="${currentTag?.name ?: ''}" name="searchTag" placeholder="Search" class="form-control" autocomplete="off" aria-label="type tag name"/>
         <input id="pane${area}ListId" type="search" hidden name="pane${area}ListId" value="${currentTag?.id}"/>
         </span>
     </div>
@@ -87,21 +87,23 @@
         updateFormCompletion(${area});
     });
 
-    $(document).on('change', '#pane${area}TagLanguageId', function(){
+    $('#pane' + ${area} + 'TagLanguageId').on('change', function(){
         updateTags(this);
     });
-    $(document).on('change', '#pane${area}TypeId', function(){
+
+    $('#pane' + ${area} + 'TypeId').on('change', function(){
         updateTags(this);
     });
 
 
-//    typeahead caching code
+    // typeahead caching code
     var bestPictures = new Bloodhound({
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace("name"),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
             url: '${currentServerUrl}/microsite/searchTags.json?name=%QUERY&typeId=${selectedTagType}&languageId=${selectedLanguage}',
             wildcard: '%QUERY',
+            cache:false,
             filter:function(response){
                 updateTagListId(response);
                 return response;
@@ -109,7 +111,7 @@
         }
     });
 
-//    typeahead display and its options
+    // typeahead display and its options
     $('#typeahead' + ${area}).typeahead({
         minLength: 0,
         maxItem: 15,
@@ -124,10 +126,10 @@
     //updates listId when a tag is selected
     $('#typeahead' + ${area}).bind('typeahead:select', function(ev, suggestion) {
         document.getElementById("pane${area}ListId").value = suggestion.id;
-        updateFormCompletion(${area});
+            updateFormCompletion(${area});
     });
 
-//updates a listId when a tag is typed out correctly but not selected
+    //updates a listId when a tag is typed out correctly but not selected
     function updateTagListId(response){
         var noMatch = 0;
         var i = 0;
@@ -145,7 +147,7 @@
         updateFormCompletion(${area});
     }
 
-//updates available tags when their language or type is changed
+    //updates available tags when their language or type is changed
     function updateTags(htmlTag){
         var listType = "TAG";
         var mediaArea = $(htmlTag).attr("data-mediaArea");
@@ -159,6 +161,7 @@
             url: '${g.createLink(controller: 'microsite', action: 'specificList')}', // the file to call
             success: function (response) { // on success..
                 $('#pane' + mediaArea + 'ListBody').html(response); // update the DIV
+                document.getElementById(htmlTag.id).focus();
             }
         });
     }

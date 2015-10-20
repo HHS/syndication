@@ -4,6 +4,6 @@
         This page requires Javascript to function
     </span>
     <g:link controller="storefront" action="index">
-        <img src="${assetPath(src: 'logo.png')}" alt="HHS Storefront Logo"/>
+        <img src="${assetPath(src: 'logo.png')}" alt="HHS Syndication Storefront Logo"/>
     </g:link>
 </div>

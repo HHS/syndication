@@ -1,15 +1,359 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>README.html</title>
-  <meta name="generator" content="Haroopad 0.13.0" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+      <meta charset="utf-8" />
+      <title>README</title>
+      <style>.markdown-preview, .markdown-preview[data-use-github-style] { font-family: 'Helvetica Neue', Helvetica, 'Segoe UI', Arial, freesans, sans-serif; font-size: 16px; line-height: 1.6; word-wrap: break-word; overflow: scroll; box-sizing: border-box; padding: 20px; background-color: rgb(255, 255, 255); }
+.markdown-preview > :first-child, .markdown-preview[data-use-github-style] > :first-child { margin-top: 0px !important; }
+.markdown-preview > :last-child, .markdown-preview[data-use-github-style] > :last-child { margin-bottom: 0px !important; }
+.markdown-preview a:not([href]), .markdown-preview[data-use-github-style] a:not([href]) { color: inherit; text-decoration: none; }
+.markdown-preview .absent, .markdown-preview[data-use-github-style] .absent { color: rgb(204, 0, 0); }
+.markdown-preview .anchor, .markdown-preview[data-use-github-style] .anchor { position: absolute; top: 0px; left: 0px; display: block; padding-right: 6px; padding-left: 30px; margin-left: -30px; }
+.markdown-preview .anchor:focus, .markdown-preview[data-use-github-style] .anchor:focus { outline: none; }
+.markdown-preview h1, .markdown-preview[data-use-github-style] h1, .markdown-preview h2, .markdown-preview[data-use-github-style] h2, .markdown-preview h3, .markdown-preview[data-use-github-style] h3, .markdown-preview h4, .markdown-preview[data-use-github-style] h4, .markdown-preview h5, .markdown-preview[data-use-github-style] h5, .markdown-preview h6, .markdown-preview[data-use-github-style] h6 { position: relative; margin-top: 1em; margin-bottom: 16px; font-weight: bold; line-height: 1.4; }
+.markdown-preview h1 .octicon-link, .markdown-preview[data-use-github-style] h1 .octicon-link, .markdown-preview h2 .octicon-link, .markdown-preview[data-use-github-style] h2 .octicon-link, .markdown-preview h3 .octicon-link, .markdown-preview[data-use-github-style] h3 .octicon-link, .markdown-preview h4 .octicon-link, .markdown-preview[data-use-github-style] h4 .octicon-link, .markdown-preview h5 .octicon-link, .markdown-preview[data-use-github-style] h5 .octicon-link, .markdown-preview h6 .octicon-link, .markdown-preview[data-use-github-style] h6 .octicon-link { display: none; color: rgb(0, 0, 0); vertical-align: middle; }
+.markdown-preview h1:hover .anchor, .markdown-preview[data-use-github-style] h1:hover .anchor, .markdown-preview h2:hover .anchor, .markdown-preview[data-use-github-style] h2:hover .anchor, .markdown-preview h3:hover .anchor, .markdown-preview[data-use-github-style] h3:hover .anchor, .markdown-preview h4:hover .anchor, .markdown-preview[data-use-github-style] h4:hover .anchor, .markdown-preview h5:hover .anchor, .markdown-preview[data-use-github-style] h5:hover .anchor, .markdown-preview h6:hover .anchor, .markdown-preview[data-use-github-style] h6:hover .anchor { padding-left: 8px; margin-left: -30px; text-decoration: none; }
+.markdown-preview h1:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h1:hover .anchor .octicon-link, .markdown-preview h2:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h2:hover .anchor .octicon-link, .markdown-preview h3:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h3:hover .anchor .octicon-link, .markdown-preview h4:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h4:hover .anchor .octicon-link, .markdown-preview h5:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h5:hover .anchor .octicon-link, .markdown-preview h6:hover .anchor .octicon-link, .markdown-preview[data-use-github-style] h6:hover .anchor .octicon-link { display: inline-block; }
+.markdown-preview h1 tt, .markdown-preview[data-use-github-style] h1 tt, .markdown-preview h2 tt, .markdown-preview[data-use-github-style] h2 tt, .markdown-preview h3 tt, .markdown-preview[data-use-github-style] h3 tt, .markdown-preview h4 tt, .markdown-preview[data-use-github-style] h4 tt, .markdown-preview h5 tt, .markdown-preview[data-use-github-style] h5 tt, .markdown-preview h6 tt, .markdown-preview[data-use-github-style] h6 tt, .markdown-preview h1 code, .markdown-preview[data-use-github-style] h1 code, .markdown-preview h2 code, .markdown-preview[data-use-github-style] h2 code, .markdown-preview h3 code, .markdown-preview[data-use-github-style] h3 code, .markdown-preview h4 code, .markdown-preview[data-use-github-style] h4 code, .markdown-preview h5 code, .markdown-preview[data-use-github-style] h5 code, .markdown-preview h6 code, .markdown-preview[data-use-github-style] h6 code { font-size: inherit; }
+.markdown-preview h1, .markdown-preview[data-use-github-style] h1 { padding-bottom: 0.3em; font-size: 2.25em; line-height: 1.2; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(238, 238, 238); }
+.markdown-preview h1 .anchor, .markdown-preview[data-use-github-style] h1 .anchor { line-height: 1; }
+.markdown-preview h2, .markdown-preview[data-use-github-style] h2 { padding-bottom: 0.3em; font-size: 1.75em; line-height: 1.225; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: rgb(238, 238, 238); }
+.markdown-preview h2 .anchor, .markdown-preview[data-use-github-style] h2 .anchor { line-height: 1; }
+.markdown-preview h3, .markdown-preview[data-use-github-style] h3 { font-size: 1.5em; line-height: 1.43; }
+.markdown-preview h3 .anchor, .markdown-preview[data-use-github-style] h3 .anchor { line-height: 1.2; }
+.markdown-preview h4, .markdown-preview[data-use-github-style] h4 { font-size: 1.25em; }
+.markdown-preview h4 .anchor, .markdown-preview[data-use-github-style] h4 .anchor { line-height: 1.2; }
+.markdown-preview h5, .markdown-preview[data-use-github-style] h5 { font-size: 1em; }
+.markdown-preview h5 .anchor, .markdown-preview[data-use-github-style] h5 .anchor { line-height: 1.1; }
+.markdown-preview h6, .markdown-preview[data-use-github-style] h6 { font-size: 1em; color: rgb(119, 119, 119); }
+.markdown-preview h6 .anchor, .markdown-preview[data-use-github-style] h6 .anchor { line-height: 1.1; }
+.markdown-preview p, .markdown-preview[data-use-github-style] p, .markdown-preview blockquote, .markdown-preview[data-use-github-style] blockquote, .markdown-preview ul, .markdown-preview[data-use-github-style] ul, .markdown-preview ol, .markdown-preview[data-use-github-style] ol, .markdown-preview dl, .markdown-preview[data-use-github-style] dl, .markdown-preview table, .markdown-preview[data-use-github-style] table, .markdown-preview pre, .markdown-preview[data-use-github-style] pre { margin-top: 0px; margin-bottom: 16px; }
+.markdown-preview hr, .markdown-preview[data-use-github-style] hr { height: 4px; padding: 0px; margin: 16px 0px; border: 0px none; background-color: rgb(231, 231, 231); }
+.markdown-preview ul, .markdown-preview[data-use-github-style] ul, .markdown-preview ol, .markdown-preview[data-use-github-style] ol { padding-left: 2em; }
+.markdown-preview ul.no-list, .markdown-preview[data-use-github-style] ul.no-list, .markdown-preview ol.no-list, .markdown-preview[data-use-github-style] ol.no-list { padding: 0px; list-style-type: none; }
+.markdown-preview ul ul, .markdown-preview[data-use-github-style] ul ul, .markdown-preview ul ol, .markdown-preview[data-use-github-style] ul ol, .markdown-preview ol ol, .markdown-preview[data-use-github-style] ol ol, .markdown-preview ol ul, .markdown-preview[data-use-github-style] ol ul { margin-top: 0px; margin-bottom: 0px; }
+.markdown-preview li > p, .markdown-preview[data-use-github-style] li > p { margin-top: 16px; }
+.markdown-preview dl, .markdown-preview[data-use-github-style] dl { padding: 0px; }
+.markdown-preview dl dt, .markdown-preview[data-use-github-style] dl dt { padding: 0px; margin-top: 16px; font-size: 1em; font-style: italic; font-weight: bold; }
+.markdown-preview dl dd, .markdown-preview[data-use-github-style] dl dd { padding: 0px 16px; margin-bottom: 16px; }
+.markdown-preview blockquote, .markdown-preview[data-use-github-style] blockquote { padding: 0px 15px; color: rgb(119, 119, 119); border-left-width: 4px; border-left-style: solid; border-left-color: rgb(221, 221, 221); }
+.markdown-preview blockquote > :first-child, .markdown-preview[data-use-github-style] blockquote > :first-child { margin-top: 0px; }
+.markdown-preview blockquote > :last-child, .markdown-preview[data-use-github-style] blockquote > :last-child { margin-bottom: 0px; }
+.markdown-preview table, .markdown-preview[data-use-github-style] table { display: block; width: 100%; overflow: auto; word-break: normal; }
+.markdown-preview table th, .markdown-preview[data-use-github-style] table th { font-weight: bold; }
+.markdown-preview table th, .markdown-preview[data-use-github-style] table th, .markdown-preview table td, .markdown-preview[data-use-github-style] table td { padding: 6px 13px; border: 1px solid rgb(221, 221, 221); }
+.markdown-preview table tr, .markdown-preview[data-use-github-style] table tr { border-top-width: 1px; border-top-style: solid; border-top-color: rgb(204, 204, 204); background-color: rgb(255, 255, 255); }
+.markdown-preview table tr:nth-child(2n), .markdown-preview[data-use-github-style] table tr:nth-child(2n) { background-color: rgb(248, 248, 248); }
+.markdown-preview img, .markdown-preview[data-use-github-style] img { max-width: 100%; box-sizing: border-box; }
+.markdown-preview .emoji, .markdown-preview[data-use-github-style] .emoji { max-width: none; }
+.markdown-preview span.frame, .markdown-preview[data-use-github-style] span.frame { display: block; overflow: hidden; }
+.markdown-preview span.frame > span, .markdown-preview[data-use-github-style] span.frame > span { display: block; float: left; width: auto; padding: 7px; margin: 13px 0px 0px; overflow: hidden; border: 1px solid rgb(221, 221, 221); }
+.markdown-preview span.frame span img, .markdown-preview[data-use-github-style] span.frame span img { display: block; float: left; }
+.markdown-preview span.frame span span, .markdown-preview[data-use-github-style] span.frame span span { display: block; padding: 5px 0px 0px; clear: both; color: rgb(51, 51, 51); }
+.markdown-preview span.align-center, .markdown-preview[data-use-github-style] span.align-center { display: block; overflow: hidden; clear: both; }
+.markdown-preview span.align-center > span, .markdown-preview[data-use-github-style] span.align-center > span { display: block; margin: 13px auto 0px; overflow: hidden; text-align: center; }
+.markdown-preview span.align-center span img, .markdown-preview[data-use-github-style] span.align-center span img { margin: 0px auto; text-align: center; }
+.markdown-preview span.align-right, .markdown-preview[data-use-github-style] span.align-right { display: block; overflow: hidden; clear: both; }
+.markdown-preview span.align-right > span, .markdown-preview[data-use-github-style] span.align-right > span { display: block; margin: 13px 0px 0px; overflow: hidden; text-align: right; }
+.markdown-preview span.align-right span img, .markdown-preview[data-use-github-style] span.align-right span img { margin: 0px; text-align: right; }
+.markdown-preview span.float-left, .markdown-preview[data-use-github-style] span.float-left { display: block; float: left; margin-right: 13px; overflow: hidden; }
+.markdown-preview span.float-left span, .markdown-preview[data-use-github-style] span.float-left span { margin: 13px 0px 0px; }
+.markdown-preview span.float-right, .markdown-preview[data-use-github-style] span.float-right { display: block; float: right; margin-left: 13px; overflow: hidden; }
+.markdown-preview span.float-right > span, .markdown-preview[data-use-github-style] span.float-right > span { display: block; margin: 13px auto 0px; overflow: hidden; text-align: right; }
+.markdown-preview code, .markdown-preview[data-use-github-style] code, .markdown-preview tt, .markdown-preview[data-use-github-style] tt { padding: 0.2em 0px; margin: 0px; font-size: 85%; border-radius: 3px; background-color: rgba(0, 0, 0, 0.0392157); }
+.markdown-preview code::before, .markdown-preview[data-use-github-style] code::before, .markdown-preview tt::before, .markdown-preview[data-use-github-style] tt::before, .markdown-preview code::after, .markdown-preview[data-use-github-style] code::after, .markdown-preview tt::after, .markdown-preview[data-use-github-style] tt::after { letter-spacing: -0.2em; content: ' '; }
+.markdown-preview code br, .markdown-preview[data-use-github-style] code br, .markdown-preview tt br, .markdown-preview[data-use-github-style] tt br { display: none; }
+.markdown-preview del code, .markdown-preview[data-use-github-style] del code { text-decoration: inherit; }
+.markdown-preview pre > code, .markdown-preview[data-use-github-style] pre > code { padding: 0px; margin: 0px; font-size: 100%; word-break: normal; white-space: pre; border: 0px; background: transparent; }
+.markdown-preview .highlight, .markdown-preview[data-use-github-style] .highlight { margin-bottom: 16px; }
+.markdown-preview .highlight pre, .markdown-preview[data-use-github-style] .highlight pre, .markdown-preview pre, .markdown-preview[data-use-github-style] pre { padding: 16px; overflow: auto; font-size: 85%; line-height: 1.45; border-radius: 3px; background-color: rgb(247, 247, 247); }
+.markdown-preview .highlight pre, .markdown-preview[data-use-github-style] .highlight pre { margin-bottom: 0px; word-break: normal; }
+.markdown-preview pre, .markdown-preview[data-use-github-style] pre { word-wrap: normal; }
+.markdown-preview pre code, .markdown-preview[data-use-github-style] pre code, .markdown-preview pre tt, .markdown-preview[data-use-github-style] pre tt { display: inline; max-width: initial; padding: 0px; margin: 0px; overflow: initial; line-height: inherit; word-wrap: normal; border: 0px; background-color: transparent; }
+.markdown-preview pre code::before, .markdown-preview[data-use-github-style] pre code::before, .markdown-preview pre tt::before, .markdown-preview[data-use-github-style] pre tt::before, .markdown-preview pre code::after, .markdown-preview[data-use-github-style] pre code::after, .markdown-preview pre tt::after, .markdown-preview[data-use-github-style] pre tt::after { content: normal; }
+.markdown-preview kbd, .markdown-preview[data-use-github-style] kbd { display: inline-block; padding: 3px 5px; font-size: 11px; line-height: 10px; color: rgb(85, 85, 85); vertical-align: middle; border-style: solid; border-width: 1px; border-color: rgb(204, 204, 204) rgb(204, 204, 204) rgb(187, 187, 187); border-radius: 3px; box-shadow: rgb(187, 187, 187) 0px -1px 0px inset; background-color: rgb(252, 252, 252); }
+.markdown-preview, .markdown-preview[data-use-github-style], .markdown-preview code, .markdown-preview[data-use-github-style] code { color: rgb(51, 51, 51); }
+.markdown-preview h1, .markdown-preview[data-use-github-style] h1, .markdown-preview h2, .markdown-preview[data-use-github-style] h2, .markdown-preview h3, .markdown-preview[data-use-github-style] h3, .markdown-preview h4, .markdown-preview[data-use-github-style] h4, .markdown-preview h5, .markdown-preview[data-use-github-style] h5, .markdown-preview h6, .markdown-preview[data-use-github-style] h6 { -webkit-font-smoothing: antialiased; cursor: text; }
+.markdown-preview > h1:first-child, .markdown-preview[data-use-github-style] > h1:first-child, .markdown-preview > h1:first-child + h2, .markdown-preview[data-use-github-style] > h1:first-child + h2, .markdown-preview > h2:first-child, .markdown-preview[data-use-github-style] > h2:first-child, .markdown-preview > h3:first-child, .markdown-preview[data-use-github-style] > h3:first-child, .markdown-preview > h4:first-child, .markdown-preview[data-use-github-style] > h4:first-child, .markdown-preview > h5:first-child, .markdown-preview[data-use-github-style] > h5:first-child, .markdown-preview > h6:first-child, .markdown-preview[data-use-github-style] > h6:first-child { margin-top: 0px; padding-top: 0px; }
+.markdown-preview a, .markdown-preview[data-use-github-style] a, .markdown-preview a code, .markdown-preview[data-use-github-style] a code { color: rgb(65, 131, 196); }
+.markdown-preview a:first-child h1, .markdown-preview[data-use-github-style] a:first-child h1, .markdown-preview a:first-child h2, .markdown-preview[data-use-github-style] a:first-child h2, .markdown-preview a:first-child h3, .markdown-preview[data-use-github-style] a:first-child h3, .markdown-preview a:first-child h4, .markdown-preview[data-use-github-style] a:first-child h4, .markdown-preview a:first-child h5, .markdown-preview[data-use-github-style] a:first-child h5, .markdown-preview a:first-child h6, .markdown-preview[data-use-github-style] a:first-child h6 { margin-top: 0px; padding-top: 0px; }
+.markdown-preview h1 + p, .markdown-preview[data-use-github-style] h1 + p, .markdown-preview h2 + p, .markdown-preview[data-use-github-style] h2 + p, .markdown-preview h3 + p, .markdown-preview[data-use-github-style] h3 + p, .markdown-preview h4 + p, .markdown-preview[data-use-github-style] h4 + p, .markdown-preview h5 + p, .markdown-preview[data-use-github-style] h5 + p, .markdown-preview h6 + p, .markdown-preview[data-use-github-style] h6 + p { margin-top: 0px; }
+.markdown-preview li p.first, .markdown-preview[data-use-github-style] li p.first { display: inline-block; }
+.markdown-preview ul li > :first-child, .markdown-preview[data-use-github-style] ul li > :first-child, .markdown-preview ol li > :first-child, .markdown-preview[data-use-github-style] ol li > :first-child, .markdown-preview ul li ul:first-of-type, .markdown-preview[data-use-github-style] ul li ul:first-of-type, .markdown-preview ol li ul:first-of-type, .markdown-preview[data-use-github-style] ol li ul:first-of-type { margin-top: 0px; }
+.markdown-preview ol > li, .markdown-preview[data-use-github-style] ol > li { list-style-type: decimal; }
+.markdown-preview ul > li, .markdown-preview[data-use-github-style] ul > li { list-style-type: disc; }
+.markdown-preview dl dt:first-child, .markdown-preview[data-use-github-style] dl dt:first-child { padding: 0px; }
+.markdown-preview dl dt > :first-child, .markdown-preview[data-use-github-style] dl dt > :first-child { margin-top: 0px; }
+.markdown-preview dl dt > :last-child, .markdown-preview[data-use-github-style] dl dt > :last-child { margin-bottom: 0px; }
+.markdown-preview dl dd > :first-child, .markdown-preview[data-use-github-style] dl dd > :first-child { margin-top: 0px; }
+.markdown-preview dl dd > :last-child, .markdown-preview[data-use-github-style] dl dd > :last-child { margin-bottom: 0px; }
+.markdown-preview blockquote p, .markdown-preview[data-use-github-style] blockquote p { font-size: 16px; line-height: 1.5; }
+.markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { padding: 16px; overflow: auto; font-size: 84%; line-height: 1.45; border-radius: 3px; background-color: rgb(39, 43, 51); }
+.markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { margin-bottom: 16px; word-break: normal; }
+.markdown-preview code, .markdown-preview[data-use-github-style] code, .markdown-preview tt, .markdown-preview[data-use-github-style] tt, .markdown-preview pre.editor-colors, .markdown-preview[data-use-github-style] pre.editor-colors { font-family: Consolas, 'Liberation Mono', Courier, monospace; }
+.markdown-preview .emoji, .markdown-preview[data-use-github-style] .emoji { height: 20px; width: 20px; }
+.markdown-preview { font-size: 1.25em; color: rgb(241, 242, 244); background-color: rgba(10, 11, 13, 0.439216); }
+.markdown-preview h1, .markdown-preview h2 { color: inherit; border-color: rgb(23, 26, 31); }
+.markdown-preview a { color: rgb(100, 148, 237); }
+.markdown-preview hr { background-color: rgba(23, 26, 31, 0.439216); }
+.markdown-preview blockquote { color: rgb(197, 202, 211); border-left-color: rgba(197, 202, 211, 0.701961); }
+.markdown-preview table th, .markdown-preview table td { border-color: rgb(23, 26, 31); }
+.markdown-preview table th { background-color: rgba(30, 33, 39, 0.439216); }
+.markdown-preview table tr { background-color: rgba(23, 26, 31, 0.439216); }
+.markdown-preview table tr:nth-child(2n) { background-color: rgba(17, 18, 22, 0.439216); }
+.markdown-preview code { color: rgb(255, 255, 255); border-color: rgb(23, 26, 31); background-color: rgba(39, 43, 51, 0.439216); background-clip: padding-box; }
+.markdown-preview pre.editor-colors::shadow .line.cursor-line { background-color: transparent; }
+.bracket-matcher .region {
+  border-bottom: 1px dotted lime;
+  position: absolute;
+}
 
-  <style>div.oembedall-githubrepos{border:1px solid #DDD;border-radius:4px;list-style-type:none;margin:0 0 10px;padding:8px 10px 0;font:13.34px/1.4 helvetica,arial,freesans,clean,sans-serif;width:452px;background-color:#fff}div.oembedall-githubrepos .oembedall-body{background:-moz-linear-gradient(center top,#FAFAFA,#EFEFEF);background:-webkit-gradient(linear,left top,left bottom,from(#FAFAFA),to(#EFEFEF));border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-top:1px solid #EEE;margin-left:-10px;margin-top:8px;padding:5px 10px;width:100%}div.oembedall-githubrepos h3{font-size:14px;margin:0;padding-left:18px;white-space:nowrap}div.oembedall-githubrepos p.oembedall-description{color:#444;font-size:12px;margin:0 0 3px}div.oembedall-githubrepos p.oembedall-updated-at{color:#888;font-size:11px;margin:0}div.oembedall-githubrepos ul.oembedall-repo-stats{border:none;float:right;font-size:11px;font-weight:700;padding-left:15px;position:relative;z-index:5;margin:0}div.oembedall-githubrepos ul.oembedall-repo-stats li{border:none;color:#666;display:inline-block;list-style-type:none;margin:0!important}div.oembedall-githubrepos ul.oembedall-repo-stats li a{background-color:transparent;border:none;color:#666!important;background-position:5px -2px;background-repeat:no-repeat;border-left:1px solid #DDD;display:inline-block;height:21px;line-height:21px;padding:0 5px 0 23px}div.oembedall-githubrepos ul.oembedall-repo-stats li:first-child a{border-left:medium none;margin-right:-3px}div.oembedall-githubrepos ul.oembedall-repo-stats li a:hover{background:5px -27px no-repeat #4183C4;color:#FFF!important;text-decoration:none}div.oembedall-githubrepos ul.oembedall-repo-stats li:first-child a:hover{border-bottom-left-radius:3px;border-top-left-radius:3px}ul.oembedall-repo-stats li:last-child a:hover{border-bottom-right-radius:3px;border-top-right-radius:3px}span.oembedall-closehide{background-color:#aaa;border-radius:2px;cursor:pointer;margin-right:3px}div.oembedall-container{margin-top:5px;text-align:left}.oembedall-ljuser{font-weight:700}.oembedall-ljuser img{vertical-align:bottom;border:0;padding-right:1px}.oembedall-stoqembed{border-bottom:1px dotted #999;float:left;overflow:hidden;width:730px;line-height:1;background:#FFF;color:#000;font-family:Arial,Liberation Sans,DejaVu Sans,sans-serif;font-size:80%;text-align:left;margin:0;padding:0}.oembedall-stoqembed a{color:#07C;text-decoration:none;margin:0;padding:0}.oembedall-stoqembed a:hover{text-decoration:underline}.oembedall-stoqembed a:visited{color:#4A6B82}.oembedall-stoqembed h3{font-family:Trebuchet MS,Liberation Sans,DejaVu Sans,sans-serif;font-size:130%;font-weight:700;margin:0;padding:0}.oembedall-stoqembed .oembedall-reputation-score{color:#444;font-size:120%;font-weight:700;margin-right:2px}.oembedall-stoqembed .oembedall-user-info{height:35px;width:185px}.oembedall-stoqembed .oembedall-user-info .oembedall-user-gravatar32{float:left;height:32px;width:32px}.oembedall-stoqembed .oembedall-user-info .oembedall-user-details{float:left;margin-left:5px;overflow:hidden;white-space:nowrap;width:145px}.oembedall-stoqembed .oembedall-question-hyperlink{font-weight:700}.oembedall-stoqembed .oembedall-stats{background:#EEE;margin:0 0 0 7px;padding:4px 7px 6px;width:58px}.oembedall-stoqembed .oembedall-statscontainer{float:left;margin-right:8px;width:86px}.oembedall-stoqembed .oembedall-votes{color:#555;padding:0 0 7px;text-align:center}.oembedall-stoqembed .oembedall-vote-count-post{font-size:240%;color:#808185;display:block;font-weight:700}.oembedall-stoqembed .oembedall-views{color:#999;padding-top:4px;text-align:center}.oembedall-stoqembed .oembedall-status{margin-top:-3px;padding:4px 0;text-align:center;background:#75845C;color:#FFF}.oembedall-stoqembed .oembedall-status strong{color:#FFF;display:block;font-size:140%}.oembedall-stoqembed .oembedall-summary{float:left;width:635px}.oembedall-stoqembed .oembedall-excerpt{line-height:1.2;margin:0;padding:0 0 5px}.oembedall-stoqembed .oembedall-tags{float:left;line-height:18px}.oembedall-stoqembed .oembedall-tags a:hover{text-decoration:none}.oembedall-stoqembed .oembedall-post-tag{background-color:#E0EAF1;border-bottom:1px solid #3E6D8E;border-right:1px solid #7F9FB6;color:#3E6D8E;font-size:90%;line-height:2.4;margin:2px 2px 2px 0;padding:3px 4px;text-decoration:none;white-space:nowrap}.oembedall-stoqembed .oembedall-post-tag:hover{background-color:#3E6D8E;border-bottom:1px solid #37607D;border-right:1px solid #37607D;color:#E0EAF1}.oembedall-stoqembed .oembedall-fr{float:right}.oembedall-stoqembed .oembedall-statsarrow{background-image:url(http://cdn.sstatic.net/stackoverflow/img/sprites.png?v=3);background-repeat:no-repeat;overflow:hidden;background-position:0 -435px;float:right;height:13px;margin-top:12px;width:7px}.oembedall-facebook1{border:1px solid #1A3C6C;padding:0;font:13.34px/1.4 verdana;width:500px}.oembedall-facebook2{background-color:#627add}.oembedall-facebook2 a{color:#e8e8e8;text-decoration:none}.oembedall-facebookBody{background-color:#fff;vertical-align:top;padding:5px}.oembedall-facebookBody .contents{display:inline-block;width:100%}.oembedall-facebookBody div img{float:left;margin-right:5px}div.oembedall-lanyard{-webkit-box-shadow:none;-webkit-transition-delay:0s;-webkit-transition-duration:.4000000059604645s;-webkit-transition-property:width;-webkit-transition-timing-function:cubic-bezier(0.42,0,.58,1);background-attachment:scroll;background-clip:border-box;background-color:transparent;background-image:none;background-origin:padding-box;border-width:0;box-shadow:none;color:#112644;display:block;float:left;font-family:'Trebuchet MS',Trebuchet,sans-serif;font-size:16px;height:253px;line-height:19px;margin:0;max-width:none;min-height:0;outline:#112644 0;overflow-x:visible;overflow-y:visible;padding:0;position:relative;text-align:left;vertical-align:baseline;width:804px}div.oembedall-lanyard .tagline{font-size:1.5em}div.oembedall-lanyard .wrapper{overflow:hidden;clear:both}div.oembedall-lanyard .split{float:left;display:inline}div.oembedall-lanyard .prominent-place .flag:active,div.oembedall-lanyard .prominent-place .flag:focus,div.oembedall-lanyard .prominent-place .flag:hover,div.oembedall-lanyard .prominent-place .flag:link,div.oembedall-lanyard .prominent-place .flag:visited{float:left;display:block;width:48px;height:48px;position:relative;top:-5px;margin-right:10px}div.oembedall-lanyard .place-context{font-size:.889em}div.oembedall-lanyard .prominent-place .sub-place{display:block}div.oembedall-lanyard .prominent-place{font-size:1.125em;line-height:1.1em;font-weight:400}div.oembedall-lanyard .main-date{color:#8CB4E0;font-weight:700;line-height:1.1}div.oembedall-lanyard .first{width:48.57%;margin:0 0 0 2.857%}html{height:100%}body{margin:0!important;padding:5px 20px 26px!important;background-color:#fff;font-family:"Lucida Grande","Segoe UI","Apple SD Gothic Neo","Malgun Gothic","Lucida Sans Unicode",Helvetica,Arial,sans-serif;font-size:.9em;overflow-x:hidden;overflow-y:auto}br,h1,h2,h3,h4,h5,h6{clear:both}hr.page{background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAECAYAAACtBE5DAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OENDRjNBN0E2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OENDRjNBN0I2NTZBMTFFMEI3QjRBODM4NzJDMjlGNDgiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4Q0NGM0E3ODY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4Q0NGM0E3OTY1NkExMUUwQjdCNEE4Mzg3MkMyOUY0OCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PqqezsUAAAAfSURBVHjaYmRABcYwBiM2QSA4y4hNEKYDQxAEAAIMAHNGAzhkPOlYAAAAAElFTkSuQmCC) repeat-x;border:0;color:#ccc;height:3px;padding:0}hr.underscore{border:0!important;height:30px;padding:0;-webkit-margin-before:0;-webkit-margin-after:0}body >:first-child{margin-top:0!important}img.plugin{box-shadow:0 1px 3px rgba(0,0,0,.1);border-radius:3px}iframe{border:0}figure{-webkit-margin-before:0;-webkit-margin-after:0;-webkit-margin-start:0;-webkit-margin-end:0}kbd{border:1px solid #aaa;-moz-border-radius:2px;-webkit-border-radius:2px;border-radius:2px;-moz-box-shadow:1px 2px 2px #ddd;-webkit-box-shadow:1px 2px 2px #ddd;box-shadow:1px 2px 2px #ddd;background-color:#f9f9f9;background-image:-moz-linear-gradient(top,#eee,#f9f9f9,#eee);background-image:-o-linear-gradient(top,#eee,#f9f9f9,#eee);background-image:-webkit-linear-gradient(top,#eee,#f9f9f9,#eee);background-image:linear-gradient(top,#eee,#f9f9f9,#eee);padding:1px 3px;font-family:inherit;font-size:.85em}.oembeded .oembed_photo{display:inline-block}img[data-echo]{margin:25px 0;width:100px;height:100px;background:url(../img/ajax.gif) center center no-repeat #fff}.spinner{display:inline-block;width:10px;height:10px;margin-bottom:-.1em;border:2px solid rgba(0,0,0,.5);border-top-color:transparent;border-radius:100%;-webkit-animation:spin 1s infinite linear;animation:spin 1s infinite linear}.spinner:after{content:'';display:block;width:0;height:0;position:absolute;top:-6px;left:0;border:4px solid transparent;border-bottom-color:rgba(0,0,0,.5);-webkit-transform:rotate(45deg);transform:rotate(45deg)}@-webkit-keyframes spin{to{-webkit-transform:rotate(360deg)}}@keyframes spin{to{transform:rotate(360deg)}}p.toc{margin:0!important}p.toc ul{padding-left:10px}p.toc>ul{padding:10px;margin:0 10px;display:inline-block;border:1px solid #ededed;border-radius:5px}p.toc li,p.toc ul{list-style-type:none}p.toc li{width:100%;padding:0;overflow:hidden}p.toc li a::after{content:"."}p.toc li a:before{content:"• "}p.toc h5{text-transform:uppercase}p.toc .title{float:left;padding-right:3px}p.toc .number{margin:0;float:right;padding-left:3px;background:#fff;display:none}.markdown{padding:20px}.markdown a{text-decoration:none;vertical-align:baseline}.markdown a:hover{text-decoration:underline}.markdown h1{font-size:2.2em;font-weight:700;margin:1.5em 0 1em}.markdown h2{font-size:1.8em;font-weight:700;margin:1.275em 0 .85em}.markdown h3{font-size:1.6em;font-weight:700;margin:1.125em 0 .75em}.markdown h4{font-size:1.4em;font-weight:700;margin:.99em 0 .66em}.markdown h5{font-size:1.2em;font-weight:700;margin:.855em 0 .57em}.markdown h6{font-size:1em;font-weight:700;margin:.75em 0 .5em}.markdown h1+p,.markdown h1:first-child,.markdown h2+p,.markdown h2:first-child,.markdown h3+p,.markdown h3:first-child,.markdown h4+p,.markdown h4:first-child,.markdown h5+p,.markdown h5:first-child,.markdown h6+p,.markdown h6:first-child{margin-top:0}.markdown hr{border:1px solid #ccc}.markdown p{margin:1em 0;word-wrap:break-word}.markdown ol{list-style-type:decimal}.markdown li{display:list-item;line-height:1.4em}.markdown blockquote{margin:1em 20px}.markdown blockquote>:first-child{margin-top:0}.markdown blockquote>:last-child{margin-bottom:0}.markdown blockquote cite:before{content:'\2014 \00A0'}.markdown .code{border-radius:3px;word-wrap:break-word}.markdown pre{border-radius:3px;word-wrap:break-word;border:1px solid #ccc;overflow:auto}.markdown pre code{display:block}.markdown pre>code{white-space:pre;padding:.5em;margin:0}.markdown code{border-radius:3px;word-wrap:break-word;padding:0 5px;margin:0 2px}.markdown img{max-width:100%}.markdown table{padding:0;border-collapse:collapse;border-spacing:0;margin-bottom:16px}.markdown table tr td,.markdown table tr th{border:1px solid #ccc;margin:0;padding:6px 13px}.markdown table tr th{font-weight:700}.markdown table tr th>:first-child{margin-top:0}.markdown table tr th>:last-child{margin-bottom:0}.markdown table tr td>:first-child{margin-top:0}.markdown table tr td>:last-child{margin-bottom:0}.markdown em.underline{font-style:normal;text-decoration:underline}.markdown strong.highlight{color:#000;padding:0 5px;background-color:#fdffb6;-webkit-box-shadow:#fdffb6 0 0 5px;-moz-box-shadow:#fdffb6 0 0 5px;box-shadow:#fdffb6 0 0 5px}@import url(http://fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,400,300,700);.haroopad{padding:20px;color:#222;font-size:15px;font-family:'Roboto Condensed',Tauri,"Lucida Grande","Lucida Sans Unicode","Lucida Sans",AppleSDGothicNeo-Medium,'Segoe UI','Malgun Gothic',Verdana,Tahoma,sans-serif;background:#fff;-webkit-font-smoothing:antialiased}.haroopad a{color:#3269a0}.haroopad a:hover{color:#4183c4}.haroopad h2{border-bottom:1px solid #e6e6e6;line-height:1.7em}.haroopad h6{color:#777}.haroopad hr{border:1px solid #e6e6e6}.haroopad blockquote>code,.haroopad h1>code,.haroopad h2>code,.haroopad h3>code,.haroopad h4>code,.haroopad h5>code,.haroopad h6>code,.haroopad li>code,.haroopad p>code,.haroopad td>code{color:#000;background-color:#feecdd;border:1px solid #efdfd0}.haroopad pre>code{font-size:1em;font-family:Consolas,Inconsolata,Courier,monospace;letter-spacing:-1px;font-weight:700}.haroopad blockquote{border-left:4px solid #e6e6e6;padding:0 15px;color:#777}.haroopad table{background-color:#fafafa}.haroopad table tr td,.haroopad table tr th{border:1px solid #e6e6e6}.haroopad table tr:nth-child(2n){background-color:#f2f2f2}.hljs{display:block;overflow-x:auto;padding:.5em;color:#333;background:#f8f8f8;-webkit-text-size-adjust:none}.diff .hljs-header,.hljs-comment,.hljs-javadoc{color:#998;font-style:italic}.css .rule .hljs-keyword,.hljs-keyword,.hljs-request,.hljs-status,.hljs-subst,.hljs-winutils,.nginx .hljs-title{color:#333;font-weight:700}.hljs-hexcolor,.hljs-number,.ruby .hljs-constant{color:teal}.hljs-dartdoc,.hljs-phpdoc,.hljs-string,.hljs-tag .hljs-value,.tex .hljs-formula{color:#d14}.hljs-id,.hljs-title,.scss .hljs-preprocessor{color:#900;font-weight:700}.hljs-list .hljs-keyword,.hljs-subst{font-weight:400}.hljs-class .hljs-title,.hljs-type,.tex .hljs-command,.vhdl .hljs-literal{color:#458;font-weight:700}.django .hljs-tag .hljs-keyword,.hljs-rules .hljs-property,.hljs-tag,.hljs-tag .hljs-title{color:navy;font-weight:400}.hljs-attribute,.hljs-variable,.lisp .hljs-body{color:teal}.hljs-regexp{color:#009926}.clojure .hljs-keyword,.hljs-prompt,.hljs-symbol,.lisp .hljs-keyword,.ruby .hljs-symbol .hljs-string,.scheme .hljs-keyword,.tex .hljs-special{color:#990073}.hljs-built_in{color:#0086b3}.hljs-cdata,.hljs-doctype,.hljs-pi,.hljs-pragma,.hljs-preprocessor,.hljs-shebang{color:#999;font-weight:700}.hljs-deletion{background:#fdd}.hljs-addition{background:#dfd}.diff .hljs-change{background:#0086b3}.hljs-chunk{color:#aaa}.MathJax_Hover_Frame{border-radius:.25em;-webkit-border-radius:.25em;-moz-border-radius:.25em;-khtml-border-radius:.25em;box-shadow:0 0 15px #83A;-webkit-box-shadow:0 0 15px #83A;-moz-box-shadow:0 0 15px #83A;-khtml-box-shadow:0 0 15px #83A;border:1px solid #A6D!important;display:inline-block;position:absolute}.MathJax_Hover_Arrow{position:absolute;width:15px;height:11px;cursor:pointer}#MathJax_About{position:fixed;left:50%;width:auto;text-align:center;border:3px outset;padding:1em 2em;background-color:#DDD;color:#000;cursor:default;font-family:message-box;font-size:120%;font-style:normal;text-indent:0;text-transform:none;line-height:normal;letter-spacing:normal;word-spacing:normal;word-wrap:normal;white-space:nowrap;float:none;z-index:201;border-radius:15px;-webkit-border-radius:15px;-moz-border-radius:15px;-khtml-border-radius:15px;box-shadow:0 10px 20px gray;-webkit-box-shadow:0 10px 20px gray;-moz-box-shadow:0 10px 20px gray;-khtml-box-shadow:0 10px 20px gray;filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}.MathJax_Menu{position:absolute;background-color:#fff;color:#000;width:auto;padding:5px 0;border:1px solid #CCC;margin:0;cursor:default;font:menu;text-align:left;text-indent:0;text-transform:none;line-height:normal;letter-spacing:normal;word-spacing:normal;word-wrap:normal;white-space:nowrap;float:none;z-index:201;border-radius:5px;-webkit-border-radius:5px;-moz-border-radius:5px;-khtml-border-radius:5px;box-shadow:0 10px 20px gray;-webkit-box-shadow:0 10px 20px gray;-moz-box-shadow:0 10px 20px gray;-khtml-box-shadow:0 10px 20px gray;filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}.MathJax_MenuItem{padding:1px 2em;background:0 0}.MathJax_MenuArrow{position:absolute;right:.5em;color:#666}.MathJax_MenuActive .MathJax_MenuArrow{color:#fff}.MathJax_MenuCheck,.MathJax_MenuRadioCheck{position:absolute;left:.7em}.MathJax_MenuLabel{padding:1px 2em 3px 1.33em;font-style:italic}.MathJax_MenuRule{border-top:1px solid #DDD;margin:4px 3px}.MathJax_MenuDisabled{color:GrayText}.MathJax_MenuActive{background-color:#606872;color:#fff}.MathJax_Menu_Close{position:absolute;width:31px;height:31px;top:-15px;left:-15px}#MathJax_Zoom{position:absolute;background-color:#F0F0F0;overflow:auto;display:block;z-index:301;padding:.5em;border:1px solid #000;margin:0;font-weight:400;font-style:normal;text-align:left;text-indent:0;text-transform:none;line-height:normal;letter-spacing:normal;word-spacing:normal;word-wrap:normal;white-space:nowrap;float:none;box-shadow:5px 5px 15px #AAA;-webkit-box-shadow:5px 5px 15px #AAA;-moz-box-shadow:5px 5px 15px #AAA;-khtml-box-shadow:5px 5px 15px #AAA;filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}#MathJax_ZoomOverlay{position:absolute;left:0;top:0;z-index:300;display:inline-block;width:100%;height:100%;border:0;padding:0;margin:0;background-color:#fff;opacity:0;filter:alpha(opacity=0)}#MathJax_ZoomFrame{position:relative;display:inline-block;height:0;width:0}#MathJax_ZoomEventTrap{position:absolute;left:0;top:0;z-index:302;display:inline-block;border:0;padding:0;margin:0;background-color:#fff;opacity:0;filter:alpha(opacity=0)}.MathJax_Preview{color:#888}#MathJax_Message{position:fixed;left:1px;bottom:2px;background-color:#E6E6E6;border:1px solid #959595;margin:0;padding:2px 8px;z-index:102;color:#000;font-size:80%;width:auto;white-space:nowrap}#MathJax_MSIE_Frame{position:absolute;top:0;left:0;width:0;z-index:101;border:0;margin:0;padding:0}.MathJax_Error{color:#C00;font-style:italic}.MathJax_Display{text-align:center;margin:1em 0;position:relative;display:block;width:100%}.MathJax .merror{background-color:#FF8;color:#C00;border:1px solid #C00;padding:1px 3px;font-style:normal;font-size:90%}#MathJax_Tooltip{background-color:InfoBackground;color:InfoText;border:1px solid #000;box-shadow:2px 2px 5px #AAA;-webkit-box-shadow:2px 2px 5px #AAA;-moz-box-shadow:2px 2px 5px #AAA;-khtml-box-shadow:2px 2px 5px #AAA;filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true');padding:3px 4px;z-index:401;position:absolute;left:0;top:0;width:auto;height:auto;display:none}.MathJax{display:inline;font-style:normal;font-weight:400;line-height:normal;font-size:100%;font-size-adjust:none;text-indent:0;text-align:left;text-transform:none;letter-spacing:normal;word-spacing:normal;word-wrap:normal;white-space:nowrap;float:none;direction:ltr;border:0;padding:0;margin:0}.MathJax a,.MathJax img,.MathJax nobr{border:0;padding:0;margin:0;max-width:5000em;max-height:5000em;vertical-align:0;line-height:normal;text-decoration:none}img.MathJax_strut{border:0!important;padding:0!important;margin:0!important;vertical-align:0!important}.MathJax span{display:inline;position:static;border:0;padding:0;margin:0;vertical-align:0;line-height:normal;text-decoration:none}.MathJax nobr{white-space:nowrap!important}.MathJax img{display:inline!important;float:none!important}.MathJax *{transition:none;-webkit-transition:none;-moz-transition:none;-ms-transition:none;-o-transition:none}.MathJax_Processing{visibility:hidden;position:fixed;width:0;height:0;overflow:hidden}.MathJax_Processed{display:none!important}.MathJax_ExBox{display:block;overflow:hidden;width:1px;height:60ex}.MathJax .MathJax_EmBox{display:block;overflow:hidden;width:1px;height:60em}.MathJax .MathJax_HitBox{cursor:text;background:#fff;opacity:0;filter:alpha(opacity=0)}#MathJax_Tooltip *,.MathJax .MathJax_HitBox *{filter:none;opacity:1;background:0 0}@font-face{font-family:MathJax_Blank;src:url(about:blank)}.MathJax .noError{font-size:90%;text-align:left;color:#000;padding:1px 3px;border:1px solid}footer{position:fixed;font-size:.8em;text-align:right;bottom:0;margin-left:-25px;height:20px;width:100%}</style>
-</head>
-<body class="markdown haroopad">
-<h1 id="syndication-delivery-handler-0-2-6-installation-and-configuration-guide">Syndication Delivery Handler 0.3.0 Installation and Configuration Guide</h1><h2 id="build-number">Build Number</h2><p>The build number associated with this release of the <em>Syndication Delivery Handler</em> is <strong>0.3.0</strong>. This number should be indicated when requesting support or administration of this release.</p><h2 id="nomenclature">Nomenclature</h2><ul>
+.spell-check-misspelling .region {
+  border-bottom: 1px dashed rgba(250, 128, 114, 0.5);
+}
+
+pre.editor-colors,
+.host {
+  background-color: #272b33;
+  color: #abb2c0;
+  text-rendering: optimizeSpeed;
+  -webkit-filter: contrast(200%);
+  -webkit-filter: saturate(150%);
+}
+pre.editor-colors .invisible-character,
+.host .invisible-character {
+  color: rgba(171, 178, 192, 0.15);
+}
+pre.editor-colors .indent-guide,
+.host .indent-guide {
+  color: rgba(171, 178, 192, 0.15);
+}
+pre.editor-colors .wrap-guide,
+.host .wrap-guide {
+  background-color: rgba(102, 153, 204, 0.05);
+  box-shadow: 0 0 6px 0 rgba(102, 153, 204, 0.2);
+}
+pre.editor-colors .gutter .line-number,
+.host .gutter .line-number {
+  color: #636e84;
+}
+pre.editor-colors .gutter .line-number.git-line-removed:before,
+.host .gutter .line-number.git-line-removed:before {
+  bottom: -3px;
+}
+pre.editor-colors .gutter .line-number.git-line-removed:after,
+.host .gutter .line-number.git-line-removed:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 25px;
+  border-bottom: 1px dotted rgba(242, 119, 122, 0.5);
+  pointer-events: none;
+}
+pre.editor-colors .gutter .line-number.cursor-line,
+.host .gutter .line-number.cursor-line {
+  color: #abb2c0;
+  background-color: #2b3039;
+}
+pre.editor-colors .gutter .line-number.cursor-line-no-selection,
+.host .gutter .line-number.cursor-line-no-selection {
+  background-color: transparent;
+}
+pre.editor-colors .gutter .line-number .icon-right,
+.host .gutter .line-number .icon-right {
+  color: #abb2c0;
+}
+pre.editor-colors .gutter .line-number .icon-right,
+.host .gutter .line-number .icon-right {
+  color: #abb2c0;
+}
+pre.editor-colors .gutter .line-number.folded,
+.host .gutter .line-number.folded,
+pre.editor-colors .gutter .line-number:after,
+.host .gutter .line-number:after,
+pre.editor-colors .fold-marker:after,
+.host .fold-marker:after {
+  color: #abb2c0;
+}
+pre.editor-colors.is-focused .cursor,
+.host .cursor {
+  border-color: #528bff;
+}
+pre.editor-colors.is-focused .selection .region,
+.host .selection .region {
+  background-color: rgba(61, 67, 80, 0.55);
+}
+pre.editor-colors.is-focused .line-number.cursor-line-no-selection,
+.host .line-number.cursor-line-no-selection,
+pre.editor-colors.is-focused .line.cursor-line,
+.host .line.cursor-line {
+  box-shadow: 0 0 5px 0 rgba(102, 153, 204, 0.6);
+}
+.comment {
+  color: #777777;
+}
+.string {
+  color: #ccaac8;
+  text-shadow: 0 0 8px rgba(170, 175, 219, 0.8);
+}
+.constant.numeric {
+  color: #f99157;
+  text-shadow: 0 0 8px rgba(119, 194, 187, 0.8);
+}
+.constant.character,
+.constant.other {
+  color: #ffcc66;
+  text-shadow: 0 0 8px rgba(34, 200, 153, 0.8);
+}
+.constant.language {
+  color: #bdbe82;
+  text-shadow: 0 0 8px rgba(189, 190, 130, 0.8);
+}
+.storage {
+  color: #f2777a;
+  text-shadow: 0 0 8px rgba(139, 93, 223, 0.8);
+}
+.meta.function-call {
+  color: #6699cc;
+  text-shadow: 0 0 8px rgba(5, 214, 249, 0.8);
+}
+.support.function {
+  color: #6699cc;
+  text-shadow: 0 0 8px rgba(189, 190, 130, 0.8);
+}
+.variable.other.external-symbol {
+  color: #f2777a;
+  text-shadow: 0 0 8px rgba(187, 223, 221, 0.8);
+}
+.variable.language,
+.variable.other {
+  color: #f2777a;
+  text-shadow: 0 0 8px rgba(58, 175, 255, 0.8);
+}
+.variable.parameter {
+  color: #6699cc;
+  text-shadow: 0 0 8px rgba(5, 214, 249, 0.7);
+}
+.keyword {
+  color: #12ffa9;
+  text-shadow: 0 0 8px rgba(34, 255, 169, 0.8);
+}
+.entity.name.type {
+  color: #c3dad9;
+  text-shadow: 0 0 8px rgba(175, 119, 169, 0.8);
+}
+.entity.name.class {
+  color: #6699cc;
+  text-shadow: 0 0 8px rgba(185, 152, 223, 0.8);
+}
+.entity.name.structure {
+  color: #c3dad9;
+  text-shadow: 0 0 8px rgba(185, 152, 223, 0.8);
+}
+.entity.name.tag {
+  color: #f2777a;
+  text-shadow: 0 0 8px rgba(73, 166, 210, 0.8);
+}
+.entity.name.function {
+  color: #6699cc;
+  text-shadow: 0 0 8px rgba(79, 111, 255, 0.8);
+}
+.entity.name.function.io {
+  color: #c3dad9;
+  text-shadow: 0 0 8px rgba(223, 179, 172, 0.8);
+}
+.entity.name.function.misc {
+  color: #c3dad9;
+  text-shadow: 0 0 8px rgba(227, 228, 169, 0.8);
+}
+.entity.name.function.predicate {
+  color: #abb2c0;
+  text-shadow: 0 0 8px rgba(165, 223, 147, 0.8);
+}
+.entity.other.attribute-name {
+  color: #ccaac8;
+  text-shadow: 0 0 8px rgba(73, 134, 194, 0.8);
+}
+.entity.other.attribute-name.html {
+  color: #d29b67;
+  text-shadow: 0 0 8px rgba(73, 134, 194, 0.8);
+}
+.entity.other.inherited-class {
+  color: #ffcc66;
+  text-shadow: 0 0 8px rgba(73, 134, 194, 0.8);
+}
+.meta.function-call {
+  color: #e8e6df;
+  text-shadow: 0 0 8px rgba(5, 214, 249, 0.8);
+}
+.meta.function-call.arguments {
+  color: #abb2c0;
+  text-shadow: 0 0 8px rgba(5, 214, 249, 0.8);
+}
+.meta.class,
+.entity.name.class,
+.entity.name.type.class {
+  color: #f2f0ec;
+  text-shadow: 0 0 8px rgba(255, 51, 153, 0.8);
+}
+.support.class {
+  color: #ffcc66;
+  text-shadow: 0 0 8px rgba(239, 106, 167, 0.8);
+}
+.invalid {
+  color: #be4f44;
+  text-shadow: 0 0 8px #cc1b27;
+}
+.string .source {
+  font-style: italic;
+  color: #f99157;
+  text-shadow: 0 0 8px rgba(0, 153, 255, 0.8);
+}
+.entity.name.tag {
+  color: #66cccc;
+  text-shadow: 0 0 8px rgba(73, 166, 210, 0.8);
+}
+.markup.heading {
+  font-weight: bold;
+  color: #12ffa9;
+  text-shadow: 0 0 8px rgba(34, 255, 169, 0.8);
+}
+.markup.italic {
+  font-style: italic;
+  color: #ccaac8;
+  text-shadow: 0 0 8px rgba(155, 169, 253, 0.8);
+}
+.markup.bold {
+  font-weight: bold;
+  color: #747369;
+  text-shadow: 0 0 8px rgba(155, 169, 253, 0.8);
+}
+.markup.underline {
+  text-decoration: underline;
+  color: #c679dd;
+  text-shadow: 0 0 8px rgba(139, 93, 223, 0.8);
+}
+.gfm .link .entity {
+  text-decoration: underline;
+  color: #66cccc;
+  text-shadow: 0 0 8px rgba(58, 175, 255, 0.8);
+}
+.punctuation.definition.tag {
+  color: #66cccc;
+  text-shadow: 0 0 8px rgba(73, 166, 210, 0.8);
+}
+.meta.tag.template {
+  color: #f2777a;
+  text-shadow: 0 0 8px rgba(227, 228, 169, 0.8);
+}
+</style>
+  </head>
+  <body class='markdown-preview'><h1 id="syndication-delivery-handler-0-4-0-installation-and-configuration-guide">Syndication Delivery Handler 0.4.0 Installation and Configuration Guide</h1>
+<h2 id="build-number">Build Number</h2>
+<p>The build number associated with this release of the <em>Syndication Delivery Handler</em> is <strong>0.4.0</strong>. This number should be indicated when requesting support or administration of this release.</p>
+<h2 id="nomenclature">Nomenclature</h2>
+<ul>
 <li><strong>Delivery Handler</strong> - The software described by this document that provides publishing capabilities to Syndication.</li>
 <li><strong>Syndication</strong> - The syndication network as a whole including efforts put forth by CDC and instances deployed at various agencies such as CDC, FDA, and HHS.</li>
 <li><strong>CMS Manager</strong> - The web application responsible for issuing REST API security key agreements to CMS entities (i.e. hhs.gov).</li>
@@ -18,70 +362,81 @@
 <li><strong>user</strong> - A Rhythmyx content editor (user).</li>
 <li><strong>${USER}</strong> - The UNIX user account that owns the Rhythmyx installation directory.</li>
 <li><strong>${HOME}</strong> - The home directory of the UNIX user account that owns the Rhythmyx installation directory.</li>
-</ul><h2 id="about">About</h2><p>The Syndication Delivery Handler is a Rhythmyx delivery handler that publishes content to the REST API. It replaces the legacy delivery handler from the <em>CM Syndication</em> software package.</p><h2 id="distribution-contents">Distribution Contents</h2><p>The delivery handler is distributed as a zip file, <em>syndication-delivery-handler-0.3.0.zip</em>, and contains the following:</p><ul>
-<li><strong>install.sh</strong> - The installer script that copies the distribution's files to their respective locations.</li>
+</ul>
+<h2 id="about">About</h2>
+<p>The Syndication Delivery Handler is a Rhythmyx delivery handler that publishes content to the REST API. It replaces the legacy delivery handler from the <em>CM Syndication</em> software package.</p>
+<h2 id="distribution-contents">Distribution Contents</h2>
+<p>The delivery handler is distributed as a zip file, <em>syndication-delivery-handler-0.4.0.zip</em>, and contains the following:</p>
+<ul>
+<li><strong>install.sh</strong> - The installer script that copies the distribution&#39;s files to their respective locations.</li>
 <li><strong>syndication_delivery_handler_config.groovy</strong> - The configuration file for the delivery handler. See the <em>Installation and Configuration</em> section for details.</li>
 <li><strong>syndication_delivery_handler.xml</strong> - The Spring XML configuration file that enables the delivery handler in Rhythmyx.</li>
 <li><strong>publishing_template.json</strong> - The Velocity template used to publish content to the REST API.</li>
 <li><strong>key_agreement.json</strong> - The configuration that provides the security keys used to authenticate the delivery handler when publish requests are made to the REST API.</li>
-<li><strong>syndication-delivery-handler-0.3.0.jar</strong> - The JAR file containing all the required Java classes and resources needed by the delivery handler.</li>
-</ul><h2 id="installation-and-configuration">Installation and Configuration</h2><h3 id="install-the-distribution">Install the Distribution</h3><ol>
+<li><strong>syndication-delivery-handler-0.4.0.jar</strong> - The JAR file containing all the required Java classes and resources needed by the delivery handler.</li>
+</ul>
+<h2 id="installation-and-configuration">Installation and Configuration</h2>
+<h3 id="install-the-distribution">Install the Distribution</h3>
+<ol>
 <li><p>SCP or FTP the distribution ZIP file to the Rhythmyx host and put it in the ${HOME} directory and make sure the distribution ZIP is owned by ${USER}.</p>
 </li>
 <li><p>Check that the <em>unzip</em> command is installed by issuing the following command:</p>
-<pre class="bash hljs"><span class="hljs-keyword">if</span> [ <span class="hljs-operator">-f</span> /usr/bin/unzip ]; <span class="hljs-keyword">then</span> <span class="hljs-built_in">echo</span> <span class="hljs-string">"unzip is installed"</span>; <span class="hljs-keyword">fi</span>
-</pre>
+<pre class="editor-colors lang-bash"><div class="line"><span class="source shell"><span class="meta scope if-block shell"><span class="keyword control shell"><span>if</span></span><span>&nbsp;[&nbsp;-f&nbsp;/usr/bin/unzip&nbsp;]</span><span class="keyword operator list shell"><span>;</span></span><span>&nbsp;</span><span class="keyword control shell"><span>then</span></span><span>&nbsp;</span><span class="support function builtin shell"><span>echo</span></span><span>&nbsp;</span><span class="string quoted double shell"><span class="punctuation definition string begin shell"><span>&quot;</span></span><span>unzip&nbsp;is&nbsp;installed</span><span class="punctuation definition string end shell"><span>&quot;</span></span></span><span class="keyword operator list shell"><span>;</span></span><span>&nbsp;</span><span class="keyword control shell"><span>fi</span></span></span></span></div></pre>
 </li>
-<li>If <em>unzip</em> is installed, the previous command would display "unzip is installed". If <em>unzip</em> is not currently installed, run the following command:<pre class="bash hljs">sudo apt-get install unzip
-</pre>
+<li>If <em>unzip</em> is installed, the previous command would display &quot;unzip is installed&quot;. If <em>unzip</em> is not currently installed, run the following command:<pre class="editor-colors lang-bash"><div class="line"><span class="source shell"><span>sudo&nbsp;apt-get&nbsp;install&nbsp;unzip</span></span></div></pre>
 </li>
-<li>Unzip the distribution with the following command:<pre class="bash hljs">unzip syndication-delivery-handler-<span class="hljs-number">0.2</span>.<span class="hljs-number">6</span>.zip
-</pre>
+<li>Unzip the distribution with the following command:<pre class="editor-colors lang-bash"><div class="line"><span class="source shell"><span>unzip&nbsp;syndication-delivery-handler-0.4.0.zip</span></span></div></pre>
 </li>
-</ol><h3 id="configure-the-rest-client">Configure the REST Client</h3><h4 id="set-the-syndication-rest-api-connection-properties">Set the Syndication REST API Connection Properties</h4><ol>
+</ol>
+<h3 id="configure-the-rest-client">Configure the REST Client</h3>
+<h4 id="set-the-syndication-rest-api-connection-properties">Set the Syndication REST API Connection Properties</h4>
+<ol>
 <li><p>Open the <em>syndication_delivery_handler_config.groovy</em> configuration file in the distribution root and edit the following two properties:</p>
-<pre class="bash hljs"> publish.url = <span class="hljs-string">'http://localhost:8080/syndication/api/v1/media'</span>
- server.base.url = <span class="hljs-string">'http://localhost:9992'</span>
-</pre>
+<pre class="editor-colors lang-bash"><div class="line"><span class="source shell"><span>&nbsp;publish.url&nbsp;=&nbsp;</span><span class="string quoted single shell"><span class="punctuation definition string begin shell"><span>&#39;</span></span><span class="markup underline link http hyperlink"><span>http://localhost:8080/syndication/api/v1/media</span></span><span class="punctuation definition string end shell"><span>&#39;</span></span></span></span></div><div class="line"><span class="source shell"><span>&nbsp;server.base.url&nbsp;=&nbsp;</span><span class="string quoted single shell"><span class="punctuation definition string begin shell"><span>&#39;</span></span><span class="markup underline link http hyperlink"><span>http://localhost:9992</span></span><span class="punctuation definition string end shell"><span>&#39;</span></span></span></span></div></pre>
 </li>
-<li><p>For <em>publish.url</em>, use the REST API's publishing endpoint URL. For <em>server.base.url</em>, use the Rhythmyx server's hostname and port number.</p>
+<li><p>For <em>publish.url</em>, use the REST API&#39;s publishing endpoint URL. For <em>server.base.url</em>, use the Rhythmyx server&#39;s hostname and port number.</p>
 </li>
 <li>When the install.sh script is run during the install process, a config file will be created at <em>${HOME}/syndication_delivery_handler_config.groovy</em>.</li>
-<li><strong>Optional</strong>: To adjust the connection and socket timeout settings for the REST client, you can uncomment the following properties in the external config file <em>${HOME}/syndication_delivery_handler_config.groovy</em>.<pre class="bash hljs">http.connection.timeout = <span class="hljs-number">30</span>
-http.socket.timeout = <span class="hljs-number">30</span>
-</pre>
+<li><strong>Optional</strong>: To adjust the connection and socket timeout settings for the REST client, you can uncomment the following properties in the external config file <em>${HOME}/syndication_delivery_handler_config.groovy</em>.<pre class="editor-colors lang-bash"><div class="line"><span class="source shell"><span>http.connection.timeout&nbsp;=&nbsp;30</span></span></div><div class="line"><span class="source shell"><span>http.socket.timeout&nbsp;=&nbsp;30</span></span></div></pre>
 </li>
-</ol><h4 id="rest-authentication-api-key">REST Authentication / API Key</h4><p>The REST API requires an Authentication header to authenticate any requests made to it's publish endpoint. The delivery handler requires the key agreement issued by CMS Manager for the 'owning' entity (i.e. HHS) of the Rhythmyx instances where the plugin is installed. Please see the CMS Manager user manual for instructions to create and issue a new key agreement.</p><p>Once the key agreement has been issued, configure the security keys by editing the key agreement file <em>${HOME}/syndication_key_agreement.json</em>, and replacing the entire contents of the file with the key agreement issued by CMS Manager.</p><p>When the install.sh is run during the install process, an encrypted version of this file will be created at <em>${HOME}/syndication_key_agreement.dat</em>. A private key and a public key are also created in <em>${HOME}/.ssh</em>. These keys are used to encrypt the key agreement so it is not in plain text.</p><h3 id="install-the-delivery-handler">Install the Delivery Handler</h3><ol>
-<li>Run the install script in the root of the distribution by issuing the following commands:<pre class="bash hljs"><span class="hljs-built_in">cd</span> syndication-delivery-handler-<span class="hljs-number">0.2</span>.<span class="hljs-number">6</span>/
-./install.sh
-</pre>
+</ol>
+<h4 id="rest-authentication-api-key">REST Authentication / API Key</h4>
+<p>The REST API requires an Authentication header to authenticate any requests made to it&#39;s publish endpoint. The delivery handler requires the key agreement issued by CMS Manager for the &#39;owning&#39; entity (i.e. HHS) of the Rhythmyx instances where the plugin is installed. Please see the CMS Manager user manual for instructions to create and issue a new key agreement.</p>
+<p>Once the key agreement has been issued, configure the security keys by editing the key agreement file <em>${HOME}/syndication_key_agreement.json</em>, and replacing the entire contents of the file with the key agreement issued by CMS Manager.</p>
+<p>When the install.sh is run during the install process, an encrypted version of this file will be created at <em>${HOME}/syndication_key_agreement.dat</em>. A private key and a public key are also created in <em>${HOME}/.ssh</em>. These keys are used to encrypt the key agreement so it is not in plain text.</p>
+<h3 id="install-the-delivery-handler">Install the Delivery Handler</h3>
+<ol>
+<li>Run the install script in the root of the distribution by issuing the following commands:<pre class="editor-colors lang-bash"><div class="line"><span class="source shell"><span class="support function builtin shell"><span>cd</span></span><span>&nbsp;syndication-delivery-handler-0.4.0/</span></span></div><div class="line"><span class="source shell"><span>./install.sh</span></span></div></pre>
 </li>
-<li>Select <strong>'e'</strong> at the following prompt:<pre class="bash hljs">Use the external config (e) or update the internal (i) config <span class="hljs-keyword">in</span> the delivery handler JAR? [e/i]:
-</pre>
+<li>Select <strong>&#39;e&#39;</strong> at the following prompt:<pre class="editor-colors lang-bash"><div class="line"><span class="source shell"><span>Use&nbsp;the&nbsp;external&nbsp;config&nbsp;</span><span class="meta scope subshell shell"><span class="punctuation definition subshell shell"><span>(</span></span><span>e</span><span class="punctuation definition subshell shell"><span>)</span></span></span><span>&nbsp;or&nbsp;update&nbsp;the&nbsp;internal&nbsp;</span><span class="meta scope subshell shell"><span class="punctuation definition subshell shell"><span>(</span></span><span>i</span><span class="punctuation definition subshell shell"><span>)</span></span></span><span>&nbsp;config&nbsp;</span><span class="keyword control shell"><span>in</span></span><span>&nbsp;the&nbsp;delivery&nbsp;handler&nbsp;JAR</span><span class="keyword operator glob shell"><span>?</span></span><span>&nbsp;[e/i]:</span></span></div></pre>
 </li>
-</ol><h3 id="configure-a-content-type-to-be-publishable">Configure a Content Type to be Publishable</h3><p><strong>Note:</strong> The following instructions configure the <em>BasicPage</em> content type for publishing to Syndication. Select a different content type in step 3 if required.</p><p>To make a content type publishable to the REST API, perform the following actions from the Rhythmyx Workbench:</p><ol>
-<li>Click the 'Content Design' tab from the left pane</li>
-<li>Expand 'Content Types'</li>
-<li>Double click the 'BasicPage' content type</li>
-<li>Click the '+' button from the right pane</li>
-<li>For the 'Field and Field Sets', set:<ul>
+</ol>
+<h3 id="configure-a-content-type-to-be-publishable">Configure a Content Type to be Publishable</h3>
+<p><strong>Note:</strong> The following instructions configure the <em>BasicPage</em> content type for publishing to Syndication. Select a different content type in step 3 if required.</p>
+<p>To make a content type publishable to the REST API, perform the following actions from the Rhythmyx Workbench:</p>
+<ol>
+<li>Click the &#39;Content Design&#39; tab from the left pane</li>
+<li>Expand &#39;Content Types&#39;</li>
+<li>Double click the &#39;BasicPage&#39; content type</li>
+<li>Click the &#39;+&#39; button from the right pane</li>
+<li>For the &#39;Field and Field Sets&#39;, set:<ul>
 <li>Name = syndicatable</li>
 <li>Label = Syndicatable:</li>
 <li>Control = sys_DropDownSingle</li>
 <li>Source = Local</li>
 </ul>
 </li>
-<li>Double click the 'sys_DropDownSingle' cell from the  'Control' column and click the button that appears in the cell</li>
-<li>Click the 'Choices' button</li>
-<li>Select the 'Define choices for this control only' radio button</li>
+<li>Double click the &#39;sys_DropDownSingle&#39; cell from the  &#39;Control&#39; column and click the button that appears in the cell</li>
+<li>Click the &#39;Choices&#39; button</li>
+<li>Select the &#39;Define choices for this control only&#39; radio button</li>
 <li>Add the following entries:<ul>
 <li>Label: No, Value: No</li>
 <li>Label: Yes, Value: Yes</li>
 </ul>
 </li>
-<li>Set 'Sort order' = Ascending</li>
-<li>Click 'OK'</li>
-<li>For the 'Field Properties', set:<ul>
+<li>Set &#39;Sort order&#39; = Ascending</li>
+<li>Click &#39;OK&#39;</li>
+<li>For the &#39;Field Properties&#39;, set:<ul>
 <li>Data type = text</li>
 <li>Storage Size = 50</li>
 <li>Default Value = No</li>
@@ -92,73 +447,72 @@ http.socket.timeout = <span class="hljs-number">30</span>
 <li>Show in preview: checked</li>
 </ul>
 </li>
-<li>Click the 'Save' button</li>
-</ol><h3 id="create-the-velocity-publishing-template">Create the Velocity Publishing Template</h3><p><strong><em>Note:</em></strong> <em>This template is only used to publish content to Syndication. It is not used for site publishing.</em></p><p>The delivery handler uses a custom Velocity template to format the content for publishing to REST API. To create the template, perform the following actions from the Rhythmyx Workbench:</p><ol>
-<li>Click the 'Assembly Design' tab from the left pane</li>
-<li>Expand 'Templates'</li>
-<li>Right click on 'Shared &gt; New &gt; Template'</li>
-<li>Click the 'Shared' radio button and click 'Next'</li>
+<li>Click the &#39;Save&#39; button</li>
+</ol>
+<h3 id="create-the-velocity-publishing-template">Create the Velocity Publishing Template</h3>
+<p><strong><em>Note:</em></strong> <em>This template is only used to publish content to Syndication. It is not used for site publishing.</em></p>
+<p>The delivery handler uses a custom Velocity template to format the content for publishing to REST API. To create the template, perform the following actions from the Rhythmyx Workbench:</p>
+<ol>
+<li>Click the &#39;Assembly Design&#39; tab from the left pane</li>
+<li>Expand &#39;Templates&#39;</li>
+<li>Right click on &#39;Shared &gt; New &gt; Template&#39;</li>
+<li>Click the &#39;Shared&#39; radio button and click &#39;Next&#39;</li>
 <li>Set:<ul>
 <li>Assembler = velocity Assembler</li>
 <li>Output = Text page</li>
 <li>Global Template = None</li>
 </ul>
 </li>
-<li>Click 'Next'</li>
+<li>Click &#39;Next&#39;</li>
 <li>Set:<ul>
 <li>Template name = Syndication_Publish</li>
 </ul>
 </li>
-<li>Moving all entries from 'Available Communities' to 'Visible to these communities' will make the 'Syndicated_Publish' template visible to all communities. Make changes according to your security policy.</li>
-<li>Click 'Next'</li>
-<li>Moving all entries from 'Available Slots' to 'Contained Slots' will make the 'Syndicated_Publish' template available to all slots. Make changes according to your security policy.</li>
-<li>Click 'Next'</li>
-<li>Moving all entries from 'Available Content Types' to 'Associated Content Types' will make the 'Syndicated_Publish' template available to all content types. Make changes according to your security policy.</li>
-<li>Click 'Finish'</li>
-<li>Click the 'Save' button</li>
-<li>In the 'Source Tab', paste the following XML document exactly as given without any formatting:<pre class="xml hljs">##make sure the template is set to never publish, not default.
-##also make sure not to leave space in the top line.
-#set ($display_title = $tools.esc.xml($sys.item.getProperty("rx:displaytitle").String))
-<span class="hljs-pi">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-title">json</span>&gt;</span>
-<span class="hljs-cdata">&lt;![CDATA[{"language":1,"source":1,"sourceUrl":"$source_url","name":"$display_title"}]]&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-title">json</span>&gt;</span>
-</pre>
+<li>Moving all entries from &#39;Available Communities&#39; to &#39;Visible to these communities&#39; will make the &#39;Syndicated_Publish&#39; template visible to all communities. Make changes according to your security policy.</li>
+<li>Click &#39;Next&#39;</li>
+<li>Moving all entries from &#39;Available Slots&#39; to &#39;Contained Slots&#39; will make the &#39;Syndicated_Publish&#39; template available to all slots. Make changes according to your security policy.</li>
+<li>Click &#39;Next&#39;</li>
+<li>Moving all entries from &#39;Available Content Types&#39; to &#39;Associated Content Types&#39; will make the &#39;Syndicated_Publish&#39; template available to all content types. Make changes according to your security policy.</li>
+<li>Click &#39;Finish&#39;</li>
+<li>Click the &#39;Save&#39; button</li>
+<li>In the &#39;Source Tab&#39;, paste the following XML document exactly as given without any formatting:<pre class="editor-colors lang-xml"><div class="line"><span class="text xml"><span>##make&nbsp;sure&nbsp;the&nbsp;template&nbsp;is&nbsp;set&nbsp;to&nbsp;never&nbsp;publish,&nbsp;not&nbsp;default.</span></span></div><div class="line"><span class="text xml"><span>##also&nbsp;make&nbsp;sure&nbsp;not&nbsp;to&nbsp;leave&nbsp;space&nbsp;in&nbsp;the&nbsp;top&nbsp;line.</span></span></div><div class="line"><span class="text xml"><span>#set&nbsp;($display_title&nbsp;=&nbsp;$tools.esc.xml($sys.item.getProperty(&quot;rx:displaytitle&quot;).String))</span></span></div><div class="line"><span class="text xml"><span class="meta tag preprocessor xml"><span class="punctuation definition tag xml"><span>&lt;?</span></span><span class="entity name tag xml"><span>xml</span></span><span class="entity other attribute-name xml"><span>&nbsp;version</span></span><span>=</span><span class="string quoted double xml"><span class="punctuation definition string begin xml"><span>&quot;</span></span><span>1.0</span><span class="punctuation definition string end xml"><span>&quot;</span></span></span><span class="entity other attribute-name xml"><span>&nbsp;encoding</span></span><span>=</span><span class="string quoted double xml"><span class="punctuation definition string begin xml"><span>&quot;</span></span><span>UTF-8</span><span class="punctuation definition string end xml"><span>&quot;</span></span></span><span class="punctuation definition tag xml"><span>?&gt;</span></span></span></span></div><div class="line"><span class="text xml"><span class="meta tag xml"><span class="punctuation definition tag xml"><span>&lt;</span></span><span class="entity name tag localname xml"><span>json</span></span><span class="punctuation definition tag xml"><span>&gt;</span></span></span></span></div><div class="line"><span class="text xml"><span class="string unquoted cdata xml"><span class="punctuation definition string begin xml"><span>&lt;![CDATA[</span></span><span>{&quot;language&quot;:1,&quot;source&quot;:1,&quot;sourceUrl&quot;:&quot;$source_url&quot;,&quot;name&quot;:&quot;$display_title&quot;}</span><span class="punctuation definition string end xml"><span>]]&gt;</span></span></span></span></div><div class="line"><span class="text xml"><span class="meta tag xml"><span class="punctuation definition tag xml"><span>&lt;/</span></span><span class="entity name tag localname xml"><span>json</span></span><span class="punctuation definition tag xml"><span>&gt;</span></span></span></span></div></pre>
 </li>
-<li>Click the 'General' Tab</li>
+<li>Click the &#39;General&#39; Tab</li>
 <li>Set:<ul>
 <li>Publish = Never</li>
 </ul>
 </li>
-<li>Click the 'Save' button</li>
+<li>Click the &#39;Save&#39; button</li>
 <li>Restart the Rhythmyx application server for the changes to take effect.</li>
-</ol><h5 id="marking-up-content-for-publishing-to-syndication">Marking Up Content for Publishing to Syndication</h5><p>Your content must be properly marked up to be processed by Syndication. Make sure that any content you wish to make available for syndication should use a HTML div with the <em>syndicate</em> class name. For example, the following HTML elements are properly marked up for publishing to Syndication:</p><pre class="xml hljs"><span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"syndicate"</span>&gt;</span>
-    This is syndicated content!
-<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-title">div</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"some-other-class-name syndicate"</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-title">p</span>&gt;</span>
-        This is more syndicated content!
-    <span class="hljs-tag">&lt;/<span class="hljs-title">p</span>&gt;</span>
-<span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>
-</pre><h3 id="configure-the-publishing-design">Configure the Publishing Design</h3><p>These are general instructions for configuring the delivery handler and content lists and attaching the content lists to a publishing edition. Per site publishing configuration will dictate the naming of content lists and editions, and specific publishing requirements may require configuration that is out-of-scope for this document.</p><h4 id="add-the-syndication_delivery_handler-delivery-type">Add the Syndication_Delivery_Handler Delivery Type</h4><ol>
+</ol>
+<h5 id="marking-up-content-for-publishing-to-syndication">Marking Up Content for Publishing to Syndication</h5>
+<p>Your content must be properly marked up to be processed by Syndication. Make sure that any content you wish to make available for syndication should use a HTML div with the <em>syndicate</em> class name. For example, the following HTML elements are properly marked up for publishing to Syndication:</p>
+<pre class="editor-colors lang-xml"><div class="line"><span class="text xml"><span class="meta tag xml"><span class="punctuation definition tag xml"><span>&lt;</span></span><span class="entity name tag localname xml"><span>div</span></span><span>&nbsp;</span><span class="entity other attribute-name localname xml"><span>class</span></span><span>=</span><span class="string quoted double xml"><span class="punctuation definition string begin xml"><span>&quot;</span></span><span>syndicate</span><span class="punctuation definition string end xml"><span>&quot;</span></span></span><span class="punctuation definition tag xml"><span>&gt;</span></span></span></span></div><div class="line"><span class="text xml"><span>&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;is&nbsp;syndicated&nbsp;content!</span></span></div><div class="line"><span class="text xml"><span class="meta tag xml"><span class="punctuation definition tag xml"><span>&lt;/</span></span><span class="entity name tag localname xml"><span>div</span></span><span class="punctuation definition tag xml"><span>&gt;</span></span></span></span></div><div class="line"><span class="text xml"><span class="meta tag xml"><span class="punctuation definition tag xml"><span>&lt;</span></span><span class="entity name tag localname xml"><span>div</span></span><span>&nbsp;</span><span class="entity other attribute-name localname xml"><span>class</span></span><span>=</span><span class="string quoted double xml"><span class="punctuation definition string begin xml"><span>&quot;</span></span><span>some-other-class-name&nbsp;syndicate</span><span class="punctuation definition string end xml"><span>&quot;</span></span></span><span class="punctuation definition tag xml"><span>&gt;</span></span></span></span></div><div class="line"><span class="text xml"><span>&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="meta tag xml"><span class="punctuation definition tag xml"><span>&lt;</span></span><span class="entity name tag localname xml"><span>p</span></span><span class="punctuation definition tag xml"><span>&gt;</span></span></span></span></div><div class="line"><span class="text xml"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;is&nbsp;more&nbsp;syndicated&nbsp;content!</span></span></div><div class="line"><span class="text xml"><span>&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="meta tag xml"><span class="punctuation definition tag xml"><span>&lt;/</span></span><span class="entity name tag localname xml"><span>p</span></span><span class="punctuation definition tag xml"><span>&gt;</span></span></span></span></div><div class="line"><span class="text xml"><span class="meta tag xml"><span class="punctuation definition tag xml"><span>&lt;</span></span><span class="entity name tag localname xml"><span>div</span></span><span class="punctuation definition tag xml"><span>&gt;</span></span></span></span></div></pre>
+<h3 id="configure-the-publishing-design">Configure the Publishing Design</h3>
+<p>These are general instructions for configuring the delivery handler and content lists and attaching the content lists to a publishing edition. Per site publishing configuration will dictate the naming of content lists and editions, and specific publishing requirements may require configuration that is out-of-scope for this document.</p>
+<h4 id="add-the-syndication_delivery_handler-delivery-type">Add the Syndication_Delivery_Handler Delivery Type</h4>
+<ol>
 <li>Log into the Rhythmyx Content Management application</li>
-<li>Click the 'Publishing Design' tab</li>
-<li>Click 'Delivery Types' on the left-hand side</li>
-<li>Click 'Action &gt; Create Delivery Type'</li>
+<li>Click the &#39;Publishing Design&#39; tab</li>
+<li>Click &#39;Delivery Types&#39; on the left-hand side</li>
+<li>Click &#39;Action &gt; Create Delivery Type&#39;</li>
 <li>Set:<ul>
 <li>Name = Syndication_Delivery_Handler</li>
 <li>Description = Publishes content to the Syndication REST API</li>
 <li>Spring Bean Name = syndication</li>
 </ul>
 </li>
-<li>Click 'Save'</li>
+<li>Click &#39;Save&#39;</li>
 <li>Restart the Rhythmyx application server for the changes to take effect.</li>
-</ol><h4 id="create-a-new-content-list">Create a new Content List</h4><h5 id="to-create-a-full-publish-content-list-do-the-following-">To create a 'Full' publish content list, do the following:</h5><ol>
+</ol>
+<h4 id="create-a-new-content-list">Create a new Content List</h4>
+<h5 id="to-create-a-full-publish-content-list-do-the-following-">To create a &#39;Full&#39; publish content list, do the following:</h5>
+<ol>
 <li>Log into the Rhythmyx Content Management application</li>
-<li>Click the 'Publishing Design' tab</li>
-<li>Click 'Sites' on the left-hand side</li>
-<li>Click the site to which the delivery handler will be used and then click 'Content Lists'</li>
-<li>Click 'Action &gt; Create Content List'</li>
+<li>Click the &#39;Publishing Design&#39; tab</li>
+<li>Click &#39;Sites&#39; on the left-hand side</li>
+<li>Click the site to which the delivery handler will be used and then click &#39;Content Lists&#39;</li>
+<li>Click &#39;Action &gt; Create Content List&#39;</li>
 <li>Set:<ul>
 <li>Name = Syndication_Publish_Full</li>
 <li>Description = Full publish to the Syndication REST API</li>
@@ -166,19 +520,21 @@ http.socket.timeout = <span class="hljs-number">30</span>
 <li>Delivery Type = Syndication_Delivery_Handler</li>
 <li>Item Filter = public</li>
 <li>Generator = Java/global/percussion/system/sys_SearchGenerator</li>
-<li>query = select rx:sys_contentid, rx:sys_folderid from rx:BasicPage where rx:syndicatable = 'Yes'</li>
+<li>query = select rx:sys_contentid, rx:sys_folderid from rx:BasicPage where rx:syndicatable = &#39;Yes&#39;</li>
 <li>Template Expander = Java/global/percussion/system/sys_ListTemplateExpander</li>
 <li>default_template = Syndication_Publish</li>
 </ul>
 </li>
-<li>Using a comma separator, modify the above 'query' to add other content types other than rx:BasicPage</li>
-<li>Click 'Save'</li>
-</ol><h5 id="to-create-an-incremental-publish-content-list-do-the-following-">To create an 'Incremental' publish content list, do the following:</h5><ol>
+<li>Using a comma separator, modify the above &#39;query&#39; to add other content types other than rx:BasicPage</li>
+<li>Click &#39;Save&#39;</li>
+</ol>
+<h5 id="to-create-an-incremental-publish-content-list-do-the-following-">To create an &#39;Incremental&#39; publish content list, do the following:</h5>
+<ol>
 <li>Log into the Rhythmyx Content Management application</li>
-<li>Click the 'Publishing Design' tab</li>
-<li>Click 'Sites' on the left-hand side</li>
-<li>Click the site to which the delivery handler will be used and then click 'Content Lists'</li>
-<li>Click 'Action &gt; Create Content List'</li>
+<li>Click the &#39;Publishing Design&#39; tab</li>
+<li>Click &#39;Sites&#39; on the left-hand side</li>
+<li>Click the site to which the delivery handler will be used and then click &#39;Content Lists&#39;</li>
+<li>Click &#39;Action &gt; Create Content List&#39;</li>
 <li>Set:<ul>
 <li>Name = Syndication_Publish_Incremental</li>
 <li>Description = Incremental publish to the Syndication REST API</li>
@@ -186,48 +542,52 @@ http.socket.timeout = <span class="hljs-number">30</span>
 <li>Delivery Type = Syndication_Delivery_Handler</li>
 <li>Item Filter = public</li>
 <li>Generator = Java/global/percussion/system/sys_SearchGenerator</li>
-<li>query = select rx:sys_contentid, rx:sys_folderid from rx:BasicPage where rx:syndicatable = 'Yes'</li>
+<li>query = select rx:sys_contentid, rx:sys_folderid from rx:BasicPage where rx:syndicatable = &#39;Yes&#39;</li>
 <li>Template Expander = Java/global/percussion/system/sys_ListTemplateExpander</li>
 <li>default_template = Syndication_Publish</li>
 </ul>
 </li>
-<li>Using a comma separator, modify the above 'query' to add other content types other than rx:BasicPage</li>
-<li>Click 'Save'</li>
-</ol><h4 id="associate-the-content-list-with-a-publishing-edition">Associate the Content List with a Publishing Edition</h4><ol>
-<li>Click the 'Publishing Design' tab</li>
-<li>Click 'Sites' on the left-hand side</li>
-<li>Click the site to which the delivery handler will be used and then click 'Editions'</li>
+<li>Using a comma separator, modify the above &#39;query&#39; to add other content types other than rx:BasicPage</li>
+<li>Click &#39;Save&#39;</li>
+</ol>
+<h4 id="associate-the-content-list-with-a-publishing-edition">Associate the Content List with a Publishing Edition</h4>
+<ol>
+<li>Click the &#39;Publishing Design&#39; tab</li>
+<li>Click &#39;Sites&#39; on the left-hand side</li>
+<li>Click the site to which the delivery handler will be used and then click &#39;Editions&#39;</li>
 <li>Click the edition to which the delivery handler will be used</li>
-<li>Click 'Action &gt; Add Content List Association...'</li>
-<li>Type 'Syndication' in the 'Filter Content List' and click 'Apply'</li>
-<li>Click the checkbox the Content List that was created in the previous section (i.e. 'Syndication_Publish_Full')</li>
+<li>Click &#39;Action &gt; Add Content List Association...&#39;</li>
+<li>Type &#39;Syndication&#39; in the &#39;Filter Content List&#39; and click &#39;Apply&#39;</li>
+<li>Click the checkbox the Content List that was created in the previous section (i.e. &#39;Syndication_Publish_Full&#39;)</li>
 <li>Set:<ul>
 <li>Delivery Context = (set to delivery context of which the delivery handler will be used, ex. Publish)</li>
 <li>Assembly Context = (set to delivery context of which the delivery handler will be used, ex. Publish)</li>
 <li>Authtype = unselected</li>
 </ul>
 </li>
-<li>Click 'Add'</li>
-<li>Click 'Save'</li>
-</ol><h2 id="uninstall-procedures">Uninstall Procedures</h2><h3 id="remove-the-publishing-contexts">Remove the publishing contexts</h3><p>To remove the publishing contexts, perform the following actions within the Rhythmyx Content Explorer:</p><ol>
-<li>Click the 'Publishing Design' tab</li>
-<li>Click 'Editions'</li>
-<li>Click the edition to which the 'Syndication_Publish_Incremental' or 'Syndication_Publish_Full' content list was added</li>
-<li>Click the radio button of the 'Syndication_Publish_Incremental' or 'Syndication_Publish_Full' content list</li>
-<li>Click 'Action &gt; Delete Selected Row'</li>
-<li>Click 'Save'</li>
-<li>Click 'Unused Content Lists' on the left-hand side</li>
-<li>Type 'Syndication' in the 'Filter Content List' and click 'Apply'</li>
-<li>Click the radio button of the 'Syndication_Publish_Incremental' or 'Syndication_Publish_Full' content list</li>
-<li>Click 'Action &gt; Delete Selected Content List' and then click 'Delete' on the subsequent page</li>
-<li>Click 'Delivery Types' in the left-hand side</li>
-<li>Click the radio button for the 'Syndication_Delivery_Handler'</li>
-<li>Click 'Action'</li>
-<li>Click 'Action &gt; Delete Selected Delivery Type' and then click 'Delete' on the subsequent page</li>
-</ol><h3 id="uninstall-the-delivery-handler">Uninstall the delivery handler</h3><p>Run the uninstall script in the root of the distribution by issuing the following commands:</p><pre class="bash hljs"><span class="hljs-built_in">cd</span> syndication-delivery-handler-<span class="hljs-number">0.2</span>.<span class="hljs-number">6</span>/
-./uninstall.sh
-</pre>
-
-<footer style="position:fixed; font-size:.8em; text-align:right; bottom:0px; margin-left:-25px; height:20px; width:100%;">generated by <a href="http://pad.haroopress.com" target="_blank">haroopad</a></footer>
-</body>
+<li>Click &#39;Add&#39;</li>
+<li>Click &#39;Save&#39;</li>
+</ol>
+<h2 id="uninstall-procedures">Uninstall Procedures</h2>
+<h3 id="remove-the-publishing-contexts">Remove the publishing contexts</h3>
+<p>To remove the publishing contexts, perform the following actions within the Rhythmyx Content Explorer:</p>
+<ol>
+<li>Click the &#39;Publishing Design&#39; tab</li>
+<li>Click &#39;Editions&#39;</li>
+<li>Click the edition to which the &#39;Syndication_Publish_Incremental&#39; or &#39;Syndication_Publish_Full&#39; content list was added</li>
+<li>Click the radio button of the &#39;Syndication_Publish_Incremental&#39; or &#39;Syndication_Publish_Full&#39; content list</li>
+<li>Click &#39;Action &gt; Delete Selected Row&#39;</li>
+<li>Click &#39;Save&#39;</li>
+<li>Click &#39;Unused Content Lists&#39; on the left-hand side</li>
+<li>Type &#39;Syndication&#39; in the &#39;Filter Content List&#39; and click &#39;Apply&#39;</li>
+<li>Click the radio button of the &#39;Syndication_Publish_Incremental&#39; or &#39;Syndication_Publish_Full&#39; content list</li>
+<li>Click &#39;Action &gt; Delete Selected Content List&#39; and then click &#39;Delete&#39; on the subsequent page</li>
+<li>Click &#39;Delivery Types&#39; in the left-hand side</li>
+<li>Click the radio button for the &#39;Syndication_Delivery_Handler&#39;</li>
+<li>Click &#39;Action&#39;</li>
+<li>Click &#39;Action &gt; Delete Selected Delivery Type&#39; and then click &#39;Delete&#39; on the subsequent page</li>
+</ol>
+<h3 id="uninstall-the-delivery-handler">Uninstall the delivery handler</h3>
+<p>Run the uninstall script in the root of the distribution by issuing the following commands:</p>
+<pre class="editor-colors lang-bash"><div class="line"><span class="source shell"><span class="support function builtin shell"><span>cd</span></span><span>&nbsp;syndication-delivery-handler-0.4.0/</span></span></div><div class="line"><span class="source shell"><span>./uninstall.sh</span></span></div></pre></body>
 </html>

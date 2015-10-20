@@ -5,7 +5,7 @@ package com.ctacorp.syndication.jobs
  */
 class contentChangeDetectionJob {
     static triggers = {
-        cron name: 'mediaValidationTrigger', cronExpression: "0 0 0 ? * *" //Every night at midnight
+        cron name: 'contentChangeDetectionTrigger', cronExpression: "0 0 0 ? * *" //Every night at midnight
     }
     
     def mediaItemsService

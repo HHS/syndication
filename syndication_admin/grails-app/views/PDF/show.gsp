@@ -5,8 +5,8 @@
     <meta name="layout" content="main">
     <g:set var="entityName" value="${message(code: 'PDF.label', default: 'PDF')}"/>
     <title><g:message code="default.show.label" args="[entityName]"/></title>
-    <asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
-    <asset:stylesheet src="/tokenInput/token-input.css"/>
+    <asset:javascript src="tokenInput/jquery.tokeninput.js"/>
+    <asset:stylesheet src="tokenInput/token-input.css"/>
 </head>
 
 <body>

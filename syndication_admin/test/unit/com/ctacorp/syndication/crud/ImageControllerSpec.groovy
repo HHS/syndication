@@ -25,7 +25,7 @@ class ImageControllerSpec extends Specification {
 
     def setup(){
         controller.mediaItemsService = mediaItemsService
-        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {image, subId ->if(image.save(flush:true)){return null} else{return "errors"}}
+        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {Image image, subId ->if(image.save(flush:true)){return image} else{return image}}
 
         controller.cmsManagerKeyService = cmsManagerKeyService
         controller.solrIndexingService = solrIndexingService

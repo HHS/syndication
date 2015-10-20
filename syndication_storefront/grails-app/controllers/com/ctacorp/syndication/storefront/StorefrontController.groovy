@@ -24,8 +24,8 @@ class StorefrontController {
         model
     }
 
-    def embedCodeForTag(Long id){
-        [tagName:params.tagName, id:id, renderTagList:true]
+    def embedCodeForTag(Long id) {
+        [tagName: params.tagName, id: id, renderTagList: true,userId: springSecurityService?.currentUser?.id ?: -1]
     }
 
     def listMediaForTag(Long id) {
@@ -37,11 +37,11 @@ class StorefrontController {
             tagsForMedia[it.id] = allTags.collect { [name: it.name, id: it.id] }
         }
         [
-            mediaItemInstanceList: mediaItemInstanceList,
-            tagsForMedia         : tagsForMedia,
-            tagName              : params.tagName,
-            tagId                : id,
-            likeInfo             : likeService.getAllMediaLikeInfo(mediaItemInstanceList)
+                mediaItemInstanceList: mediaItemInstanceList,
+                tagsForMedia         : tagsForMedia,
+                tagName              : params.tagName,
+                tagId                : id,
+                likeInfo             : likeService.getAllMediaLikeInfo(mediaItemInstanceList)
         ]
     }
 
@@ -81,7 +81,7 @@ class StorefrontController {
     def qa() {
         def adminEmail = grailsApplication.config.grails.mail.default.from
 
-        [adminEmail:adminEmail]
+        [adminEmail: adminEmail]
     }
 
     def reportAProblem() {
@@ -154,7 +154,8 @@ class StorefrontController {
                 alreadyLiked     : alreadyLiked,
                 likeCount        : likeCount,
                 mediaItemInstance: mediaItemInstance,
-                apiBaseUrl       : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+                apiBaseUrl       : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                userId           : springSecurityService?.currentUser?.id ?: -1
         ]
     }
 
@@ -173,14 +174,14 @@ class StorefrontController {
         redirect action: "showContent", id: mediaId
     }
 
-    def releaseInfo(){}
+    def releaseInfo() {}
 
     def showCampaign() {}
 
     def showAgency() {}
 
     private getTagsForMediaItem(MediaItem mediaItemInstance) {
-        tagService.getTagsForMediaId(mediaItemInstance.id).groupBy{ it.language.isoCode }
+        tagService.getTagsForMediaId(mediaItemInstance?.id).groupBy { it.language.isoCode }
     }
 
     private getTagsForMediaItems(Collection mediaItemInstanceList) {
@@ -207,18 +208,17 @@ class StorefrontController {
 
         //used if basic search is submitted
         if (params.searchQuery) {
-            DelayedQueryLogJob.schedule(new Date(System.currentTimeMillis() + 10000), [queryString:params.searchQuery])
+            DelayedQueryLogJob.schedule(new Date(System.currentTimeMillis() + 10000), [queryString: params.searchQuery])
             searchQuery = params.searchQuery
             mediaItemInstanceList = mediaService.mediaItemSolrSearch(searchQuery, params)
             total = mediaItemInstanceList?.totalCount
-            mediaItemInstanceList = mediaItemInstanceList?.results
             contentTitle = "Search Results: '${params.searchQuery}'"
-            likeInfo = likeService.getAllMediaLikeInfoFromJson(mediaItemInstanceList)
+            likeInfo = likeService.getAllMediaLikeInfo(mediaItemInstanceList)
         }
 
         //used if advanced search is submitted
         else if (params.advancedSearch) {
-            if(params.title){
+            if (params.title) {
                 DelayedQueryLogJob.schedule(new Date(System.currentTimeMillis() + 10000), [queryString: params.title])
             }
             params.topicItems = tagService.getMediaForTagId((params?.topic ?: 0) as Long, params).id.toListString() - '[' - ']'
@@ -246,22 +246,28 @@ class StorefrontController {
                 domain               : params.domain,
                 mediaType            : params.mediaType,
                 searchType           : searchType,
-                sourceList           : Source.list(),
+                sourceList           : Source.list(sort: "name", order: "ASC"),
                 source               : params.source,
                 topic                : params.topic,
                 topicList            : tagService.getTagsByType('topic'),
                 mediaTypes           : mediaService.getMediaTypes(),
                 advancedSearch       : advanced,
                 likeInfo             : likeInfo
-
         ]
     }
 
     def otherLookupOptions() {
-        render template: 'otherLookupOptions', model: [topicList: tagService.getTagsByType('topic'), sourceList: Source.list(), mediaTypes: mediaService.getMediaTypes(), languageList: Language.findAllByIsActive(true)]
+        render template: 'otherLookupOptions', model: [
+                sourceList  : Source.list(sort: "name", order: "ASC"),
+                mediaTypes  : mediaService.getMediaTypes(),
+                languageList: Language.findAllByIsActive(true, [sort: "name", order: "ASC"])]
     }
 
     def basicSearch() {
         render template: 'basicSearch'
+    }
+
+    def fiveOhEight() {
+        [featuredMedia: mediaService.getFeaturedMedia(max: 10)]
     }
 }

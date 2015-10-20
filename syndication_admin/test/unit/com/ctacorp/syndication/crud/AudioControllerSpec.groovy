@@ -40,7 +40,7 @@ class AudioControllerSpec extends Specification {
 
     def setup(){
         controller.mediaItemsService = mediaItemsService
-        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {widget, subId ->if(widget.save(flush:true)){return null} else{return "errors"}}
+        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {Audio audio, subId ->if(audio?.save(flush:true)){return audio} else{return audio}}
 
         controller.cmsManagerKeyService = cmsManagerKeyService
         controller.solrIndexingService = solrIndexingService
@@ -84,6 +84,7 @@ class AudioControllerSpec extends Specification {
         setup:""
             request.method = 'POST'
             populateValidParams(params)
+            params.subscriberId = 1
             def audio = new Audio(params).save(flush:true)
 
         when: "The save action is executed with an invalid instance"
@@ -91,8 +92,9 @@ class AudioControllerSpec extends Specification {
             controller.save(invalidAudio)
 
         then: "The create view is rendered again with the correct model"
-            model.audioInstance != null
+            flash.errors != null
             view == 'create'
+        model.audioInstance != null
 
         when: "The save action is executed with a valid instance"
             response.reset()

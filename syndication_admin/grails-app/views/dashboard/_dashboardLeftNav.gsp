@@ -49,7 +49,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <g:link controller="periodical"><i class="fa fa-clock-o fa-fw"></i> Periodicals</g:link>
                         </li>
                         <li>
-                            <g:link controller="socialMedia"><i class="fa fa-facebook fa-fw"></i> Social Media</g:link>
+                            <g:link controller="tweet"><i class="fa fa-twitter fa-fw"></i> Tweets</g:link>
                         </li>
                         <li>
                             <g:link controller="video"><i class="fa fa-video-camera fa-fw"></i> Videos</g:link>
@@ -84,10 +84,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <g:link controller="campaign"><i class="fa fa-flag fa-fw"></i> Campaigns</g:link>
                 </li>
             </sec:ifAnyGranted>
-            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER,ROLE_BASIC">
+            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER,ROLE_BASIC,ROLE_PUBLISHER">
                 <li>
                     <a href="#"><i class="fa fa-code-fork fa-fw"></i> Other<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
+
                         <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER">
                             <li>
                                 <g:link controller="alternateImage"><i
@@ -104,6 +105,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <li>
                             <g:link controller="source"><i class="fa fa-map-marker fa-fw"></i> Sources</g:link>
                         </li>
+                        <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_PUBLISHER">
+                            <li>
+                                <g:link controller="twitterAccount"><i
+                                        class="fa fa-twitter fa-fw"></i> Twitter Accounts</g:link>
+                            </li>
+                        </sec:ifAnyGranted>
+
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>

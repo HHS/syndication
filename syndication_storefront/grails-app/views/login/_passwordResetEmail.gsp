@@ -65,7 +65,7 @@
         <p>Please log in and change your password.</p>
         <p>Your current login information is:</p>
         <ul>
-            <li>Username: ${user.username}</li>
+            <li>Username: ${user?.username}</li>
             <li>Password: ${randomPassword}</li>
         </ul>
     </div>

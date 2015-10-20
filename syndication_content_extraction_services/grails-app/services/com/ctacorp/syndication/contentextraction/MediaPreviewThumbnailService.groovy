@@ -6,6 +6,7 @@ import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.Video
 import com.ctacorp.syndication.media.Periodical
 import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.Tweet
 
 import com.ctacorp.syndication.preview.MediaThumbnail
 import com.ctacorp.syndication.preview.MediaPreview
@@ -27,17 +28,39 @@ class MediaPreviewThumbnailService {
         switch(mi){
             case Periodical:
             case Html:
-                savePreview(mi, generatePreview(htmlUrl, mi.id))
-                saveThumbnail(mi, generateThumbnail(htmlUrl, mi.id))
+                savePreview(mi, generatePreview(htmlUrl))
+                saveThumbnail(mi, generateThumbnail(htmlUrl, ".5"))
                 break
             case Image:
             case Infographic:
             case Video:
-                savePreview(mi, generatePreview(imageAndVideoUrl, mi.id))
-                saveThumbnail(mi, generateThumbnail(imageAndVideoUrl, mi.id))
+                savePreview(mi, generatePreview(imageAndVideoUrl))
+                saveThumbnail(mi, generateThumbnail(imageAndVideoUrl))
+                break
+            case Tweet:
+                savePreview(mi, generatePreview(imageAndVideoUrl))
+                saveThumbnail(mi, generateThumbnail(imageAndVideoUrl))
                 break
             default:
                 log.error("Tried to generate thumbnail for an unsupported media type: ${mi}")
+        }
+
+        if(mi.customPreviewUrl) {
+            saveCustomPreview(mi, new URL(mi.customPreviewUrl).openStream())
+        } else {
+            MediaPreview mt = MediaPreview.findByMediaItem(mi)
+            if(mt){
+                mt.customImageData = null
+            }
+        }
+
+        if(mi.customThumbnailUrl) {
+            saveCustomThumbnail(mi, new URL(mi.customThumbnailUrl).openStream())
+        } else {
+            MediaThumbnail mt = MediaThumbnail.findByMediaItem(mi)
+            if(mt){
+                mt.customImageData = null
+            }
         }
 
         previewAndThumbnail(mi)
@@ -53,23 +76,22 @@ class MediaPreviewThumbnailService {
         return [preview: MediaPreview.findByMediaItem(m), thumbnail: MediaThumbnail.findByMediaItem(m)]
     }
 
-    private InputStream generateThumbnail(String sourceUrl, Long id) {
+    private InputStream generateThumbnail(String sourceUrl, String scale = "1") {
         int width = 250
         int height = 188
-        String scale = '.4'
 
         String manetCommand = "${config?.manet?.server?.url ?: 'http://localhost:8891'}/" +
                 "?url=${URLEncoder.encode(sourceUrl, "UTF-8")}" +
                 "&format=jpg" +
                 "&width=${width+1}" +
                 "&height=${height+1}" +
-                "&zoom=${scale}" +
                 "&quality=1" +
+                "&zoom=${scale}" +
                 "&clipRect=1%2C1%2C${width}%2C${height}"
         new URL(manetCommand).openStream()
     }
 
-    private generatePreview(String sourceUrl, Long id){
+    private generatePreview(String sourceUrl){
         int width = 1024
         int height = 768
         String scale = '1'
@@ -82,7 +104,7 @@ class MediaPreviewThumbnailService {
                 "&zoom=${scale}" +
                 "&quality=1" +
                 "&clipRect=1%2C1%2C${width}%2C${height}"
-       new URL(manetCommand).openStream()
+        new URL(manetCommand).openStream()
     }
 
     protected saveThumbnail(MediaItem mi, InputStream is){
@@ -99,6 +121,20 @@ class MediaPreviewThumbnailService {
         }
     }
 
+    protected saveCustomThumbnail(MediaItem mi, InputStream is){
+        Byte[] imageData = IOUtils.toByteArray(is);
+        MediaThumbnail mt = MediaThumbnail.findByMediaItem(mi)
+        if(mt){
+            mt.customImageData = imageData
+        } else{
+            mt = new MediaThumbnail(mediaItem: mi, customImageData:imageData)
+        }
+        def result = mt.save(flush:true)
+        if(!result){
+            log.error("Error saving thumbnail: ${mt.errors}")
+        }
+    }
+
     protected savePreview(MediaItem mi, InputStream is){
         Byte[] imageData = IOUtils.toByteArray(is);
         MediaPreview mt = MediaPreview.findByMediaItem(mi)
@@ -106,6 +142,20 @@ class MediaPreviewThumbnailService {
             mt.imageData = imageData
         } else{
             mt = new MediaPreview(mediaItem: mi, imageData:imageData)
+        }
+        def result = mt.save(flush:true)
+        if(!result){
+            log.error("Error saving thumbnail: ${mt.errors}")
+        }
+    }
+
+    protected saveCustomPreview(MediaItem mi, InputStream is){
+        Byte[] imageData = IOUtils.toByteArray(is);
+        MediaPreview mt = MediaPreview.findByMediaItem(mi)
+        if(mt){
+            mt.customImageData = imageData
+        } else{
+            mt = new MediaPreview(mediaItem: mi, customImageData:imageData)
         }
         def result = mt.save(flush:true)
         if(!result){

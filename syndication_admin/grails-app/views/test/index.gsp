@@ -28,5 +28,12 @@
 <div>
   <g:link controller="mediaPreviewThumbnail" action="allThumbnails">All Thumbnails</g:link>
 </div>
+<hr/>
+<div>
+    <g:form action="putMessageOnQueue">
+        <g:textField name="messageText"/>
+        <g:submitButton name="sendMessage" value="Send Message"/>
+    </g:form>
+</div>
 </body>
 </html>

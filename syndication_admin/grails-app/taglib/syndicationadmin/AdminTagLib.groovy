@@ -27,6 +27,7 @@ class AdminTagLib {
             error:'raw',
             errors:'raw',
             message:'raw',
+            messages:'raw',
             currentUser:'raw',
             healthFailureIcon:'raw'
     ]
@@ -85,6 +86,18 @@ class AdminTagLib {
         out << "</div></div>"
     }
 
+    def messages = { attrs ->
+        if(!flash.messages){ return }
+
+        out << "<div class='row'><div class=\"alert alert-info alert-dismissable break-word\">"
+        out << "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-hidden=\"true\">&times;</button><ul>"
+        flash.messages.each{ msg ->
+            out << "<li>${msg.message}</li>"
+        }
+
+        out << "</ul></div></div>"
+    }
+
     def eventIcon = { attrs, body ->
         out << """<i class="fa """
 
@@ -126,16 +139,27 @@ class AdminTagLib {
     def healthFailureIcon = { attrs, body ->
         def prettyName = FlaggedMedia.FailureType."${attrs.failureType}".prettyName
         switch(attrs.failureType){
-            case "UNREACHABLE":     out << "<i title='${prettyName}' class='fa fa-chain-broken fa-2x text-danger'></i>"
+            case "UNREACHABLE":         out << "<i title='${prettyName}' class='fa fa-chain-broken fa-2x text-danger'></i>"
                 break
-            case "SERVER_ERROR":    out << "<i title='${prettyName}' class='fa fa-ban fa-2x text-danger'></i>"
+            case "SERVER_ERROR":        out << "<i title='${prettyName}' class='fa fa-ban fa-2x text-danger'></i>"
                 break
-            case "UNEXTRACTABLE":   out << "<i title='${prettyName}' class='fa fa-warning fa-2x text-danger'></i>"
+            case "UNEXTRACTABLE":       out << "<i title='${prettyName}' class='fa fa-warning fa-2x text-danger'></i>"
                 break
-            case "NO_CONTENT":      out << "<i title='${prettyName}' class='fa fa-file-o fa-2x text-danger'></i>"
+            case "NO_CONTENT":          out << "<i title='${prettyName}' class='fa fa-file-o fa-2x text-danger'></i>"
                 break
-            case "SHORT_CONTENT":   out << "<i title='${prettyName}' class='fa fa-adjust fa-2x text-warning'></i>"
+            case "SHORT_CONTENT":       out << "<i title='${prettyName}' class='fa fa-adjust fa-2x text-warning'></i>"
                 break
+            case "NO_PREVIEW_THUMBNAIL":out << "<i title='${prettyName}' class='fa fa-picture-o fa-2x text-warning'></i>"
+                break
+        }
+    }
+
+    def percentColor = { attrs ->
+        switch(attrs.percent){
+            case 80..100: out << 'success'; return
+            case 60..<80: out << 'info'; return
+            case 40..<60: out << 'warning'; return
+            case 0..<40: out <<  'danger'; return
         }
     }
 

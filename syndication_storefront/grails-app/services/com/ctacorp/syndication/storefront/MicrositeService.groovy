@@ -9,6 +9,10 @@ import com.ctacorp.syndication.microsite.MicroSite
 import com.ctacorp.syndication.microsite.MediaSelector
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
+import org.codehaus.groovy.grails.validation.routines.UrlValidator
+import org.hibernate.validator.internal.constraintvalidators.URLValidator
+
+import javax.annotation.PostConstruct
 
 @Transactional
 class MicrositeService {
@@ -19,22 +23,28 @@ class MicrositeService {
     def mediaService
     RestBuilder rest = new RestBuilder()
 
+    @PostConstruct
+    void init() {
+        rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
+    }
+
     def serviceMethod() {
 
     }
 
     def saveBuild(params, templateType){
+        def validator = new UrlValidator()
         MicroSite microSite = new MicroSite()
         microSite.user = User.get(springSecurityService.currentUser.id)
         microSite.title = params.title
-        microSite.logoUrl = params.logo ? new URL(params.logo): null
+        microSite.logoUrl = validator.isValid(params.logo) ? new URL(params.logo): null
         microSite.footerText = params.footerText
         microSite.templateType = templateType
         microSite = updateMediaAreas(microSite, params)
-        microSite.footerLink1 = params.footerLink1 ? new URL(params.footerLink1) : null
-        microSite.footerLink2 = params.footerLink2 ? new URL(params.footerLink2) : null
-        microSite.footerLink3 = params.footerLink3 ? new URL(params.footerLink3) : null
-        microSite.footerLink4 = params.footerLink4 ? new URL(params.footerLink4) : null
+        microSite.footerLink1 = validator.isValid(params.footerLink1) ? new URL(params.footerLink1) : null
+        microSite.footerLink2 = validator.isValid(params.footerLink2) ? new URL(params.footerLink2) : null
+        microSite.footerLink3 = validator.isValid(params.footerLink3) ? new URL(params.footerLink3) : null
+        microSite.footerLink4 = validator.isValid(params.footerLink4) ? new URL(params.footerLink4) : null
         microSite.footerLinkName1 = params.footerLinkName1
         microSite.footerLinkName2 = params.footerLinkName2
         microSite.footerLinkName3 = params.footerLinkName3
@@ -54,15 +64,16 @@ class MicrositeService {
     }
     
     def updateBuild(MicroSite microSite, params){
+        def validator = new UrlValidator()
         microSite.user = User.get(springSecurityService.currentUser.id)
         microSite.title = params.title
-        microSite.logoUrl = params.logo ? new URL(params.logo): null
+        microSite.logoUrl = validator.isValid(params.logo) ? new URL(params.logo): null
         microSite.footerText = params.footerText
         microSite = updateMediaAreas(microSite, params)
-        microSite.footerLink1 = params.footerLink1 ? new URL(params.footerLink1) : null
-        microSite.footerLink2 = params.footerLink2 ? new URL(params.footerLink2) : null
-        microSite.footerLink3 = params.footerLink3 ? new URL(params.footerLink3) : null
-        microSite.footerLink4 = params.footerLink4 ? new URL(params.footerLink4) : null
+        microSite.footerLink1 = validator.isValid(params.footerLink1) ? new URL(params.footerLink1) : null
+        microSite.footerLink2 = validator.isValid(params.footerLink2) ? new URL(params.footerLink2) : null
+        microSite.footerLink3 = validator.isValid(params.footerLink3) ? new URL(params.footerLink3) : null
+        microSite.footerLink4 = validator.isValid(params.footerLink4) ? new URL(params.footerLink4) : null
         microSite.footerLinkName1 = params.footerLinkName1
         microSite.footerLinkName2 = params.footerLinkName2
         microSite.footerLinkName3 = params.footerLinkName3
@@ -111,15 +122,16 @@ class MicrositeService {
                 mediaItems = tagService.getMediaForTagId(mediaArea.selectionId, [sort:mediaArea.sortBy, order:mediaArea.orderBy,max:max, offset:offset])
                 break
             case MediaSelector.SelectorType.COLLECTION: List<Long> mediaItemIds = Collection.get(mediaArea.selectionId)?.mediaItems?.id
-                mediaItems = MediaItem.findAllByIdInList(mediaItemIds, [sort:mediaArea.sortBy, order:mediaArea.orderBy,max:max, offset:offset])
+                mediaItems = MediaItem.facetedSearch(restrictToSet:mediaItemIds?.join(',') ?: "0", active:true, visibleInStorefront:true, syndicationVisibleBeforeDate:new Date().toString()).list([sort:mediaArea.sortBy, order:mediaArea.orderBy,max:max, offset:offset])
                 break
-            case MediaSelector.SelectorType.SOURCE: mediaItems = MediaItem.findAllBySource(Source.get(mediaArea.selectionId), [sort:mediaArea.sortBy, order:mediaArea.orderBy,max:max, offset:offset])
+            case MediaSelector.SelectorType.SOURCE:
+                mediaItems = MediaItem.facetedSearch(sourceId:"${Source.get(mediaArea.selectionId).id}", active:true, visibleInStorefront:true, syndicationVisibleBeforeDate:new Date().toString()).list([sort:mediaArea.sortBy, order:mediaArea.orderBy,max:max, offset:offset])
                 break
             case MediaSelector.SelectorType.USER_MEDIA_LIST: List<Long> mediaItemIds = UserMediaList.get(mediaArea.selectionId)?.mediaItems?.id
-                mediaItems = MediaItem.findAllByIdInList(mediaItemIds, [sort:mediaArea.sortBy, order:mediaArea.orderBy,max:max, offset:offset])
+                mediaItems = MediaItem.facetedSearch(restrictToSet:mediaItemIds?.join(',') ?: "0", active:true, visibleInStorefront:true, syndicationVisibleBeforeDate:new Date().toString()).list([sort:mediaArea.sortBy, order:mediaArea.orderBy,max:max, offset:offset])
                 break
             case MediaSelector.SelectorType.CAMPAIGN: List<Long> mediaItemIds = Campaign.get(mediaArea.selectionId)?.mediaItems?.id
-                mediaItems = MediaItem.findAllByIdInList(mediaItemIds, [sort:mediaArea.sortBy, order:mediaArea.orderBy,max:max, offset:offset])
+                mediaItems = MediaItem.facetedSearch(restrictToSet:mediaItemIds?.join(',') ?: "0", active:true, visibleInStorefront:true, syndicationVisibleBeforeDate:new Date().toString()).list([sort:mediaArea.sortBy, order:mediaArea.orderBy,max:max, offset:offset])
                 break
         }
         mediaItems

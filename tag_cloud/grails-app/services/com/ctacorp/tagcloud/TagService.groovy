@@ -24,6 +24,7 @@ import tagcloud.domain.TagType
 class TagService {
     def contentItemService
     def solrIndexingService
+
     @Transactional
     ContentItem tagContentItem(ContentItem ci, Tag tag) {
         ci.addToTags(tag)
@@ -53,6 +54,14 @@ class TagService {
                 ci.tags.remove(tag)
             }
         }
+        ci
+    }
+
+    @Transactional
+    ContentItem tagSyndicatedItemByName(String tagName, String url, Long syndicationId, Long languageId, Long typeId){
+        Tag tag = findOrSaveTag(tagName, Language.load(languageId), TagType.load(typeId))
+        ContentItem ci = contentItemService.findOrSaveContentItem(url, syndicationId)
+        tagContentItem(ci, tag)
         ci
     }
 

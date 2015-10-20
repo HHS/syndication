@@ -14,7 +14,11 @@
 .microsite-blog-right-col-top,
 .microsite-blog-right-col-bottom {
   border-radius: 5px;
-  padding: 15px;}
+  padding-right: 20px;
+  padding-left: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
 
 .microsite-blog-right-col-top {
   margin-bottom: 15px;
@@ -28,7 +32,6 @@
 .microsite-blog-right-col-bottom {
   background-color: #59A5D8;
   border-radius: 5px;
-  padding: 15px;
 }
 
 

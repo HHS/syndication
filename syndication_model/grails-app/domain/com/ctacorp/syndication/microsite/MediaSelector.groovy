@@ -20,7 +20,13 @@ class MediaSelector {
     }
 
     enum SelectorType{
-        TAG, COLLECTION, SOURCE, USER_MEDIA_LIST, CAMPAIGN, MOST_POPULAR, MOST_RECENT
+        TAG("Tag"), COLLECTION("Collection"), SOURCE("Source"), USER_MEDIA_LIST("My List"), CAMPAIGN("Campaign"), MOST_POPULAR("Most Popular"), MOST_RECENT("Most Recent")
+
+        String name
+
+        SelectorType(String name){
+            this.name = name
+        }
     }
 
     enum DisplayStyle{

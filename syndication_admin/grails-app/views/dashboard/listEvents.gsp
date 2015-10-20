@@ -18,9 +18,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <head>
     <title>Event Log</title>
     <meta name="layout" content="dashboard"/>
-    <asset:javascript src="/plugins/dataTables/jquery.dataTables.js"/>
-    <asset:javascript src="/plugins/dataTables/dataTables.bootstrap.js"/>
-    <asset:stylesheet src="/plugins/dataTables/dataTables.bootstrap.min.css"/>
+    <asset:javascript src="plugins/dataTables/jquery.dataTables.js"/>
+    <asset:javascript src="plugins/dataTables/dataTables.bootstrap.js"/>
+    <asset:stylesheet src="plugins/dataTables/dataTables.bootstrap.min.css"/>
 </head>
 
 <body>

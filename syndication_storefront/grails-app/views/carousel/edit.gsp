@@ -18,18 +18,20 @@
 <body>
 
 <g:render template="/microsite/topNav"/>
-<g:form action="update" id="${microSite?.id}" class="form-horizontal helps-footer">
+<g:form action="update" id="${microSite?.id}" name="micrositeForm" method="post" class="form-horizontal helps-footer">
 <div class="container microsite-builder">
 
   <div class="row">
 
     <div class="microsite-builder-header col-sm-4">
-
-      <h1>Microsite Builder<span class="beta-badge"></span></h1>
+      <a id="pageContent"></a>
+      <h1>Microsite Builder<span class="beta-badge"><asset:image src="microsite/beta-badge.png" alt="Currently in beta"/></span></h1>
 
       <h2>Carousel Site</h2>
 
       <p>You're editing '${microSite?.title ?: "a none titled microsite"}'</p>
+
+        <g:render template="../microsite/formDirections"/>
 
     </div><!-- end microsite-builder-header col-sm-4 -->
 
@@ -41,49 +43,44 @@
 
         <div class="header">
 
-            <a data-toggle="modal" data-target="#modal-header" data-slide-to="0">
-                <div class="outlined">
-                    <div class="section"><span>header</span></div>
-                </div>
-            </a>
+            <a id="head-modal" tabIndex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="0"></a>
+            <div class="outlined" onkeypress="if(event.keyCode==13){$('#head-modal').click();return false;}" data-toggle="modal" data-target="#modal-header" data-slide-to="0" tabindex="0" role="link">
+                <div class="section"><span>header</span></div>
+            </div>
 
         </div>
 
         <div class="content clearfix">
 
-            <a data-toggle="modal" data-target="#modal-header" data-slide-to="1">
-                <div class="outlined main">
-                    <div class="section"><span>main content</span></div>
-                </div>
-            </a>
+            <a id="main-modal" tabindex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="1"></a>
+            <div class="outlined main" onkeypress="if(event.keyCode==13){$('#main-modal').click();return false;}" data-toggle="modal" data-target="#modal-header" data-slide-to="1" tabindex="0" role="link">
+                <div class="section"><span>main content</span></div>
+            </div>
 
-            <a data-toggle="modal" data-target="#modal-header" data-slide-to="2">
-                <div class="outlined left">
-                    <div class="section"><span>left<br/>sidebar</span></div>
-                </div>
-            <a>
+            <a id="bottom-left-modal" tabIndex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="2"></a>
+            <div class="outlined left" onkeypress="if(event.keyCode==13){$('#bottom-left-modal').click();return false;}" data-toggle="modal" data-target="#modal-header" data-slide-to="2" tabindex="0" role="link">
+                <div class="section"><span>left<br/>sidebar</span></div>
+            </div>
 
-            <a data-toggle="modal" data-target="#modal-header" data-slide-to="3">
-                <div class="outlined right">
-                    <div class="section"><span>right<br>sidebar</span></div>
-                </div>
-            </a>
+            <a id="bottom-right-modal" tabIndex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="3"></a>
+            <div class="outlined right" onkeypress="if(event.keyCode==13){$('#bottom-right-modal').click();return false;}" data-toggle="modal" data-target="#modal-header" data-slide-to="3" tabindex="0" role="link">
+                <div class="section"><span>right<br>sidebar</span></div>
+            </div>
 
         </div>
 
         <div class="footer">
 
-            <a data-toggle="modal" data-target="#modal-header" data-slide-to="4">
-                <div class="outlined">
-                    <div class="section"><span>footer</span></div>
-                </div>
-            </a>
+            <a id="foot-modal" tabIndex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="4"></a>
+            <div class="outlined" onkeypress="if(event.keyCode==13){$('#foot-modal').click();return false;}" data-toggle="modal" data-target="#modal-header" data-slide-to="4" tabindex="0" role="link">
+                <div class="section"><span>footer</span></div>
+            </div>
 
         </div>
 
         <div class="builder-actions">
           
-          <g:actionSubmit class="btn btn-submit" action="update" value="Update"/>
+          <input type="button" class="btn btn-submit" onclick="submitClick()" value="Update"/>
           <g:link class="btn btn-default" controller="microsite" action="index">Cancel</g:link>
            
         </div>

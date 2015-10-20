@@ -4,11 +4,7 @@ Syndication Content Extraction Services Plugin
 Dependencies
 -----------------------------------------------
 ### Plugins
-- org.grails.plugins:syndication-model:1.5.0_SNAPSHOT4
-
-Add to your buildConfig.groovy/plugins:
-
-    runtime 'org.grails.plugins:syndication-model:1.5.0_SNAPSHOT4'
+- org.grails.plugins:syndication-model:2.1.x
 
 Structure
 ------------------------------------------------
@@ -21,14 +17,18 @@ All content extraction services are provided here for easy re-use. Core services
                 └── contentextraction
                     ├── ContentCacheService.groovy
                     ├── ContentRetrievalService.groovy
+                    ├── FileService.groovy
                     ├── JsoupWrapperService.groovy
-                    └── WebUtilService.groovy
+                    ├── MediaPreviewThumbnailService.groovy
+                    ├── NativeToolsService.groovy
+                    ├── WebUtilService.groovy
+                    └── YoutubeService.groovy
 
     src
-    └── groovy
-        └── com
-            └── ctacorp
-                └── syndication
-                    └── exception
-                        ├── ContentNotExtractableException.groovy
-                        └── ContentUnretrievableException.groovy
+    └── com
+        └── ctacorp
+            └── syndication
+                └── exception
+                    ├── ContentNotExtractableException.groovy
+                    ├── ContentUnretrievableException.groovy
+                    └── InaccessibleVideoException.groovy

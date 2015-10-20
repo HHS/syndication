@@ -74,9 +74,9 @@ class InfographicController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(infographicInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        infographicInstance =  mediaItemsService.updateItemAndSubscriber(infographicInstance, params.long('subscriberId'))
+        if(infographicInstance.hasErrors()){
+            flash.errors = infographicInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             respond infographicInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers(), formats:["jpg", "png"]]
             return
         }
@@ -105,9 +105,9 @@ class InfographicController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(infographicInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        infographicInstance =  mediaItemsService.updateItemAndSubscriber(infographicInstance, params.long('subscriberId'))
+        if(infographicInstance.hasErrors()){
+            flash.errors = infographicInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             redirect action:'edit', id:params.id
             return
         }

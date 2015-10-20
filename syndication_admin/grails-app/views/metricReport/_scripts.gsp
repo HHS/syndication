@@ -10,7 +10,6 @@
         });
 
         //go to the latest tab, if it exists:
-        console.log(localStorage.getItem('lastTab'));
         var lastTab = localStorage.getItem('lastTab');
         if (lastTab) {
             $('#'+lastTab).tab('show');
@@ -487,4 +486,53 @@
     var agencyLineGraph;
     var storefrontAgencyGraph;
     var apiAgencyGraph;
+</script>
+
+ %{--General--}%
+<script>
+    $(document).ready(function() {
+        if (localStorage.getItem('lastTab') == "generalTab") {
+            initGeneralLineChart();
+        }
+    });
+
+    $("#generalTab").click(function(){
+        initGeneralLineChart();
+    });
+
+    function initGeneralLineChart(){
+        $("div#generalTotalLineGraph").html('<div id="spinnerDivGeneral" style="width:50px;" class="center-block"><asset:image src="spinner.gif"/></div>');
+        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/getTotalLineGraph', function (data) {
+            console.log("before clear")
+            $("#spinnerDivGeneral").fadeOut("fast",function(){
+                $("div#generalTotalLineGraph").html('');
+                console.log("here");
+                generalTotalLine(data, "generalTotalLineGraph");
+            });
+        });
+    }
+
+    function generalTotalLine(data, element) {
+        agencyLineGraph = Morris.Line({
+            // ID of the element in which to draw the chart.
+            element: ""+element,
+            // Chart data records -- each entry in this array corresponds to a point on
+            // the chart.
+//    data: data.data,
+            data: data.data,
+            // The name of the data record attribute that contains x-values.
+            xkey: data.xkey,
+            xLabels: 'month',
+            // A list of names of data record attributes that contain y-values.
+            ykeys: data.ykeys,
+            // Labels for the ykeys -- will be displayed when you hover over the
+            // chart.
+            labels: data.labels,
+            hideHover: 'auto',
+            resize: true
+        });
+        return agencyLineGraph;
+    }
+
+    var generalTotalLineGraph
 </script>

@@ -1,8 +1,8 @@
-# Syndication Delivery Handler 0.3.0 Installation and Configuration Guide
+# Syndication Delivery Handler 0.4.0 Installation and Configuration Guide
 
 ## Build Number
 
-The build number associated with this release of the *Syndication Delivery Handler* is **0.3.0**. This number should be indicated when requesting support or administration of this release.
+The build number associated with this release of the *Syndication Delivery Handler* is **0.4.0**. This number should be indicated when requesting support or administration of this release.
 
 ## Nomenclature
 
@@ -21,14 +21,14 @@ The Syndication Delivery Handler is a Rhythmyx delivery handler that publishes c
 
 ## Distribution Contents
 
-The delivery handler is distributed as a zip file, *syndication-delivery-handler-0.3.0.zip*, and contains the following:
+The delivery handler is distributed as a zip file, *syndication-delivery-handler-0.4.0.zip*, and contains the following:
 
 - **install.sh** - The installer script that copies the distribution's files to their respective locations.
 - **syndication_delivery_handler_config.groovy** - The configuration file for the delivery handler. See the *Installation and Configuration* section for details.
 - **syndication_delivery_handler.xml** - The Spring XML configuration file that enables the delivery handler in Rhythmyx.
 - **publishing_template.json** - The Velocity template used to publish content to the REST API.
 - **key_agreement.json** - The configuration that provides the security keys used to authenticate the delivery handler when publish requests are made to the REST API.
-- **syndication-delivery-handler-0.3.0.jar** - The JAR file containing all the required Java classes and resources needed by the delivery handler.
+- **syndication-delivery-handler-0.4.0.jar** - The JAR file containing all the required Java classes and resources needed by the delivery handler.
 
 ## Installation and Configuration
 
@@ -46,7 +46,7 @@ sudo apt-get install unzip
 ```
 4. Unzip the distribution with the following command:
 ```bash
-unzip syndication-delivery-handler-0.3.0.zip
+unzip syndication-delivery-handler-0.4.0.zip
 ```
 
 ### Configure the REST Client
@@ -80,7 +80,7 @@ When the install.sh is run during the install process, an encrypted version of t
 
 1. Run the install script in the root of the distribution by issuing the following commands:
 ```bash
-cd syndication-delivery-handler-0.3.0/
+cd syndication-delivery-handler-0.4.0/
 ./install.sh
 ```
 2. Select **'e'** at the following prompt:
@@ -278,6 +278,6 @@ To remove the publishing contexts, perform the following actions within the Rhyt
 Run the uninstall script in the root of the distribution by issuing the following commands:
 
 ```bash
-cd syndication-delivery-handler-0.3.0/
+cd syndication-delivery-handler-0.4.0/
 ./uninstall.sh
 ```

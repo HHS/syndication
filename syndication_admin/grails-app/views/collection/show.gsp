@@ -19,8 +19,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <meta name="layout" content="main">
     <g:set var="entityName" value="${message(code: 'collection.label', default: 'Collection')}"/>
     <title><g:message code="default.show.label" args="[entityName]"/></title>
-    <asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
-    <asset:stylesheet src="/tokenInput/token-input.css"/>
+    <asset:javascript src="tokenInput/jquery.tokeninput.js"/>
+    <asset:stylesheet src="tokenInput/token-input.css"/>
 </head>
 
 <body>

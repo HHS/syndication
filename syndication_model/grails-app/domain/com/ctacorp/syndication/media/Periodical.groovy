@@ -1,5 +1,12 @@
 package com.ctacorp.syndication.media
 
+import com.ctacorp.grails.swagger.annotations.ModelExtension
+import com.ctacorp.grails.swagger.annotations.ModelProperty
+import com.ctacorp.grails.swagger.annotations.PropertyAttribute
+
+@ModelExtension(id = "Periodical", model = "MediaItem", addProperties = [
+        @ModelProperty(propertyName = "period",  attributes = [@PropertyAttribute(type = "Period", required = true)]),
+])
 class Periodical extends MediaItem{
     Period period
 

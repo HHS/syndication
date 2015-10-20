@@ -4,6 +4,7 @@ import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.authentication.UserRole
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
 @Secured(["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_PUBLISHER"])
@@ -16,43 +17,34 @@ class AutoTaggingController {
         redirect action:"suggestedTags"
     }
 
-    def suggestedTags(Long languageId, Long lastIndex){
-        def language = languageId ? Language.get(languageId) : Language.findByIsoCode("eng")
+    def suggestedTags(Long languageId, Integer max, Integer offset){
+        max = Math.min(max ?: 50, 50)
+        offset = offset ?: 0
+        Language language = languageId ? Language.read(languageId): Language.findByIsoCode("eng")
+        languageId = language.id
+        def untaggedMedia
         def tagLanguage = tagService.getAllActiveTagLanguages().find{ it.isoCode == "eng" }
-        def mediaItems
+
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
-            def publisherItemIds = MediaItemSubscriber.findAllBySubscriberId(springSecurityService.currentUser.subscriberId).mediaItem.id
-            mediaItems = MediaItem.findAllByLanguageAndIdGreaterThanAndIdInList(language, lastIndex ?: 0L, publisherItemIds, [sort:"id", order:"ASC"])
+            untaggedMedia = tagService.listMediaItemsWithoutTags(languageId, springSecurityService.currentUser.subscriberId, offset, max)
         } else {
-            mediaItems = MediaItem.findAllByLanguageAndIdGreaterThan(language, lastIndex ?: 0L, [sort:"id", order:"ASC"])
+            untaggedMedia = tagService.listMediaItemsWithoutTags(languageId, null, offset, max)
         }
 
-        def untaggedMedia = []
         def suggestedTags = [:]
-        int untaggedCount = 0
-        long firstIndex = lastIndex ?: 0
-        for(mediaItem in mediaItems){
-            def tags = tagService.getTagsForSyndicationId(mediaItem.id)
-            if(!tags){
-                if(untaggedCount >= 50){
-                    lastIndex = mediaItem.id
-                    break
-                }
-                untaggedMedia << mediaItem
-                suggestedTags[mediaItem.id] = tagService.suggestTags(mediaItem)
-                untaggedCount++
-            }
+        untaggedMedia.each{ MediaItem mediaItem ->
+            suggestedTags[mediaItem.id] = tagService.suggestTags(mediaItem)
         }
+
         def activeLanguages = Language.findAllByIsActive(true)
         [
-            untaggedMedia:untaggedMedia,
-            suggestedTags:suggestedTags,
-            firstIndex:firstIndex,
-            lastIndex:lastIndex,
-            languages:activeLanguages,
-            language:language,
-            tagLanguage:tagLanguage,
-            tagLanguages:tagService.getAllActiveTagLanguages()
+                untaggedMedia:untaggedMedia,
+                suggestedTags:suggestedTags,
+                languages:activeLanguages,
+                language:language,
+                tagLanguage:tagLanguage,
+                tagLanguages:tagService.getAllActiveTagLanguages(),
+                total:untaggedMedia ? untaggedMedia.totalCount : 0
         ]
     }
 
@@ -67,8 +59,6 @@ class AutoTaggingController {
         }
 
         def mediaItems = MediaItem.getAll(mediaAndTags*.key)
-        def mediaCount = 0
-        def tagCount = 0
         Language mediaLanguage = Language.get(languageId)
         def tagLanguage = tagService.getAllActiveTagLanguages().find{ it.isoCode == mediaLanguage.isoCode }?.id
         if(!tagLanguage) {
@@ -76,30 +66,14 @@ class AutoTaggingController {
             redirect action:'suggestedTags', params: [lastIndex:params.long("lastIndex"), languageId:params.long('languageId')]
             return
         }
-        
-        for(mediaItem in mediaItems){
-            if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
-                if(MediaItemSubscriber.findByMediaItem(mediaItem).subscriberId != springSecurityService.currentUser.subscriberId){
-                    //if publisher is logged in and they don't own this item then skip to the next mediaItem
-                    continue
-                }
-            }
-            mediaCount++
-            def tagIds = []
-            if(mediaAndTags[mediaItem.id].getClass().isArray()) {
-                mediaAndTags[mediaItem.id].each { String tagName ->
-                    tagCount++
-                    def tagInfo = tagService.createTag(tagName, 1L, tagLanguage)
-                    tagIds << tagInfo?.id
-                }
-            } else{
-                    tagCount++
-                    def tagInfo = tagService.createTag(mediaAndTags[mediaItem.id], 1L, tagLanguage)
-                    tagIds << tagInfo?.id
-            }
-            log.info "tagging ${mediaItem.id} with ${mediaAndTags[mediaItem.id]}"
-            tagService.tag(tagIds.join(","), mediaItem.id)
-        }
+
+        def response = tagService.bulkTag(mediaItems, mediaAndTags, languageId)
+
+        def allIds = []
+        response.collect()*.tags*.id.collect{ allIds += it }
+        def tagCount = allIds.unique().size()
+        def mediaCount = response.size()
+
         flash.message = "$mediaCount media items were tagged with $tagCount tags."
         redirect action:'suggestedTags', params: [lastIndex:params.long("lastIndex"), languageId:params.long('languageId')]
     }

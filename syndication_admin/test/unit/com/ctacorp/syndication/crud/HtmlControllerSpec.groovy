@@ -28,7 +28,7 @@ class HtmlControllerSpec extends Specification {
     def setup(){
         //all mediaItems
         controller.mediaItemsService = mediaItemsService
-        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {widget, subId ->if(widget.save(flush:true)){return null} else{return "errors"}}
+        controller.mediaItemsService.metaClass.updateItemAndSubscriber = {Html html, subId ->if(html.save(flush:true)){return html} else{return html}}
 
         controller.cmsManagerKeyService = cmsManagerKeyService
         controller.solrIndexingService = solrIndexingService

@@ -28,7 +28,7 @@
 <div class="template container">    
    
        <div class="microsite carousel">
-
+           <a id="pageContent"></a>
         <g:render template="/microsite/templateHeader"/>
 
         <div class="microsite-carousel-content row">
@@ -36,13 +36,13 @@
             <div class="carousel-microsite-carousel col-xs-12">
 
                <div data-carousel-3d>
-                    <asset:image src="microsite/fpo.png"/>
-                    <asset:image src="microsite/fpo.png"/>
-                    <asset:image src="microsite/fpo.png"/>
-                    <asset:image src="microsite/fpo.png"/>
-                    <asset:image src="microsite/fpo.png"/>
-                    <asset:image src="microsite/fpo.png"/>
-                    <asset:image src="microsite/fpo.png"/>
+                    <asset:image src="microsite/fpo.png" alt="example picture 1"/>
+                    <asset:image src="microsite/fpo.png" alt="example picture 2"/>
+                    <asset:image src="microsite/fpo.png" alt="example picture 3"/>
+                    <asset:image src="microsite/fpo.png" alt="example picture 4"/>
+                    <asset:image src="microsite/fpo.png" alt="example picture 5"/>
+                    <asset:image src="microsite/fpo.png" alt="example picture 6"/>
+                    <asset:image src="microsite/fpo.png" alt="example picture 7"/>
                 </div>
 
             </div>
@@ -53,7 +53,7 @@
 
                     <h2 class="microsite-article-title">Your highlighted Syndication content article here.</h2>
 
-                    <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="pic"/>
+                    <asset:image src="microsite/fpo.png" class="microsite-article-pic" alt="example picture 8"/>
 
                     <p>Lorem ipsum dolor sit amet, causae senserit urbanitas te vim, te mei zril mucius singulis. An est propriae quaerendum, no sed appareat rationibus. Ne novum nullam detraxit per. Fugit partem cu mel, has labore hendrerit instructior ea, aliquid moderatius ne sit.</p>
 

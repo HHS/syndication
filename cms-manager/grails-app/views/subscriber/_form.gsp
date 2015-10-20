@@ -41,3 +41,15 @@ Redistribution and use in source and binary forms, with or without modification,
         <g:checkBox name="sendKeyAgreement" id="sendKeyAgreement" value="true"/>
 	</div>
 </div>
+
+<g:if test="${params.action == 'edit'}">
+	<div class="form-group">
+		<label class="control-label col-sm-3" for="isPrivileged">
+			<g:message code="subscriber.isPrivileged.label" />
+		</label>
+		<div class="col-sm-6" style="padding-top: .5em;">
+			<g:checkBox onclick=" return confirm('Changing this field will require a reboot for certain apps in order for authentication in syndication to work again. ARE YOU SURE?')" name="isPrivileged" id="isPrivileged" value="${instance?.isPrivileged}"/>
+		</div>
+	</div>
+</g:if>
+

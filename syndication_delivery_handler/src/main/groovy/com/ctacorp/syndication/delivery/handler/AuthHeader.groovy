@@ -24,35 +24,25 @@ class AuthHeader {
             KEY_AGREEMENT_FILE.text
         }()
 
-        def jsonKeyAgreement = new JsonSlurper().parseText(keyAgreementText)
-
-        AuthorizationHeaderGenerator.KeyAgreement keyAgreement = new AuthorizationHeaderGenerator.KeyAgreement()
-        keyAgreement.secret = jsonKeyAgreement['Secret Key']
-        keyAgreement.publicKey = jsonKeyAgreement['Public Key']
-        keyAgreement.privateKey = jsonKeyAgreement['Private Key']
+        def keys = new JsonSlurper().parseText(keyAgreementText)
+        def keyAgreement = new AuthorizationHeaderGenerator.KeyAgreement(secret: keys['Secret Key'], publicKey: keys['Public Key'])
 
         authHeaderGenerator = new AuthorizationHeaderGenerator(Config.API_KEY_NAME as String, keyAgreement)
     }
 
-    @SuppressWarnings("GrMethodMayBeStatic")
-    def create(content) {
+    def create(String content) {
 
         def headers = [:]
 
         // Set the required headers to compute the API key
-        headers['Referer'] = Config.SERVER_BASE_URL
-        headers['Date'] = new Date() as String
-        headers['Content-Type'] = 'application/json'
-        headers['Content-Length'] = content.bytes.length as String
+        headers.Date = new Date() as String
+        headers.'Content-Type' = 'application/json; charset=utf-8'
+        headers.'Content-Length' = content.getBytes('UTF-8').length as String
 
-        def apiKeyValue = authHeaderGenerator.getApiKeyHeaderValue(headers, Config.PUBLISH_URL, 'POST', content)
-        headers[Config.API_KEY_HEADER] = apiKeyValue
-        log.info("Authorization header value is '${apiKeyValue}'")
+        def apiKeyHeader = authHeaderGenerator.getApiKeyHeaderValue(headers, Config.PUBLISH_URL, 'POST', content)
+        headers[Config.API_KEY_HEADER] = apiKeyHeader
+        log.info("Authorization header is '${apiKeyHeader}'")
 
-        // Remove the content type and content-length headers as RestClient will set these
-        headers.remove("Content-Type")
-        headers.remove("Content-Length")
-
-        return headers
+        headers
     }
 }

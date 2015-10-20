@@ -71,7 +71,7 @@ Local Content Types chosen as *syndicatable* get a new section in their edit scr
 
 Download Link
 ----------------------
-[Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication-client-drupal7-module.1.15.5.29.zip?raw=true)
+[Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication-client-drupal7-module.zip?raw=true)
 
 CHANGE LOG
 ------------

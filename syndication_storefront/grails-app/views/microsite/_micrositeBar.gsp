@@ -7,7 +7,7 @@
                 <form class="inline-form">
                     <div class="form-group">
                         <label for="microsite-url">Nice site! Now copy and share it:</label>
-                        <input type="text" id="microsite-url" disabled="disabled" value="${grailsApplication.config.storefront.serverAddress}/${params.controller}/show/${params.id}">
+                        <input type="text" id="microsite-url" readonly value="${grailsApplication.config.storefront.serverAddress}/${params.controller}/show/${params.id}">
                     </div><!--end form-group-->
                 </form>
             </div>

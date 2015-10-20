@@ -1,17 +1,27 @@
 package com.ctacorp.syndication
 
+import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.commons.util.Util
 import com.ctacorp.syndication.media.MediaItem
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
 
+import javax.annotation.PostConstruct
+
 @Transactional(readOnly = true)
 class TagService {
     def grailsApplication
     def authorizationService
+    def languageService
+    def springSecurityService
 
     RestBuilder rest = new RestBuilder()
+
+    @PostConstruct
+    void init() {
+        rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
+    }
 
     def listTags(params = [:]) {
         params.languageId = params.languageId ?: 1
@@ -43,6 +53,38 @@ class TagService {
         get("/tags/findTagsByTagName.json?tagName=${name}&languageId=${params.languageId}&tagTypeId=${params.tagTypeId}")
     }
 
+    def listMediaItemsWithoutTags(Long languageId, Long subscriberId, Integer offset = 0, Integer max = 50){
+        Language language
+        if(!languageId){
+            language = Language.findByIsoCode('eng')
+        }else{
+            language = Language.read(languageId)
+        }
+        def subscriberMediaIds
+        if(subscriberId){
+            subscriberMediaIds = MediaItemSubscriber.findAllBySubscriberId(subscriberId)*.mediaItemId
+            if(!subscriberMediaIds){
+                return []
+            }
+        }
+
+        def mediaIdsWithTags = get("/tags/allSyndicationIds.json")*.syndicationId.collect{it as long}
+        def criteria = MediaItem.createCriteria()
+        def mediaWithoutTags = criteria.list(max:max, offset:offset){
+            and {
+                eq('language', language)
+                not {
+                    'in'('id', mediaIdsWithTags)
+                }
+                if(subscriberId){
+                    'in'('id', subscriberMediaIds)
+                }
+            }
+            order('id', 'desc')
+        }
+        mediaWithoutTags
+    }
+
     def suggestTags(MediaItem mediaItem) {
         def titleParts = mediaItem.name.split(" ").collect { cleanString(it) }
         def suggestions = []
@@ -58,6 +100,10 @@ class TagService {
 
     def getTag(Long id) {
         get("/tags/show/${id}.json")
+    }
+
+    def checkTagExistence(String tagName, Long tagTypeId, Long languageId){
+        get("/tags/checkTagExistence.json?name=${tagName}&tagTypeId=${tagTypeId}&language=${languageId}")
     }
 
     def deleteTag(Long id) {
@@ -100,6 +146,38 @@ class TagService {
 
     def getTagsForSyndicationId(Long id, Long languageId, Long tagTypeId) {
         get("/tags/getTagsForSyndicationId.json?syndicationId=${id}&languageId=${languageId}&tagTypeId=${tagTypeId}")
+    }
+
+    def bulkTag(mediaItems, mediaAndTags, languageId){
+        long tagType = 1L //hardcoded to "General" at this time
+        def bulkTags = [:]
+        int mediaCount, tagCount
+        mediaCount = tagCount = 0
+
+        for(MediaItem mediaItem in mediaItems){
+            if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
+                if(MediaItemSubscriber.findByMediaItem(mediaItem).subscriberId != springSecurityService.currentUser.subscriberId){
+                    //if publisher is logged in and they don't own this item then skip to the next mediaItem
+                    continue
+                }
+            }
+            mediaCount++
+            def tagsForMediaItem = []
+            if(mediaAndTags[mediaItem.id].getClass().isArray()) {
+                mediaAndTags[mediaItem.id].each { String tagName ->
+                    tagsForMediaItem << tagName
+                    tagCount++
+                }
+            } else{
+                tagCount++
+                tagsForMediaItem << mediaAndTags[mediaItem.id]
+            }
+            bulkTags[mediaItem.id] = [tagNames: tagsForMediaItem, url: mediaItem.sourceUrl]
+            log.info "tagging ${mediaItem.id} with ${mediaAndTags[mediaItem.id]}"
+        }
+
+        def bulkTagData = [tagType:tagType, language:languageId, bulkTags:bulkTags]
+        post("/tags/bulkTag", bulkTagData)
     }
 
     def createTag(String tagName, Long tagTypeId, Long languageId) {
@@ -158,10 +236,14 @@ class TagService {
             def status = get("/statusCheck")
             return (status) ? true : false
         } catch (e) {
+            log.error(e)
+            e.printStackTrace()
             return false;
         }
     }
 
+    //This tags multiple media items with the SAME set of tags, for instance, add the same
+    //three tags to 100 different media items
     def tagMultiple(String tagIds, String mediaIds, params = []) {
         def urls = []
         tagIds = checkForNewTags(tagIds, params)
@@ -178,7 +260,6 @@ class TagService {
         There is a bunch of stuff every media item controller has to do to have the tag widget included.
         This method puts all that logic in one place so it can be reused with maximum dry code.
     */
-
     def getTagInfoForMediaShowViews(MediaItem mi, params) {
 
         params.languageId = params.languageId ?: 1
@@ -200,9 +281,12 @@ class TagService {
 
     private get(String path) {
         try {
-            return rest.get(grailsApplication.config.tagCloud.serverAddress + path).json
+//            println("--------------> "+grailsApplication.config.tagCloud.serverAddress + path)
+            def resp = rest.get(grailsApplication.config.tagCloud.serverAddress + path)
+            return resp.json
         } catch (e) {
             log.error "Could not connect to: ${path}"
+            e.printStackTrace()
             return null
         }
     }
@@ -225,36 +309,6 @@ class TagService {
         }
     }
 
-    private String gatherPaginationParams(params) {
-        String parts = ""
-        if (!params) {
-            return parts
-        }
-        parts = "?"
-        if (params.sort) {
-            parts += "sort=${params.sort}&"
-        }
-        if (params.order) {
-            parts += "order=${params.order}&"
-        }
-        if (params.max) {
-            parts += "max=${params.max}&"
-        }
-        if (params.offset) {
-            parts += "offset=${params.offset}&"
-        }
-        if (Util.isTrue(params.includePaginationFields, false)) {
-            parts += "includePaginationFields=1"
-        }
-        if (parts == "?") {
-            return ""
-        }
-        if (parts.endsWith("&")) {
-            return parts[0..-1 - 1]
-        }
-        parts
-    }
-
     private String cleanString(input) {
         String cleaned = input
         SYMBOL_EXCLUSION_LIST.each { symbol ->
@@ -274,6 +328,7 @@ class TagService {
         uppercase
     }
 
+    //Not unicode friendly, will have to be address for full unicode support (non-english only?)
     private String stripNasties(String word){
         String cleanedWord = ""
         word.each{

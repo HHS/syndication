@@ -10,7 +10,7 @@ grails.project.fork = [
     //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 
     // configure settings for the test-app JVM, uses the daemon by default
-    test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
+    test: false,
     // configure settings for the run-app JVM
     run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
     // configure settings for the run-war JVM
@@ -30,6 +30,7 @@ grails.project.dependency.resolution = {
     repositories {
         mavenRepo(config.artifactory.repo){
             auth username: config.artifactory.username, password: config.artifactory.password
+            updatePolicy "always"
         }
 
         grailsCentral()
@@ -56,7 +57,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        runtime ("org.grails.plugins:syndication-model:2.0.3"){
+        runtime ("org.grails.plugins:syndication-model:2.1.0"){
             export = false
         }
 
@@ -79,11 +80,16 @@ grails.project.dependency.resolution = {
 
 //_____________________
 // Release plugin info \_________________________________________________________________
-//
-// | to release, just run 'grails publish-plugin'
+// |
+// | to push a snapshot, run 'grails publish-plugin'
+// | to release, run 'grails publish-plugin --repository=plugin_rel'
 // | to install locally, run 'grails maven-install'
 //_______________________________________________________________________________________
-grails.project.repos.default = "myRepo"
-grails.project.repos.myRepo.url = config.artifactory.deploymentAddress
-grails.project.repos.myRepo.username = config.artifactory.username
-grails.project.repos.myRepo.password = config.artifactory.password
+grails.project.repos.default = "plugin_snap"
+grails.project.repos.plugin_snap.url = config.artifactory.plugin_snap.url
+grails.project.repos.plugin_snap.username = config.artifactory.username
+grails.project.repos.plugin_snap.password = config.artifactory.password
+
+grails.project.repos.plugin_rel.url = config.artifactory.plugin_rel.url
+grails.project.repos.plugin_rel.username = config.artifactory.username
+grails.project.repos.plugin_rel.password = config.artifactory.password

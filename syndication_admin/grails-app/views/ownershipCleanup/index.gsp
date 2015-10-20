@@ -14,6 +14,8 @@
 <body>
 <g:form>
     <g:textField name="query" value="${query}"/>
+    <label for="restrictToUnowned">Restrict to Unowned</label>
+    <g:checkBox name="restrictToUnowned" checked="true"/>
     <g:actionSubmit value="search" action="search"/>
     <g:actionSubmit value="listAll" action="list"/>
     <g:select name="subscriber" from="${subscribers}" optionValue="name" optionKey="id"/>
@@ -25,7 +27,7 @@
     <span style="display: block;">${mi.id} - ${mi.sourceUrl}</span>
 </g:each>
 <g:if test="${!mediaItems}">
-    No media items found that are not already owned.
+    No media items found matching provided criteria.
 </g:if>
 </body>
 </html>

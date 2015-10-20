@@ -52,14 +52,10 @@ grails.project.dependency.resolution = {
     legacyResolve false // whether to do a secondary resolve on plugin installation, not advised and here for backwards compatibility
 
     repositories {
-        inherits true // Whether to inherit repository definitions from plugins
+        inherits("global") {}
 
         mavenRepo(config.artifactory.repo){
-            auth([
-                    username: config.artifactory.username,
-                    password: config.artifactory.password
-            ])
-
+            auth username: config.artifactory.username, password: config.artifactory.password
             updatePolicy "always"
         }
         mavenLocal()
@@ -82,7 +78,7 @@ grails.project.dependency.resolution = {
         compile "com.google.guava:guava:18.0"
 
         runtime 'com.ctacorp.commons:multi-read-servlet-filter:1.0.0'
-        compile('com.ctacorp.commons:api-key-utils:1.5.1') {
+        compile('com.ctacorp.commons:api-key-utils:1.6.0') {
             excludes 'groovy'
         }
 
@@ -91,24 +87,24 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the compile step -----------------------------------------------------
-        compile "org.grails.plugins:syndication-model:1.7.0"
+        compile "org.grails.plugins:syndication-model:2.1.0"
 
         //plugins for the compile step -----------------------------------------------------
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.8'
-        compile ':asset-pipeline:2.1.5'
+        compile ':asset-pipeline:2.5.9'
         compile ":rest-client-builder:2.1.1"
-        compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
+        compile ":bruteforce-defender:1.1"
 
 
-        compile ":spring-security-core:2.0-RC4"
+        compile ":spring-security-core:2.0-RC5"
         compile ":marshallers:0.6"  //Object Marshalling
 
-        compile ":codenarc:0.23"
+        compile ":codenarc:0.24.1"
 
         // plugins needed at runtime but not for compilation --------------------------------
         runtime ":hibernate4:4.3.8.1"
-        runtime ":database-migration:1.4.0"
+        runtime ":database-migration:1.4.1"
         runtime ":jquery:1.11.1"
 
         // plugins for the build system only ------------------------------------------------
@@ -119,24 +115,29 @@ grails.project.dependency.resolution = {
 
         // plugins for the test phase -------------------------------------------------------
         test ":auto-test:1.0.1"
-        test ":code-coverage:1.2.7"
-        test ":build-test-data:2.1.2"
+        test ":code-coverage:2.0.3-3"
+        test ":build-test-data:2.4.0"
 
         //Leave this at the bottom - moving it breaks codeCoverage, probably because of a dependency conflict
-        compile ("org.grails.plugins:solr-operations:1.2")
+        compile ("org.grails.plugins:solr-operations:1.3.0")
     }
 }
 
 //_____________________
-// Release plugin info \_________________________________________________________________
-//
-// | to release, just run 'grails maven-deploy'
+// Release War info    \_________________________________________________________________
+// |
+// | to push a snapshot, run 'grails prod maven-deploy'
+// | to release, run 'grails prod maven-deploy --repository=plugin_rel'
 // | to install locally, run 'grails maven-install'
 //_______________________________________________________________________________________
-grails.project.repos.default = "myRepo"
-grails.project.repos.myRepo.url = config.artifactory.deploymentAddress
-grails.project.repos.myRepo.username = config.artifactory.username
-grails.project.repos.myRepo.password = config.artifactory.password
+grails.project.repos.default = "app_snap"
+grails.project.repos.app_snap.url = config.artifactory.app_snap.url
+grails.project.repos.app_snap.username = config.artifactory.username
+grails.project.repos.app_snap.password = config.artifactory.password
+
+grails.project.repos.app_rel.url = config.artifactory.app_rel.url
+grails.project.repos.app_rel.username = config.artifactory.username
+grails.project.repos.app_rel.password = config.artifactory.password
 
 
 //Code coverage exclusions

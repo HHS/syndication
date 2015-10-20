@@ -76,9 +76,9 @@ class VideoController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(videoInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        videoInstance =  mediaItemsService.updateItemAndSubscriber(videoInstance, params.long('subscriberId'))
+        if(videoInstance.hasErrors()){
+            flash.errors = videoInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             respond videoInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
@@ -107,9 +107,9 @@ class VideoController {
             return
         }
 
-        def status =  mediaItemsService.updateItemAndSubscriber(videoInstance, params.long('subscriberId'))
-        if(status){
-            flash.errors = status
+        videoInstance =  mediaItemsService.updateItemAndSubscriber(videoInstance, params.long('subscriberId'))
+        if(videoInstance.hasErrors()){
+            flash.errors = videoInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             redirect action:'edit', id:params.id
             return
         }

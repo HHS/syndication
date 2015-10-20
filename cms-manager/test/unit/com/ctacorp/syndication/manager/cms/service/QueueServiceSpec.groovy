@@ -13,6 +13,8 @@ Redistribution and use in source and binary forms, with or without modification,
 
   */
 package com.ctacorp.syndication.manager.cms.service
+
+import com.budjb.rabbitmq.publisher.RabbitMessagePublisher
 import com.ctacorp.syndication.commons.mq.Message
 import com.ctacorp.syndication.commons.mq.MessageType
 import com.ctacorp.syndication.manager.cms.QueueService
@@ -27,14 +29,14 @@ import spock.lang.Specification
 @Build([RhythmyxSubscription, Subscription])
 class QueueServiceSpec extends Specification {
 
-    def rabbitSender = Mock(QueueService.RabbitSender)
+    def rabbitMessagePublisher = Mock(RabbitMessagePublisher)
 
     RhythmyxSubscription rhythmyxSubscription
     Subscription subscription
 
     def setup() {
 
-        service.rabbitSender = rabbitSender
+        service.rabbitMessagePublisher = rabbitMessagePublisher
 
         service.maxAttempts = 2
 
@@ -60,7 +62,7 @@ class QueueServiceSpec extends Specification {
 
         then: "convert and send the message via rabbitmq"
 
-        rabbitSender.sendMessage('rhythmyxErrorQueue', message) >> null
+        rabbitMessagePublisher.sendMessage('rhythmyxErrorQueue', message) >> null
     }
 
     void "send to the email error queue"() {
@@ -81,7 +83,7 @@ class QueueServiceSpec extends Specification {
 
         then: "convert and send the message via rabbitmq"
 
-        rabbitSender.sendMessage('emailErrorQueue', message) >> null
+        rabbitMessagePublisher.sendMessage('emailErrorQueue', message) >> null
     }
 
     void "send to the rhythmyx update queue"() {
@@ -101,7 +103,7 @@ class QueueServiceSpec extends Specification {
 
         then: "convert and send the message via rabbitmq"
 
-        rabbitSender.sendMessage('rhythmyxUpdateQueue', message) >> null
+        rabbitMessagePublisher.sendMessage('rhythmyxUpdateQueue', message) >> null
     }
 
     void "send to the email update queue"() {
@@ -121,7 +123,7 @@ class QueueServiceSpec extends Specification {
 
         then: "convert and send the message via rabbitmq"
 
-        rabbitSender.sendMessage('emailUpdateQueue', message) >> null
+        rabbitMessagePublisher.sendMessage('emailUpdateQueue', message) >> null
     }
 
     void "send to when the rabbit service throws an exception"() {
@@ -141,7 +143,7 @@ class QueueServiceSpec extends Specification {
 
         then: "don't send the message to the error queue"
 
-        rabbitSender.sendMessage('emailUpdateQueue', message) >> new Exception("bologna hammies")
+        rabbitMessagePublisher.sendMessage('emailUpdateQueue', message) >> new Exception("bologna hammies")
 
         and: "no exception should be thrown"
 

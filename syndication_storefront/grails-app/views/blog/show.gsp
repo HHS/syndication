@@ -21,7 +21,7 @@
 <div class="template container">
 
     <div class="microsite blog">
-
+        <a id="pageContent"></a>
         <g:render template="/microsite/templateHeader"/>
 
         <div class="microsite-blog-content row">

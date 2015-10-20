@@ -20,8 +20,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'campaign.label', default: 'Campaign')}" />
 		<title><g:message code="default.edit.label" args="[entityName]" /></title>
-        <asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
-        <asset:stylesheet src="/tokenInput/token-input.css"/>
+        <asset:javascript src="tokenInput/jquery.tokeninput.js"/>
+        <asset:stylesheet src="tokenInput/token-input.css"/>
         <g:javascript>
         $(document).ready(function(){
             $("#mediaItems").tokenInput("${g.createLink(controller: 'mediaItem', action: 'tokenMediaSearch')}.json", {

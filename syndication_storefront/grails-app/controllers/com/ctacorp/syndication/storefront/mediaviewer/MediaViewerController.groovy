@@ -41,8 +41,10 @@ class MediaViewerController {
                 return
         }
 
+        mediaItems = mediaItems.sort{it.name}
+
         if(mediaItems?.size() > 20){
-            mediaItems = mediaItems.toArray().sort{it.name}[0..19]
+            mediaItems = mediaItems.toArray()[0..19]
         }
 
         def mediaList = []

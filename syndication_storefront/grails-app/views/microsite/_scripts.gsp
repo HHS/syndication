@@ -12,7 +12,7 @@
             if(displayStyle != null) displayStyle = displayStyle.value;
 
             $.ajax({ // create an AJAX call...
-                data: {listType: listType, listId: listId, sortBy: sortBy, orderBy: orderBy, panelHeader: panelHeader, displayStyle: displayStyle, sidePanel: sidePanel}, // get the form data
+                data: {listType: listType, listId: listId, sortBy: sortBy, orderBy: orderBy, panelHeader: panelHeader, displayStyle: displayStyle, sidePanel: sidePanel, area:area}, // get the form data
                 type: 'POST', // GET or POST
                 url: '${g.createLink(controller: 'microsite', action: 'summary')}', // the file to call
                 success: function (response) { // on success..
@@ -32,7 +32,7 @@
             var displayStyle = mediaArea.displayStyle;
 
             $.ajax({ // create an AJAX call...
-                data: {listType: listType, listId: listId, sortBy: sortBy, orderBy: orderBy, panelHeader: panelHeader, displayStyle: displayStyle}, // get the form data
+                data: {listType: listType, listId: listId, sortBy: sortBy, orderBy: orderBy, panelHeader: panelHeader, displayStyle: displayStyle, area:area}, // get the form data
                 type: 'POST', // GET or POST
                 url: '${g.createLink(controller: 'microsite', action: 'summary')}', // the file to call
                 success: function (response) { // on success..
@@ -168,73 +168,169 @@
             success: function (response) { // on success..
                 $('#pane' + mediaAreaValue + 'ListBody').html(response); // update the DIV
                 updateFormCompletion(mediaAreaValue);
+                forceFocusList(mediaAreaValue, listType);
             }
         });
     });
 
-    //changes form area picture to completed if applicable
-    function updateFormCompletion(area){
-        if(document.getElementById('pane' + area + 'ListId').value != ""){
-            document.getElementById('check-area' + area).hidden = ""
-
-        } else {
-            //change to not complete pic
-            document.getElementById('check-area' + area).hidden = "hidden"
+    function forceFocusList(area, listType) {
+        switch(listType) {
+            case "USER_MEDIA_LIST":document.getElementById("pane" +area + "ListId").focus();break;
+            case "COLLECTION":document.getElementById("pane" + area + "LanguageId").focus();break;
+            case "TAG":document.getElementById("pane" + area + "TagLanguageId").focus();break;
+            case "SOURCE":document.getElementById("pane" + area + "ListId").focus();break;
+            case "CAMPAIGN":document.getElementById("pane" + area + "ListId").focus();break;
         }
     }
 
-    $('#title').on('input', function(){
-        if(document.getElementById('title').value != ""){
-            document.getElementById('check-title').hidden = ""
+    //changes form area picture to completed if applicable
+    function updateFormCompletion(area){
+        if(${params.id == null}) {
+            if (document.getElementById('pane' + area + 'ListId').value != "") {
+                document.getElementById('check-area' + area).innerHTML = '<img src="${assetPath(src: '/microsite/check.png')}" class="check-image" alt="Section complete, check mark" />';
 
+            } else {
+                //change to not complete pic
+                document.getElementById('check-area' + area).innerHTML = '';
+            }
+        }
+    }
+
+    $('#title').bind('input propertychange', function(){
+        if(document.getElementById('title').value != ""){
+            document.getElementById('check-title').innerHTML = '<img src="${assetPath(src: '/microsite/check.png')}" class="check-image" alt="Section complete, check mark" />';
         } else {
-            //change to not complete pic
-            document.getElementById('check-title').hidden = "hidden"
+            document.getElementById('check-title').innerHTML = '';
         }
     });
 
-    $('#footerText').change(function(){
+    $('#footerText').on('input propertychange', function(){
         if(document.getElementById('footerText').value != ""){
-            document.getElementById('check-footer').hidden = ""
+            document.getElementById('check-footer').innerHTML = '<img src="${assetPath(src: '/microsite/check.png')}" class="check-image" alt="Section complete, check mark" />';
 
         } else {
             //change to not complete pic
-            document.getElementById('check-footer').hidden = "hidden"
+            document.getElementById('check-footer').innerHTML = '';
         }
     });
 
 
 //    model carousel navigation listeners
-    $('#carousel-example-generic').on('slid.bs.carousel', function () {
+    var modalFocusTitle;
+
+    $('#carousel-example-generic').on('slid.bs.carousel', function (e) {
         if($('.carousel-inner .item:last').hasClass('active')) {
-            document.getElementById("left-carousel-button").hidden = "";
-            document.getElementById("right-carousel-button").hidden = "hidden";
+            $("#left-carousel-button").show();
+            $("#right-carousel-button").hide();
             document.getElementById("modal-done-button").className = "pull-right btn btn-submit";
+            document.getElementById("step-five").focus();
         } else if($('.carousel-inner .item:first').hasClass('active')){
-            document.getElementById("left-carousel-button").hidden = "hidden";
-            document.getElementById("right-carousel-button").hidden = "";
+            $("#left-carousel-button").hide();
+            $("#right-carousel-button").show();
             document.getElementById("modal-done-button").className = "pull-right btn btn-submit hide";
+            document.getElementById("step-one").focus();
         }
         else {
-            document.getElementById("left-carousel-button").hidden = "";
-            document.getElementById("right-carousel-button").hidden = "";
+            $("#left-carousel-button").show();
+            $("#right-carousel-button").show();
             document.getElementById("modal-done-button").className = "pull-right btn btn-submit hide";
+            var carouselData = $(this).data('bs.carousel');
+            var currentIndex = carouselData.getActiveIndex();
+            switch(currentIndex) {
+                case 1:document.getElementById("step-two").focus();break;
+                case 2:document.getElementById("step-three").focus();break;
+                case 3:document.getElementById("step-four").focus();break;
+            }
         }
     });
     $('.header').on('click', function(){
-        document.getElementById("left-carousel-button").hidden = "hidden";
-        document.getElementById("right-carousel-button").hidden = "";
+        $("#left-carousel-button").hide();
+        $("#right-carousel-button").show();
         document.getElementById("modal-done-button").className = "pull-right btn btn-submit hide";
+        modalFocusTitle = "step-one"
+
     });
     $('.content').on('click', function(){
-        document.getElementById("left-carousel-button").hidden = "";
-        document.getElementById("right-carousel-button").hidden = "";
+        $("#left-carousel-button").show();
+        $("#right-carousel-button").show();
         document.getElementById("modal-done-button").className = "pull-right btn btn-submit hide";
+        switch(document.activeElement.getAttribute("data-slide-to")) {
+            case '1':modalFocusTitle = "step-two";break;
+            case '2':modalFocusTitle = "step-three";break;
+            case '3':modalFocusTitle = "step-four";break;
+        }
+
     });
     $('.footer').on('click', function(){
-        document.getElementById("left-carousel-button").hidden = "";
-        document.getElementById("right-carousel-button").hidden = "hidden";
+        $("#left-carousel-button").show();
+        $("#right-carousel-button").hide();
         document.getElementById("modal-done-button").className = "pull-right btn btn-submit";
+        modalFocusTitle = "step-five"
+    });
+
+
+// content list listeners
+    //collections
+    $("#pane1ListBody").on("change",".collection-languages",function(){
+        var listType = "COLLECTION";
+        var mediaArea = $(this).attr("data-mediaArea");
+        var microSiteId = $(this).attr("data-microSiteId");
+        var language = $(this).val();
+
+        $.ajax({ // create an AJAX call...
+            data: {listType:listType, mediaAreaValue:mediaArea, microSiteId:microSiteId,language:language}, // get the form data
+            type: 'POST', // GET or POST
+            url: '${g.createLink(controller: 'microsite', action: 'specificList')}', // the file to call
+            success: function (response) { // on success..
+                $('#pane' + mediaArea + 'ListBody').html(response); // update the DIV
+                updateFormCompletion(mediaArea);
+                document.getElementById("pane1LanguageId").focus();
+            }
+        });
+    });
+    $("#pane2ListBody").on("change",".collection-languages",function(){
+        var listType = "COLLECTION";
+        var mediaArea = $(this).attr("data-mediaArea");
+        var microSiteId = $(this).attr("data-microSiteId");
+        var language = $(this).val();
+
+        $.ajax({ // create an AJAX call...
+            data: {listType:listType, mediaAreaValue:mediaArea, microSiteId:microSiteId,language:language}, // get the form data
+            type: 'POST', // GET or POST
+            url: '${g.createLink(controller: 'microsite', action: 'specificList')}', // the file to call
+            success: function (response) { // on success..
+                $('#pane' + mediaArea + 'ListBody').html(response); // update the DIV
+                updateFormCompletion(mediaArea);
+                document.getElementById("pane" + mediaArea + "LanguageId").focus();
+            }
+        });
+    });
+    $("#pane3ListBody").on("change",".collection-languages",function(){
+        var listType = "COLLECTION";
+        var mediaArea = $(this).attr("data-mediaArea");
+        var microSiteId = $(this).attr("data-microSiteId");
+        var language = $(this).val();
+
+        $.ajax({ // create an AJAX call...
+            data: {listType:listType, mediaAreaValue:mediaArea, microSiteId:microSiteId,language:language}, // get the form data
+            type: 'POST', // GET or POST
+            url: '${g.createLink(controller: 'microsite', action: 'specificList')}', // the file to call
+            success: function (response) { // on success..
+                $('#pane' + mediaArea + 'ListBody').html(response); // update the DIV
+                updateFormCompletion(mediaArea);
+                document.getElementById("pane" + mediaArea + "LanguageId").focus();
+            }
+        });
+    });
+
+    function submitClick(){
+        document.getElementById('micrositeForm').submit();
+    }
+
+    $('#modal-header').on('shown.bs.modal', function () {
+        document.getElementById(modalFocusTitle).focus();
+//        document.getElementById("title").focus();
+//        $("#title").focus()
     });
 
 </script>

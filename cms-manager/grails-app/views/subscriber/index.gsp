@@ -22,6 +22,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 </head>
 <body>
   <g:render template="../templates/header"/>
+  <g:render template="search"/>
   <g:render template="../templates/list" model="[
           instanceList: subscriberInstanceList,
           instanceCount: instanceCount,

@@ -18,13 +18,16 @@ package com.ctacorp.syndication.crud
 import com.ctacorp.syndication.CampaignSubscriber
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.Campaign
+import com.ctacorp.syndication.authentication.Role
+import com.ctacorp.syndication.authentication.User
+import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.media.MediaItem
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import spock.lang.Specification
 
 @TestFor(CampaignController)
-@Mock([Campaign,CampaignSubscriber,MediaItem])
+@Mock([Campaign,CampaignSubscriber,MediaItem, User, Role, UserRole])
 class CampaignControllerSpec extends Specification {
 
     void setup() {
@@ -32,8 +35,14 @@ class CampaignControllerSpec extends Specification {
         controller.solrIndexingService = solrService
         def mockCmsManagerKeyService = [listSubscribers:{}, getSubscriberById: {CampaignSubscriber cs ->}]
         controller.cmsManagerKeyService = mockCmsManagerKeyService
-        def mockCampaignService = [updateCampaignAndSubscriber: {Campaign c, String id -> if(c.save(flush:true)){return null} else{return "errors"}}]
+        def mockCampaignService = [updateCampaignAndSubscriber: {Campaign c, String id -> if(c.save(flush:true)){return c} else{return c}}]
         controller.campaignService = mockCampaignService
+
+        //spring security service setup
+        User user = new User(name:"admin", username: "test@example.com", enabled: true, password: "SomerandomPass1").save()
+        Role role = new Role(authority: "ROLE_ADMIN").save()
+        UserRole.create user, role, true
+        controller.springSecurityService = [currentUser:User.get(1)]
     }
     def populateValidParams(params) {
         assert params != null

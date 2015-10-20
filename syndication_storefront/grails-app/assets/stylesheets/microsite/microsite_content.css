@@ -1,3 +1,19 @@
+/* nav skip anchor */
+.skipNavLink {
+  display: block;
+  height: 1px;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  width: 1px;
+}
+/* To hide things visually, but allow them to be read by screen readers */
+.obscure {
+  position: absolute !important;
+  left: -999em;
+  /*clip: rect(1px 1px 1px 1px);*/
+  /*clip: rect(1px, 1px, 1px, 1px);*/
+}
+
  /* Smallest devices (phones, 768px and up) */
 @media (max-width: 320px) { 
   .microsite-article img {
@@ -83,15 +99,14 @@ a.list-group-item {
 }
 
 .display-thumbnail {
-  padding: 0 0;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
-a.list-group-item:hover {
+a.list-group-item:hover, a.list-group-item:focus {
   background-color: transparent;
   text-decoration: underline;
 }
-
-
 
  /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) { ... }
