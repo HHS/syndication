@@ -10,7 +10,6 @@ import javax.crypto.spec.SecretKeySpec
 import java.security.MessageDigest
 import java.security.Security
 
-@SuppressWarnings("GrMethodMayBeStatic")
 @Log
 public class AuthorizationHeaderGenerator {
 
@@ -27,24 +26,12 @@ public class AuthorizationHeaderGenerator {
 
     static class KeyAgreement {
 
-        private String publicKey
-        private String privateKey
-        private String secret
-
-        public void setPublicKey(String publicKey) {
-            this.publicKey = publicKey
-        }
-
-        public void setPrivateKey(String privateKey) {
-            this.privateKey = privateKey
-        }
-
-        public void setSecret(String secret) {
-            this.secret = secret
-        }
+        String publicKey
+        String secret
     }
 
     AuthorizationHeaderGenerator(String keyName, KeyAgreement keyAgreement) {
+
         this.keyName = keyName
         this.keyAgreement = keyAgreement
     }
@@ -52,7 +39,7 @@ public class AuthorizationHeaderGenerator {
     String getApiKeyHeaderValue(Map<String, String> headers, String requestUrl, String httpMethod, String requestBody) throws Exception {
 
         String computedHash = computeHash(headers, requestUrl, httpMethod, requestBody)
-        return keyName + " " + keyAgreement.publicKey + ":" + computedHash
+        "${keyName} ${keyAgreement.publicKey}:${computedHash}"
     }
 
     String computeHash(Map<String, String> headers, String requestUrl, String httpMethod, String requestBody) throws Exception {
@@ -72,15 +59,15 @@ public class AuthorizationHeaderGenerator {
         def signingStringLogMessage = "Signing string is: \n${signingString}"
         def computedHashLogMessage = "Computed hash is: ${computedHash}"
 
-        log.fine(signingStringLogMessage)
-        log.fine(computedHashLogMessage)
+        log.info(signingStringLogMessage)
+        log.info(computedHashLogMessage)
 
         if(printToConsole) {
             println signingStringLogMessage
             println computedHashLogMessage
         }
 
-        return computedHash
+        computedHash
     }
 
     String signString(String signingString) throws Exception {
@@ -89,24 +76,22 @@ public class AuthorizationHeaderGenerator {
         SecretKeySpec signingKey = new SecretKeySpec(keyAgreement.secret.getBytes(), HMAC_MD5_ALGORITHM)
         mac.init(signingKey)
         byte[] hash = mac.doFinal(signingString.getBytes())
-        return new String(Base64.encode(hash))
+        new String(Base64.encode(hash))
     }
 
     String createSigningString(String requestMethod, String md5, String canonicalizedHeaders, String canonicalizedResource) {
-
-        return requestMethod + "\n" + md5 + "\n" + canonicalizedHeaders + "\n" + canonicalizedResource
+        "${requestMethod}\n${md5}\n${canonicalizedHeaders}\n${canonicalizedResource}"
     }
 
     String hashData(String requestBody) throws Exception {
 
         MessageDigest digest = MessageDigest.getInstance("MD5", "BC")
-        byte[] encoded = Hex.encode(digest.digest(requestBody.getBytes()))
-        return new String(encoded)
+        byte[] encoded = Hex.encode(digest.digest(requestBody.getBytes("UTF-8")))
+        new String(encoded)
     }
 
     String normalizeHttpMethod(String httpMethod) {
-
-        return httpMethod.toUpperCase()
+        httpMethod.toUpperCase()
     }
 
     String getCanonicalizedResource(String requestUrl) {

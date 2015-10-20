@@ -15,9 +15,8 @@ public class AuthorizationHeadersGeneratorTest {
     @Before
     public void b4() {
 
-        keyAgreement.setPrivateKey("eWV8zlOHK52dbF9r1v6EZMfQtWnvgcwPbn79W0jSHJW3elE4n2rsD1Fuy8uxpB1EMcwcqXRil6xLqJ0ISL9fAQ==")
-        keyAgreement.setPublicKey("e24cv82JldJrMZCjhTeGFTqCHmOTcIgyya7jTf37K7iM4N265Myqqt32qoBjz+oEZEglwmDW28Eru1gjKw6Iw==")
-        keyAgreement.setSecret("x+Cm5SRyQDGGLyd3J7QYZFB2oKjD6WQ0NcA+uFZz/qH0XRuX+u7Q6U9tkAgiLc5ZyONtyPfGUPBEuCxychodmw==")
+        keyAgreement.publicKey = "e24cv82JldJrMZCjhTeGFTqCHmOTcIgyya7jTf37K7iM4N265Myqqt32qoBjz+oEZEglwmDW28Eru1gjKw6Iw=="
+        keyAgreement.secret = "x+Cm5SRyQDGGLyd3J7QYZFB2oKjD6WQ0NcA+uFZz/qH0XRuX+u7Q6U9tkAgiLc5ZyONtyPfGUPBEuCxychodmw=="
     }
 
     @Test
@@ -31,9 +30,7 @@ public class AuthorizationHeadersGeneratorTest {
         headers.put("Content-Beef-Weight", "10 lb")
 
         String canonicalizedHeaders = generator.getCanonicalizedHeaders(headers)
-        assertEquals("date:Wed Dec 31 19:00:00 EST 1969\n" +
-                "content-type:application/json\n" +
-                "content-length:25", canonicalizedHeaders)
+        assertEquals("date:Wed Dec 31 19:00:00 EST 1969\n" + "content-type:application/json\n" + "content-length:25", canonicalizedHeaders)
     }
 
     @Test
@@ -66,10 +63,7 @@ public class AuthorizationHeadersGeneratorTest {
 
         String signingString = generator.createSigningString("httpMethod", "md5", "canonicalizedHeaders", "canonicalizedResource")
 
-        assertEquals("httpMethod\n" +
-                "md5\n" +
-                "canonicalizedHeaders\n" +
-                "canonicalizedResource", signingString)
+        assertEquals("httpMethod\n" + "md5\n" + "canonicalizedHeaders\n" + "canonicalizedResource", signingString)
     }
 
     @Test

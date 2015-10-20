@@ -1,6 +1,6 @@
 def projectName = 'api-key-utils'
 def projectGroup = 'com.ctacorp.commons'
-def projectVersion = '1.5.2'
+def projectVersion = '1.6.0'
 
 def sourceLevel = JavaVersion.VERSION_1_6
 def targetLevel = JavaVersion.VERSION_1_6
