@@ -1,6 +1,7 @@
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.FeaturedMedia
+import com.ctacorp.syndication.Language
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -56,7 +57,9 @@ class PeriodicalController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Periodical(params), model: [subscribers:subscribers]
+        Periodical periodical = new Periodical(params)
+        periodical.language = Language.findByIsoCode("eng")
+        respond periodical, model: [subscribers:subscribers]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
@@ -85,13 +88,13 @@ class PeriodicalController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Periodical periodicalInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond periodicalInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(periodicalInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Periodical periodicalInstance) {
         if (periodicalInstance == null) {
@@ -130,7 +133,7 @@ class PeriodicalController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(periodicalInstance, true)
+        mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(periodicalInstance, true)
         solrIndexingService.removeMediaItem(periodicalInstance)
         mediaItemsService.delete(periodicalInstance.id)
 

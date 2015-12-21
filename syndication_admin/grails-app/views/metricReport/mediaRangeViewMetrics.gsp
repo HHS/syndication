@@ -1,5 +1,5 @@
 %{--
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -39,31 +39,35 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <div class="panel-body">
                 <div class="row">
                     <form>
-                    <div class="col-md-6">
-                        <h4>Select a Time Range</h4>
-                        <div class="form-group">
-                            <label for="fromDay" class="padded">From:</label>
-                            <g:datePicker name="fromDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${fromDay}"/>
-                            <br/>
-                            <label for="toDay" class="padded">To:</label>
-                            <g:datePicker name="toDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${toDay}"/>
-                            <g:actionSubmit action="mediaRangeViewMetrics" class="btn btn-success btn-xs" value="Apply Range"/>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="pull-right-md">
-                            <div class="pull-right-md" style="margin-bottom: 10px;">
-                                <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'week' , sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Past Week</g:link>
-                                <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'month', sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Past Month</g:link>
-                                <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'year' , sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Past Year</g:link>
-                                <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'ytd'  , sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Year to Date</g:link>
+                        <div class="col-md-6">
+                            <h4>Select a Time Range</h4>
+                            <div class="form-group">
+                                <label for="fromDay" class="padded">From:</label>
+                                <g:datePicker name="fromDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${fromDay}"/>
                             </div>
-                            <div class="hidden-sm hidden-xs"><br/><br/><br/></div>
-                            <label for="max">Max records to display</label>
-                            <g:select name="max" from="[10,50,100,250,500,1000]" value="${params.max}"/>
-                            <g:actionSubmit action="mediaRangeViewMetrics" class="btn btn-default btn-xs" name="Apply Limit" value="Apply Limit"/>
+                            <div class="form-group">
+                                <label for="toDay" class="padded">To:</label>
+                                <g:datePicker name="toDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${toDay}"/>
+                                <g:actionSubmit action="mediaRangeViewMetrics" class="btn btn-success btn-xs" value="Apply Range"/>
+                            </div>
                         </div>
-                    </div>
+                        <div class="col-md-6">
+                            <div class="pull-right-md">
+                                <div class="form-group">
+                                    <div class="pull-right-md" style="margin-bottom: 10px;">
+                                        <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'week' , sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Past Week</g:link>
+                                        <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'month', sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Past Month</g:link>
+                                        <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'year' , sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Past Year</g:link>
+                                        <g:link action="mediaRangeViewMetrics" class="btn-sm btn-info" params="[rangePreset: 'ytd'  , sort:params.sort?:'id', order:params.order?:'asc', max:params.max ?: 10]">Year to Date</g:link>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="max">Max records to display</label>
+                                    <g:select name="max" from="[10,50,100,250,500,1000]" value="${params.max}"/>
+                                    <g:actionSubmit action="mediaRangeViewMetrics" class="btn btn-default btn-xs" name="Apply Limit" value="Apply Limit"/>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="row">
@@ -130,6 +134,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <br/>
                         <p>* If sorting by view count, items with 0 views for the specified day are omitted.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <label>Storefront Views:&nbsp;</label>Generated when someone looks at the given Media Item on the HHS Syndication Storefront site.
+                    <br>
+                    <label>API Views:&nbsp;</label>Generated when the Media Item's content is pulled from our API. (Any time the items Embed Code is triggered)
                 </div>
             </div>
         </div>

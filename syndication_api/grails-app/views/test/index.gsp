@@ -38,5 +38,20 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <br/>
         <g:submitButton name="submit" value="Send"/>
     </g:form>
+
+    <hr/>
+    <g:form action="createStructuredItem">
+        <h2>Create a structured item</h2>
+        <label>Name: </label>
+        <g:textField name="name" required="required"/>
+        <br/>
+        <label>Structured Content Type:</label>
+        <g:select name="structuredType" from="${com.ctacorp.syndication.media.MediaItem.StructuredContentType.enumConstants}" optionValue="prettyName" keys="${com.ctacorp.syndication.media.MediaItem.StructuredContentType.enumConstants}"/>
+        <br/>
+        <label>SourceUrl: </label>
+        <g:textField name="sourceUrl" required="required"/>
+        <br/>
+        <g:submitButton name="Go!"/>
+    </g:form>
 </body>
 </html>

@@ -1,5 +1,5 @@
 %{--
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -66,91 +66,93 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         </div>
 
         <div class="col-lg-4">
-            <div class="row">
-                <div class="col-sm-12">
-                    <h4>General</h4>
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h1 class="panel-title">
-                                Total Subscribers
-                            </h1>
-                        </div>
-
-                        <div class="panel-body">
-                            ${subscribers.size()}
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h1 class="panel-title">
-                                Total Hits
-                            </h1>
-                        </div>
-
-                        <div class="panel-body">
-                            <div class="btn-group btn-group-sm btn-group-justified" role="group" aria-label="...">
-                                <a href="#" id="totalWeek" data-totalrange="week" class="btn totalRange btn-default active">Week</a>
-                                <a href="#" id="totalMonth" data-totalrange="month" class="btn totalRange btn-default">Month</a>
-                                <a href="#" id="totalYear" data-totalrange="year" class="btn totalRange btn-default">Year</a>
-                                <a href="#" id="totalAll" data-totalrange="all" class="btn totalRange btn-default">All Time</a>
-                            </div>
-                            <br/>
-                            <ul class="list-group">
-                                <li  class="searchQuery list-group-item">
-                                    <strong>Storefront</strong><br/><span id="storefrontTotal">1</span>
-                                </li>
-                                <li class="searchQuery list-group-item">
-                                    <strong>API</strong><br/><span id="apiTotal">1</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-            <h4>Google Analytics Overview</h4>
+            <h4>Collaborators</h4>
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h1 class="panel-title">
-                        Google Analytics
+                        Total's
                     </h1>
                 </div>
 
                 <div class="panel-body">
-                    <label for="start">Since&nbsp;</label>
-                    <g:form action="overview">
-                        <g:datePicker name="start" precision="day" years="${(new java.util.GregorianCalendar().get(Calendar.YEAR))..2006}" value="${start?:new Date()-30}"/>
-                        <g:submitButton name="lookup" value="Go" class="btn btn-xs btn-success"/>
-                    </g:form>
-                    <br/>
-                    <g:if test="${googleOverview?.error}">
-                        <div class="alert alert-danger" role="alert">
-                            <i class="fa fa-exclamation-circle"></i>
-                            <span class="sr-only">Error:</span>
-                            ${googleOverview.error}
-                        </div>
-                    </g:if>
-                    <g:else>
-                        <g:if test="${googleOverview?.stats}">
-                            <g:each in="${googleOverview.stats}" var="stat">
-                                <li class="searchQuery list-group-item">
-                                    <strong>${stat.key}</strong><br/>
-                                    <g:if test="${stat.key == 'avgTimeOnPage'}">
-                                        <span>${stat.value} Seconds</span>
-                                    </g:if>
-                                    <g:else>
-                                        <span>${stat.value}</span>
-                                    </g:else>
-                                </li>
-                            </g:each>
-                        </g:if>
-                    </g:else>
+                    <li class="list-group-item">
+                        <strong>number of publishers</strong><br><span>${publishers.size()}</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>number of Subscribers</strong><br><span>${totalSubscribers}</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>number of Media Items</strong><br><span>${totalMediaItems}</span>
+                    </li>
+                    <li class="list-group-item clearfix">
+                        <strong>number of Partner Domains</strong><br><span>${partnerDomains.size()}</span><input type="button" class="btn btn-info pull-right" value="View Domains" data-toggle="modal" data-target="#myModal"/>
+                    </li>
                 </div>
             </div>
+        </div>
+        <div class="col-lg-4">
+            <h4>General</h4>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h1 class="panel-title">
+                        Total Hits
+                    </h1>
+                </div>
+
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="btn-group btn-group-sm btn-group-justified" role="group" aria-label="...">
+                            <a href="#" id="totalWeek" data-totalrange="week" class="btn totalRange btn-default active">Week</a>
+                            <a href="#" id="totalMonth" data-totalrange="month" class="btn totalRange btn-default">Month</a>
+                            <a href="#" id="totalYear" data-totalrange="year" class="btn totalRange btn-default">Year</a>
+                            <a href="#" id="totalAll" data-totalrange="all" class="btn totalRange btn-default">All Time</a>
+                        </div>
+                    </div>
+                    <ul class="list-group">
+                        <li  class="searchQuery list-group-item">
+                            <strong>Storefront</strong><br/><span id="storefrontTotal">0</span>
+                        </li>
+                        <li class="searchQuery list-group-item">
+                            <strong>API</strong><br/><span id="apiTotal">0</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <label>Storefront/API Views </label> include metrics that we keep track of internally.
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal for partner domains -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Partner Domains</h4>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group">
+                        <g:each in="${partnerDomains}" var="domain">
+                            <li class="list-group-item">
+                                <strong>${domain}</strong>
+                            </li>
+                        </g:each>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

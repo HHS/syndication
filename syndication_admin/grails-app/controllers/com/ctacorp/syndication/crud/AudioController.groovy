@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA) All rights reserved.
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA) All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -13,6 +13,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 
 package com.ctacorp.syndication.crud
+
+import com.ctacorp.syndication.Language
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -64,7 +66,9 @@ class AudioController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Audio(), model: [subscribers:subscribers]
+        Audio audio = new Audio(params)
+        audio.language = Language.findByIsoCode("eng")
+        respond audio, model: [subscribers:subscribers]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
@@ -92,13 +96,13 @@ class AudioController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Audio audioInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond audioInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(audioInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Audio audioInstance) {
         if (audioInstance == null) {
@@ -137,7 +141,7 @@ class AudioController {
             featuredItem.delete()
         }
        
-        mediaItemsService.removeMediaItemsFromUserMediaLists(audioInstance, true)
+        mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(audioInstance, true)
        solrIndexingService.removeMediaItem(audioInstance)
        mediaItemsService.delete(audioInstance.id)
 

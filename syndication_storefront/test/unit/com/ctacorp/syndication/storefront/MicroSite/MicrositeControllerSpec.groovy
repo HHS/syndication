@@ -178,10 +178,8 @@ class MicrositeControllerSpec extends Specification {
             params.listType = "banana"
         when: "currentList is called"
             controller.currentList()
-        then: "we should be redirected to index"
-            response.redirectUrl == "/microsite/index"
-        and: "there should be an error in flash"
-            flash.error
+        then: "we should get a string containing no source and list"
+            response.contentAsString == "No Media Source and list specified"
     }
 
     def "currentList should find userMediaLists for the current user"() {

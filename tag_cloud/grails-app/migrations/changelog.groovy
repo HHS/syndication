@@ -1211,5 +1211,5 @@ databaseChangeLog = {
 	}
 
 	include file: 'prodUpdateSept2015.groovy'
-    include file: 'test.groovy'
+    include file: 'prodUpdateOct2015.groovy'
 }

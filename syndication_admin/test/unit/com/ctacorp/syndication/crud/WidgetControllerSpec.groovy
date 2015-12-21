@@ -194,7 +194,7 @@ class WidgetControllerSpec extends Specification {
             controller.delete(widget)
 
         then:"The instance is deleted"
-            1 * mediaItemsService.removeMediaItemsFromUserMediaLists(widget,true)
+            1 * mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(widget,true)
             1 * controller.solrIndexingService.removeMediaItem(widget)
             1 * controller.mediaItemsService.delete(widget.id)
             response.redirectedUrl == '/widget/index'

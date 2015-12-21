@@ -47,8 +47,7 @@ class MediaPreviewThumbnailController {
             remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", previewkey)
             render """<img src="${grails.util.Holders.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/thumbnail.jpg"/>"""
         } catch(e){
-            println errorCode
-            log.error(e)
+            log.error("Error Code: ${errorCode}\n"+e)
             e.printStackTrace()
             render "Error code: ${errorCode}"
         }

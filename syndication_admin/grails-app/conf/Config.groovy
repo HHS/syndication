@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -172,3 +172,21 @@ greenmail.ports.smtp = 3026
 //Content extraction
 syndication.contentExtraction.cssClassName = "syndicate"
 syndication.scratch.root = "${System.getProperty('user.home')}/.syndication"
+
+//AWS
+grails {
+    plugin {
+        aws {
+            s3 {
+                bucket = "bucketName"
+                acl = "private"
+            }
+            credentials {
+                accessKey = "your-access-key"
+                secretKey = "your-secret-key"
+            }
+        }
+    }
+}
+
+autotest.excludes = ["MetaData.groovy"]

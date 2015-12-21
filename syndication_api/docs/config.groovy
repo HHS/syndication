@@ -9,3 +9,5 @@ title = "Syndication API"
 
 // The path of directory to be outputted a document
 //outputDirectoryPath = "build"
+
+numbering = false

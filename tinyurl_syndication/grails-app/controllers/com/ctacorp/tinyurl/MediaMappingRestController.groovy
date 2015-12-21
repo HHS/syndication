@@ -1,5 +1,6 @@
 package com.ctacorp.tinyurl
 
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
@@ -14,6 +15,8 @@ class MediaMappingRestController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
     static defaultAction = "index"
 
+    def mediaMappingService
+
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond MediaMapping.list(params), model:[mediaMappingInstanceCount: MediaMapping.count()]
@@ -25,27 +28,13 @@ class MediaMappingRestController {
 
     @Transactional
     def save(MediaMapping mediaMappingInstance) {
-        log.info "Mapping save for ${mediaMappingInstance}"
         if (mediaMappingInstance == null) {
             notFound()
             return
         }
+        log.info "Mapping save for ${mediaMappingInstance}"
 
-        if(mediaMappingInstance.guid) {
-            def existing = MediaMapping.findByGuid(mediaMappingInstance.guid)
-            if(existing){
-                respond existing, [status: CREATED]
-                return
-            }
-        }
-
-        if (mediaMappingInstance.hasErrors()) {
-            log.error mediaMappingInstance.errors
-            respond mediaMappingInstance.errors, view:'create'
-            return
-        }
-
-        mediaMappingInstance.save flush:true
+        mediaMappingInstance = mediaMappingService.saveMediaMapping(mediaMappingInstance)
 
         request.withFormat {
             form multipartForm {
@@ -54,6 +43,12 @@ class MediaMappingRestController {
             }
             '*' { respond mediaMappingInstance, [status: CREATED] }
         }
+    }
+
+    @Transactional
+    def saveBulkMappings(){
+        def savedMappings = mediaMappingService.bulkMapping(request.getJSON())
+        render savedMappings as JSON
     }
 
     @Transactional

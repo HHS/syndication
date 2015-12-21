@@ -1,5 +1,5 @@
 %{--
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
+
     <div class="row">
         <div class="col-lg-12">
             <!-- /.panel-heading -->
@@ -121,6 +122,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <br/>
                         <p>* If sorting by view count, items with 0 views for the specified day are omitted.</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <label>Storefront Views: &nbsp;</label>Generated when someone looks at the given Media Item on the HHS Syndication Storefront site.
+                    <br>
+                    <label>API Views: &nbsp;</label>Generated when the Media Item's content is pulled from our API. (Any time the items Embed Code is triggered)
                 </div>
             </div>
         </div>

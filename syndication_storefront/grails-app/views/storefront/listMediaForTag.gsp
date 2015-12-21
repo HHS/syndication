@@ -13,6 +13,7 @@
 </head>
 
 <body>
+<div id="home">
     <div id="home_left">
         <h2>HHS Syndication Storefront</h2>
 
@@ -40,5 +41,6 @@
         <g:link action="embedCodeForTag" controller="storefront" id="${tagId}" params="[tagName:tagName]">>> Click here to get embed code for this tag</g:link>
     </div>
     <g:render template="rightBoxes"/>
+</div>
 </body>
 </html>

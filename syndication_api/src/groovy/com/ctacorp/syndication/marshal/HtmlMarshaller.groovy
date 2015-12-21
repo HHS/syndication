@@ -19,6 +19,7 @@ import clover.com.lowagie.text.html.HtmlEncoder
 import com.ctacorp.syndication.ExtendedAttribute
 import com.ctacorp.syndication.media.Html
 import grails.converters.JSON
+import static com.ctacorp.syndication.media.MediaItem.StructuredContentType.*
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,8 +37,19 @@ class HtmlMarshaller {
             def campaigns = services.mediaService.getCampaignsForAPIResponse(h)
 
             def attr = HtmlEncoder.encode("<div id='hhsAttribution'>Content provided and maintained by <a href='${h.source.websiteUrl}' target='_blank'>Health and Human Services</a> (HHS). Please see our system <a href='http:syndication.hhs.gov' target='_blank'>usage guidelines and disclaimer</a>.</div>")
+
+            def mediaType
+
+            switch (h.structuredContentType){
+                case BLOG_POST: mediaType = "BlogPost"
+                    break
+                case NEWS_RELEASE: mediaType = "NewsRelease"
+                    break
+                default: mediaType = "Html"
+            }
+
             return [
-                mediaType:             "Html",
+                mediaType:              mediaType,
                 id:                     h.id,
                 name:                   h.name,
                 description:            h.description,
@@ -54,6 +66,7 @@ class HtmlMarshaller {
                 externalGuid:           h.externalGuid,
                 contentHash:            h.hash,
                 source:                 h.source,
+                createdBy:              h.createdBy,
                 campaigns:              campaigns,
                 tags:                   services.mediaService.getTagsForMediaItemForAPIResponse(h),
                 tinyUrl:                tinyInfo.tinyUrl,

@@ -23,7 +23,7 @@ class ContentCacheService {
     def contentRetrievalService
 
     CachedContent cache(MediaItem media){
-        String content = contentRetrievalService.extractSyndicatedContent(media?.sourceUrl)
+        String content = contentRetrievalService.extractSyndicatedContent(media?.sourceUrl, [disableFailFast:true])
         cacheHelper(media, content)
     }
 

@@ -1,6 +1,7 @@
 package com.ctacorp.syndication.jobs
 
 import com.ctacorp.syndication.authentication.User
+import com.ctacorp.syndication.contact.EmailContact
 import com.ctacorp.syndication.health.FlaggedMedia
 import grails.util.Holders
 
@@ -33,7 +34,7 @@ class MediaValidationJob {
             flaggedItems = mediaValidationService.getPublisherFlaggedMedia(subscriberId)
         } else {
             mediaValidationService.fullHealthScan()
-            mailRecipiants = grailsApplication.config.SyndicationAdmin.healthReportEmailAddresses ?: "syndication@ctacorp.com"
+            mailRecipiants = EmailContact.list().email ?: "syndicationAdmin@hhs.gov"
             flaggedItems = mediaValidationService.getFlaggedMedia()
         }
         

@@ -163,14 +163,14 @@ class TagService {
             }
             mediaCount++
             def tagsForMediaItem = []
-            if(mediaAndTags[mediaItem.id].getClass().isArray()) {
+            if(List.class.isAssignableFrom(mediaAndTags[mediaItem.id].getClass())){
                 mediaAndTags[mediaItem.id].each { String tagName ->
                     tagsForMediaItem << tagName
                     tagCount++
                 }
             } else{
                 tagCount++
-                tagsForMediaItem << mediaAndTags[mediaItem.id]
+                tagsForMediaItem = mediaAndTags[mediaItem.id]
             }
             bulkTags[mediaItem.id] = [tagNames: tagsForMediaItem, url: mediaItem.sourceUrl]
             log.info "tagging ${mediaItem.id} with ${mediaAndTags[mediaItem.id]}"
@@ -286,7 +286,7 @@ class TagService {
             return resp.json
         } catch (e) {
             log.error "Could not connect to: ${path}"
-            e.printStackTrace()
+//            e.printStackTrace()
             return null
         }
     }

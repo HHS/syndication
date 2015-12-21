@@ -263,3 +263,19 @@ bruteforcedefender {
     time = 15
     allowedNumberOfAttempts = 5
 }
+
+//AWS
+grails {
+    plugin {
+        aws {
+            s3 {
+                bucket = "bucketName"
+                acl = "private"
+            }
+            credentials {
+                accessKey = "your-access-key"
+                secretKey = "your-secret-key"
+            }
+        }
+    }
+}

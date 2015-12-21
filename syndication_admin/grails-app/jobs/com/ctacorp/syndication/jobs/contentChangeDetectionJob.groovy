@@ -3,7 +3,7 @@ package com.ctacorp.syndication.jobs
 /**
  * Created by nburk on 2/17/15.
  */
-class contentChangeDetectionJob {
+class ContentChangeDetectionJob {
     static triggers = {
         cron name: 'contentChangeDetectionTrigger', cronExpression: "0 0 0 ? * *" //Every night at midnight
     }

@@ -19,6 +19,7 @@ package syndication.rest
 
 import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.Source
+import com.ctacorp.syndication.data.SourceHolder
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.web.mime.MimeType
 import com.ctacorp.syndication.api.ApiResponse
@@ -84,12 +85,25 @@ class SourcesController {
         respond ApiResponse.get200Response(sourceList).autoFill(params)
     }
 
+    @APIResource(path="/resources/sources/{id}/syndicate.{format}", description="MediaItem", operations=[
+            @Operation(httpMethod="GET", notes="Renders the list of MediaItems associated with the Source identified by the 'id'.", nickname="syndicate", type = "MediaItems", summary = "Get MediaItems for Source", responseMessages=[
+                    @ResponseMessage(code = 400, description = "Bad Request"),
+                    @ResponseMessage(code = 500, description = "Internal Server Error")
+            ], parameters = [
+                    @Parameter(name = "id",          type="integer", format="int64", description = "The id of the record to look up", required = true, paramType = "path"),
+                    @Parameter(name="displayMethod", type="string",                  description="Method used to render an html request. Accepts one: [mv, list, feed]", required=false, paramType = "query")
+            ])
+    ])
     def syndicate(Long id){
         def sourceInstance = Source.read(id)
         if(!sourceInstance){
             response.setStatus(400)
             respond ApiResponse.get400NotFoundResponse()
             return
+        }
+
+        params.controllerContext = { model ->
+            g.render template: "/media/mediaViewer", model:model
         }
 
         String content = mediaService.renderMediaForSource(sourceInstance, params)
@@ -102,6 +116,42 @@ class SourcesController {
                 respond ApiResponse.get200Response([resp]).autoFill(params)
             }
         }
+    }
 
+    def embed(Long id){
+        String sourceName
+        if(!id || !(sourceName = Source.get(id))){
+            response.status = 400
+            respond ApiResponse.get400NotFoundResponse().autoFill(params)
+            return
+        }
+        String renderedResponse
+        String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/sources/${id}"
+        SourceHolder sourceHolder = new SourceHolder([id:id, name:sourceName])
+        switch(params.displayMethod ? params.displayMethod.toLowerCase() : "feed"){
+            case "mv":
+                renderedResponse = mediaService.renderMediaViewerSnippet(sourceHolder, params)
+                break
+            case "feed":
+            case "list":
+            default:
+                if(params.flavor && params.flavor.toLowerCase() == "iframe") {
+                    renderedResponse = mediaService.renderIframeSnippet(url, params)
+                } else{
+                    renderedResponse = mediaService.renderJSSnippet(url, sourceHolder, params)
+                }
+        }
+
+        withFormat {
+            html {
+                render renderedResponse
+                return
+            }
+            json {
+                response.contentType = 'application/json'
+                respond ApiResponse.get200Response([[snippet:renderedResponse]]).autoFill(params)
+                return
+            }
+        }
     }
 }

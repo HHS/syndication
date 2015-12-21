@@ -17,6 +17,7 @@
     <asset:javascript src="application.js"/>
     <asset:stylesheet src="storefront.css"/>
     <asset:stylesheet src="templates.css"/>
+    <asset:stylesheet src="preview-popup.css"/>
 
     <g:layoutHead/>
 </head>

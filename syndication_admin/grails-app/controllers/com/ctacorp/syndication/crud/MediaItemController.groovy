@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA) All rights reserved.
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA) All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -83,17 +83,17 @@ class MediaItemController {
         params.visibleInStorefront = params.visibleInStorefront ?: ""
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
             if(q.isInteger() && publisherItems().contains(q.toInteger() as Long)){
-                render MediaItem.findAllByIdLikeOrNameIlike(q.toInteger(), "%${q}%", [max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
+                render MediaItem.findAllByIdLike(q.toInteger(), [max:20]).collect{ [id:it.id, name:"$it.name"] } as JSON
                 return
             } else {
-                render MediaItem.facetedSearch([restrictToSet:publisherItems().join(","), nameContains: "${q}", active:params.active, visibleInStorefront:params.visibleInStorefront]).list([max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
+                render MediaItem.facetedSearch([restrictToSet:publisherItems().join(","), nameContains: "${q}", active:params.active, visibleInStorefront:params.visibleInStorefront]).list([max:20]).collect{ [id:it.id, name:"$it.name"] } as JSON
                 return
             }
         }
         if(q.isInteger()){
             render MediaItem.findAllByIdLikeOrNameIlike(q.toInteger(), "%${q}%", [max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
         } else {
-            render MediaItem.facetedSearch([nameContains: "${q}", active:params.active, visibleInStorefront:params.visibleInStorefront]).list([max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
+            render MediaItem.facetedSearch([nameContains: "${q}", active:params.active, visibleInStorefront:params.visibleInStorefront]).list([max:20]).collect{ [id:it.id, name:"$it.name"] } as JSON
         }
     }
 
@@ -172,5 +172,11 @@ class MediaItemController {
                 }
         }
         render "false"
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def resetHash(Long id){
+        mediaItemsService.resetHash(id)
+        redirect action: "show", id:id
     }
 }

@@ -1,5 +1,5 @@
 <%--
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -73,6 +73,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="adminPill"><a href="#" id="adminInfoButton">Details</a></li>
                                     </ul>
                                 </div>
+                                <g:link action="logDownload" params="[file:'adminErrorsFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors File"/>
+                                </g:link>
+                                <g:link action="logDownload" params="[file:'adminDetailsFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Details File"/>
+                                </g:link>
                             </div>
                         </div>
                     </div>
@@ -105,6 +111,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="apiPill"><a href="#" id="apiInfoButton">Details</a></li>
                                     </ul>
                                 </div>
+                                <g:link action="logDownload" params="[file:'apiErrorsFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors File"/>
+                                </g:link>
+                                <g:link action="logDownload" params="[file:'apiDetailsFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Details File"/>
+                                </g:link>
                             </div>
                         </div>
                     </div>
@@ -137,6 +149,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="cmsPill"><a href="#" id="cmsApiKeyLogButton">Api Key Log</a></li>
                                     </ul>
                                 </div>
+                                <g:link action="logDownload" params="[file:'cmsLogFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Log File"/>
+                                </g:link>
+                                <g:link action="logDownload" params="[file:'cmsKeyLogFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Key Log File"/>
+                                </g:link>
                             </div>
                         </div>
                     </div>
@@ -169,6 +187,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="storefrontPill"><a href="#" id="storefrontInfoButton">Details</a></li>
                                     </ul>
                                 </div>
+                                <g:link action="logDownload" params="[file:'storefrontErrorsFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors File"/>
+                                </g:link>
+                                <g:link action="logDownload" params="[file:'storefrontDetailsFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Details File"/>
+                                </g:link>
                             </div>
                         </div>
                     </div>
@@ -201,6 +225,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="tinyPill"><a href="#" id="tinyInfoButton">Details</a></li>
                                     </ul>
                                 </div>
+                                <g:link action="logDownload" params="[file:'tinyUrlErrorsFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors File"/>
+                                </g:link>
+                                <g:link action="logDownload" params="[file:'tinyUrlDetailsFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Details File"/>
+                                </g:link>
                             </div>
                         </div>
                     </div>
@@ -233,6 +263,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="tagPill"><a href="#" id="tagInfoButton">Details</a></li>
                                     </ul>
                                 </div>
+                                <g:link action="logDownload" params="[file:'tagErrorsFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors File"/>
+                                </g:link>
+                                <g:link action="logDownload" params="[file:'tagDetailsFile']">
+                                    <input class="btn btn-primary" type="button" value="Download Details File"/>
+                                </g:link>
                             </div>
                         </div>
                     </div>

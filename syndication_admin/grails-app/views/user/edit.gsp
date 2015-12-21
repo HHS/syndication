@@ -1,5 +1,5 @@
 %{--
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -110,7 +110,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                     <tr><td>Edit Alternate Images</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
                                     <tr><td>Delete Alternate Images</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
                                     <tr><td>View Campaigns</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Create Campaigns</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Create Campaigns</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
                                     <tr><td>Edit Campaigns</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
                                     <tr><td>Delete Campaigns</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td></tr>
                                     <tr><td>Enable/Disable System Languages</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
@@ -120,7 +120,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                     <tr><td>Delete Extended Attributes</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
                                     <tr><td>List Sources</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td><td>X</td></tr>
                                     <tr><td>Show Sources</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Create Sources</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Create Sources</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td></tr>
                                     <tr><td>Edit Sources</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
                                     <tr><td>Delete Sources</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
                                     <tr><td>Show Tags</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>

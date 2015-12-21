@@ -35,6 +35,8 @@
     <g:render template="header"/>
   </div>
 
+  <input type="button" class="btn btn-info pull-right" value="Field Keys" data-toggle="modal" data-target="#myModal"/>
+
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" id="tab1" class="active"><a id="topTenTab" role="tab" data-toggle="tab" href="#topTen">Top Ten</a></li>
     <li role="presentation" id="tab2"><a id="singleMediaItem" role="tab" data-toggle="tab" href="#singleMediaItems">Single Media Items</a></li>
@@ -402,6 +404,34 @@
     </div>
   </div>
 
+</div>
+
+<!-- Modal for partner domains -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Partner Domains</h4>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <label>Storefront Views:&nbsp;</label>Generated when someone looks at the given Media Item on the HHS Syndication Storefront site.
+          </li>
+          <li class="list-group-item">
+            <label>API Views:&nbsp;</label>Generated when the Media Item's content is pulled from our API. (Any time the items Embed Code is triggered)
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <g:render template="scripts"/>

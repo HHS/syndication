@@ -36,7 +36,7 @@ class ContentRetrievalService {
 
         String content = null
         try{
-            content = webUtilService.getPage(url)
+            content = webUtilService.getPage(url, params.disableFailFast)
             return wrap(jsoupWrapperService.extract(content, params), params)
         } catch(ContentUnretrievableException e){
             log.error("Tried to extract content from a bad URL: ${url}\nError: ${e}")
@@ -84,10 +84,10 @@ class ContentRetrievalService {
         content + attr
     }
 
-    //This looks hella sketchy, are we really doing this anywhere? Looks legacy to me -Steffen
     private String wrap(String content, params){
-        StringBuilder sb = new StringBuilder()
+        //This looks hella sketchy, are we really doing this anywhere? Looks legacy to me -Steffen
         if(params.jsonP){
+            StringBuilder sb = new StringBuilder()
             content.eachLine(){
                 sb.append("document.write('" + it.trim().replace("'","’") + "');\n")
             }

@@ -88,7 +88,12 @@ class MediaPreviewThumbnailService {
                 "&quality=1" +
                 "&zoom=${scale}" +
                 "&clipRect=1%2C1%2C${width}%2C${height}"
-        new URL(manetCommand).openStream()
+        try {
+            return new URL(manetCommand).openStream()
+        } catch(e){
+            throw new Exception("Manet service couldn't be reached, tried command: ${manetCommand}")
+        }
+        null
     }
 
     private generatePreview(String sourceUrl){
@@ -104,7 +109,12 @@ class MediaPreviewThumbnailService {
                 "&zoom=${scale}" +
                 "&quality=1" +
                 "&clipRect=1%2C1%2C${width}%2C${height}"
-        new URL(manetCommand).openStream()
+        try {
+            return new URL(manetCommand).openStream()
+        } catch(e){
+            throw new Exception("Manet service couldn't be reached, tried command: ${manetCommand}")
+        }
+        null
     }
 
     protected saveThumbnail(MediaItem mi, InputStream is){

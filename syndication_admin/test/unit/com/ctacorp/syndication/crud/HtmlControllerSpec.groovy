@@ -185,7 +185,7 @@ class HtmlControllerSpec extends Specification {
             controller.delete(html)
 
         then:"The instance is deleted"
-            1 * mediaItemsService.removeMediaItemsFromUserMediaLists(html,true)
+            1 * mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(html,true)
             1 * controller.solrIndexingService.removeMediaItem(html)
             1 * controller.mediaItemsService.delete(html.id)
             response.redirectedUrl == '/html/index'

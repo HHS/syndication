@@ -15,6 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.rest
 
 import com.ctacorp.grails.swagger.annotations.*
+import com.ctacorp.syndication.media.MediaItem
 import grails.transaction.Transactional
 import grails.util.Holders
 import com.ctacorp.syndication.api.ApiResponse
@@ -67,6 +68,17 @@ class MediaTypesController {
             }
         }
 
-        mediaTypes
+        def structuredTypes = MediaItem.StructuredContentType
+                .enumConstants*.prettyName
+                .collect{
+                    def name = it.replace(" ", "")
+                    new MediaTypeHolder(
+                            name: name,
+                            description: g.message(code: "syndication.mediaType.${name}.description"))
+                }
+
+        mediaTypes.addAll(structuredTypes)
+
+        mediaTypes.sort()
     }
 }

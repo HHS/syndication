@@ -1041,12 +1041,6 @@ class MediaController {
         renderStream(url, contentType)
     }
 
-    private void renderImageFromUrl(String url){
-        def content=url.toURL().bytes
-        def contentType=URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(content))
-        renderBytes(content, contentType)
-    }
-
     private renderBytes(byte[] bytes, String contentType = "image/jpeg"){
         response.contentType = contentType
         response.setHeader('Content-length', "${bytes.size()}")
@@ -1061,34 +1055,5 @@ class MediaController {
         response.outputStream << inputStream
         response.outputStream.flush()
         inputStream.close()
-    }
-
-    private String getExtractedContent(MediaItem mi){
-        String key = Hash.md5(mi.sourceUrl + params.sort().toString())
-        String extractedContent = guavaCacheService.extractedContentCache.get(key, new Callable<String>() {
-            @Override
-            public String call(){
-                Map extractedContentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mi.sourceUrl, params)
-                String extractedContent = extractedContentAndHash.content
-                String newHash = extractedContentAndHash.hash
-                def lastKnownGood = contentCacheService.get(mi)
-
-                if(!extractedContent){
-                    if(lastKnownGood && lastKnownGood.content){
-                        extractedContent = lastKnownGood.content
-                    } else {
-                        throw new ContentNotExtractableException("There is no syndicated markup/content found!")
-                    }
-                } else{ //Else update the lastKnownGood if it's out of date
-                    if(!lastKnownGood || lastKnownGood.mediaItem.hash != newHash){
-                        contentCacheService.cache(mi, extractedContent)
-                    }
-                }
-                extractedContent
-            }
-        });
-        extractedContent = contentRetrievalService.addAttributionToExtractedContent(mi.id, extractedContent)
-        extractedContent += analyticsService.getGoogleAnalyticsString(mi, params)
-        extractedContent
     }
 }

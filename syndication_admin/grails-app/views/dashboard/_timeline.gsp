@@ -13,7 +13,8 @@
                     </div>
                     <div class="timeline-panel">
                         <div class="timeline-heading">
-                            <h4 class="timeline-title" style="word-wrap: break-word"><a href="${grailsApplication.config.storefront.serverAddress}/storefront/showContent/${timelineEvent.id}">${timelineEvent?.title}</a></h4>
+                            <h4 class="timeline-title" style="word-wrap: break-word"><a href="${grailsApplication.config.grails.serverURL}/mediaItem/show?id=${timelineEvent.id}">${timelineEvent?.title}</a></h4>
+                            <h4 class="timeline-title" style="word-wrap: break-word"><a href="${grailsApplication.config.storefront.serverAddress}/storefront/showContent/${timelineEvent.id}">Storefront Page</a></h4>
                             <p>
                                 <small class="text-muted"><i class="fa fa-clock-o"></i> <prettytime:display date="${timelineEvent?.timestamp}" /></small>
                             </p>

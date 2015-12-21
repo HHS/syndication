@@ -292,11 +292,20 @@ class ViewMetricService {
     def getAllHits(Date within = new Date()-30){
         def sql = new Sql(dataSource)
         def viewCounts = [:]
-        def responseRows = sql.rows("select sum(media_metric.api_view_count) AS api_count from media_metric WHERE media_metric.day>=${within}")
-        viewCounts.apiCount = responseRows[0].api_count
-        responseRows = sql.rows("select sum(media_metric.storefront_view_count) AS storefront_count from media_metric WHERE media_metric.day>=${within}")
-        viewCounts.storefrontCount =responseRows[0].storefront_count
-
+        def responseRows
+        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
+            def items = publisherItems().toString()
+            items = items.substring(1,items.length()-1)
+            responseRows = sql.rows("select sum(media_metric.api_view_count) AS api_count from media_metric WHERE media_metric.day>=${within} AND media_id IN ("+items+")")
+            viewCounts.apiCount = responseRows[0].api_count
+            responseRows = sql.rows("select sum(media_metric.storefront_view_count) AS storefront_count from media_metric WHERE media_metric.day>=${within} AND media_id IN (5,8)")
+            viewCounts.storefrontCount =responseRows[0].storefront_count
+        } else {
+            responseRows = sql.rows("select sum(media_metric.api_view_count) AS api_count from media_metric WHERE media_metric.day>=${within}")
+            viewCounts.apiCount = responseRows[0].api_count
+            responseRows = sql.rows("select sum(media_metric.storefront_view_count) AS storefront_count from media_metric WHERE media_metric.day>=${within}")
+            viewCounts.storefrontCount =responseRows[0].storefront_count
+        }
         viewCounts
     }
 

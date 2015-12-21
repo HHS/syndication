@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA) All rights reserved.
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA) All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -13,6 +13,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 
 package com.ctacorp.syndication.crud
+
+import com.ctacorp.syndication.Language
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -65,7 +67,9 @@ class VideoController {
     def create() {
         flash.error = null
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Video(params), model: [subscribers:subscribers]
+        Video video = new Video(params)
+        video.language = Language.findByIsoCode("eng")
+        respond video, model: [subscribers:subscribers]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
@@ -93,13 +97,13 @@ class VideoController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Video videoInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond videoInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(videoInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Video videoInstance) {
         if (videoInstance == null) {
@@ -137,7 +141,7 @@ class VideoController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(videoInstance, true)
+        mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(videoInstance, true)
         solrIndexingService.removeMediaItem(videoInstance)
         mediaItemsService.delete(videoInstance.id)
 

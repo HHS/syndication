@@ -16,6 +16,9 @@ package syndication.rest
 
 import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.AlternateImage
+import com.ctacorp.syndication.api.Embedded
+import com.ctacorp.syndication.data.CampaignHolder
+import com.ctacorp.syndication.data.TagHolder
 import com.ctacorp.syndication.media.Audio
 import com.ctacorp.syndication.Campaign
 import com.ctacorp.syndication.media.Html
@@ -31,6 +34,7 @@ import com.ctacorp.syndication.api.Meta
 import com.ctacorp.syndication.api.Pagination
 import com.ctacorp.syndication.api.Message
 import com.ctacorp.syndication.api.ApiResponse
+import org.codehaus.groovy.grails.web.mime.MimeType
 
 @API(swaggerDataPath = "/campaigns", description = "Information about campaigns", modelExtensions = [
     @ModelExtension(id="MediaItems", model="ApiResponse"),
@@ -69,6 +73,7 @@ class CampaignsController {
 
     def apiResponseBuilderService
     def campaignsService
+    def mediaService
 
     def beforeInterceptor = {
         response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
@@ -120,7 +125,7 @@ class CampaignsController {
     ])
     def listMediaForCampaign(Long id) {
         def mediaItemInstanceList = campaignsService.listMediaItemsForCampaign(id, params)
-        if(!mediaItemInstanceList){
+        if(!Campaign.get(id)){
             response.status = 400
             respond ApiResponse.get400ResponseCustomMessage("Specified campaign could not be found")
             return
@@ -128,5 +133,76 @@ class CampaignsController {
         params.total = mediaItemInstanceList.totalCount
         params.maxOverride = true
         respond ApiResponse.get200Response(mediaItemInstanceList).autoFill(params)
+    }
+
+    @APIResource(path="/resources/campaigns/{id}/syndicate.{format}", description="MediaItem", operations=[
+            @Operation(httpMethod="GET", notes="Renders the list of MediaItems associated with the Campaign identified by the 'id'.", nickname="syndicate", type = "MediaItems", summary = "Get MediaItems for Campaign", responseMessages=[
+                    @ResponseMessage(code = 400, description = "Bad Request"),
+                    @ResponseMessage(code = 500, description = "Internal Server Error")
+            ], parameters = [
+                    @Parameter(name = "id",          type="integer", format="int64", description = "The id of the record to look up", required = true, paramType = "path"),
+                    @Parameter(name="displayMethod", type="string",                  description="Method used to render an html request. Accepts one: [mv, list, feed]", required=false, paramType = "query")
+            ])
+    ])
+    def syndicate(Long id){
+        String campaignName
+        if(!id || !(campaignName = Campaign.get(id))){
+            response.status = 400
+            respond ApiResponse.get400NotFoundResponse().autoFill(params)
+            return
+        }
+
+        params.controllerContext = { model ->
+            g.render template: "/media/mediaViewer", model:model
+        }
+
+        String content = mediaService.renderMediaForCampaign(id, params)
+
+        response.withFormat {
+            html{
+                render text: content, contentType: MimeType.HTML.name
+            }
+            json{
+                def resp = new Embedded(id:id, content:content ,name: campaignName, description: "Media associated with the Campaign: '${campaignName}'")
+                respond ApiResponse.get200Response([resp]).autoFill(params)
+            }
+        }
+    }
+
+    def embed(Long id){
+        String campaignName
+        if(!id || !(campaignName = Campaign.get(id))){
+            response.status = 400
+            respond ApiResponse.get400NotFoundResponse().autoFill(params)
+            return
+        }
+        String renderedResponse
+        String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/campaigns/${id}"
+        CampaignHolder campaignHolder = new CampaignHolder([id:id, name:campaignName])
+        switch(params.displayMethod ? params.displayMethod.toLowerCase() : "feed"){
+            case "mv":
+                renderedResponse = mediaService.renderMediaViewerSnippet(campaignHolder, params)
+                break
+            case "feed":
+            case "list":
+            default:
+                if(params.flavor && params.flavor.toLowerCase() == "iframe") {
+                    renderedResponse = mediaService.renderIframeSnippet(url, params)
+                } else{
+                    renderedResponse = mediaService.renderJSSnippet(url, campaignHolder, params)
+                }
+        }
+
+        withFormat {
+            html {
+                render renderedResponse
+                return
+            }
+            json {
+                response.contentType = 'application/json'
+                respond ApiResponse.get200Response([[snippet:renderedResponse]]).autoFill(params)
+                return
+            }
+        }
     }
 }

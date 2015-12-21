@@ -1,5 +1,5 @@
 %{--
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,142 +33,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <div class="row">
         <div class="col-md-10 col-md-offset-2">
             <dl class="dl-horizontal">
-                <g:if test="${collectionInstance?.id}">
-                    <dt class="word_wrap"><g:message code="collection.id.label" default="Id"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${collectionInstance}" field="id"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.name}">
-                    <dt class="word_wrap"><g:message code="collection.name.label" default="Name"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${collectionInstance}" field="name"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.source}">
-                    <dt id="source-label" class="word_wrap"><g:message code="collection.source.label" default="Source"/></dt>
-                    <dd class="word_wrap"><g:link controller="source" action="show" id="${collectionInstance?.source?.id}">${collectionInstance?.source?.encodeAsHTML()}</g:link></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.sourceUrl}">
-                    <dt class="word_wrap"><g:message code="collection.sourceUrl.label" default="Source Url"/></dt>
-                    <dd class="word_wrap"><a target="_blank" href="${collectionInstance.sourceUrl}"><g:fieldValue bean="${collectionInstance}" field="sourceUrl"/></a></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.targetUrl}">
-                    <dt id="targetUrl-label" class="word_wrap"><g:message code="collection.targetUrl.label" default="Target Url"/></dt>
-                    <dd class="word_wrap"><a target="_blank" href="${collectionInstance?.targetUrl}"><g:fieldValue bean="${collectionInstance}" field="targetUrl"/></a></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.active && collectionInstance?.visibleInStorefront}">
-                    <dt id="storefrontLink-label" class="word_wrap"><g:message code="html.storefrontLink.label" default="Storefront Link"/></dt>
-                    <dd class="word_wrap"><a target="_blank" href="${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${collectionInstance?.id}">${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${collectionInstance?.id}</a></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.customThumbnailUrl}">
-                    <dt id="customThumbnailUrl-label" class="word_wrap"><g:message code="collection.customThumbnailUrl.label" default="Custom Thumbnail Url"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${collectionInstance}" field="customThumbnailUrl"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.customPreviewUrl}">
-                    <dt id="customPreviewUrl-label" class="word_wrap"><g:message code="collection.customPreviewUrl.label" default="Custom Preview Url"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${collectionInstance}" field="customPreviewUrl"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.language}">
-                    <dt id="language-label" class="word_wrap"><g:message code="collection.language.label" default="Language"/></dt>
-                    <dd class="word_wrap">${collectionInstance?.language?.encodeAsHTML()}</dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.description}">
-                    <dt class="word_wrap"><g:message code="collection.description.label" default="Description"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${collectionInstance}" field="description"/></dd>
-                </g:if>
-                <br>
-                <g:if test="${collectionInstance?.dateSyndicationUpdated}">
-                    <dt id="dateSyndicationUpdated-label" class="word_wrap"><g:message code="collection.dateSyndicationUpdated.label" default="Syndication Updated"/></dt>
-                    <dd class="word_wrap"><g:formatDate date="${collectionInstance?.dateSyndicationUpdated}"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.dateSyndicationCaptured}">
-                    <dt id="dateSyndicationCaptured-label" class="word_wrap"><g:message code="collection.dateSyndicationCaptured.label" default="Syndication Captured"/></dt>
-                    <dd class="word_wrap"><g:formatDate date="${collectionInstance?.dateSyndicationCaptured}"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.dateSyndicationVisible}">
-                    <dt id="dateSyndicationVisible-label" class="word_wrap"><g:message code="collection.dateSyndicationVisible.label" default="Syndication Visible"/></dt>
-                    <dd class="word_wrap"><g:formatDate date="${collectionInstance?.dateSyndicationVisible}"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.dateContentUpdated}">
-                    <dt id="dateContentUpdated-label" class="word_wrap"><g:message code="collection.dateContentUpdated.label" default="Content Updated"/></dt>
-                    <dd class="word_wrap"><g:formatDate date="${collectionInstance?.dateContentUpdated}"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.dateContentAuthored}">
-                    <dt id="dateContentAuthored-label" class="word_wrap"><g:message code="collection.dateContentAuthored.label" default="Content Authored"/></dt>
-                    <dd class="word_wrap"><g:formatDate date="${collectionInstance?.dateContentAuthored}"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.dateContentPublished}">
-                    <dt id="dateContentPublished-label" class="word_wrap"><g:message code="collection.dateContentPublished.label" default="Content Published"/></dt>
-                    <dd class="word_wrap"><g:formatDate date="${collectionInstance?.dateContentPublished}"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.dateContentReviewed}">
-                    <dt id="dateContentReviewed-label" class="word_wrap"><g:message code="collection.dateContentReviewed.label" default="Content Reviewed"/></dt>
-                    <dd class="word_wrap"><g:formatDate date="${collectionInstance?.dateContentReviewed}"/></dd>
-                </g:if>
-
-                <dt id="active-label" class="word_wrap"><g:message code="collection.active.label" default="Active"/></dt>
-                <dd class="word_wrap"><g:formatBoolean boolean="${collectionInstance?.active}"/></dd>
-
-                <dt id="active-label" class="word_wrap"><g:message code="collection.visibleInStorefront.label" default="Visible In Storefront"/></dt>
-                <dd class="word_wrap"><g:formatBoolean boolean="${collectionInstance?.visibleInStorefront}"/></dd>
-
-                <dt id="active-label" class="word_wrap"><g:message code="collection.manuallyManaged.label" default="Manually Managed"/></dt>
-                <dd class="word_wrap"><g:formatBoolean boolean="${collectionInstance?.manuallyManaged}"/></dd>
-
-                <g:if test="${collectionInstance?.externalGuid}">
-                    <dt id="externalGuid-label" class="word_wrap"><g:message code="collection.externalGuid.label" default="External GUID"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${collectionInstance}" field="externalGuid"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.hash}">
-                    <dt id="hash-label" class="word_wrap"><g:message code="collection.hash.label" default="Hash"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${collectionInstance}" field="hash"/></dd>
-                </g:if>
-
-                <g:if test="${collectionInstance?.campaigns}">
-                    <dt id="campaigns-label" class="word_wrap"><g:message code="collection.campaigns.label" default="Campaigns"/></dt>
-                    <g:each in="${collectionInstance.campaigns}" var="c">
-                        <dd class="word_wrap"><g:link controller="campaign" action="show" id="${c.id}">${c?.encodeAsHTML()}</g:link></dd>
-                    </g:each>
-                </g:if>
-
-                <g:if test="${collectionInstance?.alternateImages}">
-                    <dt id="alternateImages-label" class="word_wrap"><g:message code="collection.alternateImages.label" default="Alternate Images"/></dt>
-                    <g:each in="${collectionInstance.alternateImages}" var="a">
-                        <dd class="word_wrap"><g:link controller="alternateImage" params="[mediaId:collectionInstance.id]" action="show" id="${a.id}">${a?.encodeAsHTML()}</g:link></dd>
-                    </g:each>
-                </g:if>
-
-                <g:if test="${collectionInstance?.extendedAttributes}">
-                    <dt id="extendedAttributes-label" class="word_wrap"><g:message code="collection.extendedAttributes.label" default="Extended Attributes"/></dt>
-                    <g:each in="${collectionInstance.extendedAttributes}" var="d">
-                        <dd class="word_wrap"><g:link controller="extendedAttribute" params="[mediaId:collectionInstance.id]" action="show" id="${d.id}">${d?.encodeAsHTML()}</g:link></dd>
-                    </g:each>
-                </g:if>
-
-                <g:if test="${collectionInstance?.metrics}">
-                    <dt id="metrics-label" class="word_wrap"><g:message code="collection.metrics.label" default="Metrics"/></dt>
-                    <g:each in="${collectionInstance.metrics}" var="m">
-                        <dd class="word_wrap"><g:link controller="mediaMetric" action="show" id="${m.id}">${m?.encodeAsHTML()}</g:link></dd>
-                    </g:each>
-                </g:if>
+                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: collectionInstance, mediaType:'collection']"/>
 
                 <g:if test="${collectionInstance?.mediaItems}">
                     <dt id="mediaItems-label" class="word_wrap"><g:message code="collection.mediaItems.label" default="Media Items"/></dt>
-                    <g:each in="${collectionInstance.mediaItems}" var="m">
-                        <dd class="word_wrap"><g:link controller="mediaItem" action="show" id="${m.id}">${m?.encodeAsHTML()}</g:link></dd>
+                    <g:each in="${collectionInstance.mediaItems.sort{ it.name }}" var="m">
+                        <dd class="word_wrap"><span style="text-align: right; display:inline-block; width:3em;">${m.id}</span> <g:link controller="mediaItem" action="show" id="${m.id}">${m?.encodeAsHTML()}</g:link></dd>
                     </g:each>
                 </g:if>
             </dl>
@@ -178,7 +48,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <fieldset class="buttons">
         <g:form  url="[resource:collectionInstance, action:'edit']">
             <a href="${apiBaseUrl + '/resources/media/'+ collectionInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
-            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER, ROLE_USER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_PUBLISHER">

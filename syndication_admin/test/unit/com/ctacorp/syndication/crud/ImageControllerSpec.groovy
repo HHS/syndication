@@ -195,7 +195,7 @@ class ImageControllerSpec extends Specification {
             controller.delete(image)
 
         then:"The instance is deleted"
-            1 * mediaItemsService.removeMediaItemsFromUserMediaLists(image,true)
+            1 * mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(image,true)
             1 * controller.solrIndexingService.removeMediaItem(image)
             1 * controller.mediaItemsService.delete(image.id)
             response.redirectedUrl == '/image/index'

@@ -356,6 +356,14 @@ p.purple {
     color: #ff0000;
 }
 
+a.sourceLink:link, a.sourceLink:active, a.sourceLink:visited{
+    color: #5b7af7;
+}
+
+a.sourceLink:hover{
+    text-decoration: underline;
+}
+
 a.tagLink:link, a.tagLink:active, a.tagLink:visited{
     color: #f79647;
 }

@@ -1,5 +1,5 @@
 %{--
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -29,15 +29,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
+
     <div class="row">
         <div class="col-lg-12">
             <form>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="pull-right-md">
+                            <div class="form-group">
                             <label for="max">Max records to display</label>
-                            <g:select name="max" from="[10,50,100,250,500,1000]" value="${params.max}"/>
-                            <g:actionSubmit action="totalViews" class="btn btn-default btn-xs" name="Apply Limit" value="Apply Limit"/>
+                                <g:select name="max" from="[10,50,100,250,500,1000]" value="${params.max}"/>
+                                <g:actionSubmit action="totalViews" class="btn btn-default btn-xs" name="Apply Limit" value="Apply Limit"/>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -85,6 +88,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 </div>
             </g:if>
             <br/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <label>Storefront Views:&nbsp;</label>Generated when someone looks at the given Media Item on the HHS Syndication Storefront site.
+                    <br>
+                    <label>API Views:&nbsp;</label>Generated when the Media Item's content is pulled from our API. (Any time the items Embed Code is triggered)
+                </div>
+            </div>
         </div>
     </div>
 </div>

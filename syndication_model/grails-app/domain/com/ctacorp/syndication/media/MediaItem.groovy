@@ -67,6 +67,19 @@ class MediaItem {
     String hash
     Source source
     Set metrics
+    StructuredContentType structuredContentType
+    String createdBy
+
+    enum StructuredContentType{
+        BLOG_POST("Blog Post"),
+        NEWS_RELEASE("News Release")
+
+        String prettyName
+
+        StructuredContentType(String prettyName){
+            this.prettyName = prettyName
+        }
+    }
 
     static hasMany = [
         campaigns: Campaign,
@@ -74,6 +87,7 @@ class MediaItem {
         alternateImages:AlternateImage,
         extendedAttributes:ExtendedAttribute
     ]
+
     static belongsTo = Campaign
 
     static constraints = {
@@ -97,6 +111,8 @@ class MediaItem {
         externalGuid            nullable: true,                                 maxSize: 255
         hash                    nullable: true,     blank: false,               maxSize: 255
         source                  nullable: false
+        structuredContentType   nullable: true
+        createdBy               nullable: true,     blank: false,               maxSize: 255
     }
 
 
@@ -117,16 +133,18 @@ class MediaItem {
     }
 
     private static transient mediaTypeMapping = [
-        "audio" : "com.ctacorp.syndication.media.Audio",
-        "collection" : "com.ctacorp.syndication.media.Collection",
-        "html" : "com.ctacorp.syndication.media.Html",
-        "image" : "com.ctacorp.syndication.media.Image",
-        "infographic" : "com.ctacorp.syndication.media.Infographic",
-        "pdf" : "com.ctacorp.syndication.media.PDF",
-        "periodical" : "com.ctacorp.syndication.media.Periodical",
-        "tweet" : "com.ctacorp.syndication.media.Tweet",
-        "video" : "com.ctacorp.syndication.media.Video",
-        "widget" : "com.ctacorp.syndication.media.Widget"
+            "audio"       : "com.ctacorp.syndication.media.Audio",
+            "collection"  : "com.ctacorp.syndication.media.Collection",
+            "html"        : "com.ctacorp.syndication.media.Html",
+            "image"       : "com.ctacorp.syndication.media.Image",
+            "infographic" : "com.ctacorp.syndication.media.Infographic",
+            "pdf"         : "com.ctacorp.syndication.media.PDF",
+            "periodical"  : "com.ctacorp.syndication.media.Periodical",
+            "tweet"       : "com.ctacorp.syndication.media.Tweet",
+            "video"       : "com.ctacorp.syndication.media.Video",
+            "widget"      : "com.ctacorp.syndication.media.Widget",
+            "blog_post"   : "STRUCTURED-BLOG_POST-com.ctacorp.syndication.media.Html",
+            "news_release": "STRUCTURED-NEWS_RELEASE-com.ctacorp.syndication.media.Html"
     ]
 
     static namedQueries = {
@@ -314,8 +332,28 @@ class MediaItem {
                     types
                 }
 
+                //resolve a short class name (the simpleName) with it's full classpath mapping defined in this class (mediaTypeMapping)
                 def set = resolveTypes(params.mediaTypes)
-                inList 'class', set
+
+                //Some of the entries in the set will be STRUCTURED types, which are really just HTML types with an additional field
+                //added as a patch-in rather than a whole new syndication type
+                //These will have names in the format "STRUCTURED-STRUCTURED_MEDIA_TYPE_HERE-com.ctacorp.syndication.media.Html",
+                //Find all items in this format, and collect them
+                def structuredTypes = set.findAll{ it.startsWith("STRUCTURED-") }
+                if(structuredTypes){
+                    //If twe have structured types, the class is the third value delimited by hyphens ( - )
+                    //We need both the class and the structuredContentType field to match
+                    and {
+                        inList 'class', set - structuredTypes + structuredTypes.collect { it.split("-")[2] }.unique()
+                        inList 'structuredContentType', structuredTypes.collect{ StructuredContentType."${it.split("-")[1]}" }
+                    }
+                } else{
+                    //Otherwise, we want only items of the class without a structured type
+                    and {
+                        inList 'class', set
+                        isNull 'structuredContentType'
+                    }
+                }
             }
         }
 

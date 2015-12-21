@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,6 +17,7 @@ import com.ctacorp.syndication.MediaItemChangeListener
 import com.ctacorp.syndication.authentication.*
 import com.ctacorp.syndication.commons.mq.Message
 import com.ctacorp.syndication.commons.mq.MessageType
+import com.ctacorp.syndication.contact.EmailContact
 import grails.util.Environment
 import grails.util.Holders
 
@@ -38,12 +39,22 @@ class BootStrap {
             MediaItemChangeListener.initialize(grailsApplication, queueService, mediaPreviewThumbnailJobService)
         }
 
+        initContacts()
+
         createScratchDirectories()
         String systemRunningMessage = """
 ==========================================
 | -> Syndication Admin Ready.            |
 =========================================="""
         log.info systemRunningMessage
+    }
+
+    def initContacts(){
+        EmailContact admin = EmailContact.findByEmailIlike("syndicationadmin@hhs.gov")
+        if(!admin){
+            admin = new EmailContact(email: "syndicationadmin@hhs.gov", name: "Syndication Admin")
+            admin.save()
+        }
     }
 
     def destroy = {

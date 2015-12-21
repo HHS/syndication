@@ -1,34 +1,58 @@
+<%@ page import="grails.util.Holders" %>
 <!-- Text input-->
 <div class="form-group ${hasErrors(bean:mediaItemInstance, field:'name', 'errors')}" xmlns="http://www.w3.org/1999/html">
     <label class="col-md-4 control-label" for="name">Name<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <input id="name" name="name" value="${mediaItemInstance?.name}" required="true" type="text" placeholder="Media Item Name" class="form-control input-md">
+        <input id="name" name="name" value="${mediaItemInstance?.name}" required="true" type="text" placeholder="Name" class="form-control input-md">
     </div>
 </div>
 
 <!-- Text input-->
-<div class="form-group ${hasErrors(bean:mediaItemInstance, field:'sourceUrl', 'errors')}">
-    <label class="col-md-4 control-label" for="sourceUrl">Source Url<span class="required-indicator">*</span></label>
+<g:if test="${mediaItemInstance.getClass().simpleName == 'Collection'}">
+    <g:hiddenField name="sourceUrl" value="https://www.example.com/collection/${System.nanoTime()}"/>
+</g:if>
+<g:else>
+    <div class="form-group ${hasErrors(bean:mediaItemInstance, field:'sourceUrl', 'errors')}">
+        <label class="col-md-4 control-label" for="sourceUrl">Source Url<span class="required-indicator">*</span></label>
 
-    <g:if test="${mediaItemInstance.getClass().simpleName == 'Html' || mediaItemInstance.getClass().simpleName == 'Periodical'}">
-        <div class="col-md-6">
-            <input id="sourceUrl" name="sourceUrl" maxlength="2000" required="true" value="${mediaItemInstance?.sourceUrl}" type="url" placeholder="Source URL" class="form-control input-md">
-        </div>
-        <div class="col-md-2">
-            <button type="button" id="urlModal" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#myModal">
-                Verify URL
-            </button>
-            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <g:render template="../mediaTestPreview/testModal"/>
+        <g:if test="${mediaItemInstance.getClass().simpleName == 'Html' || mediaItemInstance.getClass().simpleName == 'Periodical'}">
+            <div class="col-md-6">
+                <input id="sourceUrl" name="sourceUrl" maxlength="2000" required="true" value="${mediaItemInstance?.sourceUrl}" type="url" placeholder="Source URL" class="form-control input-md">
             </div>
-        </div>
-    </g:if>
-    <g:else>
+            <div class="col-md-2">
+                <button type="button" id="urlModal" class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#myModal">
+                    Verify URL
+                </button>
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <g:render template="../mediaTestPreview/testModal"/>
+                </div>
+            </div>
+        </g:if>
+        <g:else>
+            <div class="col-md-8">
+                <input id="sourceUrl" name="sourceUrl" maxlength="2000" required="true" value="${mediaItemInstance?.sourceUrl}" type="url" placeholder="Source URL" class="form-control input-md">
+            </div>
+        </g:else>
+    </div>
+</g:else>
+
+<!-- Select Basic -->
+<g:if test="${mediaItemInstance.getClass().simpleName == 'Html'}">
+    <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'structuredContentType', 'errors')}">
+        <label class="col-md-4 control-label" for="structuredContentType">Structured Type</label>
+
         <div class="col-md-8">
-            <input id="sourceUrl" name="sourceUrl" maxlength="2000" required="true" value="${mediaItemInstance?.sourceUrl}" type="url" placeholder="Source URL" class="form-control input-md">
+            <g:select from="${com.ctacorp.syndication.media.MediaItem.StructuredContentType.enumConstants}"
+                      name="structuredContentType"
+                      id="structuredContentType"
+                      keys="${com.ctacorp.syndication.media.MediaItem.StructuredContentType.enumConstants}"
+                      optionValue="prettyName"
+                      noSelection="['':'No Type Specified']"
+                      value="${mediaItemInstance.structuredContentType ?: null}"
+                      class="form-control"/>
         </div>
-    </g:else>
-</div>
+    </div>
+</g:if>
 
 <!-- Select Basic -->
 <div class="form-group ${hasErrors(bean:mediaItemInstance, field:'language', 'errors')}">
@@ -43,6 +67,14 @@
     <label class="col-md-4 control-label" for="source">Source<span class="required-indicator">*</span></label>
     <div class="col-md-8">
         <g:select from="${com.ctacorp.syndication.Source.list([sort: "name"])}" name="source.id" id="source" class="form-control" optionValue="name" optionKey="id" value="${mediaItemInstance?.source?.id}" noSelection="${['null':'-Choose a Source-']}"/>
+    </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group ${hasErrors(bean:mediaItemInstance, field:'createdBy', 'errors')}">
+    <label class="col-md-4 control-label" for="createdBy">Created By</label>
+    <div class="col-md-8">
+        <input id="createdBy" name="createdBy" maxlength="255" value="${mediaItemInstance?.createdBy}" type="text" class="form-control input-md">
     </div>
 </div>
 

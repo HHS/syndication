@@ -22,14 +22,14 @@ import java.util.concurrent.TimeUnit
 
 class GuavaCacheService {
     static transactional = false
-    private final int apiResponseCacheSize = Holders.config.disableGuavaCache ? 0 : 10000
-    private final int apiResponseCacheTimeout = 1
+    private final int apiResponseCacheSize = Holders.config.disableGuavaCache ? 0 : 5000
+    private final int apiResponseCacheTimeout = 30
 
-    private final int extractedContentCacheSize = Holders.config.disableGuavaCache ? 0 : 200
-    private final int extractedContentCacheTimeout = 30
+    private final int extractedContentCacheSize = Holders.config.disableGuavaCache ? 0 : 1000
+    private final int extractedContentCacheTimeout = 12
 
     private final int imageCacheSize = Holders.config.disableGuavaCache ? 0 : 500
-    private final int imageCacheTimeout = 60*60
+    private final int imageCacheTimeout = 24
 
 
     def caches = [
@@ -38,11 +38,11 @@ class GuavaCacheService {
                     maximumSize(apiResponseCacheSize).
                     build(),
             extractedContentCache:CacheBuilder.newBuilder().
-                    expireAfterWrite(extractedContentCacheTimeout, TimeUnit.MINUTES).
+                    expireAfterWrite(extractedContentCacheTimeout, TimeUnit.HOURS).
                     maximumSize(extractedContentCacheSize).
                     build(),
             imageCache:CacheBuilder.newBuilder().
-                    expireAfterWrite(imageCacheTimeout, TimeUnit.MINUTES).
+                    expireAfterWrite(imageCacheTimeout, TimeUnit.HOURS).
                     maximumSize(imageCacheSize).
                     build()
     ]
@@ -60,6 +60,7 @@ class GuavaCacheService {
     }
 
     boolean flushItem(String cacheName, String key){
+        println "FLUSHING ITEM CACHE: ${key}"
         try{
             caches."$cacheName".invalidate(key)
             return true
@@ -70,6 +71,7 @@ class GuavaCacheService {
     }
 
     boolean flushCache(String cacheName){
+        println "FLUSHING ENTIRE CACHE: ${cacheName}"
         try{
             caches."$cacheName".invalidateAll()
             return true
@@ -82,6 +84,7 @@ class GuavaCacheService {
 
     //Careful, this flushes **ALL** caches
     boolean flushAllCaches(){
+        println "FLUSHING ALL CACHES"
         try {
             caches.each{ String name, Cache cache ->
                 cache.invalidateAll()

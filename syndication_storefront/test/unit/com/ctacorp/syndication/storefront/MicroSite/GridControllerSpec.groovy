@@ -9,6 +9,7 @@ import com.ctacorp.syndication.microsite.MicroSite
 import com.ctacorp.syndication.storefront.MicrositeService
 import com.ctacorp.syndication.storefront.TagService
 import com.ctacorp.syndication.storefront.UserMediaList
+import com.ctacorp.syndication.microsite.FlaggedMicrosite
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -17,7 +18,7 @@ import spock.lang.Specification
  * Created by nburk on 10/5/15.
  */
 @TestFor(GridController)
-@Mock([MicroSite, MediaSelector,UserMediaList, Collection, Source, Campaign, User])
+@Mock([MicroSite, MediaSelector,UserMediaList, Collection, Source, Campaign, User, FlaggedMicrosite])
 class GridControllerSpec extends Specification {
     def tagService = Mock(TagService)
     def micrositeService = Mock(MicrositeService)

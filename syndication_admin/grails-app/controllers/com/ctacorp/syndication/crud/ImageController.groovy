@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA) All rights reserved.
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA) All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -14,6 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
+import com.ctacorp.syndication.Language
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import static org.springframework.http.HttpStatus.CREATED
@@ -65,7 +66,9 @@ class ImageController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Image(params), model: [subscribers:subscribers, formats:["jpg", "png"]]
+        Image image = new Image(params)
+        image.language = Language.findByIsoCode("eng")
+        respond image, model: [subscribers:subscribers, formats:["jpg", "png"]]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
@@ -93,13 +96,13 @@ class ImageController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Image imageInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond imageInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(imageInstance)?.subscriberId), formats:["jpg", "png"]]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Image imageInstance) {
         if (imageInstance == null) {
@@ -137,7 +140,7 @@ class ImageController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(imageInstance, true)
+        mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(imageInstance, true)
         solrIndexingService.removeMediaItem(imageInstance)
         mediaItemsService.delete(imageInstance.id)
 

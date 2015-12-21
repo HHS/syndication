@@ -191,6 +191,12 @@ class UrlMappings {
         "$v2/resources/campaigns/$id/media(.$format)?"(controller: "campaigns", parseRequest: true) {
             action = [GET: "listMediaForCampaign"]
         }
+        "$v2/resources/campaigns/$id/syndicate(.$format)?"(controller: "campaigns", parseRequest: true) {
+            action = [GET: "syndicate"]
+        }
+        "$v2/resources/campaigns/$id/embed(.$format)?"(controller: "campaigns", parseRequest: true) {
+            action = [GET: "embed"]
+        }
 
 
 // ===================================================================================================
@@ -354,6 +360,9 @@ class UrlMappings {
         }
         "$v2/resources/sources/$id/syndicate(.$format)?"(controller: "sources", parseRequest: true){
             action = [GET: "syndicate"]
+        }
+        "$v2/resources/sources/$id/embed(.$format)?"(controller: "sources", parseRequest: true) {
+            action = [GET: "embed"]
         }
 
 // ====================================================

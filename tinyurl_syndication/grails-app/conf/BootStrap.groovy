@@ -42,15 +42,17 @@ class BootStrap {
 
     private void initUsers() {
         String adminUsername = grailsApplication.config.springsecurity.tinyUrl.adminUsername
-        if (User.findByUsername(adminUsername)) {
-            return
+        User adminUser = User.findByUsername(adminUsername)
+        if(!adminUser){
+            adminUser = new User(username: grailsApplication.config.springsecurity.tinyUrl.adminUsername, enabled: true, password: grailsApplication.config.springsecurity.tinyUrl.initialAdminPassword)
+            adminUser.save(flush:true)
         }
-        def adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)
 
-        def adminUser = new User(username: grailsApplication.config.springsecurity.tinyUrl.adminUsername, enabled: true, password: grailsApplication.config.springsecurity.tinyUrl.initialAdminPassword)
+        def adminRole = Role.findOrSaveByAuthority('ROLE_ADMIN')
 
-        adminUser.save(flush: true)
-
-        UserRole.create adminUser, adminRole, true
+        def adminUserRole = UserRole.findByUserAndRole(adminUser, adminRole)
+        if(!adminUserRole){
+            UserRole.create adminUser, adminRole, true
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.ctacorp.syndication.storefront
 
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.authentication.UserRole
+import com.ctacorp.syndication.contact.EmailContact
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.authentication.User
@@ -28,6 +29,10 @@ class StorefrontController {
         [tagName: params.tagName, id: id, renderTagList: true,userId: springSecurityService?.currentUser?.id ?: -1]
     }
 
+    def embedCodeForSource(Long id) {
+        [sourceName: params.sourceName, id: id, renderSourceList: true,userId: springSecurityService?.currentUser?.id ?: -1]
+    }
+
     def listMediaForTag(Long id) {
         params.max = params.max ? Math.min(params.int('max'), 100) : 15
         def mediaItemInstanceList = tagService.getMediaForTagId(id, params)
@@ -41,7 +46,28 @@ class StorefrontController {
                 tagsForMedia         : tagsForMedia,
                 tagName              : params.tagName,
                 tagId                : id,
-                likeInfo             : likeService.getAllMediaLikeInfo(mediaItemInstanceList)
+                likeInfo             : likeService.getAllMediaLikeInfo(mediaItemInstanceList),
+                total                :mediaItemInstanceList.totalCount,
+                tag                 :id
+        ]
+    }
+
+    def listMediaForSource(Long id) {
+        params.max = params.max ? Math.min(params.int('max'), 100) : 15
+        def mediaItemInstanceList = MediaItem.facetedSearch([sourceId:id, active:true, visibleInStorefront:true, syndicationVisibleBeforeDate:new Date().toString()]).list(params)
+        def tagsForMedia = [:]
+        mediaItemInstanceList.each {
+            def allTags = tagService.getTagsForMediaId(it.id)
+            tagsForMedia[it.id] = allTags.collect { [name: it.name, id: it.id] }
+        }
+        [
+                mediaItemInstanceList: mediaItemInstanceList,
+                tagsForMedia         : tagsForMedia,
+                tagId                : id,
+                likeInfo             : likeService.getAllMediaLikeInfo(mediaItemInstanceList),
+                total                : mediaItemInstanceList.totalCount,
+                sourceId               : id,
+                sourceName           :Source.get(id).name
         ]
     }
 
@@ -90,9 +116,10 @@ class StorefrontController {
 
     def sendProblemReport() {
         flash.message = "Report has been filed."
+        def mailRecipiants = EmailContact.list()?.email ?: "syndication@ctacorp.com"
 
         sendMail {
-            to grailsApplication.config.SyndicationStorefront.mail.syndicate.to
+            to mailRecipiants
             subject "Issue Report: ${new Date()}"
             body """\
             Syndication Error Report: ${new Date()}
@@ -110,9 +137,10 @@ class StorefrontController {
 
     def sendSyndicationRequest() {
         flash.message = "request has been sent."
+        def mailRecipiants = EmailContact.list()?.email ?: "syndication@ctacorp.com"
 
         sendMail {
-            to grailsApplication.config.SyndicationStorefront.mail.syndicate.to
+            to mailRecipiants
             subject "syndication request: ${new Date()}"
             body """\
             Syndication Request: ${new Date()}
@@ -197,14 +225,22 @@ class StorefrontController {
 
     @Transactional
     def Map mediaTagHelper() {
+        if(params.sourceId){
+            redirect action: "listMediaForSource", id:params.sourceId, params:params
+        }
+        if(params.tag){
+            redirect action: "listMediaForTag", id:params.tag, params:params
+        }
         params.max = params.max ? Math.min(params.int('max'), 100) : 15
-        def mediaItemInstanceList = mediaService.listNewestMedia(params)
-        def total = mediaItemInstanceList.totalCount
+
         String searchQuery = ""
         String searchType = "basic"
-        String contentTitle = "Newest Syndicated Content"
+        String contentTitle
         String advanced = null
-        Map likeInfo = likeService.getAllMediaLikeInfo(mediaItemInstanceList)
+
+        def mediaItemInstanceList
+        def total
+        Map likeInfo
 
         //used if basic search is submitted
         if (params.searchQuery) {
@@ -228,6 +264,11 @@ class StorefrontController {
             contentTitle = "Search Results: 'Advanced Search'"
             advanced = "true"
             likeInfo = likeService.getAllMediaLikeInfo(mediaItemInstanceList)
+        } else{ // regular index listing
+            mediaItemInstanceList = mediaService.listNewestMedia(params)
+            total = mediaItemInstanceList.totalCount
+            likeInfo = likeService.getAllMediaLikeInfo(mediaItemInstanceList)
+            contentTitle = "Newest Syndicated Content"
         }
 
         User currentUser = springSecurityService.currentUser as User

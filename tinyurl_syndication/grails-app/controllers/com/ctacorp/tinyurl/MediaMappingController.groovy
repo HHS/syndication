@@ -24,15 +24,6 @@ class MediaMappingController {
         respond new MediaMapping(params)
     }
 
-    //just for testing
-//    @Transactional
-//    def fill(){
-//        1000.times{
-//            new MediaMapping(targetUrl:"http://www.apple.com").save()
-//        }
-//        redirect action:"index"
-//    }
-
     @Transactional
     def save(MediaMapping mediaMappingInstance) {
         if (mediaMappingInstance == null) {

@@ -83,7 +83,7 @@ grails.project.dependency.resolution = {
         runtime ":hibernate4:4.3.8.1" // or ":hibernate:3.6.10.18"
         runtime ":database-migration:1.4.1"
         runtime ":jquery:1.11.1"
-        compile ":asset-pipeline:2.5.9"
+        compile ":asset-pipeline:2.6.5"
 
         compile ":spring-security-core:2.0-RC5"
 
@@ -108,7 +108,7 @@ grails.work.dir = "target/work"
 // Release War info    \_________________________________________________________________
 // |
 // | to push a snapshot, run 'grails prod maven-deploy'
-// | to release, run 'grails prod maven-deploy --repository=plugin-release'
+// | to release, run 'grails prod maven-deploy --repository=plugin_rel'
 // | to install locally, run 'grails maven-install'
 //_______________________________________________________________________________________
 grails.project.repos.default = "app_snap"

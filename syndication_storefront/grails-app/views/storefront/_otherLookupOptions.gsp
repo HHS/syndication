@@ -20,8 +20,11 @@
                 </label>
             </td>
             <td class="col4">
-                <g:select name="mediaType" from="${mediaTypes}" value="${mediaType}"
-                          noSelection="['': '-Choose a media type-']"/>
+                <g:select name="mediaType"
+                          from="${mediaTypes*.name}"
+                          value="${mediaType}"
+                          keys="${mediaTypes*.id}"
+                          noSelection="['': 'All Media Types']"/>
             </td>
         </tr>
         <tr>
@@ -32,7 +35,7 @@
             </td>
             <td class="col2">
                 <g:select name="source" from="${sourceList}" value="${source}" optionKey="name"
-                          noSelection="['': '-Choose a source-']"/>
+                          noSelection="['': 'All Sources']"/>
             </td>
         </tr>
         <tr>
@@ -51,7 +54,7 @@
             </td>
             <td class="col4">
                 <g:select name="language" from="${languageList}" value="${language}" optionKey="name"
-                          noSelection="['': '-Choose a language-']"/>
+                          noSelection="['': 'All Languages']"/>
             </td>
         </tr>
         </tbody>

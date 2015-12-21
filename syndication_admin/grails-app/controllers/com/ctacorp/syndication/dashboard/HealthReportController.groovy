@@ -43,7 +43,7 @@ class HealthReportController {
     @NotTransactional
     def checkMediaItem(Long id){
         mediaValidationService.rescanItem(id)
-        flash.message = "Item has been rescanned. If the problem has not been resolved or if a new error was encountered, then the flag will not be removmed."
+        flash.message = "Item has been rescanned. If the problem has not been resolved or if a new error was encountered, then the flag will not be removed."
         redirect action: "index"
         return
     }

@@ -27,7 +27,7 @@ class StorefrontTagLib {
 
         out <<  "<li><span style='text-transform: lowercase;'>${g.link(controller:'login', action:'userAccount'){'<i class="fa fa-user fa-fw"></i> ' + displayName}}</span></li>" +
                 "<li>${g.link(controller:'userMediaList', action:'index'){'<i class="fa fa-list-ul fa-fw"></i> Lists'}}</li>"
-        if(UserRole.findByUser(user).role.authority in ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER']){
+        if(UserRole.findByUser(user).role.authority in ['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER']){
             out << "<li>${g.link(controller:'microsite', action:'index'){'<i class="fa fa-sitemap fa-fw"></i> Microsites'}}</li>"
         }
         out << "<li>${g.link(controller:'logout', action:'index'){'<i class="fa fa-sign-out"></i> Logout'}}</li>"

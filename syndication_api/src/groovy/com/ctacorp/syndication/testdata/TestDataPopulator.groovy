@@ -39,7 +39,8 @@ class TestDataPopulator {
     YoutubeService youtubeService
     TinyUrlService tinyUrlService
     Random ran = new Random()
-    def names
+    def names = []
+    def words = []
 
     private seedHealthReportTestsData(){
         Language english = Language.findByIsoCode("eng")
@@ -445,59 +446,6 @@ class TestDataPopulator {
 
         batchSaver(Periodical, batch)
 
-        //Social Media MediaItems
-        items = [[title:"Smokers Can Be Short of Breath and May Have More Trouble Participating in Sports", url:"https://www.facebook.com/KnowTheRealCost/photos/pb.698179880214568.-2207520000.1401142709./761478690551353/?type=3&theater", desc:"Smokers' lungs don't work as well as those of nonsmokers.", socialMediaType: "facebook"], [title:"The Chemicals in Tobacco Smoke Can Damage Your DNA, Causing Cells to Grow Out of Control and Become Cancerous", url:"https://www.facebook.com/KnowTheRealCost/photos/pb.698179880214568.-2207520000.1401142709./755041557861733/?type=3&theater", desc:"Smoking can damage your DNA.", socialMediaType: "facebook"], [title:"(@)KnowTheRealCost", url:"https://twitter.com/knowtherealcost", desc:"You already know that tobacco is bad for you, but even experimenting with cigarettes can come with a cost.", socialMediaType: "twitter"]]
-
-        batch = []
-
-//        items.each { item ->
-//            batch << new SocialMedia(
-//                    name: item.title,
-//                    description: item.description,
-//                    sourceUrl: item.url,
-//                    dateSyndicationCaptured: new Date(),
-//                    dateSyndicationUpdated: new Date(),
-//                    dateContentAuthored: new Date()-ran.nextInt(365)+30,
-//                    dateContentUpdated: new Date()-ran.nextInt(15),
-//                    dateContentPublished: new Date()-ran.nextInt(10),
-//                    dateContentReviewed: new Date()-ran.nextInt(5),
-//                    language: english,
-//                    externalGuid: "${item.url}".hashCode(),
-//                    source: cdc,
-//                    socialMediaType: item.socialMediaType,
-//                    hash: item.hash
-//            )
-//        }
-//
-//        batchSaver(SocialMedia, batch)
-
-        //Widget MediaItems
-        items = []
-
-        batch= []
-
-        items.each { item ->
-            batch << new Widget(
-                    name: item.title,
-                    sourceUrl: item.url,
-                    dateSyndicationCaptured: new Date() - (ran.nextInt(10) + 3),
-                    dateSyndicationUpdated: new Date() - (ran.nextInt(3)),
-                    dateContentAuthored: new Date()-ran.nextInt(365)+30,
-                    dateContentUpdated: new Date()-ran.nextInt(15),
-                    dateContentPublished: new Date()-ran.nextInt(10),
-                    dateContentReviewed: new Date()-ran.nextInt(5),
-                    language: english,
-                    externalGuid: "${item.url}".hashCode(),
-                    source: cdc,
-                    width: item.width,
-                    height: item.height,
-                    code: "123",
-                    description: item.desc
-            )
-        }
-
-        batchSaver(Widget, batch)
-
         assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=6yZkQqx1lag")
         assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=-VI_A1TPS6o&feature=c4-overview-vl&list=PLrl7E8KABz1GZv0fAUSb7ZNXCdTZJSrzN")
         assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=Jn9OBSNBE4M&feature=c4-overview-vl&list=PLrl7E8KABz1GZv0fAUSb7ZNXCdTZJSrzN")
@@ -789,6 +737,25 @@ class TestDataPopulator {
         }
     }
 
+    def generateRandomHtmlItems(count){
+        def batch = []
+        def lang = Language.first()
+        def source = Source.first()
+        count.times{
+            def name = randomName()
+            def url = "http://localdev.com/Syndication/htmls/${randomWord()}"
+
+            batch << new Html(name: "${it}",
+                    description: randomDescription(),
+                    sourceUrl: url,
+                    dateSyndicationCaptured: new Date(),
+                    dateSyndicationUpdated: new Date(),
+                    language: lang,
+                    source: source)
+        }
+        batchSaver(Html, batch)
+    }
+
     def seedHTMLs() {
         def htmls = ["Heart disease",
             "Hepatitis-A",
@@ -974,7 +941,43 @@ class TestDataPopulator {
     }
 
     String randomName() {
+        initNames()
         "${names[ran.nextInt(names.size())]} ${names[ran.nextInt(names.size())]}"
+    }
+
+    def initWords(){
+        if(!words){
+            words = new File("/usr/share/dict/web2").readLines()
+        }
+    }
+
+    def initNames(){
+        if(!names){
+            names = new File("/usr/share/dict/propernames").readLines()
+        }
+    }
+
+    String randomWord(){
+        initWords()
+        words[ran.nextInt(words.size())]
+    }
+
+    String randomSentence(){
+        def wordCount = ran.nextInt(12)+3
+        def sentence = ""
+        wordCount.times {
+            sentence += "${randomWord()} "
+        }
+        "${sentence[0..-2].capitalize()}."
+    }
+
+    String randomDescription(){
+        def sentenceCount = ran.nextInt(1)+3
+        def description = ""
+        sentenceCount.times {
+            description += "${randomSentence()} "
+        }
+        description[0..-2]
     }
 
     String randomUsername() {

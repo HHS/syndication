@@ -201,7 +201,7 @@ class VideoControllerSpec extends Specification {
             controller.delete(video)
 
         then:"The instance is deleted"
-            1 * mediaItemsService.removeMediaItemsFromUserMediaLists(video,true)
+            1 * mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(video,true)
             1 * controller.solrIndexingService.removeMediaItem(video)
             1 * controller.mediaItemsService.delete(video.id)
             response.redirectedUrl == '/video/index'

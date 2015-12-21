@@ -38,7 +38,7 @@ class InfographicMarshaller {
             def attr = HtmlEncoder.encode("<div id='hhsAttribution'>Content provided and maintained by <a href='${ig.source.websiteUrl}' target='_blank'>Health and Human Services</a> (HHS). Please see our system <a href='http:syndication.hhs.gov' target='_blank'>usage guidelines and disclaimer</a>.</div>")
 
             return [
-                mediaType:      "Infographic",
+                mediaType:              "Infographic",
                 id:                     ig.id,
                 name:                   ig.name,
                 description:            ig.description,

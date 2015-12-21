@@ -1,0 +1,124 @@
+%{--
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
+ All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--}%
+
+<%--
+  Created by IntelliJ IDEA.
+  User: sgates
+  Date: 10/30/15
+  Time: 11:23 AM
+--%>
+
+<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="com.ctacorp.syndication.media.Html" %>
+<html>
+<head>
+    <meta name="layout" content="dashboard">
+    <title>Admin Tools</title>
+</head>
+
+<body>
+<div id="page-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Admin Tools</h1>
+        </div><!-- /.col-lg-12 -->
+    </div><!-- /.row -->
+
+    <synd:message/>
+    <synd:errors/>
+    <synd:error/>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h3>TinyUrls</h3>
+            <g:form action="updateMissingTinyUrls">
+                <g:submitButton class="btn btn-primary" name="updateMissingTinyUrls" value="Update Missing TinyUrls"/>
+            </g:form>
+        </div>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-lg-12">
+            <h3>Content Hashes</h3>
+            <g:form action="resetAllHashes">
+                <g:checkBox name="restrictToDomain"/>
+                <label for="restrictToDomain">Restrict to Domain</label>
+                <br/>
+                <lable for="domain">URL:</lable>
+                <g:textField name="domain" size="100"/>
+                <br/><br/>
+                <g:submitButton class="btn btn-primary" name="resetAllHashes" value="Reset all content hashes"/>
+            </g:form>
+        </div>
+    </div>
+    <hr/>
+    <div class="row">
+        <div class="col-lg-12">
+            <h3>Tweet Inspector</h3>
+            <g:form action="inspectTweet">
+                <g:textField name="tweetId" value="${tweetId}"/>
+                <g:submitButton class="btn btn-primary" name="submit" value="lookup"/>
+            </g:form>
+            <g:if test="${tweetData}">
+                <h4>Data for tweet id: ${tweetData.id}</h4>
+                <div>
+                    <ul>
+                    <g:each in="${tweetData.metaClass.properties}" var="prop">
+                        <g:if test="${prop.name == "user" || prop.name.contains('Entities')}">
+                            <li>
+                                <strong>${prop.name}</strong>
+                                <ul>
+                                    <g:each in="${tweetData."${prop.name}"}" var="nestedProp" status="i">
+                                        <li>
+                                            <strong>${i}</strong>
+                                            <ul>
+                                            <g:each in="${nestedProp.metaClass.properties}" var="doubleNestedProp">
+                                                <g:if test="${doubleNestedProp.name == "videoVariants"}">
+                                                    <li><strong>videoVariants</strong>
+                                                        <ul>
+                                                            <g:each in="${nestedProp.videoVariants}" var="videoVariant" status="vi">
+                                                                <li><strong>${vi}</strong>
+                                                                    <ul>
+                                                                    <g:each in="${videoVariant.metaClass.properties}" var="videoProp">
+                                                                        <li><strong>${videoProp.name}</strong>: ${videoVariant."${videoProp.name}"}</li>
+                                                                    </g:each>
+                                                                    </ul>
+                                                                </li>
+                                                            </g:each>
+                                                        </ul>
+                                                    </li>
+                                                </g:if>
+                                                <g:else>
+                                                    <li><strong>${doubleNestedProp.name}</strong>: ${nestedProp."${doubleNestedProp.name}"}</li>
+                                                </g:else>
+                                            </g:each>
+                                            </ul>
+                                        </li>
+                                    </g:each>
+                                </ul>
+                            </li>
+                        </g:if>
+                        <g:else>
+                            <li><strong>${prop.name}</strong>: ${tweetData."${prop.name}"}</li>
+                        </g:else>
+                    </g:each>
+                    </ul>
+                </div>
+            </g:if>
+        </div>
+    </div>
+</div>
+</body>
+</html>

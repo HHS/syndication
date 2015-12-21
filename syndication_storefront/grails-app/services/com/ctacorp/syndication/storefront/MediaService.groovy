@@ -19,9 +19,9 @@ class MediaService {
     def grailsApplication
     def solrSearchService
 
-    def getFeaturedMedia(params = [:]){
-        def featured = FeaturedMedia.where{
-            mediaItem{
+    def getFeaturedMedia(params = [:]) {
+        def featured = FeaturedMedia.where {
+            mediaItem {
                 active == true
                 visibleInStorefront == true
                 dateSyndicationVisible <= new Date() || dateSyndicationVisible == null
@@ -31,7 +31,7 @@ class MediaService {
         featured*.mediaItem
     }
 
-    def listNewestMedia(params){
+    def listNewestMedia(params) {
         params.max = params.max ?: 20
         params.offset = params.offset ?: 0
         params.sort = "-id"
@@ -39,26 +39,26 @@ class MediaService {
         params.active = true
         params.languageName = "english"
         params.syndicationVisibleBeforeDate = new Date().toString()
-        MediaItem.facetedSearch(params).list([max:params.max, offset:params.offset])
+        MediaItem.facetedSearch(params).list([max: params.max, offset: params.offset])
     }
 
     //Can't test this because case insensitive query is broken in test phase: https://jira.grails.org/browse/GRAILS-8841
     @Transactional
-    def findMediaByAll(params){
+    def findMediaByAll(params) {
         MediaItem.facetedSearch([
-                nameContains:params.title?.replace('%', '\\%'),
-                languageName:params.language,
-                sourceName:params.source,
-                sourceUrlContains:params.domain,
-                mediaTypes:params.mediaType,
-                visibleInStorefront:true,
-                syndicationVisibleBeforeDate:new Date().toString(),
-                active:true,
-                restrictToSet: params.topicItems
-        ]).list(max:params.max, offset:params.offset)
+                nameContains                : params.title?.replace('%', '\\%'),
+                languageName                : params.language,
+                sourceName                  : params.source,
+                sourceUrlContains           : params.domain,
+                mediaTypes                  : params.mediaType,
+                visibleInStorefront         : true,
+                syndicationVisibleBeforeDate: new Date().toString(),
+                active                      : true,
+                restrictToSet               : params.topicItems
+        ]).list(max: params.max, offset: params.offset)
     }
 
-    def mediaItemSolrSearch(String searchQuery, params=[:]){
+    def mediaItemSolrSearch(String searchQuery, params = [:]) {
         def solrSearchResults
         try {
             solrSearchResults = solrSearchService.search(searchQuery ?: "", EntityType.MEDIAITEM)
@@ -75,16 +75,22 @@ class MediaService {
         }
 
         params.offset = params.offset ?: 0
-        MediaItem.facetedSearch(restrictToSet:ids.join(','), active:true, visibleInStorefront:true, syndicationVisibleBeforeDate:new Date().toString()).list(max:params.max, offset: params.offset)
+        MediaItem.facetedSearch(restrictToSet: ids.join(','), active: true, visibleInStorefront: true, syndicationVisibleBeforeDate: new Date().toString()).list(max: params.max, offset: params.offset)
     }
 
-     def getMediaTypes() {
+    def getMediaTypes() {
         def mediaTypes = []
         grailsApplication.domainClasses.each {
             if (it.clazz.superclass.name == "com.ctacorp.syndication.media.MediaItem") {
-                mediaTypes << it.clazz.simpleName
+                mediaTypes << [name:it.clazz.simpleName, id:it.clazz.simpleName]
             }
         }
-        mediaTypes.sort()
+
+        MediaItem.StructuredContentType.enumConstants.each{
+
+            mediaTypes << [name:it.prettyName, id:it.name()]
+        }
+
+        mediaTypes.sort{ it.name }
     }
 }

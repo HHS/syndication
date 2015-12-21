@@ -7,9 +7,10 @@ import com.ctacorp.syndication.microsite.MicroSite
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.Campaign
 import com.ctacorp.syndication.media.Collection
+import com.ctacorp.syndication.microsite.FlaggedMicrosite
 import grails.plugin.springsecurity.annotation.Secured
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
 class GridController {
     
     def tagService
@@ -93,6 +94,10 @@ class GridController {
     @Secured(['permitAll'])
     def show(){
         def microSite = MicroSite.get(params.long("id"))
+        if(FlaggedMicrosite.findByMicrosite(microSite) && !FlaggedMicrosite.findByMicrosite(microSite).ignored) {
+            flash.error = "The Microsite is temporarily blocked."
+            redirect controller: "storefront", action: "index"
+        }
 
         def pane3MediaItems = micrositeService.getMediaItems(microSite.mediaArea3)
         def pane2MediaItems = micrositeService.getMediaItems(microSite.mediaArea2)
@@ -136,6 +141,11 @@ class GridController {
         }
 
         def name = microSite.title
+        def flaggedMicrosite = FlaggedMicrosite.findByMicrosite(microSite)
+        if(flaggedMicrosite){
+            flaggedMicrosite.delete()
+        }
+
         microSite.delete(flush: true)
         flash.message = "Microsite ${name} has been deleted!"
 

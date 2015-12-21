@@ -7,7 +7,7 @@
             <p class="mediaRow">
                 <span class="expando" mediaid="${mediaItemInstance.id}"><i class="fa fa-plus-circle icons"></i></span>
                 <span class="mediaName"><a href="${createLink(action: 'showContent', id:mediaItemInstance.id)}">${mediaItemInstance.name}</a></span>
-                <span class="mediaSource">${mediaItemInstance.source.acronym}</span>
+                <g:link class="sourceLink" action="listMediaForSource" id="${mediaItemInstance.source.id}">${mediaItemInstance.source.acronym}</g:link>
                 <g:if test="${tagsForMedia}">
                     <span class="mediaTagListing">
                         <g:each in="${tagsForMedia[mediaItemInstance.id]}" var="tag">
@@ -52,11 +52,13 @@
 <g:if test="${total}">
     <div class="centeredText">
         <g:paginate action="index" params="[searchQuery: searchQuery, title: params.title,
-                                                       language: params.language,
-                                                       domain: params.domain, advancedSearch: params.advancedSearch,
-                                                        mediaType:params.mediaType,
-                                                        topic:params.topic,
-                                                source: params.source]" total="${total ?: 0}"/>
+                                                language: params.language,
+                                                domain: params.domain, advancedSearch: params.advancedSearch,
+                                                mediaType:params.mediaType,
+                                                topic:params.topic,
+                                                sourceId: sourceId,
+                                                source: source,
+                                                tag:tag]" total="${total ?: 0}"/>
     </div>
 </g:if>
 

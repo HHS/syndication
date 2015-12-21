@@ -203,7 +203,7 @@ class PeriodicalControllerSpec extends Specification {
             controller.delete(periodical)
 
         then:"The instance is deleted"
-            1 * mediaItemsService.removeMediaItemsFromUserMediaLists(periodical,true)
+            1 * mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(periodical,true)
             1 * controller.solrIndexingService.removeMediaItem(periodical)
             1 * controller.mediaItemsService.delete(periodical.id)
             response.redirectedUrl == '/periodical/index'

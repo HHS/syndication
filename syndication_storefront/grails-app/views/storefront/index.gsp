@@ -18,6 +18,9 @@
 
                 <p>The HHS Syndication Storefront allows you to syndicate (import) content from many HHS websites directly into your own website or application.  These services are provided by HHS free of charge.</p>
 
+                <g:if test="${flash.error}">
+                    <div class="errors"><li>${flash.error}</li></div>
+                </g:if>
                 <g:if test="${flash.message}">
                     <div class="message">${flash.message}</div>
                 </g:if>

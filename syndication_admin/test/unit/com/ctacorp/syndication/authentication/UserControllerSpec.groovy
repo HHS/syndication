@@ -1,12 +1,13 @@
 package com.ctacorp.syndication.authentication
 
 import com.ctacorp.syndication.CmsManagerKeyService
+import com.ctacorp.syndication.microsite.MicrositeRegistration
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import spock.lang.Specification
 
 @TestFor(UserController)
-@Mock([User, Role, User, UserRole])
+@Mock([User, Role, User, UserRole, MicrositeRegistration])
 class UserControllerSpec extends Specification {
 
     def adminUserService = Mock(AdminUserService)

@@ -8,11 +8,13 @@ import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.commons.util.Util
 import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.social.TwitterAccount
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import grails.util.Holders
 import twitter4j.Paging
 import twitter4j.Status
 import twitter4j.Twitter
+import twitter4j.TwitterException
 import twitter4j.TwitterFactory
 import twitter4j.User
 import twitter4j.conf.ConfigurationBuilder
@@ -28,6 +30,7 @@ class TwitterService {
     def mediaItemsService
     def guavaCacheService
     def springSecurityService
+    def tagService
 
     @PostConstruct
     def init(){
@@ -43,10 +46,14 @@ class TwitterService {
     }
 
     Status getTweet(Long tweetId) {
-        twitter.showStatus(tweetId)
+        try{
+            twitter.showStatus(tweetId)
+        } catch(TwitterException e) {
+            return null
+        }
     }
 
-    def saveTweet(Long tweetId, Long subscriberId = null) {
+    def saveTweet(Long tweetId, Long sourceId, Long subscriberId = null) {
         String key = Hash.md5("${tweetId}")
         Status status = guavaCacheService.tweetCache.get(key, new Callable<Status>() {
             @Override
@@ -54,38 +61,69 @@ class TwitterService {
                 twitter.showStatus(tweetId)
             }
         });
-        saveTweet(status, subscriberId)
+        saveTweet(status, sourceId, subscriberId)
     }
 
-    def saveTweet(Status status, Long subscriberId = null) {
+    def refreshMetaData(Long id){
+        Tweet tweet = Tweet.get(id)
+        Status status = getTweet(tweet.tweetId)
+        setMetaData(tweet, status, tweet.source.id)
+        tweet.save(flush:true)
+        tagTweet(tweet, status.hashtagEntities?.collect{ it.text } ?: [])
+    }
+
+    def saveTweet(Status status, Long sourceId, Long subscriberId = null) {
         if(Tweet.findByTweetId(status.id)) {
             return Tweet.findByTweetId(status.id)
         } else {
             Tweet newTweet = new Tweet()
-            //tweet specific fields
-            def twitterAccount = TwitterAccount.findOrSaveByAccountName(status.user.screenName)
-            newTweet.account = twitterAccount
-            newTweet.tweetId = status.id
-            newTweet.messageText = status.text
-            newTweet.mediaUrl = status.mediaEntities?.mediaURLHttps[0] ?: null
-            newTweet.tweetDate = status.createdAt
-
-            //media item required fields
-            newTweet.name = status.user.screenName + " Post on " + status.createdAt.format("EEE, MMM d, yyyy")
-            newTweet.sourceUrl = "https://twitter.com/" + status.user.screenName + "/status/" + status.id
-            newTweet.description = status.user.description
-            newTweet.language = Language.findByName("English")
-            newTweet.source = Source.findByAcronym("FDA")
+            setMetaData(newTweet, status, sourceId)
 
             newTweet.validate()
+            def savedTweet
             if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_ADMIN") {
-                return mediaItemsService.updateItemAndSubscriber(newTweet, subscriberId)
-//                return newTweet.save(flush:true)
+                savedTweet = mediaItemsService.updateItemAndSubscriber(newTweet, subscriberId)
             } else {
-                return mediaItemsService.updateItemAndSubscriber(newTweet, null)
+                savedTweet = mediaItemsService.updateItemAndSubscriber(newTweet, null)
+            }
+            tagTweet(savedTweet, status.hashtagEntities?.collect{ it.text } ?: [])
+            savedTweet
+        }
+    }
+
+    private setMetaData(Tweet tweet, Status status, Long sourceId){
+        //tweet specific fields
+        def twitterAccount = TwitterAccount.findOrSaveByAccountName(status.user.screenName)
+        tweet.account = twitterAccount
+        tweet.tweetId = status.id
+        tweet.messageText = status.text
+        tweet.mediaUrl = status.mediaEntities?.mediaURLHttps[0] ?: null
+        tweet.tweetDate = status.createdAt
+        if(status.extendedMediaEntities && status.extendedMediaEntities[0].videoVariants) {
+            tweet.videoVariantUrl = status.extendedMediaEntities[0]?.videoVariants[0]?.url
+        }
+        //media item required fields
+        tweet.name = status.user.screenName + " Post on " + status.createdAt.format("EEE, MMM d, yyyy")
+        tweet.sourceUrl = "https://twitter.com/" + status.user.screenName + "/status/" + status.id
+        tweet.description = status.user.description
+        tweet.language = Language.findByIsoCode("eng")
+        tweet.source = Source.read(sourceId)
+    }
+
+    @NotTransactional
+    def tagTweet(Tweet tweet, tagList = []){
+        if(!tagList){
+            tagList = getTweet(tweet.tweetId).hashtagEntities.collect{
+                it.text
             }
         }
-
+        if(!tagList){
+            return
+        }
+        def languageId = tagService.getTagLanguages().find{ it.isoCode == "eng" }?.id
+        def mediaAndTags = [:]
+        mediaAndTags[tweet.id] = tagList
+        tagService.bulkTag([tweet], mediaAndTags, languageId)
     }
 
     long getAccountID(String accountName){
@@ -106,12 +144,7 @@ class TwitterService {
             accountName = accountName[1..-1]
         }
         User user = null
-        try{
-            user = twitter.showUser(accountName)
-        } catch(e) {
-            log.error e
-            return true
-        }
+        user = twitter.showUser(accountName)
         user?.isProtected()
     }
 

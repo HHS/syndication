@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -81,8 +81,9 @@ grails.project.dependency.resolution = {
         compile "com.google.guava:guava:18.0"           //in memory cache
         compile 'org.twitter4j:twitter4j-core:4.0.4'    //twitter
 
-        compile 'com.google.api-client:google-api-client:1.19.1'
-        compile 'com.google.apis:google-api-services-analytics:v3-rev109-1.19.1'
+        compile ('com.google.api-client:google-api-client:1.19.1', 'com.google.apis:google-api-services-analytics:v3-rev109-1.19.1') {
+            excludes "jackson-core"
+        }
         compile 'com.google.oauth-client:google-oauth-client-java6:1.19.0'
         compile 'com.google.oauth-client:google-oauth-client-jetty:1.19.0'
 
@@ -91,18 +92,24 @@ grails.project.dependency.resolution = {
             excludes 'groovy'
         }
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
+
+        // Workaround to resolve dependency issue with aws-java-sdk and http-builder (dependent on httpcore:4.0)
+        build 'org.apache.httpcomponents:httpcore:4.3.2'
+        build 'org.apache.httpcomponents:httpclient:4.3.2'
+        runtime 'org.apache.httpcomponents:httpcore:4.3.2'
+        runtime 'org.apache.httpcomponents:httpclient:4.3.2'
     }
 
     plugins {
         // plugins for the compile step ----------------------------------------------------
-        compile "org.grails.plugins:syndication-model:2.1.0"       //Syndication domain classes
-        compile "org.grails.plugins:content-extraction-services:1.5.0"      //syndication content extraction tools
-        compile "org.grails.plugins:solr-operations:1.3.0"                    //syndication solr stuff
+        compile "org.grails.plugins:syndication-model:2.4.0"       //Syndication domain classes
+        compile "org.grails.plugins:content-extraction-services:1.8.0"      //syndication content extraction tools
+        compile "org.grails.plugins:solr-operations:1.3.0"                  //syndication solr stuff
 
         //plugins for the compile step
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.8'
-        compile ':asset-pipeline:2.5.9'
+        compile ':asset-pipeline:2.6.5'
 
         compile ":bruteforce-defender:1.1"
 
@@ -116,6 +123,8 @@ grails.project.dependency.resolution = {
         runtime ":hibernate4:4.3.8.1" // or ":hibernate4:4.1.11.1"
         runtime ":database-migration:1.4.1"
         runtime ":jquery:1.11.1"
+
+        runtime ':aws:1.9.13.4'
 
         //Email Support
         compile ":mail:1.0.7"
@@ -132,7 +141,7 @@ grails.project.dependency.resolution = {
         test ":build-test-data:2.4.0"
         test ":codenarc:0.19"
         test ":code-coverage:2.0.3-3"
-        test ":auto-test:1.0.1"
+        test ":auto-test:1.1.0-ctac"
     }
 }
 

@@ -20,11 +20,11 @@ class WebUtilService {
 
     def contentCacheService
 
-    String getPage(String url) {
+    String getPage(String url, Boolean disableFailFast = false) {
         String content
 
         try{
-            content = getContentFromUrl(url)
+            content = getContentFromUrl(url, disableFailFast)
         }catch (e){
             CachedContent cached = contentCacheService.get(url)
             if(!cached){
@@ -35,15 +35,20 @@ class WebUtilService {
         content
     }
 
-    private String getContentFromUrl(String url, int depth = 0){
+    private String getContentFromUrl(String url, Boolean disableFailFast, int depth = 0){
         if(depth >= 10){
             log.error("Too many redirects, stopping on ${url}")
             return null
         }
 
         HttpURLConnection con = (HttpURLConnection) (new URL(url).openConnection());
-        con.setConnectTimeout(5000)
-        con.setReadTimeout(5000)
+        if(disableFailFast) {
+            con.setConnectTimeout(1000 * 60 * 5) //5 min
+            con.setReadTimeout(1000 * 60 * 5)
+        } else{
+            con.setConnectTimeout(5000)
+            con.setReadTimeout(5000)
+        }
         con.connect();
         int status = con.getResponseCode();
         boolean redirected = false
@@ -55,7 +60,7 @@ class WebUtilService {
         }
         if(redirected){
             String newUrl = con.getHeaderField("Location");
-            return getContentFromUrl(newUrl, depth+1)
+            return getContentFromUrl(newUrl, disableFailFast, depth+1)
         }
 
         BufferedReader buff = new BufferedReader(new InputStreamReader(con.getInputStream()));

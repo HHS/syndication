@@ -43,7 +43,6 @@ class TagsController {
         JSON.use("tagList") {
             if (Util.isTrue(params.includePaginationFields, false)) {
                 def tags = tagService.listTags(params)
-                //TODO dataSize: tags.size() is redundant, you can call tags.size() on the client
                 respond([tags: tags, total: tags.totalCount, dataSize: tags.size(), max: params.max, offset: params.offset?:0])
             } else {
                 respond tagService.listTags(params) ?: []
@@ -68,7 +67,7 @@ class TagsController {
     }
 
     def findOrSaveTag(Tag tagInstance){
-        Tag existing = Tag.findByNameAndLanguage(tagInstance.name, tagInstance.language)
+        Tag existing = Tag.findByNameAndLanguageAndType(tagInstance.name, tagInstance.language, tagInstance.type)
         if(!existing){
             if(tagInstance.hasErrors()){
                 respond tagInstance.errors
@@ -289,7 +288,7 @@ class TagsController {
     }
 
     def checkTagExistence(){
-        Tag existing = Tag.findByNameAndLanguage("${params.name}", Language.get(params.language))
+        Tag existing = Tag.findByNameAndLanguageAndType("${params.name}", Language.get(params.language), TagType.get(params.tagTypeId))
         if(!existing){
             respond null
             return

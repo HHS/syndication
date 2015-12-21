@@ -1,7 +1,7 @@
 
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -16,6 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.authentication
 
+import com.ctacorp.syndication.microsite.MicrositeRegistration
 import grails.converters.JSON
 
 import static org.springframework.http.HttpStatus.CREATED
@@ -264,6 +265,10 @@ class UserController {
         if (userInstance == null) {
             notFound()
             return
+        }
+
+        if(MicrositeRegistration.findByUser(userInstance)){
+            MicrositeRegistration.findByUser(userInstance).delete()
         }
 
         adminUserService.deleteUser(userInstance)

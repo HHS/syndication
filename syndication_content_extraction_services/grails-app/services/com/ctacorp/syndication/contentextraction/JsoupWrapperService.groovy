@@ -34,7 +34,8 @@ class JsoupWrapperService {
         String newUrlBase = params.newUrlBase
 
         doc = Jsoup.parse(extractedContent)
-        if(Util.isTrue(params.stripStyles)){
+
+        if(Util.isTrue(params.stripStyles, true)){
             removeInlineStylesFromDocument(doc)
         }
 
@@ -54,17 +55,31 @@ class JsoupWrapperService {
             removeClassesFromDocument(doc)
         }
 
+        if(Util.isTrue(params.stripIds, true)){
+            removeInlineIdsFormDocument(doc)
+        }
+
         customizeStyles(doc, params)
 
         patchRelativeUrlsFromDocument(doc, newUrlBase)
 
         addAutoFocus(doc)
 
+        stripEmptyBlocks(doc)
+
         extractedContent = getElementByClassFromDocument(doc, extractionCSSClass)
 
         Jsoup.clean(extractedContent, Whitelist.relaxed().addAttributes(":all", "class"))
 
         extractedContent
+    }
+
+    String stripEmptyBlocks(Document doc) {
+        for (Element element : doc.select("*")) {
+            if (!element.hasText() && element.isBlock()) {
+                element.remove();
+            }
+        }
     }
 
     String getMetaDescription(String url){
@@ -181,6 +196,14 @@ class JsoupWrapperService {
         doc
     }
 
+    private Document removeInlineIdsFormDocument(Document doc){
+        Elements withIds = doc.select("[id]")
+        withIds.each{ element ->
+            element.removeAttr("id")
+        }
+        doc
+    }
+
     private Document removeScriptsFromDocument(Document doc){
         Elements scripts = doc.select("script")
         scripts.each{ script ->
@@ -238,6 +261,9 @@ class JsoupWrapperService {
     }
 
     private String qualifyLink(String link, String base) {
+        if(link == "/"){
+            return link
+        }
         //Ignore mailto links!
         if (link.contains("mailto")) {
             return link

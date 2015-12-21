@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA) All rights reserved.
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA) All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -13,6 +13,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 
 package com.ctacorp.syndication.crud
+
+import com.ctacorp.syndication.Language
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -33,7 +35,6 @@ import grails.transaction.Transactional
 class CollectionController {
 
     def mediaItemsService
-    def collectionItemsService
     def tagService
     def solrIndexingService
     def cmsManagerKeyService
@@ -66,7 +67,9 @@ class CollectionController {
         def subscribers = cmsManagerKeyService.listSubscribers()
         def featuredMedia = collectionInstance?.mediaItems
         String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
-        respond new Collection(), model: [featuredMedia:featuredMedia,
+        Collection collection = new Collection(params)
+        collection.language = Language.findByIsoCode("eng")
+        respond collection, model: [featuredMedia:featuredMedia,
                                                 featuredMediaForTokenInput:featuredMediaForTokenInput,
                                                 subscribers:subscribers]
     }
@@ -83,9 +86,9 @@ class CollectionController {
         if(collectionInstance.hasErrors()){
             flash.errors = collectionInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             def subscribers = cmsManagerKeyService.listSubscribers()
-            def featuredMedia = collectionInstance?.mediaItems
-            String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
-            respond collectionInstance, view:'create', model: [featuredMedia:featuredMedia,
+            def media = MediaItem.facetedSearch(restrictToSet:params.allMediaItems).list()
+            String featuredMediaForTokenInput = media.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
+            respond collectionInstance, view:'create', model: [featuredMedia:media,
                                                                featuredMediaForTokenInput:featuredMediaForTokenInput,
                                                                subscribers:subscribers]
             return
@@ -106,11 +109,11 @@ class CollectionController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Collection collectionInstance) {
         def featuredMedia = collectionInstance?.mediaItems
         def subscribers = cmsManagerKeyService.listSubscribers()
-        String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
+        String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"${it.name}"] } as JSON
 
         respond collectionInstance, model:[featuredMedia:featuredMedia,
                                            featuredMediaForTokenInput:featuredMediaForTokenInput,
@@ -118,7 +121,7 @@ class CollectionController {
                                            currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(collectionInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Collection collectionInstance) {
         if (collectionInstance == null) {
@@ -166,7 +169,7 @@ class CollectionController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(collectionInstance, true)
+        mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(collectionInstance, true)
         solrIndexingService.removeMediaItem(collectionInstance)
         mediaItemsService.delete(collectionInstance.id)
 

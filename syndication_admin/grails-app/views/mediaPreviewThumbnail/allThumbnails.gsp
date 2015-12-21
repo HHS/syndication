@@ -10,6 +10,15 @@
 <head>
     <title>Thumbnail Overview</title>
     <meta name="layout" content="main">
+    <style>
+        .thumb-holder{
+            width:260px;
+            height:198px;
+        }
+        .thumbnail{
+            max-width: 260px;
+        }
+    </style>
 </head>
 
 <body>
@@ -29,9 +38,12 @@
     <div>
         <g:each in="${mediaItems}" var="mi">
             <div style="display:inline-block; border:1px solid black; margin-bottom: 4px;">
-                <p>${mi.id}</p>
-                <div id="thumb_${mi.id}">
-                    <img src="${grails.util.Holders.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/thumbnail.jpg"/>
+                <p>
+                    <span>${mi.id} - </span>
+                    <span><g:link action="show" controller="mediaItem" id="${mi.id}">View</g:link></span>
+                </p>
+                <div id="thumb_${mi.id}" class="thumb-holder">
+                    <img class="thumbnail" src="${grails.util.Holders.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/thumbnail.jpg"/>
                 </div>
                 <div style="padding: 5px;">
                     <g:remoteLink class="btn btn-info center-block" action="regenerateThumbnailPreviewForSingleItem" id="${mi.id}" update="thumb_${mi.id}">Regenerate</g:remoteLink>

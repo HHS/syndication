@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA) All rights reserved.
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA) All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -13,6 +13,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 
 package com.ctacorp.syndication.crud
+
+import com.ctacorp.syndication.Language
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -62,7 +64,9 @@ class WidgetController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Widget(params), model: [subscribers:subscribers]
+        Widget widget = new Widget(params)
+        widget.language = Language.findByIsoCode("eng")
+        respond widget, model: [subscribers:subscribers]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
@@ -92,13 +96,13 @@ class WidgetController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Widget widgetInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond widgetInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(widgetInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Widget widgetInstance) {
         if (widgetInstance == null) {
@@ -138,7 +142,7 @@ class WidgetController {
         }
 
         solrIndexingService.inputMediaItem(widgetInstance)
-        mediaItemsService.removeMediaItemsFromUserMediaLists(widgetInstance, true)
+        mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(widgetInstance, true)
         solrIndexingService.removeMediaItem(widgetInstance)
         mediaItemsService.delete(widgetInstance.id)
 

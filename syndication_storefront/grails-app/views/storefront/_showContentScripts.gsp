@@ -1,5 +1,5 @@
 <sec:ifLoggedIn>
-    <script type="application/javascript">
+    <script>
         $(document).ready(function () {
 
             // Update Functions ----------------------------------------------------------------------------------------
@@ -11,6 +11,8 @@
                     url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/userMediaLists/${userMediaListInstance?.id}/embed.json?autoplay=0&" + getQueryString()
                 } else if("${renderTagList}"){
                     url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/tags/${id}/embed.json?autoplay=0&" + getQueryString()
+                }else if("${renderSourceList}"){
+                    url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/sources/${id}/embed.json?autoplay=0&" + getQueryString()
                 } else{
                     console.error("Could not find an instance to work with!")
                 }
@@ -28,6 +30,8 @@
                     url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/userMediaLists/${userMediaListInstance?.id}/embed.json?autoplay=0&" + getQueryString()
                 } else if("${renderTagList}"){
                     url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/tags/${id}/embed.json?autoplay=0&" + getQueryString()
+                }else if("${renderSourceList}"){
+                    url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/sources/${id}/embed.json?autoplay=0&" + getQueryString()
                 } else{
                     console.error("Could not find an instance to work with!")
                 }
@@ -70,6 +74,7 @@
                 var stripScripts = $('#stripScripts').prop('checked') ? '1' : '0';
                 var stripBreaks = $('#stripBreaks').prop('checked') ? '1' : '0';
                 var stripClasses = $('#stripClasses').prop('checked') ? '1' : '0';
+                var stripIds = $('#stripIds').prop('checked') ? '1' : '0';
                 var width = $('#iframeWidth').val();
                 var height = $('#iframeHeight').val();
                 var flavor = getFlavor();
@@ -81,6 +86,7 @@
                 queryParams += "&stripScripts=" + stripScripts;
                 queryParams += "&stripBreaks=" + stripBreaks;
                 queryParams += "&stripClasses=" + stripClasses;
+                queryParams += "&stripIds=" + stripIds;
                 queryParams += "&width=" + width;
                 queryParams += "&height=" + height;
                 queryParams += "&flavor=" + flavor;

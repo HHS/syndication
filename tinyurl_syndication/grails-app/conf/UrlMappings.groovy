@@ -18,6 +18,14 @@ class UrlMappings {
         "/api/v1/mediaMappings/getByTinyUrl(.${format})?"(controller: "mediaMappingQuery", action:"getByTinyUrl")
         "/api/v1/mediaMappings/getBySyndicationId/$id(.${format})?"(controller: "mediaMappingQuery", action:"getBySyndicationId")
 
+        "/api/v1/mediaMappings/missingTinyUrls(.${format})?"(controller: "MediaMappingQuery", parseRequest: true){
+            action = [POST:"missingTinyUrls"]
+        }
+
+        "/api/v1/mediaMappings/bulkAdd(.${format})?"(controller: "mediaMappingRest", parseRequest: true){
+            action = [POST:"saveBulkMappings"]
+        }
+
         "/api/v1/mediaMappings(.${format})?"(controller:'mediaMappingRest', parseRequest: true){
             action = [GET:'index', POST:'save']
         }

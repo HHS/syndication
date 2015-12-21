@@ -12,6 +12,7 @@ import com.ctacorp.syndication.preview.MediaThumbnail
 import com.ctacorp.syndication.storefront.UserMediaList
 import com.ctacorp.syndication.preview.MediaPreview
 import com.ctacorp.syndication.preview.MediaThumbnail
+import grails.transaction.NotTransactional
 import grails.util.Environment
 import grails.transaction.Transactional
 import org.springframework.transaction.interceptor.TransactionAspectSupport
@@ -26,7 +27,6 @@ class MediaItemsService {
     def cmsManagerKeyService
     def contentRetrievalService
     def solrIndexingService
-    def remoteCacheService
 
     def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id}
 
@@ -83,6 +83,7 @@ class MediaItemsService {
         mi.delete(flush:true)
     }
 
+    @Transactional(readOnly = true)
     Map getIndexResponse(params, MediaItemType){
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
             return [mediaItemList:MediaItemType.findAllByIdInList(publisherItems(),params), mediaItemInstanceCount: MediaItemType.countByIdInList(publisherItems() ?: [0],params)]
@@ -95,8 +96,8 @@ class MediaItemsService {
     def getAllMediaIds(){
         MediaItem.executeQuery("select mi.id from MediaItem mi")
     }
-    
-    @Transactional()
+
+    @Transactional(readOnly = true)
     def getPublisherMediaIds(subscriberId){
         MediaItemSubscriber.executeQuery("select mi.mediaItem.id from MediaItemSubscriber mi where mi.subscriberId = ?",[subscriberId])
     }
@@ -124,7 +125,7 @@ class MediaItemsService {
     }
 
     //removes mediaItems from user media lists if active or visibleInStorefront went from true to false
-    void removeMediaItemsFromUserMediaLists(MediaItem mediaItem, deletingMediaItem = false){
+    void removeInvisibleMediaItemsFromUserMediaLists(MediaItem mediaItem, deletingMediaItem = false){
         if(MediaItem.get(mediaItem.id)?.getPersistentValue("visibleInStorefront") && !mediaItem.visibleInStorefront ||
                 MediaItem.get(mediaItem.id)?.getPersistentValue("active") && !mediaItem.active){
 
@@ -141,6 +142,7 @@ class MediaItemsService {
         }
     }
 
+    @Transactional(readOnly = true)
     def findMediaByAll(params){
         params.sort = params.sort ?: "id"
         params.order = params.order ?: "asc"
@@ -160,6 +162,7 @@ class MediaItemsService {
         return mediaItems
     }
 
+    @NotTransactional
     def getMediaTypes() {
         def mediaTypes = []
         grailsApplication.domainClasses.each {
@@ -170,12 +173,30 @@ class MediaItemsService {
         mediaTypes.sort()
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     def ifPublisherValid(MediaItem mediaItem){
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER" && !publisherItems()?.contains(mediaItem?.id)){
             return false
         }
         return true
+    }
+
+    def updateHash(MediaItem mediaItem){
+        if(mediaItem instanceof Html || mediaItem instanceof Periodical){
+            def extractedContent
+            try {
+                def contentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mediaItem.sourceUrl)
+                extractedContent = contentAndHash.content
+                if(!extractedContent){
+                    mediaItem.errors.rejectValue("sourceUrl", "SourceUrl invalid","The system could not find syndication markup at the provided URL. Please verify the media source to ensure it contains at least one <div> element containing the 'syndicate' class.")
+                }
+                mediaItem.hash = contentAndHash.hash
+            } catch(e){
+                mediaItem.errors.rejectValue("sourceUrl", "SourceUrl invalid", "The provided URL doesn't appear to be accessible, perhaps it's invalid? Please make " +
+                        "sure it is fully qualified and correct.")
+            }
+        }
+        mediaItem
     }
 
     def updateItemAndSubscriber(MediaItem mediaItem, Long subscriberId){
@@ -184,22 +205,10 @@ class MediaItemsService {
         if(isDuplicateUrl(mediaItem)){
             mediaItem.errors.rejectValue("sourceUrl", "Duplicate Url", "The Source Url is already in use.")
         }
-        if(mediaItem instanceof Html || mediaItem instanceof Periodical){
-            def extractedContent
-            try {
-                def contentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mediaItem.sourceUrl)
-                extractedContent = contentAndHash.content
-                mediaItem.hash = contentAndHash.hash
-                if(!extractedContent){
-                    mediaItem.errors.rejectValue("sourceUrl", "SourceUrl invalid","The system could not find syndication markup at the provided URL. Please verify the media source to ensure it contains at least one <div> element containing the 'syndicate' class.")
-                }
-            } catch(e){
-                mediaItem.errors.rejectValue("sourceUrl", "SourceUrl invalid", "The provided URL doesn't appear to be accessible, perhaps it's invalid? Please make " +
-                        "sure it is fully qualified and correct.")
-            }
-        }
-        //TODO this needs to be renamed, it makes it sound like it removes this item from all user media lists
-        removeMediaItemsFromUserMediaLists(mediaItem)
+
+        mediaItem = updateHash(mediaItem)
+
+        removeInvisibleMediaItemsFromUserMediaLists(mediaItem)
 
         if(Environment.current != Environment.DEVELOPMENT || (Environment.current == Environment.DEVELOPMENT && cmsManagerKeyService.listSubscribers()) || UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
             if(mediaItem.id){
@@ -235,7 +244,6 @@ class MediaItemsService {
             MediaItemSubscriber.withTransaction {status ->
                 status.setRollbackOnly()
             }
-//            transactionStatus.setRollbackOnly()
             return mediaItem
         }
 
@@ -258,7 +266,6 @@ class MediaItemsService {
     }
 
     private updateAndNotify(mediaItems){
-        
         mediaItems.each { MediaItem mediaItem ->
             try {
                 Map freshExtraction = contentRetrievalService.getContentAndMd5Hashcode(mediaItem.sourceUrl)
@@ -274,6 +281,7 @@ class MediaItemsService {
         //remote cache flushed in syndication model MediaItemChangeListener
     }
 
+    @Transactional(readOnly = true)
     def isDuplicateUrl(MediaItem mediaItem){
         if(!mediaItem.id && MediaItem.facetedSearch(sourceUrl:mediaItem.sourceUrl).count() == 1){
             return true
@@ -283,4 +291,13 @@ class MediaItemsService {
         return false
     }
 
+    def resetHash(Long mediaId){
+        MediaItem mi = MediaItem.get(mediaId)
+        def oldHash = mi.hash
+        mi.hash = null
+        mi = updateHash(mi)
+        mi.save(flush:true)
+        log.info "resetting hash for ${mediaId}\n${oldHash} --> ${mi.hash}"
+        mi
+    }
 }

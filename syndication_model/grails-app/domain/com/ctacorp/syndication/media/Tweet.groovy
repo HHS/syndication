@@ -17,6 +17,7 @@ class Tweet extends MediaItem{
     Long tweetId
     String messageText
     String mediaUrl
+    String videoVariantUrl
     Date tweetDate
 
     static constraints = {
@@ -25,5 +26,6 @@ class Tweet extends MediaItem{
         messageText     nullable: false,    maxSize: 255
         mediaUrl        nullable: true,     url: true
         tweetDate       nullable: false
+        videoVariantUrl nullable: true,     url: true
     }
 }

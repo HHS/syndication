@@ -5,19 +5,20 @@
         <div class="footer-connect-icons">
             <!-- AddThis Follow BEGIN -->
             <div class="addthis_toolbox addthis_32x32_style addthis_default_style global-footer-icons">
-                <p>
-                    <a class="addthis_button_facebook_follow at300b" addthis:userid="HHS" title="Visit the HHS Facebook account" alt="Visit the HHS Facebook account" target="_self" href="http://www.facebook.com/HHS"><asset:image border="0" src="footer/follow_facebook_on.png" alt="Share on facebook"/></a>
-                    <a href="https://twitter.com/hhsgov" title="Visit the HHS Twitter account"><asset:image border="0" src="footer/connect-icon-twitter.png" alt="Visit the HHS Twitter account"/></a>
-                    <a class="addthis_button_youtube_follow at300b" addthis:userid="USGOVHHS" title="Visit the HHS YouTube account" alt="Visit the HHS YouTube account" target="_self" href="http://www.youtube.com/user/USGOVHHS?sub_confirmation=1"><asset:image border="0" src="footer/youtube-icon.png" alt="Share on youtube"/></a>
-                    <a class="addthis_button_flickr_follow at300b" addthis:userid="hhsgov/" title="Visit the HHS Flickr account" alt="Visit the HHS Flickr account" target="_self" href="http://www.flickr.com/photos/hhsgov/"><asset:image border="0" src="footer/flickr_32.png" alt="Share on flickr"/></a>
-                </p>
+            <p>
+                <a class="addthis_button_facebook_follow at300b" addthis:userid="HHS" title="Visit the HHS Facebook account" alt="Visit the HHS Facebook account" target="_self" href="http://www.facebook.com/HHS"><asset:image border="0" src="/footer/follow_facebook_on.png" alt="Share on facebook"/></a>
+                <a href="https://twitter.com/hhsgov" title="Visit the HHS Twitter account"><asset:image border="0" src="/footer/connect-icon-twitter.png" alt="Visit the HHS Twitter account"/></a>
+                <a class="addthis_button_youtube_follow at300b" addthis:userid="USGOVHHS" title="Visit the HHS YouTube account" alt="Visit the HHS YouTube account" target="_self" href="http://www.youtube.com/user/USGOVHHS?sub_confirmation=1"><asset:image border="0" src="/footer/youtube-icon.png" alt="Share on youtube"/></a>
+            </p>
 
-                <p>
-                    <a class="addthis_button_pinterest_follow at300b" addthis:userid="hhsgov/" title="Visit the HHS Pinterest account" alt="Visit the HHS Pinterest account" target="_self" href="http://www.pinterest.com/hhsgov/"><asset:image border="0" src="footer/pinterest.png" alt="Share on pinterest"/></a>
-                    <a href="https://public.govdelivery.com/accounts/USHHS/subscriber/new" title="Subscribe to HHS email updates"><asset:image src="footer/connect-icon-email.png" alt="Subscribe to HHS email updates"/></a>
-                    <a href="http://www.hhs.gov/blog/" title="Visit the HHS Blog"><asset:image src="footer/blog-icon.jpeg" alt="Visit the HHS Blog"/></a>
-                    <a href="http://www.hhs.gov/socialhub/" title="Browse other social media accounts from HHS"><asset:image src="footer/connect-icon-socialmedia-directory.png" alt="Browse other social media accounts from HHS"/></a>
-                </p>
+            <p>
+                <a class="addthis_button_flickr_follow at300b" addthis:userid="hhsgov/" title="Visit the HHS Flickr account" alt="Visit the HHS Flickr account" target="_self" href="http://www.flickr.com/photos/hhsgov/"><asset:image border="0" src="/footer/flickr_32.png" alt="Share on flickr"/></a>
+                <a class="addthis_button_pinterest_follow at300b" addthis:userid="hhsgov/" title="Visit the HHS Pinterest account" alt="Visit the HHS Pinterest account" target="_self" href="http://www.pinterest.com/hhsgov/"><asset:image border="0" src="/footer/pinterest.png" alt="Share on pinterest"/></a>
+                <a href="https://plus.google.com/+HHS/posts" title="Visit HHS GooglePlus account"><asset:image src="/footer/footer-googleplus.png" alt="Visit HHS GooglePlus account"/></a>
+                %{--<a href="https://public.govdelivery.com/accounts/USHHS/subscriber/new" title="Subscribe to HHS email updates"><asset:image src="/footer/connect-icon-email.png" alt="Subscribe to HHS email updates"/></a>--}%
+                %{--<a href="http://www.hhs.gov/blog/" title="Visit the HHS Blog"><asset:image src="/footer/blog-icon.jpeg" alt="Visit the HHS Blog"/></a>--}%
+                %{--<a href="http://www.hhs.gov/socialhub/" title="Browse other social media accounts from HHS"><asset:image src="/footer/connect-icon-socialmedia-directory.png" alt="Browse other social media accounts from HHS"/></a>--}%
+            </p>
                 <div class="atclear"></div></div> <!-- end .addthis_toolbox -->
         <!-- AddThis Follow END -->
         </div> <!-- end .footer-connect-icons -->

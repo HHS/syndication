@@ -51,6 +51,9 @@ class AutoTaggingController {
     def tagAll(Long languageId){
         def mediaAndTags = [:]
         params.each{ key, val ->
+            if(val?.class == String) {
+                val = [val]
+            }
             def keyName = key as String
             if(keyName.startsWith("media_tag_")){
                 long mediaId = keyName[10..-1] as Long

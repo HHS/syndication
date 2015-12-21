@@ -22,6 +22,7 @@ import com.ctacorp.syndication.metric.MediaMetric
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.media.Video
 import grails.plugin.springsecurity.annotation.Secured
+import static com.ctacorp.syndication.media.MediaItem.StructuredContentType.*
 
 @Secured('ROLE_ADMIN')
 class TestController {
@@ -34,6 +35,36 @@ class TestController {
 
     def index() {
         flash.message = null
+    }
+
+    def createStructuredItem(){
+        Html html
+        switch(MediaItem.StructuredContentType."${params.structuredType}"){
+            case BLOG_POST:
+                    html = new Html(
+                            structuredContentType: MediaItem.StructuredContentType.BLOG_POST,
+                            sourceUrl: params.sourceUrl,
+                            language: Language.findByIsoCode('eng'),
+                            source: Source.first(),
+                            name:params.name
+                    )
+                break
+            case NEWS_RELEASE:
+                html = new Html(
+                        structuredContentType: MediaItem.StructuredContentType.NEWS_RELEASE,
+                        sourceUrl: params.sourceUrl,
+                        language: Language.findByIsoCode('eng'),
+                        source: Source.first(),
+                        name:params.name
+                )
+                break
+        }
+
+        html.save(flush:true)
+        println html.errors
+        redirect url: "/api/v2/resources/media/${html.id}.json"
+
+        return
     }
 
     def extractTest(){

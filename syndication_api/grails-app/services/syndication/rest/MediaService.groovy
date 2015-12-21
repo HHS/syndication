@@ -15,8 +15,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.rest
 
+import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.commons.util.Util
+import com.ctacorp.syndication.data.CampaignHolder
+import com.ctacorp.syndication.data.SourceHolder
 import com.ctacorp.syndication.data.TagHolder
 import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.storefront.UserMediaList
@@ -30,6 +33,7 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.codehaus.groovy.grails.web.util.WebUtils
 import com.ctacorp.syndication.exception.UnauthorizedException
 
+import java.security.MessageDigest
 import java.util.concurrent.Callable
 
 @Transactional
@@ -47,6 +51,7 @@ class MediaService {
     def groovyPageRenderer
     def mediaService
     def assetResourceLocator
+    def aws
 
     @NotTransactional
     String renderHtml(Html html, params){
@@ -100,7 +105,9 @@ class MediaService {
     }
 
     String renderPdf(PDF pdf, params){
-        String content = groovyPageRenderer.render(template: "/media/pdfView", model: [pdf:pdf])
+        def urlHash = MessageDigest.getInstance("MD5").digest(pdf.sourceUrl.bytes).encodeHex().toString()
+
+        String content = groovyPageRenderer.render(template: "/media/pdfView", model: [pdf:pdf, s3Url:aws.s3().on("syndication-files").publicUrlFor(1.hour, "pdf-files/"+urlHash + ".pdf")])
         content = contentRetrievalService.wrapWithSyndicateDiv(content, pdf)
         content = contentRetrievalService.addAttributionToExtractedContent(pdf.id, content)
         content += analyticsService.getGoogleAnalyticsString(pdf, params)
@@ -135,13 +142,43 @@ class MediaService {
             mediaItems = collection.mediaItems
         }
 
+        //Handle nested collections
+        mediaItems = resolveNestedCollections(mediaItems)
+
         renderMediaList(mediaItems.sort{it.name}, params)
+    }
+
+    private resolveNestedCollections(initialList){
+        def items = []
+        def collectionsAlreadyChecked = []
+        items = resolveNestedCollectionsHelper(initialList, collectionsAlreadyChecked, items)
+        items
+    }
+
+    private resolveNestedCollectionsHelper(initialList, collectionsAlreadyChecked, items){
+        initialList.each{ mediaItem ->
+            //If it isn't a collection and it isn't already in the list, add it
+            if(!(mediaItem instanceof com.ctacorp.syndication.media.Collection) && !(items.contains(mediaItem))){
+                items << mediaItem
+            } else if(!(mediaItem in collectionsAlreadyChecked) && mediaItem instanceof com.ctacorp.syndication.media.Collection){ //it's a nested collection, if it hasn't already been checked
+                collectionsAlreadyChecked << mediaItem
+                resolveNestedCollectionsHelper(mediaItem.mediaItems, collectionsAlreadyChecked, items)
+            }
+        }
+        items
     }
 
     String renderMediaForTag(Long id, params){
         params.id = id
         params.max = 50
         def mediaItems = tagsService.getMediaForTagId(params) ?: []
+        renderMediaList(mediaItems, params)
+    }
+
+    String renderMediaForCampaign(Long id, params){
+        params.id = id
+        params.max = 50
+        def mediaItems = Campaign.get(id).mediaItems
         renderMediaList(mediaItems, params)
     }
 
@@ -161,6 +198,12 @@ class MediaService {
                 break
             case TagHolder:
                 url = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath +"/resources/tags/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                break;
+            case SourceHolder:
+                url = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath +"/resources/sources/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                break;
+            case CampaignHolder:
+                url = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath +"/resources/campaigns/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
                 break;
             default:
                 url = grailsApplication.config.syndication.contentExtraction.urlBase + "/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
@@ -259,6 +302,7 @@ class MediaService {
         queryParams += "&stripBreaks="+         Util.isTrue(params.stripBreaks)
         queryParams += "&stripImages="+         Util.isTrue(params.stripImages)
         queryParams += "&stripClasses="+        Util.isTrue(params.stripClasses)
+        queryParams += "&stripIds="+            Util.isTrue(params.stripIds)
         queryParams += "&displayMethod="+       params.displayMethod ?: "feed"
         queryParams += "&autoplay="+            Util.isTrue(params.autoplay, false)
         queryParams += "&userId="+              params.userId
@@ -289,6 +333,7 @@ class MediaService {
         try {
             //for debugging
             if(Holders.config.disableGuavaCache){
+                println "cache is disabled for this request"
                 Map extractedContentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mi.sourceUrl, params)
                 String extractedContent = extractedContentAndHash.content
                 String newHash = extractedContentAndHash.hash
@@ -311,10 +356,20 @@ class MediaService {
                 return extractedContent
             }
 
-            String key = Hash.md5(mi.sourceUrl + params.sort().toString())
+            //With ajax requests from storefront, a random id and callback will cause the cache to miss every time
+            //This corrects that
+            def keyParts = params.clone()
+            keyParts.remove("_")
+            keyParts.remove("callback")
+            keyParts.remove("controllerContext")
+            keyParts.remove("newUrlBase")
+
+            String key = Hash.md5(mi.sourceUrl + keyParts.sort().toString())
+
             String extractedContent = guavaCacheService.extractedContentCache.get(key, new Callable<String>() {
                 @Override
                 public String call(){
+                    log.info "cache miss: ${keyParts}"
                     Map extractedContentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mi.sourceUrl, params)
                     String extractedContent = extractedContentAndHash.content
                     String newHash = extractedContentAndHash.hash
@@ -364,17 +419,18 @@ class MediaService {
 
     def saveHtml(Html htmlInstance, params) throws ContentNotExtractableException, ContentUnretrievableException{
         //Extract the content (or try to)
-        String content = contentRetrievalService.extractSyndicatedContent(htmlInstance.sourceUrl, params)
-        if (!content) { //Extraction failed
+        params.disableFailFast = true
+        def contentAndHash = contentRetrievalService.getContentAndMd5Hashcode(htmlInstance.sourceUrl, params)
+        if (!contentAndHash.content) { //Extraction failed
             log.error("Could not extract content, page was found but not marked up at url: ${htmlInstance.sourceUrl}")
             throw new ContentNotExtractableException("Could not extract content, page was found but not marked up at url: ${htmlInstance.sourceUrl}")
         } else { // Content extracted fine, can we save?
-            htmlInstance.hash = Hash.md5(content)                   //rehash content
+            htmlInstance.hash = contentAndHash.hash
 
             //Try to add a meaningful description if one isn't provided
             if(!htmlInstance.description){
                 try {
-                    String desc = contentRetrievalService.getDescriptionFromContent(content, htmlInstance.sourceUrl)
+                    String desc = contentRetrievalService.getDescriptionFromContent(contentAndHash.content, htmlInstance.sourceUrl)
                     if(desc){
                         htmlInstance.description = desc
                     }
@@ -383,7 +439,10 @@ class MediaService {
                 }
             }
 
-            htmlInstance = createOrUpdateMediaItem(htmlInstance, content, generalMediaItemLoader) as Html      //load or update and existing record if it exists
+            htmlInstance = createOrUpdateMediaItem(htmlInstance, generalMediaItemLoader, contentAndHash) as Html      //load or update and existing record if it exists
+        }
+        if(contentAndHash.content) {
+            contentCacheService.cache(htmlInstance, contentAndHash.content)
         }
         htmlInstance
     }
@@ -401,17 +460,17 @@ class MediaService {
     }
 
     Periodical savePeriodical(Periodical periodicalInstance){
-        String content = contentRetrievalService.extractSyndicatedContent(periodicalInstance.sourceUrl)
-        if (!content) { //Extraction failed
+        def contentAndHash = contentRetrievalService.getContentAndMd5Hashcode(periodicalInstance.sourceUrl)
+        if (!contentAndHash.content) { //Extraction failed
             log.error("Could not extract content, page was found but not marked up at url: ${periodicalInstance.sourceUrl}")
             throw new ContentNotExtractableException("Could not extract content, page was found but not marked up at url: ${periodicalInstance.sourceUrl}")
         } else { // Content extracted fine, can we save?
-            periodicalInstance.hash = Hash.md5(content)                   //rehash content
+            periodicalInstance.hash = contentAndHash.hash                   //rehash content
 
             //Try to add a meaningful description if one isn't provided
             if(!periodicalInstance.description){
                 try {
-                    String desc = contentRetrievalService.getDescriptionFromContent(content, periodicalInstance.sourceUrl)
+                    String desc = contentRetrievalService.getDescriptionFromContent(contentAndHash.content, periodicalInstance.sourceUrl)
                     if(desc){
                         periodicalInstance.description = desc
                     }
@@ -420,7 +479,7 @@ class MediaService {
                 }
             }
 
-            periodicalInstance = createOrUpdateMediaItem(periodicalInstance, content, generalMediaItemLoader) as Periodical     //load or update and existing record if it exists
+            periodicalInstance = createOrUpdateMediaItem(periodicalInstance, generalMediaItemLoader, contentAndHash) as Periodical     //load or update and existing record if it exists
         }
         periodicalInstance
     }
@@ -466,14 +525,15 @@ class MediaService {
         widgetInstance
     }
 
-    private MediaItem createOrUpdateMediaItem(MediaItem item, String content = null, Closure mediaFinder){
+    private MediaItem createOrUpdateMediaItem(MediaItem item, Closure mediaFinder, Map contentAndHash = [:]){
         boolean savetoDB = true
         MediaItem existing = mediaFinder(item)
         
         if (existing) {
             def result = updateMediaItem(existing, item)
             // -- media type specific updates here --
-            if(!result.changed){
+            boolean checkHash = contentAndHash.hash != null
+            if(!result.changed && (checkHash && contentAndHash.hash == existing.hash)){
                 log.info "Item not changed, skipping update ${result.updatedRecord.sourceUrl}"
                 item = existing // if there were no changes, return the existing record instead
                 savetoDB = false
@@ -494,7 +554,7 @@ class MediaService {
 
             log.info "media saved: ${item.id}"
             if (grailsApplication.config.syndication.solrService.useSolr) {
-               solrIndexingService.inputMediaItem(item,content)
+               solrIndexingService.inputMediaItem(item, contentAndHash.content)
             }
             log.info "Media Item Created/Updated: ${item.id} - ${item.sourceUrl}"
         }

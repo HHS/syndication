@@ -1,5 +1,5 @@
 %{--
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -47,7 +47,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <a href="#list-html" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
             <br/>
             <sec:ifAnyGranted roles="ROLE_ADMIN">
-                <g:if test="${!(params.controller in ["metricReport", "mediaPreviewThumbnail"])}">
+                <g:if test="${!(params.controller in ["metricReport", "mediaPreviewThumbnail", "consumerMetrics"])}">
                     <nav class="navbar navbar-default" role="navigation">
                         <div class="container-fluid">
                             <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
@@ -56,18 +56,23 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                 <g:link class="navbar-brand" controller="twitterAccount" action="create"><i class="fa fa-plus"></i> Add Twitter Account</g:link>
                             </g:if>
                             <g:else>
-                                <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                                <g:if test="${params.controller == "registration"}">
+                                    %{--don't show new button--}%
+                                </g:if>
+                                <g:else>
+                                    <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                                </g:else>
                             </g:else>
                         </div>
                     </nav>
                 </g:if>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_PUBLISHER">
-                <g:if test="${params.controller in ["audio","collection","html","image","infographic","periodical","tweet","twitterAccount","video","widget"]}">
+                <g:if test="${params.controller in ["campaign", "audio","collection","html","image","infographic", "PDF", "periodical","tweet","twitterAccount","video","widget"]}">
                     <nav class="navbar navbar-default" role="navigation">
                         <div class="container-fluid">
                             <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
-                            <g:if test="${params.controller in ["campaign", "audio", "collection", "html", "image", "infographic", "periodical", "twitterAccount", "video", "widget"]}">
+                            <g:if test="${params.controller in ["campaign", "audio", "collection", "html", "image", "infographic", "PDF", "periodical", "twitterAccount", "video", "widget"]}">
                                 <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
                             </g:if>
                             <g:elseif test="${params.controller == "tweet"}">
@@ -79,7 +84,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 </g:if>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_MANAGER">
-                <g:if test="${params.controller in ["alternateImage", "campaign", "language", "extendedAttribute", "twitterAccount", "source", "user", "audio", "collection", "html", "image", "infographic", "periodical", "tweet", "video", "widget"]}">
+                <g:if test="${params.controller in ["alternateImage", "campaign", "language", "extendedAttribute", "twitterAccount", "source", "user", "audio", "collection", "html", "image", "infographic", "PDF", "periodical", "tweet", "video", "widget"]}">
                 <nav class="navbar navbar-default" role="navigation">
                     <div class="container-fluid">
                         <g:if test="${params.controller == "tweet"}">
@@ -97,7 +102,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             </g:if>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_USER">
-                <g:if test="${params.controller in ["campaign", "source", "audio", "collection", "html", "image", "infographic", "periodical", "tweet", "video", "widget"]}">
+                <g:if test="${params.controller in ["campaign", "source", "audio", "collection", "html", "image", "infographic", "PDF", "periodical", "tweet", "video", "widget"]}">
                     <nav class="navbar navbar-default" role="navigation">
                         <div class="container-fluid">
                             <g:if test="${params.controller == "tweet"}">

@@ -58,7 +58,6 @@ class LogController {
     }
 
     def tinyErrorLog(){
-        println "tinyErrors"
         File tinyErrorLog = new File("${System.getProperty('user.home')}/syndicationLogs/tiny/errors.log")
         response.contentType = "application/json"
         render([logData:loadFile(tinyErrorLog)] as JSON)
@@ -71,18 +70,48 @@ class LogController {
     }
 
     def tagErrorLog(){
-        println "tag errors!"
         File tagErrorLog = new File("${System.getProperty('user.home')}/syndicationLogs/tag/errors.log")
         response.contentType = "application/json"
         render([logData:loadFile(tagErrorLog)] as JSON)
     }
 
     def tagInfoLog(){
-        println "tagInfo"
         File tagInfoLog = new File("${System.getProperty('user.home')}/syndicationLogs/tag/details.log")
-        println tagInfoLog.text
         response.contentType = "application/json"
         render([logData:loadFile(tagInfoLog)] as JSON)
+    }
+
+    def logDownload(){
+        File file = null
+        switch(params.file) {
+            case "adminErrorsFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/admin/errors.log")
+                break
+            case "adminDetailsFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/admin/details.log")
+                break
+            case "apiErrorsFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/api/errors.log")
+                break
+            case "apiDetailsFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/api/details.log")
+                break
+            case "cmsLogFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/cms/cmsmanager.log")
+                break
+            case "cmsKeyLogFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/cms/cmsmanager.apikey.log")
+                break
+            case "storefrontErrorsFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/storefront/errors.log")
+                break
+            case "storefrontDetailsFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/storefront/details.log")
+                break
+            case "tinyUrlErrorsFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/tiny/errors.log")
+                break
+            case "tinyUrlDetailsFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/tiny/details.log")
+                break
+            case "tagErrorsFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/tag/errors.log")
+                break
+            case "tagDetailsFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/tag/details.log")
+                break
+
+        }
+        response.setContentType("application/download")
+        response.outputStream << file.bytes
     }
 
 

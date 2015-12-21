@@ -26,7 +26,7 @@
         <div class="col-md-8">
 
           <div class="panel panel-default">
-              <div class="panel panel-heading">
+              <div class="panel-heading">
                   <h3 class="panel-title">Search Media Items</h3>
               </div>
             <div class="panel-body">
@@ -58,14 +58,14 @@
                 <div class="form-group">
                   <label class="col-md-4 control-label" for="mediaType">Media Type</label>
                   <div class="col-md-8">
-                    <g:select from="${mediaTypeList}" class="form-control" name="mediaType" value="${mediaType}" noSelection="['':'-Choose Type-']"/>
+                    <g:select from="${mediaTypeList}" class="form-control" name="mediaType" value="${mediaType}" noSelection="['':'-Any Type-']"/>
                   </div>
                 </div>
 
                 <div class="form-group">
                   <label class="col-md-4 control-label" for="mediaType">Language</label>
                   <div class="col-md-8">
-                    <g:select class="form-control" from="${languageList}" name="language" optionKey="id" value="${language}" noSelection="['':'-Choose Lang-']"/>
+                    <g:select class="form-control" from="${languageList}" name="language" optionKey="id" value="${language}" noSelection="['':'-Any Language-']"/>
                   </div>
                 </div>
 

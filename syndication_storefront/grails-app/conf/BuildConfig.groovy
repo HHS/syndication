@@ -54,10 +54,6 @@ grails.project.dependency.resolution = {
         mavenLocal()
         grailsCentral()
         mavenCentral()
-        // uncomment these (or add new ones) to enable remote dependency resolution from public Maven repositories
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
     }
 
     dependencies {
@@ -70,7 +66,7 @@ grails.project.dependency.resolution = {
 
     plugins {
         compile ":rest-client-builder:2.1.1"
-        compile "org.grails.plugins:syndication-model:2.1.0"
+        compile "org.grails.plugins:syndication-model:2.4.0"
 
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
         compile ":recaptcha:0.6.9"
@@ -78,7 +74,7 @@ grails.project.dependency.resolution = {
         // plugins for the compile step
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.8'
-        compile ':asset-pipeline:2.5.9'
+        compile ':asset-pipeline:2.1.5'
         compile ":quartz:1.0.2"
 
         compile ":spring-security-core:2.0-RC4"

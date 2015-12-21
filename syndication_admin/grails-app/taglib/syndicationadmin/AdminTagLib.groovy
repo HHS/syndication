@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,6 +19,8 @@ import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.health.FlaggedMedia
 
 class AdminTagLib {
+    def twitterService
+
     static defaultEncodeAs = 'html'
     static encodeAsForTags = [
             serverLink: 'raw',
@@ -29,7 +31,8 @@ class AdminTagLib {
             message:'raw',
             messages:'raw',
             currentUser:'raw',
-            healthFailureIcon:'raw'
+            healthFailureIcon:'raw',
+            linkify: 'raw'
     ]
 
     static namespace = "synd"
@@ -161,6 +164,10 @@ class AdminTagLib {
             case 40..<60: out << 'warning'; return
             case 0..<40: out <<  'danger'; return
         }
+    }
+
+    def linkify = { attrs, body ->
+        out << twitterService.linkifyUrls(body() as String)
     }
 
     private String shortenSentence(String text){

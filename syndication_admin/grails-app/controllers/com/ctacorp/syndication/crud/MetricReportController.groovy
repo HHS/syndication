@@ -1,5 +1,6 @@
 package com.ctacorp.syndication.crud
 
+import com.google.api.client.auth.oauth2.Credential
 import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
@@ -31,6 +32,7 @@ class MetricReportController {
     def queryAuditService
     def googleAnalyticsService
     def guavaCacheService
+    def cmsManagerKeyService
 
     static defaultAction = "overview"
 
@@ -49,36 +51,35 @@ class MetricReportController {
             case "alltime": mostPopular = queryAuditService.getMostPopularAllTime(); break
         }
 
-        def googleOverview = null
-        try{
-            def googleResponse = googleAnalyticsService.getDashboardOverviewData(overviewMeta?.start)
-            googleOverview = [
-                    stats : [:],
-                    error : googleResponse.error
-            ]
-            if(googleResponse?.rows && googleResponse?.rows[0]?.size() > 0){
-                for(def i = 0; i < googleResponse.rows[0].size(); i++){
-                    googleOverview.stats[googleResponse.columnHeaders[i].name-'ga:'] = googleResponse.rows[0][i]
-                }
-            } else{
-                googleOverview.error = "There are no metrics available for the select date range."
-            }
+        Credential cred = googleAnalyticsService.authorize()
+        cred.refreshToken()
 
-        }catch(e){
-            log.error "Couldn't retrieve google anayltics info"
-            StringWriter sw = new StringWriter()
-            PrintWriter pw = new PrintWriter(sw)
-            e.printStackTrace(pw)
-            log.error(sw.toString())
-            googleOverview = [stats:[:], error:"Couldn't connect to google analytics service.", exception:sw.toString()]
+        Set<String> uniqueDomains = new HashSet<String>()
+        if (UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
+            def partners = MediaItemSubscriber.findAllBySubscriberIdNotInList([1597837916, 1615147890]).mediaItem
+            partners.each{
+                URI uri = new URI(it.sourceUrl)
+                uniqueDomains.add(uri.getHost())
+            }
+        } else {
+            def partners = MediaItem.list([order:"sourceUrl"])
+            partners.each{
+                URI uri = new URI(it.sourceUrl)
+                uniqueDomains.add(uri.getHost())
+            }
         }
+
+        Set<String> treeSet = new TreeSet<String>(uniqueDomains);
 
         [
             start:overviewMeta.start,
-            googleOverview: googleOverview,
             mostPopular: mostPopular,
-            subscribers: UserRole.findAllByRole(Role.findByAuthority("ROLE_STOREFRONT_USER"))*.user,
-            popularRange: overviewMeta.popularRange
+            publishers: UserRole.findAllByRole(Role.findByAuthority("ROLE_PUBLISHER"))*.user,
+            popularRange: overviewMeta.popularRange,
+            tempAccessToken:cred.getAccessToken(),
+            totalMediaItems:MediaItem.count(),
+            totalSubscribers:cmsManagerKeyService.listSubscribers().size(),
+            partnerDomains:treeSet
         ]
     }
 

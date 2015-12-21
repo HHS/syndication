@@ -21,9 +21,10 @@
 
                         <div class="panel-body">
                             <ul>
+                                <li>Syndication supports youtube as a video source.</li>
                                 <li>Enter a fully qualified YouTube player URL in the text field.</li>
                                 <li>Enter the URL of a single video only since playlists are not supported yet.</li>
-                                <li>Once 'Import' is clicked, metadata information like video title, description etc will be pulled into the Create Video form.</li>
+                                <li>Once 'Import Youtube Video' is clicked, metadata information like video title, description etc will be pulled into the Create Video form.</li>
                             </ul>
                         </div>
                     </div>

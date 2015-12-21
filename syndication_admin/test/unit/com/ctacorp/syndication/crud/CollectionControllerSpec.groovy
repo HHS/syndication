@@ -188,7 +188,7 @@ class CollectionControllerSpec extends Specification {
             controller.delete(collection)
 
         then:"The instance is deleted"
-        1 * mediaItemsService.removeMediaItemsFromUserMediaLists(collection,true)
+        1 * mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(collection,true)
         1 * controller.solrIndexingService.removeMediaItem(collection)
         1 * controller.mediaItemsService.delete(collection.id)
             response.redirectedUrl == '/collection/index'

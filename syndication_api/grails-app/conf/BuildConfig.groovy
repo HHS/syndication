@@ -68,7 +68,6 @@ grails.project.dependency.resolution = {
         mavenCentral()
 
         // uncomment these (or add new ones) to enable remote dependency resolution from public Maven repositories
-        mavenRepo "http://repository.codehaus.org"
         mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo "https://maven.atlassian.com/public/"
         mavenRepo "https://maven.atlassian.com/public-snapshot/"
@@ -109,11 +108,11 @@ grails.project.dependency.resolution = {
         }
 
         // plugins for the compile step --------------------------------------------------------------------------------
-        compile ":syndication-model:2.1.0"   //syndication domain models
-        compile ":content-extraction-services:1.5.0"   //syndication content extraction tools
+        compile ":syndication-model:2.4.0"   //syndication domain models
+        compile ":content-extraction-services:1.8.0"   //syndication content extraction tools
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
-        compile ":asset-pipeline:2.5.9"
+        compile ":asset-pipeline:2.6.5"
         compile ":release:3.1.1"
         compile ":rest-client-builder:2.1.1"
         compile ":spring-security-core:2.0-RC5"
@@ -126,6 +125,7 @@ grails.project.dependency.resolution = {
         runtime ":hibernate4:4.3.8.1"
         runtime ":database-migration:1.4.1"
         runtime ":jquery:1.11.1"
+        runtime ':aws:1.9.13.4'
 
         // Test phase plugins ------------------------------------------------------------------------------------------
         test ":build-test-data:2.4.0"

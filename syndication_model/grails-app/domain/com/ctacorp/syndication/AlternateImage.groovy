@@ -36,7 +36,7 @@ class AlternateImage {
 
     static constraints = {
         name    nullable: false,             blank: false,  maxSize: 255
-        url     nullable: false,  url:true, blank: false
+        url     nullable: false,  url:true,  blank: false, maxSize: 2000
         width   nullable: true, min: 1, max: (Integer.MAX_VALUE - 1)
         height  nullable: true, min: 1, max: (Integer.MAX_VALUE - 1)
     }

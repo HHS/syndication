@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA) All rights reserved.
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA) All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -13,6 +13,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 
 package com.ctacorp.syndication.crud
+
+import com.ctacorp.syndication.Language
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -63,7 +65,9 @@ class InfographicController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Infographic(params), model: [subscribers:subscribers, formats:["jpg", "png"]]
+        Infographic infographic = new Infographic(params)
+        infographic.language = Language.findByIsoCode("eng")
+        respond infographic, model: [subscribers:subscribers, formats:["jpg", "png"]]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
@@ -91,13 +95,13 @@ class InfographicController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Infographic infographicInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond infographicInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(infographicInstance)?.subscriberId), formats:["jpg", "png"]]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Infographic infographicInstance) {
         if (infographicInstance == null) {
@@ -135,7 +139,7 @@ class InfographicController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(infographicInstance, true)
+        mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(infographicInstance, true)
         solrIndexingService.removeMediaItem(infographicInstance)
         mediaItemsService.delete(infographicInstance.id)
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA) All rights reserved.
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA) All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -13,6 +13,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
+import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.media.MediaItem
 
 import static org.springframework.http.HttpStatus.CREATED
@@ -72,7 +73,9 @@ class HtmlController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new Html(), model: [subscribers:subscribers]
+        Html html = new Html(language:Language.findByIsoCode("eng"))
+        html.language = Language.findByIsoCode("eng")
+        respond html, model: [subscribers:subscribers]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
@@ -101,13 +104,13 @@ class HtmlController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Html htmlInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond htmlInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(htmlInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Html htmlInstance) {
         if (htmlInstance == null) {
@@ -146,7 +149,7 @@ class HtmlController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(htmlInstance, true)
+        mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(htmlInstance, true)
         solrIndexingService.removeMediaItem(htmlInstance)
         mediaItemsService.delete(htmlInstance.id)
 

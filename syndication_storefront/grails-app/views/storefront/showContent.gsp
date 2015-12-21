@@ -25,18 +25,32 @@
 </div>
 <div>
     <br/>
-    <strong>Media Type: ${mediaItemInstance.class.simpleName}</strong>
+    <g:if test="${mediaItemInstance.structuredContentType}">
+        <strong>${mediaItemInstance.structuredContentType}</strong>
+    </g:if>
+    <g:else>
+        <strong>Media Type: ${mediaItemInstance.class.simpleName}</strong>
+    </g:else>
     <ul>
         <g:if test="${mediaItemInstance?.sourceUrl}"><li>SourceUrl: <a href="${mediaItemInstance.sourceUrl}" style="word-break: break-all;">${mediaItemInstance.sourceUrl}</a></li></g:if>
         <g:if test="${mediaItemInstance?.id}"><li>Syndication ID: ${mediaItemInstance.id}</li></g:if>
         <g:if test="${mediaItemInstance?.language}"><li>Language: ${mediaItemInstance.language.name}</li></g:if>
         <g:if test="${mediaItemInstance?.source}"><li>Source: ${mediaItemInstance.source.name} (${mediaItemInstance.source.acronym})</li></g:if>
+        <g:if test="${mediaItemInstance?.createdBy}"><li>Created By: ${mediaItemInstance.createdBy} </li></g:if>
         <g:if test="${mediaItemInstance?.dateContentAuthored}"><li>Date Content Authored: ${mediaItemInstance.dateContentAuthored?.format(dateFormat)}</li></g:if>
         <g:if test="${mediaItemInstance?.dateContentUpdated}"><li>Date Content Updated: ${mediaItemInstance.dateContentUpdated?.format(dateFormat)}</li></g:if>
         <g:if test="${mediaItemInstance?.dateContentPublished}"><li>Date Content Published: ${mediaItemInstance.dateContentPublished?.format(dateFormat)}</li></g:if>
         <g:if test="${mediaItemInstance?.dateContentReviewed}"><li>Date Content Reviewed: ${mediaItemInstance.dateContentReviewed?.format(dateFormat)}</li></g:if>
         <g:if test="${mediaItemInstance?.dateSyndicationCaptured}"><li>Date Syndication Captured: ${mediaItemInstance.dateSyndicationCaptured?.format(dateFormat)}</li></g:if>
         <g:if test="${mediaItemInstance?.dateSyndicationUpdated}"><li>Date Syndication Updated: ${mediaItemInstance.dateSyndicationUpdated?.format(dateFormat)}</li></g:if>
+        <g:if test="${mediaItemInstance.class.simpleName == "Tweet"}">
+            <g:if test="${mediaItemInstance?.tweetId}"><li>Tweet ID: ${mediaItemInstance.tweetId}</li></g:if>
+            <g:if test="${mediaItemInstance?.account?.accountName}"><li>Account: ${mediaItemInstance.account.accountName}</li></g:if>
+            <g:if test="${mediaItemInstance?.messageText}"><li>Tweet text: ${mediaItemInstance.messageText}</li></g:if>
+            <g:if test="${mediaItemInstance?.mediaUrl}"><li>mediaUrl: ${mediaItemInstance.mediaUrl}</li></g:if>
+            <g:if test="${mediaItemInstance?.videoVariantUrl}"><li>VideoUrl: ${mediaItemInstance.videoVariantUrl}</li></g:if>
+            <g:if test="${mediaItemInstance?.tweetDate}"><li>Tweet Post Date: ${mediaItemInstance.tweetDate}</li></g:if>
+        </g:if>
     </ul>
     <g:if test="${tags.eng}">
         <h3>Tags</h3>

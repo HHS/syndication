@@ -39,12 +39,12 @@ class Campaign {
     static hasMany = [mediaItems: MediaItem, campaignMetrics: CampaignMetric]
 
     static constraints = {
-        name nullable: false, unique: true, blank: false,       maxSize: 255
-        description nullable: true, blank: false, maxSize: 2000
-        startDate nullable: false
-        endDate nullable: true
-        source nullable: false
-        contactEmail    nullable: true,     blank: false,  email: true,             maxSize: 2000
+        name            nullable: false,    unique: true, blank: false,             maxSize: 255
+        description     nullable: true,     blank: false,                           maxSize: 2000
+        startDate       nullable: false
+        endDate         nullable: true
+        source          nullable: false
+        contactEmail    nullable: true,     blank: false,  email: true,             maxSize: 255
     }
 
     static namedQueries = {

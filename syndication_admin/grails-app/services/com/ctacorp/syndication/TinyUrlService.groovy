@@ -1,6 +1,5 @@
-
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -15,7 +14,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication
 
+import com.ctacorp.syndication.media.MediaItem
+import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 
 import javax.annotation.PostConstruct
@@ -23,63 +25,97 @@ import javax.annotation.PostConstruct
 @Transactional(readOnly = true)
 class TinyUrlService {
     def grailsApplication
-    private String tServer
+    def authorizationService
+    private String apiUrl
     private RestBuilder rest = new RestBuilder()
 
     @PostConstruct
     void init() {
+        apiUrl = grailsApplication.config.tinyUrl.serverAddress + grailsApplication.config.tinyUrl.mappingBase
+        //This still needed?
         rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
-        tServer = grailsApplication.config.syndication.tinyUrl.serverAddress + grailsApplication.config.syndication.tinyUrl.mappingBase
     }
 
-    def listTinyUrlMappings() {
-        rest.get("${tServer}.json"){ accept "application/json" }.json
+    def updateItemsWithoutMappings(){
+        def mediaItems = MediaItem.list().collect{
+            [id:it.id, url:it.sourceUrl]
+        }
+
+        def start = System.currentTimeMillis()
+        def itemIds = rest.post("${apiUrl}/missingTinyUrls.json"){
+            accept "application/json;charset=UTF-8"
+            body mediaItems as JSON
+        }.json.collect{ it as Long }
+        println "time elapsed: ${System.currentTimeMillis() - start}"
+
+//        println "items without tinyUrls:"
+//        itemIds.each{
+//            println "- ${it}"
+//        }
+
+        if(itemIds){
+            def mediaItemsWithoutTinyUrls = MediaItem.withCriteria {
+                'in'('id', itemIds)
+            }
+
+            def bulkData = mediaItemsWithoutTinyUrls.collect{
+                [url:it.sourceUrl, id:it.id, guid:it.externalGuid]
+            }
+
+            def result = authorizationService.post(apiUrl + "/bulkAdd.json", bulkData)
+//            println result
+            return result
+        }
+
+        []
     }
 
-    def listTinyUrlMappings(Map params) {
-        rest.get("${tServer}.json", params){ accept "application/json" }.json
+    @NotTransactional
+    def listTinyUrlMappings(Map params = null) {
+        rest.get("${apiUrl}.json", params){ accept "application/json" }.json
     }
 
+    @NotTransactional
     def getMappingByTargetUrl(String targetUrl){
-        rest.get("${tServer}/getByTargetUrl", ["targetUrl":targetUrl]){ accept "application/json" }.json
+        rest.get("${apiUrl}/getByTargetUrl", ["targetUrl":targetUrl]){ accept "application/json" }.json
     }
 
+    @NotTransactional
     def getMappingByTinyUrl(String tinyUrl){
-        rest.get("${tServer}/getFromTinyUrl",[tinyUrl:tinyUrl]){ accept "application/json" }.json
+        rest.get("${apiUrl}/getFromTinyUrl",[tinyUrl:tinyUrl]){ accept "application/json" }.json
     }
 
+    @NotTransactional
     def getMappingByToken(String token){
-        rest.get("${tServer}/getByToken", [token:token]){ accept "application/json" }.json
+        rest.get("${apiUrl}/getByToken", [token:token]){ accept "application/json" }.json
     }
 
+    @NotTransactional
     def getMappingByMediaItemId(Long id){
-        rest.get("${tServer}/getBySyndicationId/${id}"){ accept "application/json" }.json
+        rest.get("${apiUrl}/getBySyndicationId/${id}"){ accept "application/json" }.json
     }
 
+    @NotTransactional
     def getMapping(Long id){
-        rest.get("${tServer}/${id}.json"){ accept "application/json" }.json
+        rest.get("${apiUrl}/${id}.json"){ accept "application/json" }.json
     }
 
-    @Transactional
+    @NotTransactional
     def createMapping(String targetUrl, Long syndicationId, String guid){
-        def resp = rest.post(tServer, [targetUrl:targetUrl, syndicationId:syndicationId, guid:guid]){
-            accept "application/json"
-            json targetUrl:targetUrl, syndicationId:syndicationId, guid:guid
-        }
-        resp.json
+        authorizationService.post(apiUrl, [targetUrl:targetUrl, syndicationId:syndicationId, guid:guid])
     }
 
-    @Transactional
+    @NotTransactional
     def updateMapping(String targetUrl, Long syndicationId, String guid, Long mappingId){
-        def resp = rest.put("${tServer}/${mappingId}"){
-            accept "application/json"
+        def resp = rest.put("${apiUrl}/${mappingId}"){
+            accept "application/json;charset=UTF-8"
             json targetUrl:targetUrl, syndicationId:syndicationId, guid:guid
         }
         resp.json
     }
 
-    @Transactional
+    @NotTransactional
     def deleteMapping(Long id){
-        rest.delete("${tServer}/${id}").status
+        rest.delete("${apiUrl}/${id}").status
     }
 }

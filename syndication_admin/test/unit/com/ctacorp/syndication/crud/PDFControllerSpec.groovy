@@ -9,6 +9,7 @@ import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.TagService
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.PDF
+import grails.plugin.aws.AWSCredentialsHolder
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import solr.operations.SolrIndexingService
@@ -29,7 +30,8 @@ class PDFControllerSpec extends Specification {
     def setup(){
         controller.mediaItemsService = mediaItemsService
         controller.mediaItemsService.metaClass.updateItemAndSubscriber = {PDF pdf, subId ->if(pdf.save(flush:true)){return pdf} else{return pdf}}
-
+        controller.aws = [s3:{ -> [on:{String bucket -> [delete: {String path ->[]}]}]}]
+        controller.metaClass.static.addToBucket = {PDF pdfInstance, String path -> []}
         controller.cmsManagerKeyService = cmsManagerKeyService
         controller.solrIndexingService = solrIndexingService
         controller.tagService = tagService
@@ -102,33 +104,34 @@ class PDFControllerSpec extends Specification {
 
     void "Test that the show action returns the correct model"() {
         setup:""
-        populateValidParams(params)
-        def pdf = new PDF(params).save(flush:true)
-        params.languageId = "1"
-        params.tagTypeId = "1"
+            populateValidParams(params)
+            def pdf = new PDF(params).save(flush:true)
+            params.languageId = "1"
+            params.tagTypeId = "1"
 
         when:"The show action is executed with a null domain"
-        controller.show(null)
+            controller.show(null)
 
         then:"A 404 error is returned"
-        1 * controller.tagService.getTagInfoForMediaShowViews(null, params) >> {[tags:[],languages:[],tagTypes:[], selectedLanguage:[], selectedTagType:[]]}
-        response.status == 404
+            1 * controller.tagService.getTagInfoForMediaShowViews(null, params) >> {[tags:[],languages:[],tagTypes:[], selectedLanguage:[], selectedTagType:[]]}
+            response.status == 404
 
         when:"A domain instance is passed to the show action"
-        controller.show(pdf)
+            response.reset()
+            controller.show(pdf)
 
         then:"A model is populated containing the domain instance"
-        model.PDFInstance == pdf
-        1 * controller.tagService.getTagInfoForMediaShowViews(pdf, params) >> {[tags:[],languages:[],tagTypes:[], selectedLanguage:[], selectedTagType:[]]}
-        model.tags == []
-        model.languages == []
-        model.tagTypes == []
-        model.languageId == "1"
-        model.tagTypeId == "1"
-        model.selectedLanguage == []
-        model.selectedTagType == []
-        model.collections == []
-        model.apiBaseUrl == grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+            model.pdfInstance == pdf
+            1 * controller.tagService.getTagInfoForMediaShowViews(pdf, params) >> {[tags:[],languages:[],tagTypes:[], selectedLanguage:[], selectedTagType:[]]}
+            model.tags == []
+            model.languages == []
+            model.tagTypes == []
+            model.languageId == "1"
+            model.tagTypeId == "1"
+            model.selectedLanguage == []
+            model.selectedTagType == []
+            model.collections == []
+            model.apiBaseUrl == grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
     }
 
     void "Test that the edit action returns the correct model"() {
@@ -201,7 +204,7 @@ class PDFControllerSpec extends Specification {
             controller.delete(pdf)
 
         then:"The instance is deleted"
-            1 * mediaItemsService.removeMediaItemsFromUserMediaLists(pdf,true)
+            1 * mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(pdf,true)
             1 * controller.solrIndexingService.removeMediaItem(pdf)
             1 * controller.mediaItemsService.delete(pdf.id)
             response.redirectedUrl == '/PDF/index'

@@ -9,6 +9,7 @@ import com.ctacorp.syndication.microsite.MicroSite
 import com.ctacorp.syndication.storefront.MicrositeService
 import com.ctacorp.syndication.storefront.TagService
 import com.ctacorp.syndication.storefront.UserMediaList
+import com.ctacorp.syndication.microsite.FlaggedMicrosite
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -17,7 +18,7 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(ClassicController)
-@Mock([MicroSite, MediaSelector,UserMediaList, Collection, Source, Campaign, User])
+@Mock([MicroSite, MediaSelector,UserMediaList, Collection, Source, Campaign, User, FlaggedMicrosite])
 class ClassicControllerSpec extends Specification {
 
     def tagService = Mock(TagService)

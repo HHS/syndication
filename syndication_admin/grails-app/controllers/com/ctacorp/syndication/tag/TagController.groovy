@@ -191,20 +191,22 @@ class TagController {
 
     def tagSearch(String q){
         def tags
+        def resp = []
         if(q.isInteger()){
             tags = tagService.findTagsByTagName(q, params)
             tags << tagService.getTag(q as Long)
         } else {
             tags = tagService.findTagsByTagName(q, params)
         }
-        if(!tags.name.contains(q) && !q.isInteger()){
-            tags << [id:"'" + "${q}" + "'", name:"Create New"]
+
+        tags.each { tag ->
+            resp << [id:tag.id, name:"${tag.name}"]
         }
 
-        def resp = []
-        tags.each { tag ->
-            resp << [id:tag.id, name:"${tag.id} - ${tag.name}"]
+        if(!tags.name.contains(q) && !q.isInteger()){
+            resp << [id:"'" + "${q}" + "'", name:"${q} - Create New"]
         }
+
 
         render resp as JSON
     }

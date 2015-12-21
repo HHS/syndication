@@ -32,7 +32,7 @@ class UserMediaListController {
     }
 
     def show(UserMediaList userMediaListInstance) {
-        respond userMediaListInstance, model: [featuredMedia: mediaService.getFeaturedMedia(max:20)]
+        respond userMediaListInstance, model: [featuredMedia: mediaService.getFeaturedMedia(max:20),userId:springSecurityService?.currentUser?.id ?: -1]
     }
 
     def create() {
@@ -41,7 +41,7 @@ class UserMediaListController {
 
     def mediaSearch(String q){
         response.contentType = "application/json"
-        render MediaItem.facetedSearch([nameContains:q, active:true, visibleInStorefront:true,syndicationVisibleBeforeDate:new Date()]).list([max:15]).collect{ [name:"${it.id} - ${it.name}", id:it.id] } as JSON
+        render MediaItem.facetedSearch([nameContains:q, active:true, visibleInStorefront:true,syndicationVisibleBeforeDate:new Date()]).list([max:15]).collect{ [name:"${it.name}", id:it.id] } as JSON
     }
 
     def selectUserMediaList(){
@@ -82,7 +82,7 @@ class UserMediaListController {
             return
         }
 
-        String mediaItemList = userMediaListInstance.mediaItems?.collect{ [id:it.id, name:"${it.id} - ${it.name}"] } as JSON
+        String mediaItemList = userMediaListInstance.mediaItems?.collect{ [id:it.id, name:"${it.name}"] } as JSON
         respond userMediaListInstance, model:[mediaItemList:mediaItemList, featuredMedia: mediaService.getFeaturedMedia(max:20)]
     }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA) All rights reserved.
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA) All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -107,7 +107,7 @@ class CampaignController {
         }
 
         def featuredMedia = campaignInstance.mediaItems
-        String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
+        String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"${it.name}"] } as JSON
 
         respond campaignInstance, model:[featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput, subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(CampaignSubscriber.findByCampaign(campaignInstance)?.subscriberId)]
     }
@@ -128,7 +128,7 @@ class CampaignController {
             flash.errors = campaignInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             def subscribers = cmsManagerKeyService.listSubscribers()
             def featuredMedia = campaignInstance.mediaItems
-            String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
+            String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"${it.name}"] } as JSON
             respond campaignInstance, view: 'edit', imodel:[featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput, subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(CampaignSubscriber.findByCampaign(campaignInstance)?.subscriberId)]
             return
         }

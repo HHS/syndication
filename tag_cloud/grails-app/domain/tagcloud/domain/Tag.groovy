@@ -27,7 +27,7 @@ class Tag {
     Date lastUpdated
 
     static constraints = {
-        name            nullable: false, blank: false, unique: ['language'], maxSize:255
+        name            nullable: false, blank: false, unique: ['language','type'], maxSize:255
         type            nullable: false
         language        nullable: false
     }

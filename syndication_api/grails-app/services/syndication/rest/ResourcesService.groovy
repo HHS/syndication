@@ -146,7 +146,7 @@ class ResourcesService {
                     case Audio: total = total + addGroupedMedia(response, "audio", item, searchResult.getClass().simpleName); break;
                     case Video: total = total + addGroupedMedia(response, "videos", item, searchResult.getClass().simpleName); break;
                     case Widget: total = total + addGroupedMedia(response, "widget", item, searchResult.getClass().simpleName); break;
-                    case SocialMedia: total = total + addGroupedMedia(response, "socialMedia", searchResult.getClass().simpleName); break;
+                    case Tweet: total = total + addGroupedMedia(response, "tweet", searchResult.getClass().simpleName); break;
                     case Collection: total = total + addGroupedMedia(response,"collections",item,searchResult.getClass().simpleName); break;
                     default: log.error("Unsupported type in global search: ${item}")
                 }

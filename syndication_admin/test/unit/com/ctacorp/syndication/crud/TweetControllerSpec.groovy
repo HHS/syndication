@@ -197,7 +197,7 @@ class TweetControllerSpec extends Specification {
             controller.delete(tweetInstance)
 
         then:"The instance is deleted"
-            1 * mediaItemsService.removeMediaItemsFromUserMediaLists(tweetInstance,true)
+            1 * mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(tweetInstance,true)
             1 * controller.solrIndexingService.removeMediaItem(tweetInstance)
             1 * controller.mediaItemsService.delete(tweetInstance.id)
             response.redirectedUrl == '/tweet/index'

@@ -14,7 +14,7 @@ import com.ctacorp.syndication.storefront.UserMediaList
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
 class MicrositeController {
     def springSecurityService
     def mediaService
@@ -31,7 +31,7 @@ class MicrositeController {
 
     def selectNewMicrosite(){ }
 
-    @Secured(['permitAll'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
     def show(MicroSite microSite){
         redirectToSpecificMicrosite(microSite, "show")
     }
@@ -78,7 +78,7 @@ class MicrositeController {
                 def currentCollection = Collection.get(MediaSelector.get(params.int("mediaAreaId")).selectionId)
                 render template: "collections", model:[
                         selectorType:"COLLECTION",
-                        collections: Collection.findAllByLanguage(Language.get(currentCollection.language.id ?: 1)),
+                        collections: Collection.findAllByLanguage(Language.get(currentCollection?.language.id ?: 1)),
                         area:params.mediaAreaValue,
                         selectedLanguage:Collection.get(currentCollection.id).language.id,
                         languages:Language.findAllByIsActive(true),
@@ -113,10 +113,7 @@ class MicrositeController {
             case "CAMPAIGN": render template: "campaigns", model:[selectorType:"CAMPAIGN", campaigns:Campaign.list(), area:params.mediaAreaValue, currentCampaign:MediaSelector.get(params.int("mediaAreaId")).selectionId]
                 return
             default:
-                def code = System.nanoTime()
-                log.error("${code} - An unknown list type was specified: ${params.listType}")
-                flash.error = "An error has occurred, please notifiy an administrator with this code:${code}"
-                redirect action:"index"
+                render "No Media Source and list specified"
         }
     }
 

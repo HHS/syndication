@@ -38,7 +38,7 @@ class ImageMarshaller {
             def attr = HtmlEncoder.encode("<div id='hhsAttribution'>Content provided and maintained by <a href='${i.source.websiteUrl}' target='_blank'>Health and Human Services</a> (HHS). Please see our system <a href='http:syndication.hhs.gov' target='_blank'>usage guidelines and disclaimer</a>.</div>")
 
             return [
-                    mediaType:      "Image",
+                    mediaType:              "Image",
                     id:                     i.id,
                     name:                   i.name,
                     description:            i.description,

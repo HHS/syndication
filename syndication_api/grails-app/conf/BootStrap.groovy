@@ -62,6 +62,10 @@ class BootStrap {
             td.seedLanguages()
         }
 
+        if(config.syndication.generateFakeData){
+            td.generateRandomHtmlItems(config.syndication.fakeDataCount ?: 1000)
+        }
+
         MediaItemChangeListener.initialize(grailsApplication, queueService, mediaPreviewThumbnailJobService)
 
         //initial admins UserMediaList
@@ -73,8 +77,7 @@ class BootStrap {
         String systemRunningMessage = """
 ==========================================
 | -> Syndication API Ready.              |
-==========================================\
-"""
+=========================================="""
         log.info systemRunningMessage
     }
 
@@ -162,6 +165,7 @@ class BootStrap {
             new MediaTypeHolderMarshaller(),
             new AudioMarshaller(),
             new TweetMarshaller(),
+            new PDFMarshaller(),
             new PeriodicalMarshaller(),
             new WidgetMarshaller()
         ]

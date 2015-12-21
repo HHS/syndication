@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -209,7 +209,7 @@ class AudioControllerSpec extends Specification {
             controller.delete(audio)
 
         then: "The instance is deleted"
-            1 * mediaItemsService.removeMediaItemsFromUserMediaLists(audio,true)
+            1 * mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(audio,true)
             1 * controller.solrIndexingService.removeMediaItem(audio)
             1 * controller.mediaItemsService.delete(audio.id)
             response.redirectedUrl == '/audio/index'

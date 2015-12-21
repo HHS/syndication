@@ -87,12 +87,12 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the compile step -----------------------------------------------------
-        compile "org.grails.plugins:syndication-model:2.1.0"
+        compile "org.grails.plugins:syndication-model:2.3.0"
 
         //plugins for the compile step -----------------------------------------------------
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.8'
-        compile ':asset-pipeline:2.5.9'
+        compile ':asset-pipeline:2.6.5'
         compile ":rest-client-builder:2.1.1"
         compile ":bruteforce-defender:1.1"
 

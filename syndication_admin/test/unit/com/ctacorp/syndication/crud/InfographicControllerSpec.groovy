@@ -195,7 +195,7 @@ class InfographicControllerSpec extends Specification {
             controller.delete(infographic)
 
         then:"The instance is deleted"
-        1 * mediaItemsService.removeMediaItemsFromUserMediaLists(infographic,true)
+        1 * mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(infographic,true)
         1 * controller.solrIndexingService.removeMediaItem(infographic)
         1 * controller.mediaItemsService.delete(infographic.id)
             response.redirectedUrl == '/infographic/index'

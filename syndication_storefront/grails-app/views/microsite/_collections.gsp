@@ -9,7 +9,12 @@
 <div class="form-group">
     <label class="col-lg-4 control-label" for="pane${area}ListId">Collection</label>
     <div class="col-lg-8" id="collection-lists">
-        <g:select class="form-control" name="pane${area}ListId" from="${collections}" value="${currentCollection}" optionKey="id" aria-label="choose collection of media items"/>
+        <g:if test="${collections}">
+            <g:select class="form-control" name="pane${area}ListId" from="${collections}" value="${currentCollection}" optionKey="id" aria-label="choose collection of media items"/>
+        </g:if>
+        <g:else>
+            There are no Collections to choose from.
+        </g:else>
     </div>
 </div>
 <div class="form-group" hidden="hidden">

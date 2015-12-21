@@ -47,9 +47,9 @@ class MediaServiceSpec extends Specification {
 
     def "get Media Types"() {
         when: "get mediaTypes is called"
-            def types = service.getMediaTypes()
+            def types = service.getMediaTypes()*.name
         then: "list all of the current types"
-            types == ["Html"]
+            types == ["Blog Post", "Html", "News Release"]
     }
 
     def "findMediaByAll should find media by multiple criteria"() {

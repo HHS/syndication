@@ -10,27 +10,14 @@
 <!--[if gt IE 8]><!-->
 <html class="no-js"><!--<![endif]-->
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>HHS Media Services Workgroup</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <asset:stylesheet src="workgroup.css"/>
+    <meta name="layout" content="storefront"/>
     <asset:javascript src="jquery"/>
     <asset:javascript src="workgroup/main.js"/>
 </head>
 
 <body>
-<div id="container">
-
-    <div id="header" style="margin:0px;">
-        <a href="/">
-            <asset:image src="workgroup/logo.png" alt="HHS Storefront Logo"/>
-        </a>
-    </div>
-
-    <div id="content">
-        <g:render template="/layouts/sf_topnav"/>
+    <div id="faq">
 
         <h2><strong>Digital Media Syndication</strong><br/></h2>
         <strong>Health Content for Websites, Apps, and Social Media</strong></p>
@@ -155,8 +142,6 @@
         </ul>
     </div>
 
-    <g:render template="/layouts/sf_footer"/>
-
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
     <script>
         (function (b, o, i, l, e, r) {
@@ -174,7 +159,5 @@
         ga('create', 'UA-XXXXX-X');
         ga('send', 'pageview');
     </script>
-
-</div>
 </body>
 </html>

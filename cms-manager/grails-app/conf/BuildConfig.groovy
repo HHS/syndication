@@ -102,7 +102,7 @@ grails.project.dependency.resolution = {
         compile ":quartz:1.0.2"
         compile ":mail:1.0.7"
         compile ":rest-client-builder:2.1.1"
-        compile ":asset-pipeline:2.5.9"
+        compile ":asset-pipeline:2.6.5"
         compile ":less-asset-pipeline:2.3.0"
         compile ":font-awesome-resources:4.3.0.2"
         compile ":rabbitmq-native:3.1.2"                       //mq

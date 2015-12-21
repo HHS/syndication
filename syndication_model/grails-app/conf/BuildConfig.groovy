@@ -23,7 +23,7 @@ grails.project.fork = [
     //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 
     // configure settings for the test-app JVM, uses the daemon by default
-    test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
+    test: false,
     // configure settings for the run-app JVM
     run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
     // configure settings for the run-war JVM
@@ -89,7 +89,7 @@ grails.project.dependency.resolution = {
 // Release plugin info \_________________________________________________________________
 // |
 // | to push a snapshot, run 'grails publish-plugin'
-// | to release, run 'grails publish-plugin --repository=plugin-release'
+// | to release, run 'grails publish-plugin --repository=plugin_rel'
 // | to install locally, run 'grails maven-install'
 //_______________________________________________________________________________________
 grails.project.repos.default = "plugin_snap"

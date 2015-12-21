@@ -1,5 +1,10 @@
 package com.ctacorp.syndication.crud
 
+import com.ctacorp.syndication.Language
+import com.ctacorp.syndication.media.MediaItem
+
+import java.security.MessageDigest
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -22,6 +27,7 @@ class PDFController {
     def solrIndexingService
     def cmsManagerKeyService
     def springSecurityService
+    def aws
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "POST"]
 
@@ -34,22 +40,30 @@ class PDFController {
     def show(PDF pdfInstance) {
         def tagData = tagService.getTagInfoForMediaShowViews(pdfInstance, params)
 
-        respond pdfInstance, model:[tags:tagData.tags,
-                                      languages:tagData.languages,
-                                      tagTypes:tagData.tagTypes,
-                                      languageId:params.languageId,
-                                      tagTypeId:params.tagTypeId,
-                                      selectedLanguage:tagData.selectedLanguage,
-                                      selectedTagType:tagData.selectedTagType,
-                                      collections: Collection.findAll("from Collection where ? in elements(mediaItems)", [pdfInstance]),
-                                      apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+        if(!pdfInstance){
+            render status: NOT_FOUND
+            return
+        }
+
+        render view:'show', model:[ pdfInstance:pdfInstance,
+                                    tags:tagData.tags,
+                                    languages:tagData.languages,
+                                    tagTypes:tagData.tagTypes,
+                                    languageId:params.languageId,
+                                    tagTypeId:params.tagTypeId,
+                                    selectedLanguage:tagData.selectedLanguage,
+                                    selectedTagType:tagData.selectedTagType,
+                                    collections: Collection.findAll("from Collection where ? in elements(mediaItems)", [pdfInstance]),
+                                    apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
         ]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond new PDF(params), model: [subscribers:subscribers]
+        PDF pdf = new PDF(params)
+        pdf.language = Language.findByIsoCode("eng")
+        respond pdf, model: [subscribers:subscribers]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
@@ -67,6 +81,18 @@ class PDFController {
             return
         }
 
+        try{
+            addToBucket(pdfInstance, null)
+        } catch(FileNotFoundException e){
+            MediaItem.withTransaction {status ->
+                //more explicit for testing purposes
+                status.setRollbackOnly()
+            }
+            flash.errors = [[message:"A PDF file could not be found at " + pdfInstance.sourceUrl]]
+            redirect action:'create', model:[subscribers:cmsManagerKeyService.listSubscribers() ], params:params
+            return
+        }
+
         solrIndexingService.inputMediaItem(pdfInstance)
         request.withFormat {
             form {
@@ -77,18 +103,23 @@ class PDFController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_USER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(PDF pdfInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond pdfInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(pdfInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(PDF pdfInstance) {
         if (pdfInstance == null) {
             notFound()
             return
+        }
+        String oldSourceUrl = ""
+        def dirty = pdfInstance.isDirty("sourceUrl")
+        if(dirty) {
+            oldSourceUrl = pdfInstance.getPersistentValue("sourceUrl")
         }
 
         pdfInstance =  mediaItemsService.updateItemAndSubscriber(pdfInstance, params.long('subscriberId'))
@@ -96,6 +127,20 @@ class PDFController {
             flash.errors = pdfInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             redirect action:'edit', id:params.id
             return
+        }
+
+        if (dirty) {
+            try{
+                addToBucket(pdfInstance, oldSourceUrl)
+            } catch(FileNotFoundException e){
+                MediaItem.withTransaction {status ->
+                    //more explicit for testing purposes
+                    status.setRollbackOnly()
+                }
+                flash.errors = [[message:"A PDF file could not be found at " + pdfInstance.sourceUrl]]
+                redirect action:'edit', id:params.id
+                return
+            }
         }
 
         solrIndexingService.inputMediaItem(pdfInstance)
@@ -121,8 +166,9 @@ class PDFController {
             featuredItem.delete()
         }
 
-        mediaItemsService.removeMediaItemsFromUserMediaLists(pdfInstance, true)
+        mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(pdfInstance, true)
         solrIndexingService.removeMediaItem(pdfInstance)
+        deleteFromBucket(pdfInstance.sourceUrl)
         mediaItemsService.delete(pdfInstance.id)
 
         request.withFormat {
@@ -143,4 +189,24 @@ class PDFController {
             '*'{ render status: NOT_FOUND }
         }
     }
+
+    def addToBucket(PDF pdfInstance, String oldSourceUrl) {
+        if(oldSourceUrl) {
+            //remove old path
+            deleteFromBucket(oldSourceUrl)
+        }
+        //add to bucket
+        URL file = new URL(pdfInstance.sourceUrl)
+        def urlHash = MessageDigest.getInstance("MD5").digest(pdfInstance.sourceUrl.bytes).encodeHex().toString()
+        def s3file = file.openStream().s3upload(urlHash + ".pdf") {
+            path "pdf-files"
+        }
+    }
+
+    private deleteFromBucket(String sourceUrl) {
+        def path = new URL(sourceUrl).getPath()
+        def urlHash = MessageDigest.getInstance("MD5").digest(sourceUrl.bytes).encodeHex().toString()
+        aws.s3().on("syndication-files").delete("pdf-files/"+urlHash + ".pdf")
+    }
+
 }

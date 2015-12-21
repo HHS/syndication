@@ -1,6 +1,6 @@
 
 %{--
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -32,8 +32,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="row">
     <div class="col-lg-12">
         <h1 class="page-header">Dashboard</h1>
-    </div>
-    <!-- /.col-lg-12 -->
+    </div><!-- /.col-lg-12 -->
 </div>
 <synd:message/>
 <!-- /.row -->

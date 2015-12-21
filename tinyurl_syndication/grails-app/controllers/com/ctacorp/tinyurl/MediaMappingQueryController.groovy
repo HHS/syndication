@@ -1,6 +1,5 @@
 package com.ctacorp.tinyurl
 
-import com.ctacorp.tinyurl.MediaMapping
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
@@ -14,7 +13,7 @@ class MediaMappingQueryController {
         if(mm){
             respond mm
         } else{
-            render text:[error:"$targetUrl does not have a tinyUrl mapping!"] as JSON, contentType: "application/json"
+            render text:[error:"$targetUrl does not have a tinyUrl mapping!"] as JSON, contentType: "application/json;charset=UTF-8"
         }
     }
 
@@ -23,7 +22,7 @@ class MediaMappingQueryController {
         if(mm){
             respond mm
         } else{
-            render text:[error:"$id does not have a tinyUrl mapping!"] as JSON, contentType: "application/json"
+            render text:[error:"$id does not have a tinyUrl mapping!"] as JSON, contentType: "application/json;charset=UTF-8"
         }
     }
 
@@ -33,7 +32,7 @@ class MediaMappingQueryController {
         if(mm){
             respond mm
         } else{
-            render text:[error:"$token does not have a tinyUrl mapping!"] as JSON, contentType: "application/json"
+            render text:[error:"$token does not have a tinyUrl mapping!"] as JSON, contentType: "application/json;charset=UTF-8"
         }
     }
 
@@ -43,5 +42,21 @@ class MediaMappingQueryController {
         }
         String token = tinyUrl.split("/")[-1]
         getByToken(token)
+    }
+
+    def missingTinyUrls(){
+        def data = request.getJSON()
+
+        def missing = []
+        MediaMapping.withSession {
+            data.each{ entry ->
+                def mediaMapping = MediaMapping.findByTargetUrl(entry.url)
+                if(!mediaMapping){
+                    missing << entry.id
+                }
+            }
+        }
+
+        render text: missing as JSON, contentType: "application/json;charset=UTF-8"
     }
 }

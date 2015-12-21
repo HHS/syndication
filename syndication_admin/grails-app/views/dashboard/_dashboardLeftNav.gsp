@@ -1,5 +1,5 @@
 %{--
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -67,13 +67,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <a href="#"><i class="fa fa-tasks fa-fw"></i> Metrics<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
                         <li>
-                            <g:link controller="metricReport" action="overview"><i class="fa fa-tasks fa-fw"></i> Metrics Report</g:link>
+                            <g:link controller="metricReport" action="overview"><i class="fa fa-tasks fa-fw"></i> Storefront/API Hits</g:link>
                         </li>
                         <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER">
                             <li>
-                                <g:link controller="mediaMetric"><i class="fa fa-tasks fa-fw"></i> Media Metrics</g:link>
+                                <g:link controller="mediaMetric"><i class="fa fa-newspaper-o fa-fw"></i> Media Metrics</g:link>
                             </li>
                         </sec:ifAnyGranted>
+                        <li>
+                            <g:link controller="consumerMetrics" action="generalViews"><i class="fa fa-group fa-fw"></i> Google Analytics Views</g:link>
+                        </li>
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>
@@ -88,7 +91,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <li>
                     <a href="#"><i class="fa fa-code-fork fa-fw"></i> Other<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
-
                         <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER">
                             <li>
                                 <g:link controller="alternateImage"><i
@@ -100,6 +102,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <li>
                                 <g:link controller="extendedAttribute"><i
                                         class="fa fa-subscript fa-fw"></i> Extended Attributes</g:link>
+                            </li>
+                            <li>
+                                <g:link controller="emailContact"><i
+                                        class="fa fa-envelope fa-fw"></i> Email Contacts</g:link>
                             </li>
                         </sec:ifAnyGranted>
                         <li>
@@ -163,6 +169,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     </sec:ifAnyGranted>
                     <sec:ifAnyGranted roles="ROLE_ADMIN">
                         <li>
+                            <g:link controller="registration"><i class="fa fa-files-o fa-fw"></i> Microsite Registration</g:link>
+                        </li>
+                        <li>
+                            <g:link controller="MicrositeFilter"><i class="fa fa-heart-o fa-fw"></i> Microsite Filter</g:link>
+                        </li>
+                        <li>
                             <g:link controller="log"><i class="fa fa-file-text-o fa-fw"></i> Logs</g:link>
                         </li>
                         <li>
@@ -172,6 +184,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <li>
                         <g:link controller="mediaTestPreview"><i class="fa fa-eye fa-fw"></i> Media Preview & Test</g:link>
                     </li>
+                    <sec:ifAnyGranted roles="ROLE_ADMIN">
+                        <li>
+                            <g:link controller="adminTools" action="index"><i class="fa fa-wrench fa-fw"></i> Admin Tools</g:link>
+                        </li>
+                    </sec:ifAnyGranted>
                 </ul><!-- /.nav-second-level -->
             </li>
 
@@ -197,5 +214,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <!-- /.nav-second-level -->
                 </li>
             </sec:ifAnyGranted>
+        </ul>
     </div>
 </nav>

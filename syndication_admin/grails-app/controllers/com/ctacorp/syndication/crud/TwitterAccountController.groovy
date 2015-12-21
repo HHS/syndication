@@ -25,7 +25,7 @@ class TwitterAccountController {
             render view:"index", model:[twitterAccountInstanceList:allAccounts, total:allAccounts.totalCount]
         } else {
             def accountsBySubscriber = TwitterAccount.findAllBySubscriberId(springSecurityService.currentUser.subscriberId, params)
-            render view:"index", model:[twitterAccountInstanceList:accountsBySubscriber, total:accountsBySubscriber.totalCount]
+            render view:"index", model:[twitterAccountInstanceList:accountsBySubscriber, total:accountsBySubscriber?.size() ?: 0]
         }
     }
 
@@ -105,7 +105,7 @@ class TwitterAccountController {
 
         def mediaItems = Tweet.findAllByAccount(twitterAccount)
         mediaItems.each{ item ->
-            mediaItemsService.removeMediaItemsFromUserMediaLists(item, true)
+            mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(item, true)
             solrIndexingService.removeMediaItem(item)
             mediaItemsService.delete(item.id)
         }
