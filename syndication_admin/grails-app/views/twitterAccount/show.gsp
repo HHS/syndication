@@ -47,7 +47,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
     <fieldset class="buttons">
         <g:form  url="[resource:twitterAccountInstance, action:'edit']">
-            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER, ROLE_USER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
                 <g:link action="importTweets" params="[accountName:twitterAccountInstance.accountName]" controller="tweet"><input type="button" class="btn btn-info" value="Import Tweets"/></g:link>
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>

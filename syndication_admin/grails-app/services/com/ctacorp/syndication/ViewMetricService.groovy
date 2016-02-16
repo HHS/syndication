@@ -289,23 +289,25 @@ class ViewMetricService {
         name
     }
 
-    def getAllHits(Date within = new Date()-30){
+    def getAllHits(Date fromDate = new Date()-30, Date toDate = new Date()){
         def sql = new Sql(dataSource)
         def viewCounts = [:]
         def responseRows
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
             def items = publisherItems().toString()
             items = items.substring(1,items.length()-1)
-            responseRows = sql.rows("select sum(media_metric.api_view_count) AS api_count from media_metric WHERE media_metric.day>=${within} AND media_id IN ("+items+")")
+            responseRows = sql.rows("select sum(media_metric.api_view_count) AS api_count from media_metric WHERE media_metric.day>=${fromDate} AND media_metric.day<=${toDate} AND media_id IN ("+items+")")
             viewCounts.apiCount = responseRows[0].api_count
-            responseRows = sql.rows("select sum(media_metric.storefront_view_count) AS storefront_count from media_metric WHERE media_metric.day>=${within} AND media_id IN (5,8)")
+            responseRows = sql.rows("select sum(media_metric.storefront_view_count) AS storefront_count from media_metric WHERE media_metric.day>=${fromDate} AND media_metric.day<=${toDate} AND media_id IN (5,8)")
             viewCounts.storefrontCount =responseRows[0].storefront_count
         } else {
-            responseRows = sql.rows("select sum(media_metric.api_view_count) AS api_count from media_metric WHERE media_metric.day>=${within}")
+            responseRows = sql.rows("select sum(media_metric.api_view_count) AS api_count from media_metric WHERE media_metric.day>=${fromDate} AND media_metric.day<=${toDate}")
             viewCounts.apiCount = responseRows[0].api_count
-            responseRows = sql.rows("select sum(media_metric.storefront_view_count) AS storefront_count from media_metric WHERE media_metric.day>=${within}")
+            responseRows = sql.rows("select sum(media_metric.storefront_view_count) AS storefront_count from media_metric WHERE media_metric.day>=${fromDate} AND media_metric.day<=${toDate}")
             viewCounts.storefrontCount =responseRows[0].storefront_count
         }
+        viewCounts.storefrontCount = viewCounts.storefrontCount ?: 0
+        viewCounts.apiCount = viewCounts.apiCount ?: 0
         viewCounts
     }
 

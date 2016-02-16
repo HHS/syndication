@@ -1,6 +1,6 @@
 package com.ctacorp.commons.api.key.utils
 
-import groovy.util.logging.Log
+import groovy.util.logging.Log4j
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.util.encoders.Base64
 import org.bouncycastle.util.encoders.Hex
@@ -10,7 +10,7 @@ import javax.crypto.spec.SecretKeySpec
 import java.security.MessageDigest
 import java.security.Security
 
-@Log
+@Log4j
 public class AuthorizationHeaderGenerator {
 
     static {
@@ -56,13 +56,16 @@ public class AuthorizationHeaderGenerator {
         String signingString = createSigningString(method,hashedData, canonicalizedHeaders, canonicalizedResource)
         String computedHash = signString(signingString)
 
+        def requestBodyLogMessage = "Request body is: ${requestBody}"
         def signingStringLogMessage = "Signing string is: \n${signingString}"
         def computedHashLogMessage = "Computed hash is: ${computedHash}"
 
+        log.info(requestBodyLogMessage)
         log.info(signingStringLogMessage)
         log.info(computedHashLogMessage)
 
         if(printToConsole) {
+            println requestBodyLogMessage
             println signingStringLogMessage
             println computedHashLogMessage
         }

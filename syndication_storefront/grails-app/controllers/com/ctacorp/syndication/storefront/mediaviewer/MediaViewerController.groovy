@@ -2,7 +2,7 @@ package com.ctacorp.syndication.storefront.mediaviewer
 
 import com.ctacorp.syndication.Campaign
 import com.ctacorp.syndication.Source
-import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.storefront.UserMediaList
 
 class MediaViewerController {
@@ -35,8 +35,11 @@ class MediaViewerController {
             case "source":
                 mediaItems = MediaItem.findAllBySource(Source.load(id), [max:20, sort:"id", order:"desc"])
                 break
+            case "faq":
+                mediaItems = FAQ.read(id).questionAndAnswers
+                break
             default:
-                log.error "invalid mediaSource"
+                log.error "invalid mediaSource: ${params.mediaSource}"
                 response.sendError(400, "Invalid media source: ${params.mediaSource}")
                 return
         }

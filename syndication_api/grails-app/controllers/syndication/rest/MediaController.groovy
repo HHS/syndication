@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -76,17 +76,14 @@ import java.util.concurrent.Callable
         Message,
         Collection,
         AlternateImage,
-        Audio,
         Html,
         Image,
         Infographic,
         PDF,
-        Periodical,
         Language,
         Source,
         Tweet,
-        Video,
-        Widget
+        Video
 ])
 class MediaController {
     static defaultAction = "list"
@@ -102,10 +99,8 @@ class MediaController {
     def tinyUrlService
     def tagsService
     def resourcesService
-    def analyticsService
     def guavaCacheService
     def assetResourceLocator
-    def contentCacheService
     RestBuilder rest = new RestBuilder()
 
     def beforeInterceptor = {
@@ -282,6 +277,14 @@ class MediaController {
 
         //render special icons for collections and social media
         switch(mi){
+            case QuestionAndAnswer:
+                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/questionAndAnswer.jpg").inputStream
+                renderBytes(f.bytes)
+                return
+            case FAQ:
+                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/faq.jpg").inputStream
+                renderBytes(f.bytes)
+                return
             case Collection:
                 InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream
                 renderBytes(f.bytes)
@@ -343,6 +346,14 @@ class MediaController {
                 InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/pdf.jpg").inputStream
                 renderBytes(f.bytes)
                 return
+            case QuestionAndAnswer:
+                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/questionAndAnswer.jpg").inputStream
+                renderBytes(f.bytes)
+                break
+            case FAQ:
+                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/faq.jpg").inputStream
+                renderBytes(f.bytes)
+                break
         }
 
         String key = Hash.md5("thumbnail/${id}?" + params.sort().toString())
@@ -402,11 +413,6 @@ class MediaController {
                     renderStream(pdf.sourceUrl, "application/pdf")
                     inputStream.close()
                     return
-                case Periodical:
-                    Periodical periodical = mi as Periodical
-                    String extractedPeriodicalContent = contentRetrievalService.extractSyndicatedContent(periodical.sourceUrl, params)
-                    renderHtml(extractedPeriodicalContent)
-                    return
                 case Image:
                     Image image = mi as Image
                     renderImage(image.sourceUrl)
@@ -460,6 +466,40 @@ class MediaController {
         def resp = new Embedded( id: mi.id, name: mi.name, description: mi.description, sourceUrl: mi.sourceUrl)
 
         switch(mi){
+            case com.ctacorp.syndication.media.Collection:
+                params.controllerContext = { model ->
+                    g.render template: "mediaViewer", model:model
+                }
+                String content = mediaService.renderCollection(mi as com.ctacorp.syndication.media.Collection, params)
+
+                response.withFormat {
+                    html{
+                        render text: content, contentType: MimeType.HTML.name
+                    }
+                    json{
+                        resp.mediaType = "Collection"
+                        resp.content = content
+                        respond ApiResponse.get200Response([resp]).autoFill(params)
+                    }
+                }
+                break
+            case FAQ:
+                params.controllerContext = { model ->
+                    g.render template: "mediaViewer", model:model
+                }
+                String content = mediaService.renderFAQ(mi as FAQ, params)
+
+                response.withFormat {
+                    html{
+                        render text: content, contentType: MimeType.HTML.name
+                    }
+                    json{
+                        resp.mediaType = "FAQ"
+                        resp.content = content
+                        respond ApiResponse.get200Response([resp]).autoFill(params)
+                    }
+                }
+                break
             case Html:
                 String content = mediaService.renderHtml(mi as Html, params)
                 response.withFormat {
@@ -468,32 +508,6 @@ class MediaController {
                     }
                     json{
                         resp.mediaType = "Html"
-                        resp.content = content
-                        respond ApiResponse.get200Response([resp]).autoFill(params)
-                    }
-                }
-                break
-            case PDF:
-                String content = mediaService.renderPdf(mi as PDF, params)
-                response.withFormat {
-                    html{
-                        render text: content, contentType: MimeType.HTML.name
-                    }
-                    json{
-                        resp.mediaType = "PDF"
-                        resp.content = content
-                        respond ApiResponse.get200Response([resp]).autoFill(params)
-                    }
-                }
-                break
-            case Periodical:
-                String content = mediaService.renderPeriodical(mi as Periodical, params)
-                response.withFormat {
-                    html{
-                        render text: content, contentType: MimeType.HTML.name
-                    }
-                    json{
-                        resp.mediaType = "Periodical"
                         resp.content = content
                         respond ApiResponse.get200Response([resp]).autoFill(params)
                     }
@@ -525,6 +539,32 @@ class MediaController {
                     }
                 }
                 break
+            case PDF:
+                String content = mediaService.renderPdf(mi as PDF, params)
+                response.withFormat {
+                    html{
+                        render text: content, contentType: MimeType.HTML.name
+                    }
+                    json{
+                        resp.mediaType = "PDF"
+                        resp.content = content
+                        respond ApiResponse.get200Response([resp]).autoFill(params)
+                    }
+                }
+                break
+            case QuestionAndAnswer:
+                String content = mediaService.renderQuestionAndAnswer(mi as QuestionAndAnswer, params)
+                response.withFormat {
+                    html{
+                        render text: content, contentType: MimeType.HTML.name
+                    }
+                    json{
+                        resp.mediaType = "QuestionAndAnswer"
+                        resp.content = content
+                        respond ApiResponse.get200Response([resp]).autoFill(params)
+                    }
+                }
+                break
             case Tweet:
                 String content = mediaService.renderTweet(mi as Tweet, params)
                 response.withFormat {
@@ -546,23 +586,6 @@ class MediaController {
                     }
                     json{
                         resp.mediaType = "Video"
-                        resp.content = content
-                        respond ApiResponse.get200Response([resp]).autoFill(params)
-                    }
-                }
-                break
-            case com.ctacorp.syndication.media.Collection:
-                params.controllerContext = { model ->
-                    g.render template: "mediaViewer", model:model
-                }
-                String content = mediaService.renderCollection(mi as com.ctacorp.syndication.media.Collection, params)
-
-                response.withFormat {
-                    html{
-                        render text: content, contentType: MimeType.HTML.name
-                    }
-                    json{
-                        resp.mediaType = "Collection"
                         resp.content = content
                         respond ApiResponse.get200Response([resp]).autoFill(params)
                     }
@@ -632,7 +655,8 @@ class MediaController {
             @Parameter(name="sourceAcronym",                type="string",                  description="Find all media items that belong to the source specified by acronym, case insensitive.",                           required=false, paramType = "query"),
             @Parameter(name="sourceAcronymContains",        type="string",                  description="Find all media items that belong to the source specified by partial acronym, case insensitive.",                   required=false, paramType = "query"),
             @Parameter(name="tagIds",                       type="string",                  description="Find only media items tagged with the specified tag Ids.",                                                         required=false, paramType = "query"),
-            @Parameter(name="restrictToSet",                type="string",                  description="Find only media from within the supplied list of Ids.",                                                            required=false, paramType = "query")
+            @Parameter(name="restrictToSet",                type="string",                  description="Find only media from within the supplied list of Ids.",                                                            required=false, paramType = "query"),
+            @Parameter(name="createdBy",                    type="string",                  description="Find all media items containing the createdBy value.",                                                             required=false, paramType = "query")
         ])
     ])
     def list() {
@@ -741,24 +765,39 @@ class MediaController {
 // |       ######  ##     ##    ###    ########     ##     ## ######## ########  #### ##     ##      |
 // ===================================================================================================
 
-    def saveAudio(Audio audioInstance){
-        stripTail(audioInstance)
-        log.info "Attempting to publish: ${audioInstance} - ${audioInstance.sourceUrl}"
-        try{
-            mediaService.saveAudio(audioInstance)
-        } catch(UnauthorizedException e){
-            ApiResponse.get400NotAuthorizedResponse()
-        }
-    }
-
     def saveCollection(Collection collectionInstance){
         stripTail(collectionInstance)
+        ApiResponse apiResponse
         log.info "Attempting to publish: ${collectionInstance} - ${collectionInstance.sourceUrl}"
         try{
             mediaService.saveCollection(collectionInstance)
+            if(collectionInstance.hasErrors()){
+                apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(collectionInstance).autoFill(params)
+            } else {
+                apiResponse = ApiResponse.get200Response([collectionInstance]).autoFill(params)
+            }
+
         } catch(UnauthorizedException e){
-            ApiResponse.get400NotAuthorizedResponse()
+            apiResponse = ApiResponse.get400NotAuthorizedResponse()
         }
+        mediaPostSaveAndRespond(apiResponse, collectionInstance)
+    }
+
+    def saveFAQ(FAQ faqInstance){
+        stripTail(faqInstance)
+        ApiResponse apiResponse
+        log.info "Attempting to publish: ${faqInstance} - ${faqInstance.sourceUrl}"
+        try{
+            mediaService.saveFAQ(faqInstance)
+            if(faqInstance.hasErrors()){
+                apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(faqInstance).autoFill(params)
+            } else {
+                apiResponse = ApiResponse.get200Response([faqInstance]).autoFill(params)
+            }
+        } catch(UnauthorizedException e){
+            apiResponse = ApiResponse.get400NotAuthorizedResponse()
+        }
+        mediaPostSaveAndRespond(apiResponse, faqInstance)
     }
 
     def saveHtml(Html htmlInstance){
@@ -789,70 +828,10 @@ class MediaController {
                 apiResponse = ApiResponse.get400NotAuthorizedResponse()
             }
         }
-        guavaCacheService.flushAllCaches()
         mediaPostSaveAndRespond(apiResponse, htmlInstance)
     }
 
-    def savePDF(PDF PDFInstance){
-        log.info "Attempting to publish: ${PDFInstance} - ${PDFInstance.sourceUrl}"
-        ApiResponse apiResponse
-        if (!PDFInstance) { // 400 -- no json body
-            log.error "Instance couldn't be created from publish"
-            apiResponse = ApiResponse.get400ResponseCustomMessage("Could not create instance from request, did you provide the correct JSON payload in your post?").autoFill(params)
-        }else if(!PDFInstance.validate()){ //Check validation first before something like a bad or missing url
-            log.error "Instance wasn't valid: ${PDFInstance.errors}"
-            apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(PDFInstance).autoFill(params)
-        } else {
-            try{
-                PDFInstance = mediaService.savePDF(PDFInstance)
-                if (PDFInstance?.id) { // Media saved just fine
-                    apiResponse = ApiResponse.get200Response([PDFInstance]).autoFill(params)
-                } else { // it didn't save, error handle:
-                    log.error("Couldn't save the instance: ${PDFInstance.errors}")
-                    apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(PDFInstance).autoFill(params)
-                }
-            } catch(ContentUnretrievableException e){
-                apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
-            } catch(UnauthorizedException e){
-                apiResponse = ApiResponse.get400NotAuthorizedResponse()
-            }
-        }
 
-        guavaCacheService.flushAllCaches()
-        mediaPostSaveAndRespond(apiResponse, PDFInstance)
-    }
-
-    def savePeriodical(Periodical periodicalInstance){
-        stripTail(periodicalInstance)
-        log.info "Attempting to publish: ${periodicalInstance} - ${periodicalInstance.sourceUrl}"
-        ApiResponse apiResponse
-
-        if (!periodicalInstance) { // 400 -- no json body
-            log.error "Instance couldn't be created from publish"
-            apiResponse = ApiResponse.get400ResponseCustomMessage("Could not create instance from request, did you provide the correct JSON payload in your post?").autoFill(params)
-        }else if(!periodicalInstance.validate()){ //Check validation first before something like a bad or missing url
-            log.error "Instance wasn't valid: ${periodicalInstance.errors}"
-            apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(periodicalInstance).autoFill(params)
-        } else{
-            try{
-                periodicalInstance = mediaService.savePeriodical(periodicalInstance)
-                if (periodicalInstance?.id) { // Media saved just fine
-                    apiResponse = ApiResponse.get200Response([periodicalInstance]).autoFill(params)
-                } else { // it didn't save, error handle:
-                    log.error("Couldn't save the instance: ${periodicalInstance.errors}")
-                    apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(periodicalInstance).autoFill(params)
-                }
-            } catch(ContentNotExtractableException e){
-                apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
-            } catch(ContentUnretrievableException e){
-                apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
-            } catch(UnauthorizedException e){
-                apiResponse = ApiResponse.get400NotAuthorizedResponse()
-            }
-        }
-        guavaCacheService.flushAllCaches()
-        mediaPostSaveAndRespond(apiResponse, periodicalInstance)
-    }
 
     def saveImage(Image imageInstance){
         log.info "Attempting to publish: ${imageInstance} - ${imageInstance.sourceUrl}"
@@ -879,7 +858,6 @@ class MediaController {
             }
         }
 
-        guavaCacheService.flushAllCaches()
         mediaPostSaveAndRespond(apiResponse, imageInstance)
     }
 
@@ -907,8 +885,70 @@ class MediaController {
                 apiResponse = ApiResponse.get400NotAuthorizedResponse()
             }
         }
-
         mediaPostSaveAndRespond(apiResponse, infographicInstance)
+    }
+
+    def savePDF(PDF PDFInstance){
+        log.info "Attempting to publish: ${PDFInstance} - ${PDFInstance.sourceUrl}"
+        ApiResponse apiResponse
+        if (!PDFInstance) { // 400 -- no json body
+            log.error "savePDF failed, no instance provided (maybe missing body?)"
+            apiResponse = ApiResponse.get400ResponseCustomMessage("Could not create instance from request, did you provide the correct JSON payload in your post?").autoFill(params)
+        }else if(!PDFInstance.validate()){ //Check validation first for something like a bad or missing url
+            log.error "Instance wasn't valid: ${PDFInstance.errors}"
+            apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(PDFInstance).autoFill(params)
+        } else {
+            try{
+                PDFInstance = mediaService.savePDF(PDFInstance)
+                if (PDFInstance?.id) { // Media saved just fine
+                    apiResponse = ApiResponse.get200Response([PDFInstance]).autoFill(params)
+                } else { // it didn't save, error handle:
+                    log.error("Couldn't save the instance: ${PDFInstance.errors}")
+                    apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(PDFInstance).autoFill(params)
+                }
+            } catch(ContentUnretrievableException e){
+                apiResponse = ApiResponse.get400ContentNotExtractableErrorResponse().autoFill(params)
+            } catch(UnauthorizedException e){
+                apiResponse = ApiResponse.get400NotAuthorizedResponse()
+            }
+        }
+        mediaPostSaveAndRespond(apiResponse, PDFInstance)
+    }
+
+    def saveQuestionAndAnswer(QuestionAndAnswer questionAndAnswerInstance){
+        log.info "Attempting to publish: ${questionAndAnswerInstance} - ${questionAndAnswerInstance.name}"
+        def requestJson = request.getJSON()
+
+        questionAndAnswerInstance?.name = requestJson?.question ?: questionAndAnswerInstance.name
+
+        ApiResponse apiResponse
+        if (!questionAndAnswerInstance) { // 400 -- no json body
+            log.error "saveQuestionAndAnswer failed, no instance provided (maybe missing body?)"
+            apiResponse = ApiResponse.get400ResponseCustomMessage("Could not create instance from request, did you provide the correct JSON payload in your post?").autoFill(params)
+        } else if(!questionAndAnswerInstance.validate()){ //Check validation first for something like a bad or missing url
+            log.error "Instance wasn't valid: ${questionAndAnswerInstance.errors}"
+            apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(questionAndAnswerInstance).autoFill(params)
+        } else {
+            try{
+                questionAndAnswerInstance = mediaService.saveQuestionAndAnswer(questionAndAnswerInstance)
+                if (questionAndAnswerInstance?.id) { // Media saved just fine
+                    apiResponse = ApiResponse.get200Response([questionAndAnswerInstance]).autoFill(params)
+                } else { // it didn't save, error handle:
+                    log.error("Couldn't save the instance: ${questionAndAnswerInstance.errors}")
+                    apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(questionAndAnswerInstance).autoFill(params)
+                }
+            } catch(UnauthorizedException e){
+                apiResponse = ApiResponse.get400NotAuthorizedResponse()
+            } catch(e){
+                apiResponse = ApiResponse.get400ResponseCustomMessage(e.getMessage())
+            }
+        }
+        mediaPostSaveAndRespond(apiResponse, questionAndAnswerInstance)
+    }
+
+    //TODO implement this
+    def saveTweet(Tweet tweetInstance){
+
     }
 
     def saveVideo(Video videoInstance){
@@ -933,16 +973,7 @@ class MediaController {
                 apiResponse = ApiResponse.get400NotAuthorizedResponse()
             }
         }
-        guavaCacheService.flushAllCaches()
         mediaPostSaveAndRespond(apiResponse, videoInstance)
-    }
-
-    def saveWidget(Widget widgetInstance){
-        try{
-            mediaService.saveWidget(widgetInstance)
-        } catch(UnauthorizedException e){
-            ApiResponse.get400NotAuthorizedResponse()
-        }
     }
 
 // ======================================================
@@ -1007,7 +1038,8 @@ class MediaController {
             }
 
             //Add URL Mapping
-            tinyUrlService.createMapping(instance.sourceUrl, instance.id, instance.externalGuid)
+            //TODO this is causing some publishes to fail - is a try/catch enough to avoid that?
+//            tinyUrlService.createMapping(instance.sourceUrl, instance.id, instance.externalGuid)
 
             response.status = 200
         } else{

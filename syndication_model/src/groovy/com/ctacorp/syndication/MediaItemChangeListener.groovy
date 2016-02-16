@@ -27,12 +27,12 @@ class MediaItemChangeListener extends AbstractPersistenceEventListener {
         if(event.entityObject instanceof MediaItem) {
             switch (event.eventType) {
                 case EventType.PostUpdate:
-                    queueService.flushCache()
+                    queueService.flushCacheForMediaItemUpdate(event.entityObject.id)
                     queueService.sendDelayedMessage(new Message(messageType:MessageType.UPDATE, mediaId:event.entityObject.id))
                     mediaPreviewThumbnailJobService.delayedPreviewAndThumbnailGeneration(Long.valueOf(event.entityObject.id))
                     break
                 case EventType.PostDelete:
-                    queueService.flushCache()
+                    queueService.flushCacheForMediaItemUpdate(event.entityObject.id)
                     queueService.sendDelayedMessage(new Message(messageType:MessageType.DELETE, mediaId:event.entityObject.id))
                     break
                 case EventType.PostInsert:

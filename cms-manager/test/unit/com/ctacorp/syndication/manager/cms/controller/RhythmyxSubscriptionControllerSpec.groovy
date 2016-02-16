@@ -131,7 +131,7 @@ class RhythmyxSubscriptionControllerSpec extends Specification {
 
         and: "redirect to the index with an error message"
 
-        response.redirectUrl == "/index"
+        response.redirectUrl == "/index" || response.redirectUrl == "/rhythmyxSubscription/index"
         flash.errors == ['rhythmyxSubscription.noAssociatedRhythmyxSubscribers']
     }
 
@@ -278,7 +278,7 @@ class RhythmyxSubscriptionControllerSpec extends Specification {
 
         and: "redirect to the the index with an error message"
 
-        response.redirectUrl == '/index'
+        response.redirectUrl == "/index" || response.redirectUrl == "/rhythmyxSubscription/index"
         flash.errors == ['rhythmyxSubscription.accessDeniedToRhythmyxSubscriber']
     }
 
@@ -552,7 +552,7 @@ class RhythmyxSubscriptionControllerSpec extends Specification {
 
         and: "redirect to the index view with an error message"
 
-        response.redirectUrl == "/index"
+        response.redirectUrl == "/index" || response.redirectUrl == "/rhythmyxSubscription/index"
         flash.errors == ["rhythmyxSubscription.accessDeniedToRhythmyxSubscriber"]
     }
 

@@ -4,7 +4,6 @@ import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.Video
-import com.ctacorp.syndication.media.Periodical
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Tweet
 
@@ -21,12 +20,16 @@ class MediaPreviewThumbnailService {
 
     def config = Holders.config
 
-    def generate(MediaItem mi) {
+    def generate(Long mediaId) {
+        MediaItem mi = MediaItem.read(mediaId)
+        if(!mi){
+            log.error("Tried to load a media item that doesn't exist: ${mediaId}")
+            return null
+        }
         def htmlUrl = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/media/${mi.id}/content?imageFloat=left&imageMargin=0,10,10,0"
         def imageAndVideoUrl = "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/syndicate.html?thumbnailGeneration=1"
 
         switch(mi){
-            case Periodical:
             case Html:
                 savePreview(mi, generatePreview(htmlUrl))
                 saveThumbnail(mi, generateThumbnail(htmlUrl, ".5"))
@@ -42,7 +45,7 @@ class MediaPreviewThumbnailService {
                 saveThumbnail(mi, generateThumbnail(imageAndVideoUrl))
                 break
             default:
-                log.error("Tried to generate thumbnail for an unsupported media type: ${mi}")
+                log.error("Tried to generate thumbnail for an unsupported media type: ${mi.getClass()}")
         }
 
         if(mi.customPreviewUrl) {

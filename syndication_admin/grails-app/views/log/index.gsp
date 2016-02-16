@@ -73,11 +73,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="adminPill"><a href="#" id="adminInfoButton">Details</a></li>
                                     </ul>
                                 </div>
-                                <g:link action="logDownload" params="[file:'adminErrorsFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Errors File"/>
+                                <g:link action="logDownload" params="[file:'adminErrorLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors Log"/>
                                 </g:link>
-                                <g:link action="logDownload" params="[file:'adminDetailsFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Details File"/>
+                                <g:link action="logDownload" params="[file:'adminInfoLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
                                 </g:link>
                             </div>
                         </div>
@@ -111,11 +111,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="apiPill"><a href="#" id="apiInfoButton">Details</a></li>
                                     </ul>
                                 </div>
-                                <g:link action="logDownload" params="[file:'apiErrorsFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Errors File"/>
+                                <g:link action="logDownload" params="[file:'apiErrorLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors Log"/>
                                 </g:link>
-                                <g:link action="logDownload" params="[file:'apiDetailsFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Details File"/>
+                                <g:link action="logDownload" params="[file:'apiInfoLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
                                 </g:link>
                             </div>
                         </div>
@@ -149,11 +149,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="cmsPill"><a href="#" id="cmsApiKeyLogButton">Api Key Log</a></li>
                                     </ul>
                                 </div>
-                                <g:link action="logDownload" params="[file:'cmsLogFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Log File"/>
+                                <g:link action="logDownload" params="[file:'cmsErrorLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors Log"/>
                                 </g:link>
-                                <g:link action="logDownload" params="[file:'cmsKeyLogFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Key Log File"/>
+                                <g:link action="logDownload" params="[file:'cmsInfoLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
                                 </g:link>
                             </div>
                         </div>
@@ -187,11 +187,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="storefrontPill"><a href="#" id="storefrontInfoButton">Details</a></li>
                                     </ul>
                                 </div>
-                                <g:link action="logDownload" params="[file:'storefrontErrorsFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Errors File"/>
+                                <g:link action="logDownload" params="[file:'storefrontErrorLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors Log"/>
                                 </g:link>
-                                <g:link action="logDownload" params="[file:'storefrontDetailsFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Details File"/>
+                                <g:link action="logDownload" params="[file:'storefrontInfoLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
                                 </g:link>
                             </div>
                         </div>
@@ -225,11 +225,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="tinyPill"><a href="#" id="tinyInfoButton">Details</a></li>
                                     </ul>
                                 </div>
-                                <g:link action="logDownload" params="[file:'tinyUrlErrorsFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Errors File"/>
+                                <g:link action="logDownload" params="[file:'tinyErrorLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors Log"/>
                                 </g:link>
-                                <g:link action="logDownload" params="[file:'tinyUrlDetailsFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Details File"/>
+                                <g:link action="logDownload" params="[file:'tinyInfoLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
                                 </g:link>
                             </div>
                         </div>
@@ -263,11 +263,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         <li class="tagPill"><a href="#" id="tagInfoButton">Details</a></li>
                                     </ul>
                                 </div>
-                                <g:link action="logDownload" params="[file:'tagErrorsFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Errors File"/>
+                                <g:link action="logDownload" params="[file:'tagErrorLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors Log"/>
                                 </g:link>
-                                <g:link action="logDownload" params="[file:'tagDetailsFile']">
-                                    <input class="btn btn-primary" type="button" value="Download Details File"/>
+                                <g:link action="logDownload" params="[file:'tagInfoLog']">
+                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
                                 </g:link>
                             </div>
                         </div>

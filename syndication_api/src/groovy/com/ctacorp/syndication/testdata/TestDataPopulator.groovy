@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -178,32 +178,7 @@ class TestDataPopulator {
         Source fda = Source.findByAcronym("FDA")
 
 
-
-        def items = [[title: "Audio Healthbeat 526634", url:"http://www.hhs.gov/news/healthbeat/2014/07/breathing-social.html"]]
-
-        def batch = []
-
-        items.each { item ->
-            batch << new Audio(
-                    name: item.title,
-                    description: item.description,
-                    sourceUrl: item.url,
-                    dateSyndicationCaptured: new Date(),
-                    dateSyndicationUpdated: new Date(),
-                    dateContentAuthored: new Date()-ran.nextInt(365)+30,
-                    dateContentUpdated: new Date()-ran.nextInt(15),
-                    dateContentPublished: new Date()-ran.nextInt(10),
-                    dateContentReviewed: new Date()-ran.nextInt(5),
-                    language: english,
-                    externalGuid: "${item.url}".hashCode(),
-                    source: cdc,
-                    hash: item.hash
-            )
-        }
-
-        batchSaver(Audio, batch)
-
-        items = [
+        def items = [
             [title: "Heart Disease & Stroke", url: "http://www.cdc.gov/vitalsigns/HeartDisease-Stroke/index.html", description: "Nearly 1 in 3 deaths in the US each year is caused by heart disease and stroke.", hash: "A1B2C3D"],
             [title: "Be Ready", url: "http://www.cdc.gov/features/beready/index.html", description: "Would you be ready if there were an emergency? Be prepared: throughout September there will be activities across the country to promote emergency preparedness."],
             [title: "Healthy Swimming", url: "http://www.cdc.gov/features/healthyswimming/index.html", description: "Stay healthy and avoid recreational water illnesses (RWIs) when you swim or use the hot tub/spa by following a few simple steps."],
@@ -231,7 +206,7 @@ class TestDataPopulator {
 
         ]
 
-        batch = []
+        def batch = []
 
         items.each { item ->
             batch << new Html(
@@ -420,48 +395,29 @@ class TestDataPopulator {
 
         batchSaver(PDF, batch)
 
-        //Periodical MediaItems
-        items = [[title:"People with Disabilities", url:"http://www.flu.gov/at-risk/disabilities/index.html", desc:"Find out if your disability puts you at increased risk of getting the flu and how to keep yourself healthy this flu season at ", period:Periodical.Period.DAILY], [title:"Selected Federal Agencies with a Role in Food Safety", url:"http://www.foodsafety.gov/about/federal/index.html", desc:"Selected Federal Agencies with a Role in Food Safety", period:Periodical.Period.MONTHLY], [title:"Tips for Quitting Smoking", url:"http://www.flu.gov/at-risk/health-conditions/asthma/index.html", desc:"Are you one of the more than 70% of smokers who want to quit? Then try following this advice. 1. Don’t smoke any ", period:Periodical.Period.ANNUALLY]]
+        def youtubeVideos = [
+                "http://www.youtube.com/watch?v=-VI_A1TPS6o",
+                "http://www.youtube.com/watch?v=Jn9OBSNBE4M",
+                "http://www.youtube.com/watch?v=R-oxvOTLCYU",
+                "http://www.youtube.com/watch?v=6YWEW3I1fKs",
+                "http://www.youtube.com/watch?v=4Zuo88K2Gdc",
+                "http://www.youtube.com/watch?v=vXRYmVUOD7g",
+                "http://www.youtube.com/watch?v=10gcsrx-ANA",
+                "http://www.youtube.com/watch?v=xLnA-ZdKuEY",
+                "http://www.youtube.com/watch?v=zMdFj4e0Q18",
+                "http://www.youtube.com/watch?v=QW1yodZJpG8",
+                //Real Cost videos
+                "http://www.youtube.com/watch?v=zhbXENhrkTA",
+                "http://www.youtube.com/watch?v=asarKLMCvdo"
+        ]
 
-        batch = []
-
-        items.each { item ->
-            batch << new Periodical(
-                    name: item.title,
-                    description: item.description,
-                    sourceUrl: item.url,
-                    dateSyndicationCaptured: new Date(),
-                    dateSyndicationUpdated: new Date(),
-                    dateContentAuthored: new Date()-ran.nextInt(365)+30,
-                    dateContentUpdated: new Date()-ran.nextInt(15),
-                    dateContentPublished: new Date()-ran.nextInt(10),
-                    dateContentReviewed: new Date()-ran.nextInt(5),
-                    language: english,
-                    externalGuid: "${item.url}".hashCode(),
-                    source: cdc,
-                    period: item.period,
-                    hash: item.hash
-            )
+        youtubeVideos.each{
+            try{
+                youtubeService.importYoutubeVideo(it)
+            }catch (e){
+                println "couldn't import ${it}"
+            }
         }
-
-        batchSaver(Periodical, batch)
-
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=6yZkQqx1lag")
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=-VI_A1TPS6o&feature=c4-overview-vl&list=PLrl7E8KABz1GZv0fAUSb7ZNXCdTZJSrzN")
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=Jn9OBSNBE4M&feature=c4-overview-vl&list=PLrl7E8KABz1GZv0fAUSb7ZNXCdTZJSrzN")
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=R-oxvOTLCYU&feature=c4-overview-vl&list=PLrl7E8KABz1GZv0fAUSb7ZNXCdTZJSrzN")
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=6YWEW3I1fKs&feature=c4-overview-vl&list=PLrl7E8KABz1GZv0fAUSb7ZNXCdTZJSrzN")
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=4Zuo88K2Gdc&feature=c4-overview-vl&list=PLrl7E8KABz1GOyx_HDSqmwfrq8j_THXgg")
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=vXRYmVUOD7g&feature=c4-overview-vl&list=PLrl7E8KABz1GOyx_HDSqmwfrq8j_THXgg")
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=10gcsrx-ANA&feature=c4-overview-vl&list=PLrl7E8KABz1GOyx_HDSqmwfrq8j_THXgg")
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=xLnA-ZdKuEY&feature=c4-overview-vl&list=PLrl7E8KABz1GOyx_HDSqmwfrq8j_THXgg")
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=zMdFj4e0Q18&feature=c4-overview-vl&list=PLrl7E8KABz1GOyx_HDSqmwfrq8j_THXgg")
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=QW1yodZJpG8&list=TLUZ7PoLn_4kvubarfg2JjJSlFT8Lf1dBR")
-
-        //Real Cost videos
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=zhbXENhrkTA", english, fda)
-        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=asarKLMCvdo", english, fda)
-//*this video is currently private on youtube  assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=mcteRv08Aco", english, fda)
 
         def count = Video.count()
 
@@ -896,38 +852,8 @@ class TestDataPopulator {
         batchSaver(Video, batch)
     }
 
-    def seedWidgets() {
-        def widgets = ["Blogger",
-            "Template",
-            "Dialog",
-            "Alert",
-            "Comments",
-            "CSS",
-            "IPHONE"]
-
-        def batch = []
-
-        widgets.each {
-            def lang = Language.first()
-            def source = Source.last()
-            batch << new Widget(name: "${it}",
-                description: "${it}",
-                width: 10,
-                height: 10 + it.size(),
-                code: 99,
-                sourceUrl: "http://localhost/Syndication/socialMedia/${it}",
-                dateSyndicationCaptured: new Date(),
-                dateSyndicationUpdated: new Date(),
-                language: lang,
-                externalGuid: "http://localhost/Syndication/socialMedia/${it}".toString().hashCode(),
-                source: source)
-        }
-
-        batchSaver(Widget, batch)
-    }
-
     def seedUsers() {
-        def userRole = Role.findOrSaveByAuthority("ROLE_USER")
+        def userRole = Role.findOrSaveByAuthority("ROLE_MANAGER")
         assert userRole.id
         100.times {
             def user = new User(name: randomName(), username: randomUsername(), password: "Password123")

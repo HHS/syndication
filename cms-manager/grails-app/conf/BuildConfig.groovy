@@ -21,10 +21,9 @@ grails.project.source.level = 1.6
 
 def home = System.getProperty('user.home')
 def config = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedBuildConfig.groovy").toURI().toURL())
-def runtimeConfig = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedConfig.groovy").toURI().toURL())
 
 grails.project.fork = [
-        test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon: true],
+        test: false,
         run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve: false],
         war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve: false],
         console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
@@ -72,6 +71,7 @@ grails.project.dependency.resolution = {
         test 'org.objenesis:objenesis:1.4'
         test 'cglib:cglib:2.2'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
+        test 'nl.flotsam:xeger:1.0'
 
         runtime 'mysql:mysql-connector-java:5.1.29'
         runtime 'com.ctacorp.commons:multi-read-servlet-filter:1.0.0'
@@ -104,7 +104,6 @@ grails.project.dependency.resolution = {
         compile ":rest-client-builder:2.1.1"
         compile ":asset-pipeline:2.6.5"
         compile ":less-asset-pipeline:2.3.0"
-        compile ":font-awesome-resources:4.3.0.2"
         compile ":rabbitmq-native:3.1.2"                       //mq
         compile ":greenmail:1.3.4"
         compile ":bruteforce-defender:1.1"
@@ -112,7 +111,6 @@ grails.project.dependency.resolution = {
         runtime ":hibernate4:4.3.8.1"
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
-        runtime ":twitter-bootstrap:3.3.1"
 
         test ":build-test-data:2.4.0"
     }

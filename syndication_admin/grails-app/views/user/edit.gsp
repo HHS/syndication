@@ -72,7 +72,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
             <!-- Button trigger modal -->
             <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-                Launch Role Abilities
+                Show Role Abilities
             </button>
 
             <!-- Modal -->
@@ -88,64 +88,57 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <div class="table-responsive" style="">
                                 <table class="table table-striped table-bordered table-hover">
                                     <thead>
-                                    <tr><th></th><th>Stats</th><th>Basic</th><th>Publisher</th><th>User</th><th>Manager</th></tr>
+                                    <tr><th></th><th>Publisher</th><th>Manager</th></tr>
                                     </thead>
-                                    <tr><td>Restricted to own media</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-                                    <tr><td>View Dashboard</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Search for Media</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>View Media</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Create Media</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Preview Media</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Edit Media</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Delete Media</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-                                    <tr><td>Add Media to Campaigns</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Tag Media</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Feature/Unfeature Media</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Add Extended Attributes to Media</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Add Alternate Images</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>View Metrics Report</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>View raw Metrics database</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>View raw Alternate Image database</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Create Alternate Images</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Edit Alternate Images</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Delete Alternate Images</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>View Campaigns</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Create Campaigns</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Edit Campaigns</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Delete Campaigns</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Enable/Disable System Languages</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>View Extended Attributes (RAW DB)</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Create Extended Attributes</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Edit Extended Attributes</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Delete Extended Attributes</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>List Sources</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Show Sources</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Create Sources</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Edit Sources</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Delete Sources</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Show Tags</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>List Tags</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Create Tags</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Edit Tags</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Delete Tags</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Bulk tag items</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Show Tag Types</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Create Tag Types</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Edit Tag Types</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Delete Tag Types</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Enable/Disable Tag Languages</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>See all featured media / make changes</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>X</td></tr>
-                                    <tr><td>Read Health Reports</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Resolve Health Report Issues</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Run adhoc Health Report Scans</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Reindex media adhoc</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>View Server Logs</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-                                    <tr><td>View Users</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-                                    <tr><td>Edit Users < Manager</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Edit Any Users</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-                                    <tr><td>Creat Users < Manager</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
-                                    <tr><td>Create Any Users</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-                                    <tr><td>Delete Users</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Restricted to own media</td><td>X</td><td>&nbsp;</td></tr>
+                                    <tr><td>View Dashboard</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Search for Media</td><td>X</td><td>X</td></tr>
+                                    <tr><td>View Media</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Create Media</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Preview Media</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Edit Media</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Delete Media</td><td>X</td><td>&nbsp;</td></tr>
+                                    <tr><td>Add Media to Campaigns</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Tag Media</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Feature/Unfeature Media</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Add Extended Attributes to Media</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Add Alternate Images</td><td>X</td><td>X</td></tr>
+                                    <tr><td>View Metrics Report</td><td>X</td><td>X</td></tr>
+                                    <tr><td>View raw Metrics database</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>View raw Alternate Image database</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Create Alternate Images</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Edit Alternate Images</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Delete Alternate Images</td><td>X</td><td>X</td></tr>
+                                    <tr><td>View Campaigns</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Create Campaigns</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Edit Campaigns</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Delete Campaigns</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Enable/Disable System Languages</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>View Extended Attributes (RAW DB)</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Create Extended Attributes</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Edit Extended Attributes</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Delete Extended Attributes</td><td>X</td><td>X</td></tr>
+                                    <tr><td>List Sources</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Show Sources</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Create Sources</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Edit Sources</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Delete Sources</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Show Tags</td><td>X</td><td>X</td></tr>
+                                    <tr><td>List Tags</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Create Tags</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Edit Tags</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Delete Tags</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Bulk tag items</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Show Tag Types</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Create Tag Types</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Edit Tag Types</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Delete Tag Types</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Enable/Disable Tag Languages</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>See all featured media / make changes</td><td>&nbsp;</td><td>X</td></tr>
+                                    <tr><td>Read Health Reports</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Resolve Health Report Issues</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Run adhoc Health Report Scans</td><td>X</td><td>X</td></tr>
+                                    <tr><td>Reindex media adhoc</td><td>X</td><td>X</td></tr>
                                 </table>
                             </div>
                         </div>

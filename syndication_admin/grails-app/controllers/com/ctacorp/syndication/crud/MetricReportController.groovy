@@ -79,20 +79,16 @@ class MetricReportController {
             tempAccessToken:cred.getAccessToken(),
             totalMediaItems:MediaItem.count(),
             totalSubscribers:cmsManagerKeyService.listSubscribers().size(),
-            partnerDomains:treeSet
+            partnerDomains:treeSet,
+            fromDay: new Date() - 7
         ]
     }
 
     def generalOverviewAjax(){
-        def totalRange = [:]
-        switch(params.totalRange){
-            case "week":    totalRange = viewMetricService.getAllHits(new Date()-7); break
-            case "month":   totalRange = viewMetricService.getAllHits(); break
-            case "year":    totalRange = viewMetricService.getAllHits(new Date()-365); break
-            case "all":     totalRange = viewMetricService.getAllHits(new Date()-36500); break
-        }
+        def fromDate = new Date(params.int("fromDay_year") -1900,params.int("fromDay_month") - 1,params.int("fromDay_day"))
+        def toDate = new Date(params.int("toDay_year") -1900,params.int("toDay_month") - 1,params.int("toDay_day"))
 
-        render totalRange as JSON
+        render viewMetricService.getAllHits(fromDate, toDate) as JSON
     }
 
     def getTotalLineGraph(){

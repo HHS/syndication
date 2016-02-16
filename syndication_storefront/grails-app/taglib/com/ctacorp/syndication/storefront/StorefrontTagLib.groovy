@@ -2,15 +2,22 @@ package com.ctacorp.syndication.storefront
 
 import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.authentication.UserRole
+import org.pegdown.PegDownProcessor
 
 class StorefrontTagLib {
     static defaultEncodeAs = 'html'
-    static encodeAsForTags = [currentUser: 'raw', mediaListApiLink:'raw', pageContentAnchor:'raw', hasErrors: 'raw', errors:'raw']
+    static encodeAsForTags = [markdown: 'raw', currentUser: 'raw', mediaListApiLink:'raw', pageContentAnchor:'raw', hasErrors: 'raw', errors:'raw']
     def grailsApplication
 
     static namespace = "sf"
 
     def springSecurityService
+
+    def markdown = { attrs, body ->
+        PegDownProcessor peg = new PegDownProcessor()
+        def htmlMarkdown = peg.markdownToHtml(body().toString().trim())
+        out << htmlMarkdown
+    }
 
     def currentUser = { attrs, body ->
         def user = springSecurityService.currentUser as User

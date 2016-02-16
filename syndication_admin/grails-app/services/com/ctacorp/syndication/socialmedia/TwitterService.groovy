@@ -1,17 +1,19 @@
 package com.ctacorp.syndication.socialmedia
 
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.MediaItemsService
+import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.commons.util.Hash
-import com.ctacorp.syndication.commons.util.Util
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.social.TwitterAccount
+import com.ctacorp.syndication.social.TwitterStatusCollector
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import grails.util.Holders
 import twitter4j.Paging
+import twitter4j.Query
 import twitter4j.Status
 import twitter4j.Twitter
 import twitter4j.TwitterException
@@ -20,6 +22,7 @@ import twitter4j.User
 import twitter4j.conf.ConfigurationBuilder
 
 import javax.annotation.PostConstruct
+import javax.transaction.Transaction
 import java.util.concurrent.Callable
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -31,6 +34,8 @@ class TwitterService {
     def guavaCacheService
     def springSecurityService
     def tagService
+    def gspTagLibraryLookup
+    def g
 
     @PostConstruct
     def init(){
@@ -51,6 +56,12 @@ class TwitterService {
         } catch(TwitterException e) {
             return null
         }
+    }
+
+    //query should contain the format explained at https://dev.twitter.com/rest/public/search
+    def search(String query){
+        Query q = new Query(query)
+        twitter.search(q).tweets
     }
 
     def saveTweet(Long tweetId, Long sourceId, Long subscriberId = null) {
@@ -81,7 +92,8 @@ class TwitterService {
 
             newTweet.validate()
             def savedTweet
-            if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_ADMIN") {
+            def authority = UserRole.findByUser(springSecurityService.currentUser).role.authority
+            if(authority in ["ROLE_ADMIN", "ROLE_MANAGER"]) {
                 savedTweet = mediaItemsService.updateItemAndSubscriber(newTweet, subscriberId)
             } else {
                 savedTweet = mediaItemsService.updateItemAndSubscriber(newTweet, null)
@@ -103,11 +115,85 @@ class TwitterService {
             tweet.videoVariantUrl = status.extendedMediaEntities[0]?.videoVariants[0]?.url
         }
         //media item required fields
-        tweet.name = status.user.screenName + " Post on " + status.createdAt.format("EEE, MMM d, yyyy")
+        //Old title method. New title method uses name and a tweet snippet.
+//        tweet.name = status.user.screenName + " Post on " + status.createdAt.format("EEE, MMM d, yyyy")
+        tweet.name = "@${status.user.screenName}: ${status.text}"
+        if(tweet.name.size() > 255){
+            tweet.name = "${tweet.name[0..251]}..."
+        }
         tweet.sourceUrl = "https://twitter.com/" + status.user.screenName + "/status/" + status.id
         tweet.description = status.user.description
         tweet.language = Language.findByIsoCode("eng")
         tweet.source = Source.read(sourceId)
+    }
+
+    def createStatusCollection(TwitterStatusCollector twitterStatusCollector) {
+        g = gspTagLibraryLookup.lookupNamespaceDispatcher("g")
+        def formattedStartDate = g.formatDate(date:twitterStatusCollector.startDate, format: 'yyyy-MM-dd')
+        def formattedEndDate = g.formatDate(date:twitterStatusCollector.endDate + 1 ?: new Date() + 1, format: 'yyyy-MM-dd')
+
+        def statuses = search("from:"+twitterStatusCollector.twitterAccounts[0].accountName+ twitterStatusCollector.hashTags +" since:" + formattedStartDate + " until:" + formattedEndDate)
+        twitterStatusCollector.collection.mediaItems = []
+        statuses.each{status ->
+            Tweet tweet = Tweet.findOrCreateByTweetId(status.id)
+            setMetaData(tweet,status, twitterStatusCollector.collection.source.id)
+            twitterStatusCollector.collection.mediaItems.add(tweet)
+        }
+
+        twitterStatusCollector.collection.name = "Twitter collection for the accounts " + twitterStatusCollector.twitterAccounts.toString().substring(1,twitterStatusCollector.twitterAccounts.toString().size() -1) +" and hashtags "+ twitterStatusCollector.hashTags
+        twitterStatusCollector.collection.sourceUrl = "http://www.twitter.com"
+        twitterStatusCollector.collection.language = Language.findByIsoCode("eng")
+        twitterStatusCollector.collection.description = "twitter collection for the accounts " + twitterStatusCollector.twitterAccounts.toString() +" and hashtags "+ twitterStatusCollector.hashTags
+
+        if(!twitterStatusCollector.collection.save() || !twitterStatusCollector.validate() ||
+        !(new MediaItemSubscriber(mediaItem: twitterStatusCollector.collection, subscriberId: twitterStatusCollector.twitterAccounts[0].subscriberId).save())) {
+            MediaItem.withTransaction { status ->
+                //more explicit for testing purposes
+                status.setRollbackOnly()
+            }
+            MediaItemSubscriber.withTransaction { status ->
+                status.setRollbackOnly()
+            }
+            log.error("rolling back twitter status collector transaction")
+        }
+    }
+
+    def updateStatusCollection(TwitterStatusCollector twitterStatusCollector) {
+        def formattedStartDate = twitterStatusCollector.startDate.format("yyyy-MM-dd")
+        def formattedEndDate = (twitterStatusCollector.endDate + 1 ?: new Date() + 1).format("yyyy-MM-dd")
+
+        def statuses = search("from:"+twitterStatusCollector.twitterAccounts[0].accountName+ twitterStatusCollector.hashTags +" since:" + formattedStartDate + " until:"+formattedEndDate)
+        twitterStatusCollector.collection.mediaItems = []
+        statuses.each{status ->
+            Tweet tweet = Tweet.findOrCreateByTweetId(status.id)
+            setMetaData(tweet,status, twitterStatusCollector.collection.source.id)
+            twitterStatusCollector.collection.mediaItems.add(tweet)
+        }
+
+    }
+
+    def twitterStatusCollectorErrors(TwitterStatusCollector twitterStatusCollector, params){
+        def errors = []
+        if(!twitterStatusCollector.hashTags){
+            errors << [message:"Provide a Hash Tag to follow"]
+        } else  {
+            def  validHashTag = ~/(#[A-Za-z0-9]*)|(#[A-Za-z0-9]* OR #[A-Za-z0-9]*)|(#[A-Za-z0-9]*\+#[A-Za-z0-9]*)|/
+            def matcher = (twitterStatusCollector.hashTags =~ validHashTag)
+            if(!matcher.matches()){
+                errors << [message:"Provide a Valid format for the Hashtag(s)"]
+            }
+        }
+        if(!twitterStatusCollector.twitterAccounts){
+            errors << [message:"Select a valid Twitter Account"]
+        }
+        if(!twitterStatusCollector.startDate){
+            errors << [message:"Select a Valid Start Date"]
+        }
+        if(params.source.id == "null"){
+            errors << [message:"Select a Source"]
+        }
+
+        return errors
     }
 
     @NotTransactional
@@ -140,6 +226,9 @@ class TwitterService {
     }
 
     boolean isProtected(String accountName) {
+        if(!accountName){
+            return false
+        }
         if(accountName.startsWith("@")){
             accountName = accountName[1..-1]
         }

@@ -9,109 +9,89 @@ class LogController {
     def index() {
     }
 
+    static final String home = System.getProperty('user.home')
+    static final File adminErrorLog = new File("$home/syndicationLogs/admin/errors.log")
+    static final File adminInfoLog = new File("$home/syndicationLogs/admin/details.log")
+    static final File apiErrorLog = new File("$home/syndicationLogs/api/errors.log")
+    static final File apiInfoLog = new File("$home/syndicationLogs/api/details.log")
+    static final File cmsErrorLog = new File("$home/syndicationLogs/cms/errors.log")
+    static final File cmsInfoLog = new File("$home/syndicationLogs/cms/details.log")
+    static final File storefrontErrorLog = new File("$home/syndicationLogs/storefront/errors.log")
+    static final File storefrontInfoLog = new File("$home/syndicationLogs/storefront/details.log")
+    static final File tinyErrorLog = new File("$home/syndicationLogs/tiny/errors.log")
+    static final File tinyInfoLog = new File("$home/syndicationLogs/tiny/details.log")
+    static final File tagErrorLog = new File("$home/syndicationLogs/tag/errors.log")
+    static final File tagInfoLog = new File("$home/syndicationLogs/tag/details.log")
+
     def adminErrorLog(){
-        File adminErrorLog = new File("${System.getProperty('user.home')}/syndicationLogs/admin/errors.log")
         response.contentType = "application/json"
         render([logData:loadFile(adminErrorLog)] as JSON)
     }
 
     def adminInfoLog(){
-        File adminInfoLog = new File("${System.getProperty('user.home')}/syndicationLogs/admin/details.log")
         response.contentType = "application/json"
         render([logData:loadFile(adminInfoLog)] as JSON)
     }
 
     def apiErrorLog(){
-        File apiErrorLog = new File("${System.getProperty('user.home')}/syndicationLogs/api/errors.log")
         response.contentType = "application/json"
         render([logData:loadFile(apiErrorLog)] as JSON)
     }
 
     def apiInfoLog(){
-        File apiInfoLog = new File("${System.getProperty('user.home')}/syndicationLogs/api/details.log")
         response.contentType = "application/json"
         render([logData:loadFile(apiInfoLog)] as JSON)
     }
 
     def cmsLog(){
-        File apiInfoLog = new File("${System.getProperty('user.home')}/syndicationLogs/cms/cmsmanager.log")
         response.contentType = "application/json"
-        render([logData:loadFile(apiInfoLog)] as JSON)
+        render([logData:loadFile(cmsErrorLog)] as JSON)
     }
 
     def cmsApiKeyLog(){
-        File apiInfoLog = new File("${System.getProperty('user.home')}/syndicationLogs/cms/cmsmanager.apikey.log")
         response.contentType = "application/json"
-        render([logData:loadFile(apiInfoLog)] as JSON)
+        render([logData:loadFile(cmsInfoLog)] as JSON)
     }
 
     def storefrontErrorLog(){
-        File storefrontErrorLog = new File("${System.getProperty('user.home')}/syndicationLogs/storefront/errors.log")
         response.contentType = "application/json"
         render([logData:loadFile(storefrontErrorLog)] as JSON)
     }
 
     def storefrontInfoLog(){
-        File storefrontInfoLog = new File("${System.getProperty('user.home')}/syndicationLogs/storefront/details.log")
         response.contentType = "application/json"
         render([logData:loadFile(storefrontInfoLog)] as JSON)
     }
 
     def tinyErrorLog(){
-        File tinyErrorLog = new File("${System.getProperty('user.home')}/syndicationLogs/tiny/errors.log")
         response.contentType = "application/json"
         render([logData:loadFile(tinyErrorLog)] as JSON)
     }
 
     def tinyInfoLog(){
-        File tinyInfoLog = new File("${System.getProperty('user.home')}/syndicationLogs/tiny/details.log")
         response.contentType = "application/json"
         render([logData:loadFile(tinyInfoLog)] as JSON)
     }
 
     def tagErrorLog(){
-        File tagErrorLog = new File("${System.getProperty('user.home')}/syndicationLogs/tag/errors.log")
         response.contentType = "application/json"
         render([logData:loadFile(tagErrorLog)] as JSON)
     }
 
     def tagInfoLog(){
-        File tagInfoLog = new File("${System.getProperty('user.home')}/syndicationLogs/tag/details.log")
         response.contentType = "application/json"
         render([logData:loadFile(tagInfoLog)] as JSON)
     }
 
     def logDownload(){
-        File file = null
-        switch(params.file) {
-            case "adminErrorsFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/admin/errors.log")
-                break
-            case "adminDetailsFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/admin/details.log")
-                break
-            case "apiErrorsFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/api/errors.log")
-                break
-            case "apiDetailsFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/api/details.log")
-                break
-            case "cmsLogFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/cms/cmsmanager.log")
-                break
-            case "cmsKeyLogFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/cms/cmsmanager.apikey.log")
-                break
-            case "storefrontErrorsFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/storefront/errors.log")
-                break
-            case "storefrontDetailsFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/storefront/details.log")
-                break
-            case "tinyUrlErrorsFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/tiny/errors.log")
-                break
-            case "tinyUrlDetailsFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/tiny/details.log")
-                break
-            case "tagErrorsFile":file = new File("${System.getProperty('user.home')}/syndicationLogs/tag/errors.log")
-                break
-            case "tagDetailsFile": file = new File("${System.getProperty('user.home')}/syndicationLogs/tag/details.log")
-                break
+        response.setContentType("application/octet-stream")
 
+        if(params.file && this."${params.file}"){
+            response.setHeader("Content-disposition", "attachment;filename=\"${params.file}.log\"")
+            response.outputStream << this."${params.file}".bytes
+        } else{
+            response.outputStream << "No file found (${params.file})!!".bytes
         }
-        response.setContentType("application/download")
-        response.outputStream << file.bytes
     }
 
 

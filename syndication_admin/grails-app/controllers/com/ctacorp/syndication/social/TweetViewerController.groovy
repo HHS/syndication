@@ -4,7 +4,7 @@ import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Tweet
 import grails.plugin.springsecurity.annotation.Secured
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 class TweetViewerController {
     def twitterService
 

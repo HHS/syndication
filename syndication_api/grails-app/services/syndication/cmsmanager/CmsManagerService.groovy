@@ -10,7 +10,7 @@ class CmsManagerService {
 
     def getSubscriber(def publicKey){
         try{
-            authorizationService.getRest(grailsApplication.config.cmsManager.serverUrl + "/api/v1/subscriber.json?publicKey=${publicKey}")
+            return authorizationService.getRest(grailsApplication.config.cmsManager.serverUrl + "/api/v1/subscriber.json?publicKey=${publicKey}")
         } catch (e) {
             log.error("Can't connect to CMS Manager!")
             log.error(e)

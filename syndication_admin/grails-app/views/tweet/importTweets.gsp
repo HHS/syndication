@@ -167,7 +167,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             </label>
                             <g:select from="${sourceList}" name="sourceId" optionKey="id" optionValue="name" value="${name}" noSelection="['':'Choose a Source']" class="form-control"/>
                         </div>
-						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_USER,ROLE_MANAGER">
+						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER">
 							<div class="form-group">
 								<label for="subscriberId">Subscriber<span class="required-indicator">*</span></label>
 								<g:select from="${subscribers}" name="subscriberId" optionKey="id" optionValue="name" value="${currentSubscriber?.id}" noSelection="['':'Choose an Owner']" class="form-control"/>

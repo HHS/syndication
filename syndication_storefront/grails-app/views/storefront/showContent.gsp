@@ -31,6 +31,10 @@
     <g:else>
         <strong>Media Type: ${mediaItemInstance.class.simpleName}</strong>
     </g:else>
+    <g:if test="${mediaItemInstance.getClass().simpleName == 'QuestionAndAnswer'}">
+        <div style="margin: 10px 0px 10px 10px">Question: ${mediaItemInstance?.name}</div>
+        <div style="margin: 0px 0px 10px 20px; font-style: italic">Answer: ${mediaItemInstance?.answer}</div>
+    </g:if>
     <ul>
         <g:if test="${mediaItemInstance?.sourceUrl}"><li>SourceUrl: <a href="${mediaItemInstance.sourceUrl}" style="word-break: break-all;">${mediaItemInstance.sourceUrl}</a></li></g:if>
         <g:if test="${mediaItemInstance?.id}"><li>Syndication ID: ${mediaItemInstance.id}</li></g:if>

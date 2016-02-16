@@ -26,7 +26,7 @@ import com.ctacorp.syndication.Campaign
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional(readOnly = true)
 class CampaignController {
 
@@ -52,7 +52,6 @@ class CampaignController {
         respond campaignInstance
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create(Campaign campaignInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         def featuredMedia = campaignInstance?.mediaItems
@@ -61,7 +60,6 @@ class CampaignController {
         respond new Campaign(params), model:[featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput, subscribers:subscribers]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(Campaign campaignInstance) {
         if (campaignInstance == null) {
@@ -97,7 +95,6 @@ class CampaignController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER', 'ROLE_PUBLISHER'])
     def edit(Campaign campaignInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
 
@@ -112,7 +109,6 @@ class CampaignController {
         respond campaignInstance, model:[featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput, subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(CampaignSubscriber.findByCampaign(campaignInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Campaign campaignInstance) {
         def mediaItems = params.mediaItemsToAdd ?:  ","
@@ -186,7 +182,6 @@ class CampaignController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def addMediaItem(Campaign campaign){
         if (!campaign.id) {

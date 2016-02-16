@@ -156,10 +156,4 @@
         </g:else>
     </div>
 </div>
-<sec:ifAnyGranted roles="ROLE_USER">
-    <g:link class="button" controller="mediaItem" id="${mediaItemInstance.id}" resource="${mediaItemInstance}" action="show">
-        <button type="button" class="btn">Cancel</button>
-    </g:link>
-    <br>
-</sec:ifAnyGranted>
     <br>

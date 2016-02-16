@@ -28,7 +28,7 @@
         <h1>Featured Media</h1>
     </div>
     <br/>
-    <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER">
+    <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER">
         <div class="row">
             <div class="col-md-8">
                 <div class="panel panel-default">
@@ -63,29 +63,6 @@
             </div>
         </div>
     </sec:ifAnyGranted>
-
-    <sec:ifAnyGranted roles="ROLE_BASIC">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="panel panel-success">
-                    <div class="panel-heading">
-                        <h1 class="panel-title">Featured Media</h1>
-                    </div>
-                    <ul class="list-group">
-                        <g:if test="${featuredMedia}">
-                            <g:each in= "${featuredMedia}" status = "i" var="activeMediaInstance">
-                                <div class="list-group-item" id="${activeMediaInstance.id}">${activeMediaInstance.name}</div>
-                            </g:each>
-                        </g:if>
-                        <g:else>
-                            <div class="list-group-item">No featured media at this time.</div>
-                        </g:else>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </sec:ifAnyGranted>
-
 </div>
 </body>
 </html>

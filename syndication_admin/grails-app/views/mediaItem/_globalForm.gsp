@@ -1,13 +1,36 @@
 <%@ page import="grails.util.Holders" %>
-<!-- Text input-->
+
+<g:set var="mediaTypeName" value="${mediaItemInstance.getClass().simpleName}"/>
+
+%{--Name--}%
 <div class="form-group ${hasErrors(bean:mediaItemInstance, field:'name', 'errors')}" xmlns="http://www.w3.org/1999/html">
-    <label class="col-md-4 control-label" for="name">Name<span class="required-indicator">*</span></label>
+    %{--For QuestionAndAnswe type, we refer to the name as the 'question'--}%
+    <g:if test="${mediaItemInstance.getClass().simpleName == 'QuestionAndAnswer'}">
+        <g:set var="nameLabelValue" value="Question"/>
+    </g:if>
+    <g:else>
+        <g:set var="nameLabelValue" value="Name"/>
+    </g:else>
+    <label class="col-md-4 control-label" for="name">${nameLabelValue}<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <input id="name" name="name" value="${mediaItemInstance?.name}" required="true" type="text" placeholder="Name" class="form-control input-md">
+        <input id="name" name="name" value="${mediaItemInstance?.name}" required="true" type="text" placeholder="${nameLabelValue}" class="form-control input-md">
     </div>
 </div>
 
-<!-- Text input-->
+%{--QuestionAndAnswer has an extra field that needs to be near the question for clarity--}%
+<g:if test="${mediaItemInstance.getClass().simpleName == 'QuestionAndAnswer'}">
+    <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'name', 'errors')}"
+         xmlns="http://www.w3.org/1999/html">
+        <label class="col-md-4 control-label" for="answer">Answer<span class="required-indicator">*</span></label>
+
+        <div class="col-md-8">
+            <input id="answer" name="answer" value="${mediaItemInstance?.answer}" required="true" type="text"
+                   placeholder="Answer" class="form-control input-md">
+        </div>
+    </div>
+</g:if>
+
+%{--For collections, we generate a bogus source url to meet model requirement, but to avoid confusing the user--}%
 <g:if test="${mediaItemInstance.getClass().simpleName == 'Collection'}">
     <g:hiddenField name="sourceUrl" value="https://www.example.com/collection/${System.nanoTime()}"/>
 </g:if>
@@ -15,7 +38,7 @@
     <div class="form-group ${hasErrors(bean:mediaItemInstance, field:'sourceUrl', 'errors')}">
         <label class="col-md-4 control-label" for="sourceUrl">Source Url<span class="required-indicator">*</span></label>
 
-        <g:if test="${mediaItemInstance.getClass().simpleName == 'Html' || mediaItemInstance.getClass().simpleName == 'Periodical'}">
+        <g:if test="${mediaItemInstance.getClass().simpleName == 'Html'}">
             <div class="col-md-6">
                 <input id="sourceUrl" name="sourceUrl" maxlength="2000" required="true" value="${mediaItemInstance?.sourceUrl}" type="url" placeholder="Source URL" class="form-control input-md">
             </div>
@@ -114,7 +137,7 @@
 
 <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'dateSyndicationCaptured', 'error')} required">
     <label class="col-md-4 control-label" for="dateSyndicationCaptured">
-        <g:message code="html.dateSyndicationCaptured.label" default="Date Syndication Captured"/>
+        <g:message code="${mediaTypeName}.dateSyndicationCaptured.label" default="Date Syndication Captured"/>
         <span class="required-indicator">*</span>
     </label>
     <div class="col-md-8">
@@ -124,7 +147,7 @@
 
 <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'dateSyndicationUpdated', 'error')} required">
     <label class="col-md-4 control-label" for="dateSyndicationUpdated">
-        <g:message code="html.dateSyndicationUpdated.label" default="Date Syndication Updated"/>
+        <g:message code="${mediaTypeName}.dateSyndicationUpdated.label" default="Date Syndication Updated"/>
         <span class="required-indicator">*</span>
     </label>
     <div class="col-md-8">
@@ -134,7 +157,7 @@
 
 <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'dateSyndicationVisible', 'error')} required">
     <label class="col-md-4 control-label" for="dateSyndicationVisible">
-        <g:message code="html.dateSyndicationVisible.label" default="Date Syndication Visible"/>
+        <g:message code="${mediaTypeName}.dateSyndicationVisible.label" default="Date Syndication Visible"/>
         <span class="required-indicator">*</span>
     </label>
     <div class="col-md-8">
@@ -144,7 +167,7 @@
 
 <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'dateContentAuthored', 'error')} ">
     <label class="col-md-4 control-label" for="dateContentAuthored">
-        <g:message code="html.dateContentAuthored.label" default="Date Content Authored"/>
+        <g:message code="${mediaTypeName}.dateContentAuthored.label" default="Date Content Authored"/>
     </label>
     <div class="col-md-8">
         <g:datePicker name="dateContentAuthored" precision="minute" relativeYears="[-20..1]" value="${mediaItemInstance?.dateContentAuthored}" default="none" noSelection="['': '']"/>
@@ -153,7 +176,7 @@
 
 <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'dateContentUpdated', 'error')} ">
     <label class="col-md-4 control-label" for="dateContentUpdated">
-        <g:message code="html.dateContentUpdated.label" default="Date Content Updated"/>
+        <g:message code="${mediaTypeName}.dateContentUpdated.label" default="Date Content Updated"/>
     </label>
     <div class="col-md-8">
         <g:datePicker name="dateContentUpdated" precision="minute" relativeYears="[-20..1]" value="${mediaItemInstance?.dateContentUpdated}" default="none" noSelection="['': '']"/>
@@ -162,7 +185,7 @@
 
 <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'dateContentPublished', 'error')} ">
     <label class="col-md-4 control-label" for="dateContentPublished">
-        <g:message code="html.dateContentPublished.label" default="Date Content Published"/>
+        <g:message code="${mediaTypeName}.dateContentPublished.label" default="Date Content Published"/>
     </label>
     <div class="col-md-8">
         <g:datePicker name="dateContentPublished" precision="minute" relativeYears="[-20..1]" value="${mediaItemInstance?.dateContentPublished}" default="none" noSelection="['': '']"/>
@@ -171,7 +194,7 @@
 
 <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'dateContentReviewed', 'error')} ">
     <label class="col-md-4 control-label" for="dateContentReviewed">
-        <g:message code="html.dateContentReviewed.label" default="Date Content Reviewed"/>
+        <g:message code="${mediaTypeName}.dateContentReviewed.label" default="Date Content Reviewed"/>
     </label>
     <div class="col-md-8">
         <g:datePicker name="dateContentReviewed" precision="minute" relativeYears="[-20..1]" value="${mediaItemInstance?.dateContentReviewed}" default="none" noSelection="['': '']"/>
@@ -181,7 +204,7 @@
 <!-- Radio Buttons -->
 <div class="form-group">
     <label class="col-md-4 control-label" for="active">
-        <g:message code="html.active.label" default="Active"/>
+        <g:message code="${mediaTypeName}.active.label" default="Active"/>
 
     </label>
     <div class="col-md-8">
@@ -191,7 +214,7 @@
 
 <div class="form-group">
     <label class="col-md-4 control-label" for="visibleInStorefront">
-        <g:message code="html.visibleInStorefront.label" default="Visible In Storefront"/>
+        <g:message code="${mediaTypeName}.visibleInStorefront.label" default="Visible In Storefront"/>
 
     </label>
     <div class="col-md-8">
@@ -201,7 +224,7 @@
 
 <div class="form-group">
     <label class="col-md-4 control-label" for="manuallyManaged">
-        <g:message code="html.manuallyManaged.label" default="Manually Managed"/>
+        <g:message code="${mediaTypeName}.manuallyManaged.label" default="Manually Managed"/>
 
     </label>
     <div class="col-md-8">

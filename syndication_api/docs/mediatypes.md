@@ -4,23 +4,17 @@ Media Items are broken up into Types depending on the content that they contain.
 
 Collection - A Media Item that is made up of multiple other MediaItems but not other collections.
 
-Audio - an audio file(Not currently in use)
-
 Html - A basic html page
 
 Image - A basic Image
 
 Infographic - An image with text on it
 
-Periodical - An Html item that automatically checks for updates.
-
 PDF - creates an Iframe to a pdf
 
 Tweet - Twitter posts
 
 Videos - A video
-
-Widget - Not currently in use
 
 ###GET/JSON example
 The MediaType resource offers one request that lists all of the different mediaTypes
@@ -53,10 +47,6 @@ Json Response
       },
       "results": [
         {
-          "name": "Audio",
-          "description": "An audio file."
-        },
-        {
           "name": "Collection",
           "description": "A media item that is comprised of other media items."
         },
@@ -77,20 +67,12 @@ Json Response
           "description": "syndication.mediaType.PDF.description"
         },
         {
-          "name": "Periodical",
-          "description": "A piece of HTML content which has ever-changing subject matter that is updated on a regular schedule."
-        },
-        {
           "name": "Tweet",
           "description": "A social media twitter post (a tweet)."
         },
         {
           "name": "Video",
           "description": "A youtube video."
-        },
-        {
-          "name": "Widget",
-          "description": "A combination of html, javascript, and styles which combined form a self contained interactive widget."
         }
       ]
     }

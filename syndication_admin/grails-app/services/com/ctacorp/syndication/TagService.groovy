@@ -281,12 +281,10 @@ class TagService {
 
     private get(String path) {
         try {
-//            println("--------------> "+grailsApplication.config.tagCloud.serverAddress + path)
             def resp = rest.get(grailsApplication.config.tagCloud.serverAddress + path)
             return resp.json
         } catch (e) {
             log.error "Could not connect to: ${path}"
-//            e.printStackTrace()
             return null
         }
     }

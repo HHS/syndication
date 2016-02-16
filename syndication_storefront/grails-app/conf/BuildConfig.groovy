@@ -58,15 +58,18 @@ grails.project.dependency.resolution = {
 
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
+        compile 'com.google.guava:guava:18.0'
+        compile 'org.pegdown:pegdown:1.6.0'
+
         runtime 'mysql:mysql-connector-java:5.1.29'
-        compile "com.google.guava:guava:18.0"
         runtime 'com.ctacorp:syndication-commons:1.3.1'
+
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
     }
 
     plugins {
         compile ":rest-client-builder:2.1.1"
-        compile "org.grails.plugins:syndication-model:2.4.0"
+        compile "org.grails.plugins:syndication-model:2.5.0"
 
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
         compile ":recaptcha:0.6.9"
@@ -109,7 +112,7 @@ grails.project.dependency.resolution = {
         // Solr --------------------------------------------------------------------------------------------------------
         // |  Leave this at the bottom, moving it causes dependency problems at the moment                             |
         // -------------------------------------------------------------------------------------------------------------
-        compile ":solr-operations:1.3.0"      //syndication solr stuff
+        compile ":solr-operations:1.4.0"      //syndication solr stuff
 
         //Testing ---------------------------------------------------------------
         test ":build-test-data:2.4.0"

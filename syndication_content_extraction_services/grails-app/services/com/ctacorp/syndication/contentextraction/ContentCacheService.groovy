@@ -22,23 +22,29 @@ import grails.transaction.Transactional
 class ContentCacheService {
     def contentRetrievalService
 
-    CachedContent cache(MediaItem media){
+    CachedContent cache(Long mediaId){
         String content = contentRetrievalService.extractSyndicatedContent(media?.sourceUrl, [disableFailFast:true])
-        cacheHelper(media, content)
+        cacheHelper(mediaId, content)
     }
 
-    CachedContent cache(MediaItem media, String content){
-        cacheHelper(media, content)
+    CachedContent cache(Long mediaId, String content){
+        cacheHelper(mediaId, content)
     }
 
-    CachedContent cacheHelper(MediaItem media, String content){
+    CachedContent cacheHelper(Long mediaId, String content){
+        MediaItem media = MediaItem.get(mediaId)
         CachedContent cached = CachedContent.findByMediaItem(media)
         if(!cached) {
             cached = new CachedContent(mediaItem: media, content: content)
         } else{
             cached.content = content
         }
-        cached.save(flush:true)
+
+        try {
+            cached.save()
+        } catch (e) {
+            log.error e
+        }
         if(cached.hasErrors()){
             log.error(cached.errors)
         }

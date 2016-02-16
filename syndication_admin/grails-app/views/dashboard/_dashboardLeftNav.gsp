@@ -20,7 +20,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         class="fa fa-dashboard fa-fw"></i> Dashboard</g:link>
             </li>
 
-            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER,ROLE_BASIC,ROLE_STATS,ROLE_PUBLISHER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_PUBLISHER">
                 <li>
                     <a href="#"><i class="fa fa-sitemap fa-fw"></i> Media<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
@@ -28,10 +28,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <g:link controller="mediaItem" action="search"><i class="fa fa-search fa-fw"></i> Search Media Items</g:link>
                         </li>
                         <li>
-                            <g:link controller="audio"><i class="fa fa-microphone fa-fw"></i> Audio</g:link>
+                            <g:link controller="collection"><i class="fa fa-folder-open-o fa-fw"></i> Collections</g:link>
                         </li>
                         <li>
-                            <g:link controller="collection"><i class="fa fa-folder-open-o fa-fw"></i> Collections</g:link>
+                            <g:link controller="FAQ"><i class="fa fa-question-circle fa-fw"></i> FAQs</g:link>
                         </li>
                         <li>
                             <g:link controller="html"><i class="fa fa-file-text-o fa-fw"></i> Htmls</g:link>
@@ -46,16 +46,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <g:link controller="PDF"><i class="fa fa-file-pdf-o fa-fw"></i> PDFs</g:link>
                         </li>
                         <li>
-                            <g:link controller="periodical"><i class="fa fa-clock-o fa-fw"></i> Periodicals</g:link>
+                            <g:link controller="questionAndAnswer"><i class="fa fa-question fa-fw"></i> Question & Answers</g:link>
                         </li>
                         <li>
                             <g:link controller="tweet"><i class="fa fa-twitter fa-fw"></i> Tweets</g:link>
                         </li>
                         <li>
                             <g:link controller="video"><i class="fa fa-video-camera fa-fw"></i> Videos</g:link>
-                        </li>
-                        <li>
-                            <g:link controller="widget"><i class="fa fa-gear fa-fw"></i> Widgets</g:link>
                         </li>
                     </ul>
                     <!-- /.nav-second-level -->
@@ -69,25 +66,25 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <li>
                             <g:link controller="metricReport" action="overview"><i class="fa fa-tasks fa-fw"></i> Storefront/API Hits</g:link>
                         </li>
-                        <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER">
+                        <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER">
                             <li>
                                 <g:link controller="mediaMetric"><i class="fa fa-newspaper-o fa-fw"></i> Media Metrics</g:link>
                             </li>
                         </sec:ifAnyGranted>
                         <li>
-                            <g:link controller="consumerMetrics" action="generalViews"><i class="fa fa-group fa-fw"></i> Google Analytics Views</g:link>
+                            <g:link controller="consumerMetrics" action="generalViews"><i class="fa fa-group fa-fw"></i> Google Analytics Data</g:link>
                         </li>
                     </ul>
                     <!-- /.nav-second-level -->
                 </li>
             </sec:ifAnyGranted>
 
-            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER,ROLE_BASIC, ROLE_PUBLISHER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER, ROLE_PUBLISHER">
                 <li>
                     <g:link controller="campaign"><i class="fa fa-flag fa-fw"></i> Campaigns</g:link>
                 </li>
             </sec:ifAnyGranted>
-            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER,ROLE_BASIC,ROLE_PUBLISHER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_PUBLISHER">
                 <li>
                     <a href="#"><i class="fa fa-code-fork fa-fw"></i> Other<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
@@ -116,6 +113,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                 <g:link controller="twitterAccount"><i
                                         class="fa fa-twitter fa-fw"></i> Twitter Accounts</g:link>
                             </li>
+                            <li>
+                                <g:link controller="twitterStatusCollector"><i
+                                        class="fa fa-twitter-square fa-fw"></i> Tweet Auto Importer</g:link>
+                            </li>
                         </sec:ifAnyGranted>
 
                     </ul>
@@ -123,7 +124,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 </li>
             </sec:ifAnyGranted>
 
-            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER,ROLE_BASIC,ROLE_PUBLISHER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_PUBLISHER">
                 <li>
                     <a href="#"><i class="fa fa-tags fa-fw"></i> Tags<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
@@ -131,7 +132,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <g:link controller="tag" action="index"><i
                                     class="fa fa-tags fa-fw"></i> Browse Tags</g:link>
                         </li>
-                        <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER">
+                        <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER">
                             <li>
                                 <g:link controller="tag" action="tagger"><i class="fa fa-tag fa-fw"></i> Bulk Tag Media</g:link>
                             </li>
@@ -149,7 +150,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         </sec:ifAnyGranted>
                     </ul><!-- /.nav-second-level -->
                 </li>
-                <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER">
+                <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER">
                     <li>
                         <g:link controller="featuredMedia" action="index"><i class="fa fa-star fa-fw"></i> Featured</g:link>
                     </li>
@@ -192,11 +193,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 </ul><!-- /.nav-second-level -->
             </li>
 
-            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_STATS,ROLE_USER,ROLE_BASIC, ROLE_PUBLISHER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER, ROLE_PUBLISHER">
                 <li>
                     <a href="#"><i class="fa fa-users fa-fw"></i> Users<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
-                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
+                        <sec:ifAnyGranted roles="ROLE_ADMIN">
                             <li>
                                 <g:link controller="user" action="index"><i
                                         class="fa fa-users fa-fw"></i> List Users</g:link>

@@ -4,8 +4,20 @@
 </g:if>
 
 <g:if test="${mediaItemInstance?.name}">
-    <dt class="word_wrap"><g:message code="${mediaType}.name.label" default="Name"/></dt>
+    <g:if test="${mediaItemInstance.getClass().simpleName == 'QuestionAndAnswer'}">
+        <g:set var="nameLabelValue" value="Question"/>
+    </g:if>
+    <g:else>
+        <g:set var="nameLabelValue" value="Name"/>
+    </g:else>
+    <dt class="word_wrap"><g:message code="${mediaType}.name.label" default="${nameLabelValue}"/></dt>
     <dd class="word_wrap"><g:fieldValue bean="${mediaItemInstance}" field="name"/></dd>
+</g:if>
+
+%{--Question and Answer requires special handling here--}%
+<g:if test="${mediaItemInstance.getClass().simpleName == 'QuestionAndAnswer'}">
+    <dt class="word_wrap"><g:message code="${mediaType}.answer.label" default="Answer"/></dt>
+    <dd class="word_wrap"><g:fieldValue bean="${mediaItemInstance}" field="answer"/></dd>
 </g:if>
 
 <g:if test="${mediaItemInstance?.source}">
@@ -18,7 +30,7 @@
     <dd class="word_wrap">${mediaItemInstance?.createdBy?.encodeAsHTML()}</dd>
 </g:if>
 
-<g:if test="${mediaItemInstance?.sourceUrl}">
+<g:if test="${mediaItemInstance?.sourceUrl && mediaItemInstance.getClass().simpleName != 'Collection'}">
     <dt class="word_wrap"><g:message code="${mediaType}.sourceUrl.label" default="Source Url"/></dt>
     <dd class="word_wrap"><a target="_blank" href="${mediaItemInstance.sourceUrl}"><g:fieldValue bean="${mediaItemInstance}" field="sourceUrl"/></a></dd>
 </g:if>

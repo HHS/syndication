@@ -43,8 +43,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                             <g:sortableColumn property="description" title="${message(code: 'collection.description.label', default: 'Description')}"/>
 
-                            <g:sortableColumn property="sourceUrl" title="${message(code: 'collection.sourceUrl.label', default: 'Source Url')}"/>
-
                             <g:sortableColumn property="dateSyndicationCaptured" title="${message(code: 'collection.dateSyndicationCaptured.label', default: 'Date Syndication Captured')}"/>
 
                             <g:sortableColumn property="dateSyndicationUpdated" title="${message(code: 'collection.dateSyndicationUpdated.label', default: 'Date Syndication Updated')}"/>
@@ -60,8 +58,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                 <td><g:link action="show" id="${collectionInstance.id}"><span class="limited-width-md ellipse">${fieldValue(bean: collectionInstance, field: "name")}</span></g:link></td>
 
                                 <td><span class="limited-width-lg ellipse abv60">${fieldValue(bean: collectionInstance, field: "description")}</span></td>
-
-                                <td><span class="limited-width-lg ellipse break-url">${fieldValue(bean: collectionInstance, field: "sourceUrl")}</span></td>
 
                                 <td><g:formatDate date="${collectionInstance.dateSyndicationCaptured}"/></td>
 

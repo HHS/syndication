@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -107,22 +107,22 @@ class UrlMappings {
             action = [GET: "featured"]
         }
 
-// ======================================================================================================
-// |    ##     ## ######## ########  ####    ###       ######## ##    ## ########  ########  ######     |
-// |    ###   ### ##       ##     ##  ##    ## ##         ##     ##  ##  ##     ## ##       ##    ##    |
-// |    #### #### ##       ##     ##  ##   ##   ##        ##      ####   ##     ## ##       ##          |
-// |    ## ### ## ######   ##     ##  ##  ##     ##       ##       ##    ########  ######    ######     |
-// |    ##     ## ##       ##     ##  ##  #########       ##       ##    ##        ##             ##    |
-// |    ##     ## ##       ##     ##  ##  ##     ##       ##       ##    ##        ##       ##    ##    |
-// |    ##     ## ######## ########  #### ##     ##       ##       ##    ##        ########  ######     |
-// ======================================================================================================
-
-        "$v2/resources/media/audio"(controller: "media", parseRequest: true) {
-            action = [POST: "saveAudio"]
-        }
+// =====================================================
+// |    ##     ## ######## ########  ####    ###       |
+// |    ###   ### ##       ##     ##  ##    ## ##      |
+// |    #### #### ##       ##     ##  ##   ##   ##     |
+// |    ## ### ## ######   ##     ##  ##  ##     ##    |
+// |    ##     ## ##       ##     ##  ##  #########    |
+// |    ##     ## ##       ##     ##  ##  ##     ##    |
+// |    ##     ## ######## ########  #### ##     ##    |
+// =====================================================
 
         "$v2/resources/media/collections"(controller: "media", parseRequest: true) {
             action = [POST: "saveCollection"]
+        }
+
+        "$v2/resources/media/faqs"(controller: "media", parseRequest: true) {
+            action = [POST: "saveFAQ"]
         }
 
         "$v2/resources/media/htmls(.$format)?"(controller: "media", parseRequest: true) {
@@ -137,24 +137,20 @@ class UrlMappings {
             action = [POST: "saveInfographic"]
         }
 
-        "$v2/resources/media/socialMedias"(controller: "media", parseRequest: true) {
-            action = [POST: "saveSocialMedia"]
+        "$v2/resources/media/pdfs"(controller: "media", parseRequest: true) {
+            action = [POST: "savePDF"]
+        }
+
+        "$v2/resources/media/questionAndAnswers"(controller: "media", parseRequest: true) {
+            action = [POST: "saveQuestionAndAnswer"]
+        }
+
+        "$v2/resources/media/tweets"(controller: "media", parseRequest: true) {
+            action = [POST: "saveTweet"]
         }
 
         "$v2/resources/media/videos"(controller: "media", parseRequest: true) {
             action = [POST: "saveVideo"]
-        }
-
-        "$v2/resources/media/widgets"(controller: "media", parseRequest: true) {
-            action = [POST: "saveWidget"]
-        }
-
-        "$v2/resources/media/periodicals"(controller: "media", parseRequest: true) {
-            action = [POST: "savePeriodical"]
-        }
-
-        "$v2/resources/media/pdfs"(controller: "media", parseRequest: true) {
-            action = [POST: "savePDF"]
         }
 
 // =================================================================================================
@@ -185,15 +181,19 @@ class UrlMappings {
         "$v2/resources/campaigns(.$format)?"(controller: "campaigns", parseRequest: true) {
             action = [GET: "list", POST: "save"]
         }
+
         "$v2/resources/campaigns/$id(.$format)?"(controller: "campaigns", parseRequest: true) {
             action = [GET: "show"]
         }
+
         "$v2/resources/campaigns/$id/media(.$format)?"(controller: "campaigns", parseRequest: true) {
             action = [GET: "listMediaForCampaign"]
         }
+
         "$v2/resources/campaigns/$id/syndicate(.$format)?"(controller: "campaigns", parseRequest: true) {
             action = [GET: "syndicate"]
         }
+
         "$v2/resources/campaigns/$id/embed(.$format)?"(controller: "campaigns", parseRequest: true) {
             action = [GET: "embed"]
         }
@@ -212,6 +212,7 @@ class UrlMappings {
         "$v2/resources/languages(.$format)?"(controller: "languages", parseRequest: true) {
             action = [GET: "list", POST: "save"]
         }
+
         "$v2/resources/languages/$id(.$format)?"(controller: "languages", parseRequest: true) {
             action = [GET: "show"]
         }
@@ -243,24 +244,31 @@ class UrlMappings {
         "$v2/resources/tags(.$format)?"(controller: "tags", parseRequest: true) {
             action = [GET: "list", POST: "tagSave"]
         }
+
         "$v2/resources/tags/$id(.$format)?"(controller: "tags", parseRequest: true) {
             action = [GET: "show", PUT: "update"]
         }
+
         "$v2/resources/tags/$id/related(.$format)?"(controller: "tags", parseRequest: true) {
             action = [GET: "relatedTags"]
         }
+
         "$v2/resources/tags/$id/media(.$format)?"(controller: "tags", parseRequest: true) {
             action = [GET: "listMediaForTagId"]
         }
+
         "$v2/resources/tags/$id/syndicate(.$format)?"(controller: "tags", parseRequest: true) {
             action = [GET: "syndicate"]
         }
+
         "$v2/resources/tags/$id/embed(.$format)?"(controller: "tags", parseRequest: true) {
             action = [GET: "embed"]
         }
+
         "$v2/resources/tags/tagLanguages(.$format)?"(controller: "tags", parseRequest: true) {
             action = [GET: "listLanguages"]
         }
+
         "$v2/resources/tags/tagTypes(.$format)?"(controller: "tags", parseRequest: true) {
             action = [GET: "listTypes"]
         }
@@ -311,12 +319,15 @@ class UrlMappings {
         "$v2/resources/users/subscriptions"(controller: "users", parseRequest: true) {
             action = [POST: "saveSubscription"]
         }
+
         "$v2/resources/users/$id/subscriptions(.$format)?"(controller: "users", parseRequest: true) {
             action = [GET: "listSubs"]
         }
+
         "$v2/resources/users/$id/subscriptions/$subId"(controller: "users", parseRequest: true) {
             action = [GET: "subscribe", DELETE: "unsubscribe"]
         }
+
         "$v2/resources/users/$id/ratings(.$format)?"(controller: "users", parseRequest: true) {
             action = [GET: "getLikes"]
         }
@@ -334,9 +345,11 @@ class UrlMappings {
         "$v2/resources/userMediaLists/$id(.$format)?"(controller:"userMediaLists", parseRequest: true){
             action = [GET: "show"]
         }
+
         "$v2/resources/userMediaLists/$id/syndicate(.$format)?"(controller:"userMediaLists", parseRequest: true){
             action = [GET: "syndicate"]
         }
+
         "$v2/resources/userMediaLists/$id/embed(.$format)?"(controller:"userMediaLists", parseRequest: true){
             action = [GET: "embed"]
         }
@@ -355,12 +368,15 @@ class UrlMappings {
         "$v2/resources/sources(.$format)?"(controller: "sources", parseRequest: true){
             action = [GET: "list"]
         }
+
         "$v2/resources/sources/$id(.$format)?"(controller: "sources", parseRequest: true){
             action = [GET: "show"]
         }
+
         "$v2/resources/sources/$id/syndicate(.$format)?"(controller: "sources", parseRequest: true){
             action = [GET: "syndicate"]
         }
+
         "$v2/resources/sources/$id/embed(.$format)?"(controller: "sources", parseRequest: true) {
             action = [GET: "embed"]
         }

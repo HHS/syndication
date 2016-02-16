@@ -168,7 +168,7 @@
     <div class="col-md-12">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <label>Google Analytics Views </label> include metrics that are recorded externally by google.
+                <label>Google Analytics Data </label> include metrics that are recorded externally by google.
                 <br>
                 All of your content data will be displayed until you search by specific MediaItems.
             </div>

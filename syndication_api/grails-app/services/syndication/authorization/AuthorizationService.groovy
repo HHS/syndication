@@ -1,6 +1,5 @@
-
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,6 +16,7 @@ package syndication.authorization
 import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
+import grails.util.Holders
 import org.apache.maven.wagon.authorization.AuthorizationException
 
 import javax.annotation.PostConstruct
@@ -44,7 +44,7 @@ class AuthorizationService {
             keyAgreement.setPublicKey(publicKey)
             keyAgreement.setSecret(secret)
 
-            generator = new AuthorizationHeaderGenerator("syndication_api_key", keyAgreement)
+            generator = new AuthorizationHeaderGenerator(Holders.config.apiKey.keyName ?: "syndication_api_key", keyAgreement)
             generator.printToConsole = false
         } else{
             log.error("Keys were left undefined!!! Verify config files. public: ${publicKey} private: ${privateKey} secret: ${secret}")
@@ -57,17 +57,30 @@ class AuthorizationService {
 
     boolean checkAuthorization(Map thirdPartyRequest) {
         def authorizationRequest = (thirdPartyRequest as JSON).toString()
-        log.debug "The authorizationRequest is \n${authorizationRequest}"
+        log.debug "API: checkAuthorization: Third Party Request: ${authorizationRequest}"
 
         String date = new Date().toString()
         String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.verifyAuthPath
-        log.debug "The requestUrl is ${requestUrl}"
-        String apiKeyHeaderValue = generator.getApiKeyHeaderValue([
-                date: date,
-                "content-type": "application/json",
-                "content-length": authorizationRequest.bytes.size() as String
-            ],
-            requestUrl, "POST", authorizationRequest)
+        log.debug "API: VerifyAuthPath: ${requestUrl}"
+
+        def requestHeaders = [                                                                               //headers
+             date: date,
+             "content-type": "application/json",
+             "content-length": authorizationRequest.bytes.size() as String
+        ]
+        String apiKeyHeaderValue = generator.getApiKeyHeaderValue(
+            requestHeaders,
+            requestUrl,                                                                     //requestURL
+            "POST",                                                                         //HTTP Method
+            authorizationRequest                                                            //Third party request as json string
+        )
+
+        log.debug("API: Internal Auth header value: ${apiKeyHeaderValue}\nThe header values are:\n" +
+                "${requestHeaders}\n" +
+                "requestUrl: ${requestUrl}\n" +
+                "authorizationRequest: ${authorizationRequest}")
+
+
         def resp = rest.post(requestUrl) {
             header 'Date', date
             header 'Authorization', apiKeyHeaderValue
@@ -75,7 +88,18 @@ class AuthorizationService {
             json thirdPartyRequest
         }
 
-        resp.status == 204
+        log.debug("API: Authorization Response Status: ${resp.status}")
+
+        if(resp.status != 204){
+            try{
+                log.error("API: The detailed response from CMS Manager: ${(resp.json as JSON).toString(true)}")
+            } catch(ignored){}
+
+            log.error("Non 204 response code for authorization check: ${resp.status}")
+            return false
+        }
+
+        true
     }
 
     def post(String body, String url){
@@ -94,6 +118,7 @@ class AuthorizationService {
             resp = rest.post(url) {
                 header 'Date', requestHeaders.Date
                 header 'Authorization', apiKeyHeaderValue
+                contentType "application/json"
                 accept "application/json"
 
                 json body
@@ -180,6 +205,8 @@ class AuthorizationService {
             header 'Authorization', apiKeyHeaderValue
         }
 
+        log.debug resp.json
+        log.debug resp.status
         resp.json.isSecure as Boolean
     }
 }

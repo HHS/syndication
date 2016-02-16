@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -60,4 +60,17 @@ class CacheAccessController {
             render text: [msg: "There was an error flushing the cache, error code ${time}"] as JSON, status: 500, contentType: "application/json"
         }
     }
+
+    def flushCacheForMediaItemUpdate(){
+        log.info("Flushing Guava Cache by Request")
+        boolean successful = guavaCacheService.flushCacheForMediaItemUpdate(params.long("mediaItemId"))
+        if(successful) {
+            render text: [msg: "Cache Flushed Successfully."] as JSON, status: 200, contentType: "application/json"
+        } else{
+            long time = System.nanoTime()
+            log.error("Cache flush failed: ${time}")
+            render text: [msg: "There was an error flushing the cache for a media item update, error code ${time}"] as JSON, status: 500, contentType: "application/json"
+        }
+    }
+
 }

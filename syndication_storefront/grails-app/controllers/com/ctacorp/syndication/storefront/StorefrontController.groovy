@@ -202,7 +202,9 @@ class StorefrontController {
         redirect action: "showContent", id: mediaId
     }
 
-    def releaseInfo() {}
+    def releaseInfo() {
+        [releaseNotes:ReleaseNote.list(sort:'releaseDate', order: 'DESC')]
+    }
 
     def showCampaign() {}
 
@@ -286,6 +288,7 @@ class StorefrontController {
                 languageList         : Language.findAllByIsActive(true),
                 domain               : params.domain,
                 mediaType            : params.mediaType,
+                createdBy            : params.createdBy,
                 searchType           : searchType,
                 sourceList           : Source.list(sort: "name", order: "ASC"),
                 source               : params.source,

@@ -3,6 +3,7 @@ package com.ctacorp.syndication.crud
 import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.social.TwitterAccount
 import com.ctacorp.syndication.media.Tweet
+import com.ctacorp.syndication.social.TwitterStatusCollector
 import grails.plugin.springsecurity.annotation.Secured
 
 import static org.springframework.http.HttpStatus.CREATED
@@ -20,7 +21,8 @@ class TwitterAccountController {
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_ADMIN") {
+        def authority = UserRole.findByUser(springSecurityService.currentUser).role.authority
+        if(authority in ["ROLE_ADMIN", "ROLE_MANAGER"]) {
             def allAccounts = TwitterAccount.list(params)
             render view:"index", model:[twitterAccountInstanceList:allAccounts, total:allAccounts.totalCount]
         } else {
@@ -101,6 +103,13 @@ class TwitterAccountController {
         if (twitterAccount == null) {
             notFound()
             return
+        }
+
+        def statusCollectors = TwitterStatusCollector.list()
+        statusCollectors.each{collector ->
+            if(collector.twitterAccounts.contains(twitterAccount)){
+                collector.delete()
+            }
         }
 
         def mediaItems = Tweet.findAllByAccount(twitterAccount)

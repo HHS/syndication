@@ -17,6 +17,7 @@ class MicrositeFilterService {
 
     def mailService
     PageRenderer groovyPageRenderer
+    def grailsApplication
 
     def scanAllMicrosites() {
             MicroSite.list().each { site ->
@@ -91,7 +92,7 @@ class MicrositeFilterService {
             async true
             to mailRecipiants
             subject "Microsite registration request"
-            html groovyPageRenderer.render(template: '/micrositeFilter/micrositeFlagEmail', model:[userInstance: microsite.user, microsite:microsite])
+            html groovyPageRenderer.render(template: '/micrositeFilter/micrositeFlagEmail', model:[userInstance: microsite.user, microsite:microsite, serverUrl:grailsApplication.config.grails.serverURL])
         }
     }
 

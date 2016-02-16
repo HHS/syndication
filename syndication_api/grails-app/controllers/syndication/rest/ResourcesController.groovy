@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,6 @@ import com.ctacorp.syndication.api.Pagination
 ], models = [
     @Model(id = "ResourceLists", properties = [
         @ModelProperty(propertyName = "alternateImages", attributes = [@PropertyAttribute(type = "ResourceList")]),
-        @ModelProperty(propertyName = "audios", attributes = [@PropertyAttribute(type = "ResourceList")]),
         @ModelProperty(propertyName = "campaigns", attributes = [@PropertyAttribute(type = "ResourceList")]),
         @ModelProperty(propertyName = "collections", attributes = [@PropertyAttribute(type = "ResourceList")]),
         @ModelProperty(propertyName = "htmls", attributes = [@PropertyAttribute(type = "ResourceList")]),
@@ -42,7 +41,6 @@ import com.ctacorp.syndication.api.Pagination
         @ModelProperty(propertyName = "tags", attributes = [@PropertyAttribute(type = "ResourceList")]),
         @ModelProperty(propertyName = "tagTypes", attributes = [@PropertyAttribute(type = "ResourceList")]),
         @ModelProperty(propertyName = "videos", attributes = [@PropertyAttribute(type = "ResourceList")]),
-        @ModelProperty(propertyName = "widgets", attributes = [@PropertyAttribute(type = "ResourceList")])
     ]),
     @Model(id = "ResourceList", properties = [
         @ModelProperty(propertyName = "items", attributes = [@PropertyAttribute(type = "array", typeRef = "Resource", required = true)]),

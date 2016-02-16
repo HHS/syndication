@@ -17,6 +17,7 @@ import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import com.icegreen.greenmail.imap.AuthorizationException
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
+import grails.util.Holders
 import org.springframework.web.client.ResourceAccessException
 
 import javax.annotation.PostConstruct
@@ -28,7 +29,7 @@ class AuthorizationService {
 
     private AuthorizationHeaderGenerator generator
     private AuthorizationHeaderGenerator.KeyAgreement keyAgreement
-    private RestBuilder rest= new RestBuilder()
+    def config = Holders.config
 
     @PostConstruct
     void init() {
@@ -36,14 +37,15 @@ class AuthorizationService {
         String publicKey = grailsApplication.config.cmsManager.publicKey
         String secret = grailsApplication.config.cmsManager.secret
         if (privateKey && publicKey && secret) {
-            rest
+            RestBuilder rest = new RestBuilder()
             rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
             keyAgreement = new AuthorizationHeaderGenerator.KeyAgreement()
 
             keyAgreement.setPublicKey(publicKey)
             keyAgreement.setSecret(secret)
 
-            generator = new AuthorizationHeaderGenerator("syndication_api_key", keyAgreement)
+            generator = new AuthorizationHeaderGenerator(config.apiKey.keyName ?: "syndication_api_key", keyAgreement)
+            generator.printToConsole = false
         }
     }
 
@@ -65,6 +67,7 @@ class AuthorizationService {
         ],
                 requestUrl, "POST", authorizationRequest)
 
+        RestBuilder rest = new RestBuilder()
         def resp = rest.post(requestUrl) {
             header 'Date', date
             header 'Authorization', apiKeyHeaderValue
@@ -90,6 +93,7 @@ class AuthorizationService {
         def apiKeyHeaderValue = generator.getApiKeyHeaderValue(requestHeaders, url, method, body)
         def resp
 
+        RestBuilder rest = new RestBuilder()
         try {
             switch (method) {
                 case "POST":
@@ -120,7 +124,6 @@ class AuthorizationService {
                 default: break; //do nothing
             }
         } catch(ResourceAccessException e){
-            println e
             log.error "Couldn't reach remote server, it might be down"
         } catch(e){
             log.error "Unexpected connection error occured trying to communicated with: ${url}"
@@ -133,7 +136,7 @@ class AuthorizationService {
         }
 
         if(!resp || !resp.json){
-            log.error "No json response from server ${url}"
+            log.error "No json response from server ${url}\nResponse: ${resp?.status}"
             return null
         }
 
@@ -156,6 +159,7 @@ class AuthorizationService {
         String date = new Date().toString()
         String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.selfAuthPath
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([date: date], requestUrl, "GET", null)
+        RestBuilder rest = new RestBuilder()
         def resp = rest.get(requestUrl) {
             header 'Date', date
             header 'Authorization', apiKeyHeaderValue

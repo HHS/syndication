@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,7 +19,6 @@ import com.ctacorp.syndication.AlternateImage
 import com.ctacorp.syndication.api.Embedded
 import com.ctacorp.syndication.data.CampaignHolder
 import com.ctacorp.syndication.data.TagHolder
-import com.ctacorp.syndication.media.Audio
 import com.ctacorp.syndication.Campaign
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Image
@@ -29,7 +28,6 @@ import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.media.Video
-import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.api.Meta
 import com.ctacorp.syndication.api.Pagination
 import com.ctacorp.syndication.api.Message
@@ -43,7 +41,6 @@ import org.codehaus.groovy.grails.web.mime.MimeType
     ], removeProperties = ["results"])
 ], modelRefs = [
         AlternateImage,
-        Audio,
         Campaign,
         com.ctacorp.syndication.media.Collection,
         Html,
@@ -54,7 +51,6 @@ import org.codehaus.groovy.grails.web.mime.MimeType
         MediaItem,
         Tweet,
         Video,
-        Widget,
         ApiResponse,
         Meta,
         Pagination,

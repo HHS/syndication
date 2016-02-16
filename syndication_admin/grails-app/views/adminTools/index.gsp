@@ -41,84 +41,156 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <synd:error/>
 
     <div class="row">
-        <div class="col-lg-12">
-            <h3>TinyUrls</h3>
-            <g:form action="updateMissingTinyUrls">
-                <g:submitButton class="btn btn-primary" name="updateMissingTinyUrls" value="Update Missing TinyUrls"/>
-            </g:form>
-        </div>
-    </div>
-    <hr/>
-    <div class="row">
-        <div class="col-lg-12">
-            <h3>Content Hashes</h3>
-            <g:form action="resetAllHashes">
-                <g:checkBox name="restrictToDomain"/>
-                <label for="restrictToDomain">Restrict to Domain</label>
-                <br/>
-                <lable for="domain">URL:</lable>
-                <g:textField name="domain" size="100"/>
-                <br/><br/>
-                <g:submitButton class="btn btn-primary" name="resetAllHashes" value="Reset all content hashes"/>
-            </g:form>
-        </div>
-    </div>
-    <hr/>
-    <div class="row">
-        <div class="col-lg-12">
-            <h3>Tweet Inspector</h3>
-            <g:form action="inspectTweet">
-                <g:textField name="tweetId" value="${tweetId}"/>
-                <g:submitButton class="btn btn-primary" name="submit" value="lookup"/>
-            </g:form>
-            <g:if test="${tweetData}">
-                <h4>Data for tweet id: ${tweetData.id}</h4>
-                <div>
-                    <ul>
-                    <g:each in="${tweetData.metaClass.properties}" var="prop">
-                        <g:if test="${prop.name == "user" || prop.name.contains('Entities')}">
-                            <li>
-                                <strong>${prop.name}</strong>
-                                <ul>
-                                    <g:each in="${tweetData."${prop.name}"}" var="nestedProp" status="i">
+        <div class="col-md-6">
+            %{--UPDATE MISSING TINY URLS ------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>TinyUrls</h3>
+                    <g:form action="updateMissingTinyUrls">
+                        <g:submitButton class="btn btn-primary" name="updateMissingTinyUrls" value="Update Missing TinyUrls"/>
+                    </g:form>
+                </div>
+            </div>
+            <hr/>
+            %{--RESET CONTENT HASHES ----------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Content Hashes</h3>
+                    <g:form action="resetAllHashes">
+                        <div class="check-box">
+                            <label>
+                                <g:checkBox name="restrictToDomain"/>   Restrict to Domain
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <lable for="domain">URL:</lable>
+                            <g:textField class="form-control" name="domain"/>
+                        </div>
+                        <div class="form-group">
+                            <g:submitButton class="btn btn-primary" name="resetAllHashes" value="Reset all content hashes"/>
+                        </div>
+                    </g:form>
+                </div>
+            </div>
+            <hr/>
+            %{--Download Database as JSON ------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Database Dump</h3>
+                    <g:form action="downloadDatabaseAsJsonFile">
+                        <div class="check-box">
+                            <label>
+                                <g:checkBox name="pretty" checked="true"/> Pretty Json?
+                            </label>
+                        </div>
+                        <g:submitButton class="btn btn-primary" name="downloadData" value="Download Datadump"/>
+
+                    </g:form>
+                </div>
+            </div>
+            <hr/>
+            %{--TWEET INSPECTOR ---------------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Tweet Inspector</h3>
+                    <g:form action="inspectTweet">
+                        <div class="form-group">
+                            <label for="tweetId">Tweet ID</label>
+                            <g:textField class="form-control" name="tweetId" value="${tweetId}"/>
+                        </div>
+
+                        <g:submitButton class="btn btn-primary" name="submit" value="Lookup"/>
+                    </g:form>
+                    <g:if test="${tweetData}">
+                        <h4>Data for tweet id: ${tweetData.id}</h4>
+                        <div>
+                            <ul>
+                                <g:each in="${tweetData.metaClass.properties}" var="prop">
+                                    <g:if test="${prop.name == "user" || prop.name.contains('Entities')}">
                                         <li>
-                                            <strong>${i}</strong>
+                                            <strong>${prop.name}</strong>
                                             <ul>
-                                            <g:each in="${nestedProp.metaClass.properties}" var="doubleNestedProp">
-                                                <g:if test="${doubleNestedProp.name == "videoVariants"}">
-                                                    <li><strong>videoVariants</strong>
+                                                <g:each in="${tweetData."${prop.name}"}" var="nestedProp" status="i">
+                                                    <li>
+                                                        <strong>${i}</strong>
                                                         <ul>
-                                                            <g:each in="${nestedProp.videoVariants}" var="videoVariant" status="vi">
-                                                                <li><strong>${vi}</strong>
-                                                                    <ul>
-                                                                    <g:each in="${videoVariant.metaClass.properties}" var="videoProp">
-                                                                        <li><strong>${videoProp.name}</strong>: ${videoVariant."${videoProp.name}"}</li>
-                                                                    </g:each>
-                                                                    </ul>
-                                                                </li>
+                                                            <g:each in="${nestedProp.metaClass.properties}" var="doubleNestedProp">
+                                                                <g:if test="${doubleNestedProp.name == "videoVariants"}">
+                                                                    <li><strong>videoVariants</strong>
+                                                                        <ul>
+                                                                            <g:each in="${nestedProp.videoVariants}" var="videoVariant" status="vi">
+                                                                                <li><strong>${vi}</strong>
+                                                                                    <ul>
+                                                                                        <g:each in="${videoVariant.metaClass.properties}" var="videoProp">
+                                                                                            <li><strong>${videoProp.name}</strong>: ${videoVariant."${videoProp.name}"}</li>
+                                                                                        </g:each>
+                                                                                    </ul>
+                                                                                </li>
+                                                                            </g:each>
+                                                                        </ul>
+                                                                    </li>
+                                                                </g:if>
+                                                                <g:else>
+                                                                    <li><strong>${doubleNestedProp.name}</strong>: ${nestedProp."${doubleNestedProp.name}"}</li>
+                                                                </g:else>
                                                             </g:each>
                                                         </ul>
                                                     </li>
-                                                </g:if>
-                                                <g:else>
-                                                    <li><strong>${doubleNestedProp.name}</strong>: ${nestedProp."${doubleNestedProp.name}"}</li>
-                                                </g:else>
-                                            </g:each>
+                                                </g:each>
                                             </ul>
                                         </li>
+                                    </g:if>
+                                    <g:else>
+                                        <li><strong>${prop.name}</strong>: ${tweetData."${prop.name}"}</li>
+                                    </g:else>
+                                </g:each>
+                            </ul>
+                        </div>
+                    </g:if>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            %{--Content Associations ---------------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Content Associations</h3>
+                    <g:link controller="ownershipCleanup" action="index" class="btn btn-warning">Bulk Media Ownership</g:link>
+                </div>
+            </div>
+            <hr/>
+            %{--Duplicate Finder ---------------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Duplicate Finder</h3>
+                    <g:link action="findDuplicates" class="btn btn-primary">Find Duplicates</g:link>
+                </div>
+                <g:if test="${duplicates}">
+                    <div class="col-lg-12">
+                        <ul>
+                            <g:each in="${duplicates}" var="dupeSet">
+                                <li><g:link controller="mediaItem" action="show" id="${dupeSet.oldest.id}">${dupeSet.oldest.id}</g:link>: ${dupeSet.oldest.sourceUrl}</li>
+                                <ul>
+                                    <g:each in="${dupeSet.dupes}" var="dupe">
+                                        <li><g:link controller="mediaItem" action="show" id="${dupe.id}">${dupe.id}</g:link>: ${dupe.sourceUrl}</li>
                                     </g:each>
                                 </ul>
-                            </li>
-                        </g:if>
-                        <g:else>
-                            <li><strong>${prop.name}</strong>: ${tweetData."${prop.name}"}</li>
-                        </g:else>
-                    </g:each>
-                    </ul>
+                            </g:each>
+                        </ul>
+                    </div>
+                </g:if>
+            </div>
+            <hr/>
+            %{--Cache Management ---------------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Cache Flusher</h3>
+                    <g:link action="flushAllCaches" class="btn btn-primary">Flush All Caches</g:link>
                 </div>
-            </g:if>
+            </div>
         </div>
     </div>
+
 </div>
 </body>
 </html>

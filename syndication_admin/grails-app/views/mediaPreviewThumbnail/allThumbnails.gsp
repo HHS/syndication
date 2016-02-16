@@ -56,6 +56,7 @@
     <div class="pagination">
         <g:paginate class="pagination" total="${com.ctacorp.syndication.media.MediaItem.count()}" action="allThumbnails"/>
     </div>
-
+    <br/>
+    <br/>
 </body>
 </html>

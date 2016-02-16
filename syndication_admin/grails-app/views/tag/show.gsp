@@ -83,7 +83,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <div class="col-xs-12">
                 <g:form class="form-horizontal">
                     <g:hiddenField name="id" value="${tag.id}"/>
-                    <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER,ROLE_USER">
+                    <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER">
                         <g:actionSubmit action="edit" class="btn btn-warning" value="Edit"/>
                         <g:actionSubmit action="delete" class="btn btn-danger" onclick="return confirm('Are you sure?');" value="Delete"/>
                     </sec:ifAnyGranted>

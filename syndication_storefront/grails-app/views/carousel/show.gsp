@@ -8,7 +8,6 @@
     <meta name="author" content="">
     <title>Syndication: Microsite Carousel Template</title>
     <link rel="shortcut icon" href="">
-    <asset:javascript src="jquery"/>
     <asset:javascript src="resize/jquery.resize.js"/>
     <asset:javascript src="waitForImages/jquery.waitforimages.js"/>
     <asset:javascript src="modernizr/modernizr.js"/>
@@ -37,10 +36,15 @@
 
                 <div data-carousel-3d>
 
-                    <g:each in="${pane1MediaItems}" var="media">
-                        <img style="width:100%" class="microsite-article-pic"
-                             src="${apiBaseUrl}/resources/media/${media?.id}/preview.jpg" alt="thumbnail for ${media.name}"/>
-                    </g:each>
+                    <g:if test="${pane1MediaItems}">
+                        <g:each in="${pane1MediaItems}" var="media">
+                            <img style="width:100%" class="microsite-article-pic"
+                                 src="${apiBaseUrl}/resources/media/${media?.id}/preview.jpg" alt="thumbnail for ${media.name}"/>
+                        </g:each>
+                    </g:if>
+                    <g:else>
+                        <asset:image src="bad.jpg" style="width:100%" class="microsite-article-pic" alt="thumbnail for empty list"/>
+                    </g:else>
 
                 </div>
 
@@ -55,7 +59,7 @@
 
                             <div class="microsite-article on-color">
 
-                                ${raw(mediaItemContent.json.results.content[0])}
+                                ${raw(mediaItemContent?.json?.results?.content[0])}
 
                             </div>
 
@@ -75,7 +79,7 @@
 
                         <div class="microsite-article on-color">
 
-                            ${raw(mediaItemContent.json.results.content[0])}
+                            ${raw(mediaItemContent?.json?.results?.content[0])}
                         </div>
 
                         </g:each>
@@ -97,16 +101,16 @@
 <script>
 
     $(document).ready(function () {
-        $('#carousel').Carousel(
-                {
-                    itemWidth: 110,
-                    itemHeight: 62,
-                    itemMinWidth: 50,
-                    items: 'a',
-                    reflections: .5,
-                    rotationSpeed: 1.8
-                }
-        );
+//        $('#carousel').Carousel3d(
+//                {
+//                    itemWidth: 110,
+//                    itemHeight: 62,
+//                    itemMinWidth: 50,
+//                    items: 'a',
+//                    reflections: .5,
+//                    rotationSpeed: 1.8
+//                }
+//        );
     });
 
 </script>

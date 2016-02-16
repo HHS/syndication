@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,6 @@ class ResourcesService {
 
 
     private static int getMax(params) {
-        //TODO we need to define a global max somewhere, and load that here
         Math.min(params.int("max") ?: 20, 1000)
     }
 
@@ -143,9 +142,7 @@ class ResourcesService {
                     case Html: total = total + addGroupedMedia(response, "htmls", item, searchResult.getClass().simpleName); break;
                     case Image: total = total + addGroupedMedia(response, "images", item, searchResult.getClass().simpleName); break;
                     case Infographic: total = total + addGroupedMedia(response, "infographics", item, searchResult.getClass().simpleName); break;
-                    case Audio: total = total + addGroupedMedia(response, "audio", item, searchResult.getClass().simpleName); break;
                     case Video: total = total + addGroupedMedia(response, "videos", item, searchResult.getClass().simpleName); break;
-                    case Widget: total = total + addGroupedMedia(response, "widget", item, searchResult.getClass().simpleName); break;
                     case Tweet: total = total + addGroupedMedia(response, "tweet", searchResult.getClass().simpleName); break;
                     case Collection: total = total + addGroupedMedia(response,"collections",item,searchResult.getClass().simpleName); break;
                     default: log.error("Unsupported type in global search: ${item}")

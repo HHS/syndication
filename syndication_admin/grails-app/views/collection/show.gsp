@@ -37,9 +37,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                 <g:if test="${collectionInstance?.mediaItems}">
                     <dt id="mediaItems-label" class="word_wrap"><g:message code="collection.mediaItems.label" default="Media Items"/></dt>
-                    <g:each in="${collectionInstance.mediaItems.sort{ it.name }}" var="m">
-                        <dd class="word_wrap"><span style="text-align: right; display:inline-block; width:3em;">${m.id}</span> <g:link controller="mediaItem" action="show" id="${m.id}">${m?.encodeAsHTML()}</g:link></dd>
-                    </g:each>
+                    <div style="height:200px; overflow-y:scroll;">
+                        <ul>
+                            <g:each in="${collectionInstance.mediaItems.sort{ it.name }}" var="m">
+                                <li class="word_wrap fieldcontain"><span style="display:inline-block; width:3em;">${m.id}</span> <g:link controller="mediaItem" action="show" id="${m.id}">${m?.encodeAsHTML()}</g:link></li>
+                            </g:each>
+                        </ul>
+
+                    </div>
                 </g:if>
             </dl>
         </div>

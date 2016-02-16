@@ -35,7 +35,6 @@ class ApiKeyUtils {
     static String headerName
 
     static {
-
         Security.addProvider(new BouncyCastleProvider())
         def apiKey = Holders.config?.apiKey
 
@@ -152,7 +151,6 @@ class ApiKeyUtils {
     }
 
     static AuthorizationHeader getAuthHeader(String rawAuthHeader, logFileId) {
-
         if (!rawAuthHeader || rawAuthHeader.indexOf(keyName) != 0) {
             log.error("(${logFileId}) api key is missing")
             return null

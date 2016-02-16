@@ -1,6 +1,5 @@
-
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -19,6 +18,7 @@ import grails.converters.JSON
 class StatusCheckController {
     def tinyUrlService
     def tagsService
+    def authorizationService
 
     def beforeInterceptor = {
         response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
@@ -35,9 +35,17 @@ class StatusCheckController {
 
         response.contentType = "application/json"
         if(allSystemsGo){
-            render "${params.callback}(${([running:"roger"] as JSON)});"
+            if(params.callback){
+                render "${params.callback}(${([running:"roger"] as JSON)});"
+            } else{
+                render ([running:"roger"] as JSON)
+            }
         } else{
-            render "${params.callback}(${([running:"partial"] as JSON)});"
+            if(params.callback) {
+                render "${params.callback}(${([running: "partial"] as JSON)});"
+            } else{
+                render ([running: "partial"] as JSON)
+            }
         }
     }
 
@@ -55,5 +63,9 @@ class StatusCheckController {
         } else{
             render "${params.callback}(${([running:"error"] as JSON)});"
         }
+    }
+
+    def amIAuthorized(){
+        render authorizationService.amIAuthorized()
     }
 }

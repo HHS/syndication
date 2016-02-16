@@ -38,53 +38,51 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 </head>
 
 <body>
-    <div id="wrapper">
-        <g:render template="/dashboard/dashboardNavbar"/>
-        <g:render template="/dashboard/dashboardLeftNav"/>
-        <div id="page-wrapper">
+<div id="wrapper">
+    <g:render template="/dashboard/dashboardNavbar"/>
+    <g:render template="/dashboard/dashboardLeftNav"/>
+    <div id="page-wrapper">
 
-            %{--Page Inner Nav--}%
-            <a href="#list-html" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-            <br/>
-            <sec:ifAnyGranted roles="ROLE_ADMIN">
-                <g:if test="${!(params.controller in ["metricReport", "mediaPreviewThumbnail", "consumerMetrics"])}">
-                    <nav class="navbar navbar-default" role="navigation">
-                        <div class="container-fluid">
-                            <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
-                            <g:if test="${params.controller == "tweet"}">
-                                <g:link class="navbar-brand" action="importTweets"><i class="fa fa-cloud-download"></i> Import Tweets</g:link>
-                                <g:link class="navbar-brand" controller="twitterAccount" action="create"><i class="fa fa-plus"></i> Add Twitter Account</g:link>
-                            </g:if>
-                            <g:else>
-                                <g:if test="${params.controller == "registration"}">
-                                    %{--don't show new button--}%
-                                </g:if>
-                                <g:else>
-                                    <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
-                                </g:else>
-                            </g:else>
-                        </div>
-                    </nav>
-                </g:if>
-            </sec:ifAnyGranted>
-            <sec:ifAnyGranted roles="ROLE_PUBLISHER">
-                <g:if test="${params.controller in ["campaign", "audio","collection","html","image","infographic", "PDF", "periodical","tweet","twitterAccount","video","widget"]}">
-                    <nav class="navbar navbar-default" role="navigation">
-                        <div class="container-fluid">
-                            <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
-                            <g:if test="${params.controller in ["campaign", "audio", "collection", "html", "image", "infographic", "PDF", "periodical", "twitterAccount", "video", "widget"]}">
+        %{--Page Inner Nav--}%
+        <a href="#list-html" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
+        <br/>
+        <sec:ifAnyGranted roles="ROLE_ADMIN">
+            <g:if test="${!(params.controller in ["metricReport", "mediaPreviewThumbnail", "consumerMetrics"])}">
+                <nav class="navbar navbar-default" role="navigation">
+                    <div class="container-fluid">
+                        <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
+                        <g:if test="${params.controller == "tweet"}">
+                            <g:link class="navbar-brand" action="importTweets"><i class="fa fa-cloud-download"></i> Import Tweets</g:link>
+                            <g:link class="navbar-brand" controller="twitterAccount" action="create"><i class="fa fa-plus"></i> Add Twitter Account</g:link>
+                        </g:if>
+                        <g:else>
+                        %{--don't show new button--}%
+                            <g:if test="${params.controller != "registration"}">
                                 <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
                             </g:if>
-                            <g:elseif test="${params.controller == "tweet"}">
-                                <g:link class="navbar-brand" action="importTweets"><i class="fa fa-cloud-download"></i> Import Tweets</g:link>
-                                <g:link class="navbar-brand" controller="twitterAccount" action="create"><i class="fa fa-plus"></i> Add Twitter Account</g:link>
-                            </g:elseif>
-                        </div>
-                    </nav>
-                </g:if>
-            </sec:ifAnyGranted>
-            <sec:ifAnyGranted roles="ROLE_MANAGER">
-                <g:if test="${params.controller in ["alternateImage", "campaign", "language", "extendedAttribute", "twitterAccount", "source", "user", "audio", "collection", "html", "image", "infographic", "PDF", "periodical", "tweet", "video", "widget"]}">
+                        </g:else>
+                    </div>
+                </nav>
+            </g:if>
+        </sec:ifAnyGranted>
+        <sec:ifAnyGranted roles="ROLE_PUBLISHER">
+            <g:if test="${params.controller in ["campaign", "source", "collection","html","image","infographic", "PDF", "tweet","twitterAccount","twitterStatusCollector", "video", "questionAndAnswer", "FAQ"]}">
+                <nav class="navbar navbar-default" role="navigation">
+                    <div class="container-fluid">
+                        <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
+                        <g:if test="${params.controller in ["campaign", "collection", "html", "image", "infographic", "PDF", "twitterAccount", "twitterStatusCollector", "video", "questionAndAnswer", "FAQ"]}">
+                            <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
+                        </g:if>
+                        <g:elseif test="${params.controller == "tweet"}">
+                            <g:link class="navbar-brand" action="importTweets"><i class="fa fa-cloud-download"></i> Import Tweets</g:link>
+                            <g:link class="navbar-brand" controller="twitterAccount" action="create"><i class="fa fa-plus"></i> Add Twitter Account</g:link>
+                        </g:elseif>
+                    </div>
+                </nav>
+            </g:if>
+        </sec:ifAnyGranted>
+        <sec:ifAnyGranted roles="ROLE_MANAGER">
+            <g:if test="${params.controller in ["alternateImage", "campaign", "language", "extendedAttribute", "twitterAccount", "twitterStatusCollector", "source", "collection", "html", "image", "infographic", "PDF", "tweet", "video", "questionAndAnswer", "FAQ"]}">
                 <nav class="navbar navbar-default" role="navigation">
                     <div class="container-fluid">
                         <g:if test="${params.controller == "tweet"}">
@@ -96,33 +94,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
                             <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
                         </g:else>
-
                     </div>
                 </nav>
             </g:if>
-            </sec:ifAnyGranted>
-            <sec:ifAnyGranted roles="ROLE_USER">
-                <g:if test="${params.controller in ["campaign", "source", "audio", "collection", "html", "image", "infographic", "PDF", "periodical", "tweet", "video", "widget"]}">
-                    <nav class="navbar navbar-default" role="navigation">
-                        <div class="container-fluid">
-                            <g:if test="${params.controller == "tweet"}">
-                                <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
-                                <g:link class="navbar-brand" action="importTweets"><i class="fa fa-cloud-download"></i> Import Tweets</g:link>
-                            </g:if>
-                            <g:else>
-                                <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
-                                <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
-                            </g:else>
-                        </div>
-                    </nav>
-                </g:if>
-            </sec:ifAnyGranted>
+        </sec:ifAnyGranted>
 
-            <g:layoutBody/>
-            <div class="footer" role="contentinfo"></div>
+        <g:layoutBody/>
+        <div class="footer" role="contentinfo"></div>
 
-            <div id="spinner" class="spinner" style="display:none;"><g:message code="spinner.alt" default="Loading&hellip;"/></div>
-        </div>
+        <div id="spinner" class="spinner" style="display:none;"><g:message code="spinner.alt" default="Loading&hellip;"/></div>
     </div>
+</div>
 </body>
 </html>

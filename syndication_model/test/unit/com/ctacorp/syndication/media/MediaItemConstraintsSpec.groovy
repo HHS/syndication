@@ -22,13 +22,13 @@ class MediaItemConstraintsSpec extends Specification {
             def instance_MediaItem = MediaItem.build()
 
         when: "the instance is validated"
-            instance_MediaItem.validate()
+            def valid = instance_MediaItem.validate()
 
-        then: "there should be no errors"
-            instance_MediaItem.validate() == true
+        then: "it should be valid"
+            valid
 
         and: "There should be no errors"
-            instance_MediaItem.errors.errorCount == 0
+            !instance_MediaItem.hasErrors()
     }
 
     void "null fields should not be allowed"(){

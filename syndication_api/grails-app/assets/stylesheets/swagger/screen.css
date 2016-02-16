@@ -1146,7 +1146,7 @@ table {
     display: block;
 
     min-height: 143px;
-    background:#f9f9f9 url('../images/footer/stay-connected-arrow-bg.png') no-repeat 27px 0px;
+    background:#f9f9f9 url('../footer/stay-connected-arrow-bg.png') no-repeat 27px 0px;
     border-right: 1px solid #afaeb1;
     border-bottom: 1px solid #afaeb1;
 }

@@ -33,8 +33,8 @@ import com.ctacorp.syndication.media.Tweet
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_STATS', 'ROLE_PUBLISHER'])
-@Transactional(readOnly = true)
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
+@Transactional
 class TweetController {
 
     def mediaItemsService
@@ -46,13 +46,14 @@ class TweetController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "POST"]
 
+    @Transactional(readOnly = true)
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         def indexResponse = mediaItemsService.getIndexResponse(params, Tweet)
         respond indexResponse.mediaItemList, model: [tweetInstanceCount: indexResponse.mediaItemInstanceCount]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @NotTransactional
     def importTweets(Integer count, Boolean restrictToMedia, String accountName){
         def sourceList = Source.list()
         count = count ? Math.min(count, 100) : 10
@@ -62,7 +63,7 @@ class TweetController {
         def tweets
 
         def twitterAccountList = null
-        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_ADMIN" || UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER" || UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_USER") {
+        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_ADMIN" || UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER") {
             twitterAccountList = TwitterAccount.list()
         } else if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
             twitterAccountList = TwitterAccount.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)
@@ -72,31 +73,18 @@ class TweetController {
             render view: "importTweets",
                     model: [
                         status:apiStatus,
-                        message:"Please add a twitter account and select it to continue.",
+                        message: twitterService.isProtected(accountName) ? "This twitter account is private." :"Please add a twitter account and select it to continue.",
                         twitterAccountList:twitterAccountList,
                         subscribers:subscribers,
                         sourceList:sourceList
                     ]
             return
         }
-        if(twitterService.isProtected(accountName)){
-            render view: "importTweets",
-                    model: [
-                            status:apiStatus,
-                            message:"This twitter account is private.",
-                            twitterAccountList:twitterAccountList,
-                            subscribers:subscribers,
-                            sourceList:sourceList
-                    ]
-            return
-        }
-        if(restrictToMedia){
-            tweets = twitterService.getMediaStatuses(accountName, count ?: 10)
-        } else{
-            tweets = twitterService.getStatuses(accountName, count ?: 10)
-        }
+
+        tweets = restrictToMedia ? twitterService.getMediaStatuses(accountName, count ?: 10) : twitterService.getStatuses(accountName, count ?: 10)
 
         ArrayList<Map> modifiableStatuses = []
+        //TODO this doesn't look like a good way to do this :/
         if(tweets instanceof LinkedHashMap) {
             flash.error = tweets.error
         } else {
@@ -105,7 +93,8 @@ class TweetController {
             }
         }
 
-        [   tweets:modifiableStatuses,
+        [
+            tweets:modifiableStatuses,
             status:apiStatus,
             restrictToMedia:restrictToMedia,
             count:count,
@@ -116,14 +105,17 @@ class TweetController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @NotTransactional
     def saveTweets(Long sourceId){
+        println params
         flash.errors = []
         if(!sourceId){
             flash.errors << [message:"No source selected!"]
         }
-        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_ADMIN" && params.subscriberId == "") {
+
+        def authority = UserRole.findByUser(springSecurityService.currentUser).role.authority
+
+        if(authority in ["ROLE_ADMIN", "ROLE_MANAGER"] && params.subscriberId == "") {
             flash.errors << [message:"No Subscriber Selected"]
         }
 
@@ -145,24 +137,33 @@ class TweetController {
         flash.messages = []
         flash.errors = []
 
-        tweetIds.each{tweetId ->
-            if(Tweet.findByTweetId(tweetId as Long)) {
-                def mi = Tweet.findByTweetId(tweetId as Long)
-                flash.errors << [message:mi.name + " already exists. Contact an administrator if this is an issue."]
-            } else {
-                def mediaItem = twitterService.saveTweet(tweetId as Long, sourceId, params.long("subscriberId"))
-                if(mediaItem.hasErrors()){
-                    flash.errors << [message:"twitter post Id: " + tweetId + " for twitter account: " + params.accountName + " has issues with its default configuration. Please Contact an administrator."]
+        try {
+            tweetIds.each { tweetId ->
+                if (Tweet.findByTweetId(tweetId as Long)) {
+                    def mi = Tweet.findByTweetId(tweetId as Long)
+                    flash.errors << [message: mi.name + " already exists. Contact an administrator if this is an issue."]
                 } else {
-                    solrIndexingService.inputMediaItem(mediaItem)
-                    flash.messages << [message:mediaItem.name + " created!"]
+                    def mediaItem = twitterService.saveTweet(tweetId as Long, sourceId, params.long("subscriberId"))
+                    if (mediaItem.hasErrors()) {
+                        flash.errors << [message: "twitter post Id: " + tweetId + " for twitter account: " + params.accountName + " has issues with its default configuration. Please Contact an administrator."]
+                    } else {
+                        solrIndexingService.inputMediaItem(mediaItem)
+                        flash.messages << [message: mediaItem.name + " created!"]
+                    }
                 }
-            }
 
+            }
+        }catch(java.util.concurrent.ExecutionException e){
+            log.error("Rate limit exceeded")
+            flash.errors = []
+            flash.errors << [message: "Twitter API Rate Limit exceeded. When too many requests are made to twitter too quickly, it exceeds a limit set by Twitter's API. Please wait a few minutes and try your import again - Twitter rate limits reset evey 15 minutes."]
+        }catch(e){
+            log.error ("Error importing tweets: ${e}")
         }
         redirect action:"index"
     }
 
+    @NotTransactional
     def show(Tweet tweetInstance) {
         def tagData = tagService.getTagInfoForMediaShowViews(tweetInstance, params)
 
@@ -178,21 +179,17 @@ class TweetController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def refreshTwitterMeta(Long id){
         twitterService.refreshMetaData(id)
         flash.message = "Twitter meta data has been reparsed and saved."
         redirect action:"show", params:[id:id]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond new Tweet(params), model: [subscribers:subscribers]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
-    @Transactional
     def save(Tweet tweetInstance) {
         if (tweetInstance == null) {
             notFound()
@@ -216,14 +213,11 @@ class TweetController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Tweet tweetInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond tweetInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(tweetInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
-    @Transactional
     def update(Tweet tweetInstance) {
         if (tweetInstance == null) {
             notFound()
@@ -248,7 +242,6 @@ class TweetController {
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_PUBLISHER'])
-    @Transactional
     def delete(Tweet tweetInstance) {
         if (tweetInstance == null) {
             notFound()

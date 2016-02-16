@@ -40,7 +40,7 @@ class HealthReportController {
         return
     }
 
-    @NotTransactional
+    @Transactional
     def checkMediaItem(Long id){
         mediaValidationService.rescanItem(id)
         flash.message = "Item has been rescanned. If the problem has not been resolved or if a new error was encountered, then the flag will not be removed."
@@ -82,7 +82,7 @@ class HealthReportController {
     }
 
     private void setDefaultParams(max){
-        params.max = Math.min(max ?: 10, 10)
+        params.max = Math.min(max ?: 10, 1000)
         params.sort = params.sort ?: "dateFlagged"
         params.order = params.order ?: "DESC"
     }
@@ -115,20 +115,9 @@ class HealthReportController {
         def totalItems = MediaItem.count()
         if(totalItems > 0){
             def stableItems = totalItems - flaggedMediaItems.totalCount - ignoredItems.totalCount
-            def percentStable = Math.round(100 * (1 - (flaggedMediaItems.totalCount + ignoredItems.totalCount) / totalItems) as Float)
-            def percentIgnored = Math.round(100 * (ignoredItems.totalCount / totalItems) as Float)
-            def percentFlagged = Math.round(100 * (flaggedMediaItems.totalCount / totalItems) as Float)
-            if(percentIgnored < 1){
-                percentIgnored = 1
-            }
-            if(percentFlagged < 1){
-                percentFlagged = 1
-            }
-            if(percentStable + percentIgnored + percentFlagged > 100 && percentIgnored > 0 && percentFlagged > 0) {
-                percentStable --
-            } else if(percentStable + percentIgnored + percentFlagged < 100 && percentIgnored >= 1 && percentFlagged >= 1){
-                percentStable ++
-            }
+            def percentStable = 100 * (1 - (flaggedMediaItems.totalCount + ignoredItems.totalCount) / totalItems)
+            def percentIgnored = 100 * ignoredItems.totalCount / totalItems
+            def percentFlagged = 100 * flaggedMediaItems.totalCount / totalItems
             [
                     percentStable:percentStable,
                     percentIgnored:percentIgnored,

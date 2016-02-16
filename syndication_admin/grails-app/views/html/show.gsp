@@ -56,7 +56,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <g:link class="button" action="index">
                 <button type="button" class="btn">Cancel</button>
             </g:link>
-            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_USER">
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
                 <g:link controller="featuredMedia" id="${htmlInstance?.id}" action="featureItem">
                     <button type="button" class="btn btn-success pull-right">Feature this Item</button>
                 </g:link>

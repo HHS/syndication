@@ -17,6 +17,9 @@ class CustomUserDetailsService implements GrailsUserDetailsService {
     def cmsManagerKeyService
     def grailsApplication
 
+    static final String UNAUTHORIZED_MESSAGE = "Sorry, your account is no longer authorized. Please contact syndicationadmin@hhs.gov to get support."
+    static final String INVALID_AGREEMENT_MESSAGE = "Sorry, your account is no longer authorized. Please contact syndicationadmin@hhs.gov to get support."
+
     static final List NO_ROLES = [new GrantedAuthorityImpl(SpringSecurityUtils.NO_ROLE)]
 
     UserDetails loadUserByUsername(String username, boolean loadRoles) throws UsernameNotFoundException {
@@ -30,11 +33,11 @@ class CustomUserDetailsService implements GrailsUserDetailsService {
             if (user.authorities.contains(Role.findByAuthority("ROLE_PUBLISHER"))){
 
                 if(!cmsManagerKeyService.getSubscriberById(user.subscriberId)){
-                    RequestContextHolder.currentRequestAttributes().setAttribute("publisherFailure", "Sorry, your account's Subscriber has been deleted", 1)
-                    throw new CustomAuthenticationException("Sorry, your account's Subscriber has been deleted")
+                    RequestContextHolder.currentRequestAttributes().setAttribute("publisherFailure", UNAUTHORIZED_MESSAGE, 1)
+                    throw new CustomAuthenticationException(UNAUTHORIZED_MESSAGE)
                 } else if(!cmsManagerKeyService.getSubscriberById(user.subscriberId as String)?.keyAgreement){
-                    RequestContextHolder.currentRequestAttributes().setAttribute("publisherFailure", "Sorry, your Subscriber does not have a valid Key Agreement", 1)
-                    throw new CustomAuthenticationException("Sorry, your Subscriber does not have a valid Key Agreement")
+                    RequestContextHolder.currentRequestAttributes().setAttribute("publisherFailure", INVALID_AGREEMENT_MESSAGE, 1)
+                    throw new CustomAuthenticationException(INVALID_AGREEMENT_MESSAGE)
                 }
 
             }

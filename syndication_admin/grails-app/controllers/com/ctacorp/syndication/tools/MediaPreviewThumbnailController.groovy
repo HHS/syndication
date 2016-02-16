@@ -9,7 +9,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 import org.apache.commons.io.IOUtils
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional
 class MediaPreviewThumbnailController {
     def mediaPreviewThumbnailService
@@ -19,9 +19,9 @@ class MediaPreviewThumbnailController {
         redirect action: 'allThumbnails'
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def flush(MediaItem mi) {
-        mediaPreviewThumbnailService.generate(mi)
+        mediaPreviewThumbnailService.generate(mi.id)
         String key = Hash.md5("thumbnail/${mi.id}?[action:[GET:thumbnail], controller:media, id:${mi.id}]")
         String previewkey = Hash.md5("preview/${mi.id}?[action:[GET:preview], controller:media, id:${mi.id}]")
         remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", key)
@@ -40,7 +40,7 @@ class MediaPreviewThumbnailController {
     def regenerateThumbnailPreviewForSingleItem(MediaItem mi){
         def errorCode = System.nanoTime()
         try {
-            mediaPreviewThumbnailService.generate(mi)
+            mediaPreviewThumbnailService.generate(mi.id)
             String key = Hash.md5("thumbnail/${mi.id}?[action:[GET:thumbnail], controller:media, id:${mi.id}]")
             String previewkey = Hash.md5("preview/${mi.id}?[action:[GET:preview], controller:media, id:${mi.id}]")
             remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", key)
@@ -69,6 +69,7 @@ class MediaPreviewThumbnailController {
     @Secured(['ROLE_ADMIN'])
     def regenerateThumbnailPreviewForAllMedia(){
         DelayedMediaPreviewThumbnailJob.schedule(new Date(System.currentTimeMillis() + (1000)), ["scope":"all"])
+        remoteCacheService.flushRemoteCacheByName("imageCache")
         flash.message = "${new Date()} Preview and Thumbnail regeneration in progress"
         redirect action: 'allThumbnails', params: [max:params.max, offset:params.offset]
     }

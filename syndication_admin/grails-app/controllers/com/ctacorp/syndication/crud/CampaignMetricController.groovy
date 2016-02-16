@@ -22,7 +22,7 @@ import com.ctacorp.syndication.metric.CampaignMetric
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
 @Transactional(readOnly = true)
 class CampaignMetricController {
 

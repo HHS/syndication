@@ -43,7 +43,8 @@ import com.ctacorp.syndication.preview.MediaThumbnail
     @ModelProperty(propertyName = "dateContentReviewed",     attributes = [@PropertyAttribute(type = "string",    format = "date")]),
     @ModelProperty(propertyName = "externalGuid",            attributes = [@PropertyAttribute(type = "string")]),
     @ModelProperty(propertyName = "hash",                    attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "extendedAttributes",      attributes = [@PropertyAttribute(type = "Map")])
+    @ModelProperty(propertyName = "extendedAttributes",      attributes = [@PropertyAttribute(type = "Map")]),
+    @ModelProperty(propertyName = "createdBy",                attributes = [@PropertyAttribute(type = "string",                      required = true)])
 ])
 class MediaItem {
     String name
@@ -133,18 +134,17 @@ class MediaItem {
     }
 
     private static transient mediaTypeMapping = [
-            "audio"       : "com.ctacorp.syndication.media.Audio",
-            "collection"  : "com.ctacorp.syndication.media.Collection",
-            "html"        : "com.ctacorp.syndication.media.Html",
-            "image"       : "com.ctacorp.syndication.media.Image",
-            "infographic" : "com.ctacorp.syndication.media.Infographic",
-            "pdf"         : "com.ctacorp.syndication.media.PDF",
-            "periodical"  : "com.ctacorp.syndication.media.Periodical",
-            "tweet"       : "com.ctacorp.syndication.media.Tweet",
-            "video"       : "com.ctacorp.syndication.media.Video",
-            "widget"      : "com.ctacorp.syndication.media.Widget",
-            "blog_post"   : "STRUCTURED-BLOG_POST-com.ctacorp.syndication.media.Html",
-            "news_release": "STRUCTURED-NEWS_RELEASE-com.ctacorp.syndication.media.Html"
+            "collection"        : "com.ctacorp.syndication.media.Collection",
+            "faq"               : "com.ctacorp.syndication.media.FAQ",
+            "html"              : "com.ctacorp.syndication.media.Html",
+            "image"             : "com.ctacorp.syndication.media.Image",
+            "infographic"       : "com.ctacorp.syndication.media.Infographic",
+            "pdf"               : "com.ctacorp.syndication.media.PDF",
+            "questionandanswer" : "com.ctacorp.syndication.media.QuestionAndAnswer",
+            "tweet"             : "com.ctacorp.syndication.media.Tweet",
+            "video"             : "com.ctacorp.syndication.media.Video",
+            "blog_post"         : "STRUCTURED-BLOG_POST-com.ctacorp.syndication.media.Html",
+            "news_release"      : "STRUCTURED-NEWS_RELEASE-com.ctacorp.syndication.media.Html"
     ]
 
     static namedQueries = {
@@ -466,6 +466,10 @@ class MediaItem {
             }
         }
 
+        createdByContains { String createdBy ->
+            ilike 'createdBy', "%${createdBy}%"
+        }
+
         activeIs { Boolean active ->
                 eq 'active', active
             }
@@ -688,6 +692,9 @@ class MediaItem {
                 }
                 if (params.sourceAcronymContains) {
                     sourceAcronymContains((String) params.sourceAcronymContains)
+                }
+                if(params.createdByContains) {
+                    createdByContains((String) params.createdByContains)
                 }
                 if (params.languageId) {
                     languageIdIs(params.languageId.toLong())

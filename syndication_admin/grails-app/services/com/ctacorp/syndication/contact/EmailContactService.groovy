@@ -27,7 +27,6 @@ class EmailContactService {
     }
 
     def delete(EmailContact ec){
-        println "id: ${ec.id}"
         ec.delete()
     }
 }

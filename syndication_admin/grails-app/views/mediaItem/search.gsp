@@ -58,12 +58,12 @@
                 <div class="form-group">
                   <label class="col-md-4 control-label" for="mediaType">Media Type</label>
                   <div class="col-md-8">
-                    <g:select from="${mediaTypeList}" class="form-control" name="mediaType" value="${mediaType}" noSelection="['':'-Any Type-']"/>
+                    <g:select from="${mediaTypeList*.name}" class="form-control" keys="${mediaTypeList*.id}" name="mediaType" value="${mediaType}" noSelection="['':'-Any Type-']"/>
                   </div>
                 </div>
 
                 <div class="form-group">
-                  <label class="col-md-4 control-label" for="mediaType">Language</label>
+                  <label class="col-md-4 control-label" for="language">Language</label>
                   <div class="col-md-8">
                     <g:select class="form-control" from="${languageList}" name="language" optionKey="id" value="${language}" noSelection="['':'-Any Language-']"/>
                   </div>

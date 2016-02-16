@@ -163,8 +163,13 @@ syndication.apiPath = "/api/v2"
 grails.assets.minifyJs = false
 
 //___________________________
+// Scratch Dir               \____________________________________________________________
+//________________________________________________________________________________________
+syndication.scratch.root = "${System.getProperty('user.home')}/.syndication"
+
+//___________________________
 // Greenmail                 \____________________________________________________________
-//_______________________________________________________________________________________
+//________________________________________________________________________________________
 
 grails.mail.port = 3026
 greenmail.ports.smtp = 3026
@@ -173,7 +178,9 @@ greenmail.ports.smtp = 3026
 syndication.contentExtraction.cssClassName = "syndicate"
 syndication.scratch.root = "${System.getProperty('user.home')}/.syndication"
 
-//AWS
+//___________________________
+// AWS                       \___________________________________________________________
+//_______________________________________________________________________________________
 grails {
     plugin {
         aws {
@@ -189,4 +196,68 @@ grails {
     }
 }
 
-autotest.excludes = ["MetaData.groovy"]
+//___________________________
+// Twitter                   \___________________________________________________________
+//_______________________________________________________________________________________
+syndication{
+    twitterConsumerKey = System.getProperty('TWITTER_CONSUMER_KEY')
+    twitterConsumerSecret = System.getProperty('TWITTER_CONSUMER_SECRET')
+    twitterAccessToken = System.getProperty('TWITTER_ACCESS_TOKEN')
+    twitterAccessTokenSecret = System.getProperty('TWITTER_ACCESS_TOKEN_SECRET')
+}
+
+//__________________________
+// Rabbit MQ Settings       \____________________________________________________________
+//_______________________________________________________________________________________
+rabbitmq {
+
+    connection = {
+        connection  host: "${System.getenv('RABBIT_PORT_5672_TCP_ADDR')}",
+                    username: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_USER')}",
+                    password: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_PASS')}",
+                    virtualHost: "${System.getenv('RABBITMQ_VIRTUAL_HOST') ?: '/'}",
+                    requestedHeartbeat: 10
+    }
+
+    queues = {
+        exchange name: "updateExchange", type: "fanout", {
+            queue name: "emailUpdateQueue", durable: true
+            queue name: "restUpdateQueue", durable: true
+            queue name: "rhythmyxUpdateQueue", durable: true
+        }
+
+        exchange name: "errorExchange", type: "direct", {
+            queue name: "emailErrorQueue", durable: true, binding: "emailError"
+            queue name: "restErrorQueue", durable: true, binding: "restError"
+            queue name: "rhythmyxErrorQueue", durable: true, binding: "rhythmyxError"
+        }
+
+        queue name: "emailErrorDelayQueue", durable: true, arguments: [
+                'x-message-ttl' : 60*60*1000,
+                'x-dead-letter-exchange' : 'errorExchange',
+                'x-dead-letter-routing-key' : 'emailError'
+        ]
+
+        queue name: "restErrorDelayQueue", durable: true, arguments: [
+                'x-message-ttl' : 60*60*1000,
+                'x-dead-letter-exchange' : 'errorExchange',
+                'x-dead-letter-routing-key' : 'restError'
+        ]
+
+        queue name: "rhythmyxErrorDelayQueue", durable: true, arguments: [
+                'x-message-ttl' : 60*60*1000,
+                'x-dead-letter-exchange' : 'errorExchange',
+                'x-dead-letter-routing-key' : 'rhythmyxError'
+        ]
+    }
+}
+
+//_________________________________________
+// Default passwords and Auth settings     \_____________________________________________
+//_______________________________________________________________________________________
+springsecurity {
+    syndicationAdmin {
+        adminUsername = System.getenv('ADMIN_USERNAME')
+        initialAdminPassword = System.getenv('ADMIN_PASSWORD')
+    }
+}

@@ -28,7 +28,7 @@
             <div id="tokenHolder">
                 <g:textField name="tagIds"/>
             </div>
-            <g:hiddenField name="mediaId" value="${mediaItemInstance.id}"/>
+            <g:hiddenField name="mediaId" value="${mediaItemInstance?.id}"/>
             <br/>
             <div class="pull-right">
                 <g:submitButton name="Save Tags" id="tagButton" class="btn btn-default btn-md btn-success"/>
@@ -39,7 +39,7 @@
 
 <g:javascript>
     $(document).ready(function () {
-        $("#tagIds").tokenInput("${g.createLink(controller: 'tag', action: 'tagSearch')}.json" + "?syndicationId=${mediaItemInstance.id}&tagTypeId=${tagTypeId}&languageId=${languageId}", {
+        $("#tagIds").tokenInput("${g.createLink(controller: 'tag', action: 'tagSearch')}.json" + "?syndicationId=${mediaItemInstance?.id}&tagTypeId=${tagTypeId}&languageId=${languageId}", {
             prePopulate:${tags.encodeAsRaw()}
         });
 
@@ -52,9 +52,9 @@
         function updateTokenInput(tagTypeId, languageId){
             $("#tokenHolder").html('<g:textField name="tagIds"/>')
 
-            $.getJSON("${g.createLink(controller: 'tag', action: 'getTagsForSyndicationId')}.json" + "?syndicationId=${mediaItemInstance.id}&tagTypeId="+tagTypeId+"&languageId="+languageId, function(data){
+            $.getJSON("${g.createLink(controller: 'tag', action: 'getTagsForSyndicationId')}.json" + "?syndicationId=${mediaItemInstance?.id}&tagTypeId="+tagTypeId+"&languageId="+languageId, function(data){
                 console.log(data);
-                $("#tagIds").tokenInput("${g.createLink(controller: 'tag', action: 'tagSearch')}.json" + "?syndicationId=${mediaItemInstance.id}&tagTypeId="+tagTypeId+"&languageId="+languageId, {
+                $("#tagIds").tokenInput("${g.createLink(controller: 'tag', action: 'tagSearch')}.json" + "?syndicationId=${mediaItemInstance?.id}&tagTypeId="+tagTypeId+"&languageId="+languageId, {
                     prePopulate:data
                 });
             });

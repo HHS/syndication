@@ -62,7 +62,7 @@
         </div>
     </div>
 </g:if>
-<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_USER, ROLE_PUBLISHER">
+<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
     <g:form action="create">
         <div class="pull-right">
             <span>Can't find the tag you're looking for?&nbsp;</span>

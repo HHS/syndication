@@ -15,6 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
+import com.ctacorp.syndication.social.TwitterStatusCollector
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -30,7 +31,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_STATS', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional(readOnly = true)
 class CollectionController {
 
@@ -62,7 +63,6 @@ class CollectionController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create(Collection collectionInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         def featuredMedia = collectionInstance?.mediaItems
@@ -74,7 +74,6 @@ class CollectionController {
                                                 subscribers:subscribers]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(Collection collectionInstance) {
         if (collectionInstance == null) {
@@ -82,15 +81,11 @@ class CollectionController {
             return
         }
 
-        collectionInstance =  mediaItemsService.updateItemAndSubscriber(collectionInstance, params.long('subscriberId'))
+        collectionInstance = mediaItemsService.updateItemAndSubscriber(collectionInstance, params.long('subscriberId'))
         if(collectionInstance.hasErrors()){
             flash.errors = collectionInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             def subscribers = cmsManagerKeyService.listSubscribers()
-            def media = MediaItem.facetedSearch(restrictToSet:params.allMediaItems).list()
-            String featuredMediaForTokenInput = media.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
-            respond collectionInstance, view:'create', model: [featuredMedia:media,
-                                                               featuredMediaForTokenInput:featuredMediaForTokenInput,
-                                                               subscribers:subscribers]
+            respond collectionInstance, view:'create', model: [subscribers:subscribers]
             return
         }
         
@@ -109,19 +104,18 @@ class CollectionController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Collection collectionInstance) {
-        def featuredMedia = collectionInstance?.mediaItems
         def subscribers = cmsManagerKeyService.listSubscribers()
-        String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"${it.name}"] } as JSON
+        String collectionMediaForTokenInput = collectionInstance?.mediaItems?.collect{
+            [id:it.id, name:"${it.name}"]
+        } as JSON
 
-        respond collectionInstance, model:[featuredMedia:featuredMedia,
-                                           featuredMediaForTokenInput:featuredMediaForTokenInput,
+        respond collectionInstance, model:[collectionMediaForTokenInput:collectionMediaForTokenInput,
                                            subscribers   :subscribers,
-                                           currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(collectionInstance)?.subscriberId)]
+                                           currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(collectionInstance)?.subscriberId)
+        ]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Collection collectionInstance) {
         if (collectionInstance == null) {
@@ -169,6 +163,9 @@ class CollectionController {
             featuredItem.delete()
         }
 
+        TwitterStatusCollector.where {
+            collection == collectionInstance
+        }.deleteAll()
         mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(collectionInstance, true)
         solrIndexingService.removeMediaItem(collectionInstance)
         mediaItemsService.delete(collectionInstance.id)

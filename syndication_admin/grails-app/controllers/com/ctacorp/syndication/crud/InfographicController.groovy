@@ -29,7 +29,7 @@ import com.ctacorp.syndication.media.Infographic
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_STATS', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional(readOnly = true)
 class InfographicController {
 
@@ -62,7 +62,6 @@ class InfographicController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
         Infographic infographic = new Infographic(params)
@@ -70,7 +69,6 @@ class InfographicController {
         respond infographic, model: [subscribers:subscribers, formats:["jpg", "png"]]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(Infographic infographicInstance) {
         if (infographicInstance == null) {
@@ -95,13 +93,11 @@ class InfographicController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Infographic infographicInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond infographicInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(infographicInstance)?.subscriberId), formats:["jpg", "png"]]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Infographic infographicInstance) {
         if (infographicInstance == null) {

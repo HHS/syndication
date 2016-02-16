@@ -57,7 +57,7 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
         runtime 'mysql:mysql-connector-java:5.1.27'
         //CMS Manager security libs
-        compile('com.ctacorp.commons:api-key-utils:1.6.0'){
+        compile('com.ctacorp.commons:api-key-utils:1.6.1'){
             excludes 'groovy'
         }
         compile "com.google.guava:guava:18.0"

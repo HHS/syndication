@@ -14,11 +14,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.contentextraction
 
 import com.ctacorp.syndication.Language
+import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.Source
+import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.commons.util.Util
 import com.ctacorp.syndication.exception.InaccessibleVideoException
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.Video
+import com.ctacorp.syndication.media.Collection
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
 import groovyx.net.http.URIBuilder
@@ -29,7 +32,15 @@ import org.joda.time.*
 class YoutubeService {
     private final String youtubeDateFormat = "yyyy-MM-dd'T'kk:mm:ss.SSS'Z'"
     private RestBuilder rest = new RestBuilder()
+    def springSecurityService
 
+    /**
+     * Returns a JSON payload for the youtube video already saved in the system. This method connects
+     * to the youtube API and pulls the json data for the video in question.
+     *
+     * @param id the syndication media_item id to look up youtube meta data for
+     * @return a json payload for the video specified
+     */
     def getMetaDataForVideo(Long id) {
         MediaItem mi = MediaItem.get(id)
         if (mi?.getClass().simpleName == "Video") {
@@ -38,12 +49,22 @@ class YoutubeService {
         }
     }
 
+    /**
+     * Given a normal link to a youtube video, find the associated JSON data from the youtube API
+     * and return it.
+     * @param url a link to a youtube video, e.g. https://www.youtube.com/watch?v=SSvi8cwb0l0
+     * @return a json payload for the video specified
+     */
     def getMetaDataForVideoUrl(String url) {
-        log.info getVideoFeedUrl(url)
         rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
         rest.get(getVideoFeedUrl(url)).json
     }
 
+    /**
+     * Get a thumbnail link for a youtube video
+     * @param url a link to a youtube video, e.g. https://www.youtube.com/watch?v=SSvi8cwb0l0
+     * @return a string "link" to the highest quality youtube thumbnail available
+     */
     String thumbnailLinkForUrl(String url) {
         String id = getVideoId(url)
         def json = getMetaDataForVideoUrl(url)
@@ -111,6 +132,33 @@ class YoutubeService {
         )
     }
 
+    def getCollectionInstanceFromVideoPlaylist(String url, Language language = null, Source source = null){
+        def jsonData = rest.get(getPlaylistFeedUrl(url)).json
+        if(!jsonData || jsonData.error || jsonData.items.size() == 0){
+            if(jsonData?.error?.message == "Private video"){
+                throw new InaccessibleVideoException("${jsonData?.error?.errors}")
+                return null
+            }
+
+            log.error "Error getting info about video: ${url}, details: ${jsonData}"
+            return null
+        }
+
+        def videoIds = getPlaylistVideoIds(url)
+        def mediaItems = getMediaItemsFromVideoIds(videoIds, source, language, jsonData)
+
+        new Collection(
+                name: jsonData.items[0].snippet.title.take(255),
+                sourceUrl: "https://www.youtube.com/playlist?list=" + getPlaylistId(url),
+                dateAuthored: Date.parse(youtubeDateFormat, jsonData.items[0].snippet.publishedAt),
+                language: language,
+                externalGuid: jsonData.items[0].id,
+                source: source,
+                description: jsonData.items[0].snippet.description.take(2000),
+                mediaItems: mediaItems
+        )
+    }
+
     private parseTime(String timecode){
         PeriodFormatter formatter = ISOPeriodFormat.standard();
         Period p = formatter.parsePeriod(timecode);
@@ -129,9 +177,27 @@ class YoutubeService {
                 return matcher[0][1]
             }
             println "Could not extract a youtube video ID from ${sourceUrl}"
+            log.info "Could not extract a youtube video ID from ${sourceUrl}"
             return null
         } catch(e){
             println "An unhandeled error has occured trying to retrieve video location from the provided url\n${e}"
+            log.error "An unhandeled error has occured trying to retrieve video location from the provided url\n${e}"
+            return null
+        }
+    }
+
+    String getPlaylistId(String sourceUrl) {
+        try {
+            def url = new URIBuilder(sourceUrl)
+            if(url?.query?.list){
+                return url.query.list
+            }
+            println "Could not extract a youtube playlist ID from ${sourceUrl}"
+            log.info "Could not extract a youtube playlist ID from ${sourceUrl}"
+            return null
+        } catch(e){
+            println "An unhandeled error has occured trying to retrieve video location from the provided url\n${e}"
+            log.error "An unhandeled error has occured trying to retrieve video location from the provided url\n${e}"
             return null
         }
     }
@@ -141,6 +207,79 @@ class YoutubeService {
         String videoId = getVideoId(sourceUrl)
         String youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${grailsApplication.config.google.youtube.apiKey}&part=snippet,contentDetails"
         youtubeFeedUrl
+    }
+
+    private String getPlaylistFeedUrl(String sourceUrl) {
+        String playlistId = getPlaylistId(sourceUrl)
+        String youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlistId}&key=${grailsApplication.config.google.youtube.apiKey}"
+        youtubeFeedUrl
+    }
+
+    private String getPlaylistItemsFeedUrl(String sourceUrl, def pageToken = null) {
+        String playlistId = getPlaylistId(sourceUrl)
+        String youtubeFeedUrl
+        if(pageToken){
+            youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&key=${grailsApplication.config.google.youtube.apiKey}&pageToken=${pageToken}"
+        } else {
+            youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&key=${grailsApplication.config.google.youtube.apiKey}"
+        }
+        youtubeFeedUrl
+    }
+
+    private getPlaylistVideoIds(String url) {
+        def playlistItemsJson = rest.get(getPlaylistItemsFeedUrl(url)).json
+        def videoIds = playlistItemsJson.items.snippet.resourceId.videoId
+        def totalResults = playlistItemsJson.pageInfo.totalResults
+
+        while(totalResults > playlistItemsJson.pageInfo.resultsPerPage) {
+            def nextPageToken = playlistItemsJson.nextPageToken
+            playlistItemsJson = rest.get(getPlaylistItemsFeedUrl(url, nextPageToken)).json
+            videoIds = videoIds + playlistItemsJson.items.snippet.resourceId.videoId
+            totalResults -= playlistItemsJson.pageInfo.resultsPerPage
+        }
+        return videoIds
+    }
+
+    private getMediaItemsFromVideoIds(def videoIds, Source source, Language language, def playlistJsonData) {
+        def mediaItems = []
+        videoIds.each{ videoId ->
+            def itemJsonData = rest.get("https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${grailsApplication.config.google.youtube.apiKey}&part=snippet,contentDetails").json
+            Video videoInstance
+            if(Video.findBySourceUrl("https://www.youtube.com/watch?v="+videoId+"&list="+playlistJsonData.items[0].id)){
+                videoInstance = Video.findBySourceUrl("https://www.youtube.com/watch?v="+videoId+"&list="+playlistJsonData.items[0].id)
+                videoInstance.save()
+            } else {
+                videoInstance = new Video(
+                        name: itemJsonData.items[0]?.snippet?.localized?.title?.take(255) ?: "YouTube Video: ${videoId}",
+                        sourceUrl: "https://www.youtube.com/watch?v="+videoId+"&list="+playlistJsonData.items[0].id,
+                        language: language,
+                        source: source,
+                        duration: parseTime(itemJsonData?.items[0]?.contentDetails?.duration ?: "PT1S"),
+                        description: itemJsonData.items[0]?.snippet?.localized?.description?.take(2000) ?: ""
+                )
+                videoInstance.save()
+                saveMediaItemSubscriber(videoInstance)
+            }
+
+            mediaItems.add(videoInstance)
+        }
+        mediaItems
+    }
+
+    def saveMediaItemSubscriber(MediaItem mediaItem) {
+        def mediaItemSubscriber = MediaItemSubscriber.findByMediaItem(mediaItem)
+
+        if (UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
+            if (!springSecurityService.currentUser.subscriberId) {
+                log.error("The publisher: " + springSecurityService.currentUser.name +" no longer has a valid subscriberId")
+            }
+            if (mediaItemSubscriber) {
+                mediaItemSubscriber.subscriberId = springSecurityService.currentUser.subscriberId
+            } else {
+                mediaItemSubscriber = new MediaItemSubscriber([mediaItem: mediaItem, subscriberId: springSecurityService.currentUser.subscriberId])
+            }
+            mediaItemSubscriber?.save()
+        }
     }
 }
 

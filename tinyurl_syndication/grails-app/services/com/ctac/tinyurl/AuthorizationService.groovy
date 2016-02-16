@@ -4,6 +4,7 @@ import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
+import grails.util.Holders
 
 import javax.annotation.PostConstruct
 
@@ -32,7 +33,7 @@ class AuthorizationService {
             keyAgreement.setPublicKey(publicKey)
             keyAgreement.setSecret(secret)
 
-            generator = new AuthorizationHeaderGenerator("syndication_api_key", keyAgreement)
+            generator = new AuthorizationHeaderGenerator(Holders.config.apiKey.keyName ?: "syndication_api_key", keyAgreement)
         }
     }
 
@@ -47,7 +48,7 @@ class AuthorizationService {
         String date = new Date().toString()
         String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.verifyAuthPath
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([
-            date: date,
+            "Date": date,
             "content-type": "application/json",
             "content-length": authorizationRequest.bytes.size() as String
         ],

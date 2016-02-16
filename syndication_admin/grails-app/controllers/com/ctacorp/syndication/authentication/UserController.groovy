@@ -28,7 +28,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
 @Transactional(readOnly = true)
-@Secured(["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_USER", "ROLE_BASIC", "ROLE_STATS", "ROLE_PUBLISHER"])
+@Secured(["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_PUBLISHER"])
 class UserController {
     def adminUserService
     def springSecurityService
@@ -37,7 +37,7 @@ class UserController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
+    @Secured(["ROLE_ADMIN"])
     def index(Integer max) {
         params.max = Math.min(max ?: 20, 100)
         params.sort = params.sort ?: "user.id"
@@ -131,25 +131,22 @@ class UserController {
         render data as JSON
     }
 
-    @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
+    @Secured(["ROLE_ADMIN"])
     def show(User userInstance) {
         boolean allowDelete = userInstance?.id != springSecurityService.currentUser.id
 
         respond userInstance, model: [allowDelete: allowDelete]
     }
     
-    @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
+    @Secured(["ROLE_ADMIN"])
     def create() {
         def roles = Role.list()
-        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER"){
-            roles = Role.findAllByAuthorityInList(adminUserService.getManagersAuthorityRoles())
-        }
-        
+
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond new User(params), model: [subscribers:subscribers, roles:roles, currentRoleId: params?.authority]
     }
 
-    @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
+    @Secured(["ROLE_ADMIN"])
     @Transactional
     def save(User userInstance) {
         if (userInstance == null) {
@@ -186,12 +183,9 @@ class UserController {
         }
     }
 
-    @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
+    @Secured(["ROLE_ADMIN"])
     def edit(User userInstance) {
         def roles = Role.list()
-        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_MANAGER"){
-            roles = Role.findAllByAuthorityInList(adminUserService.getManagersAuthorityRoles())
-        }
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond userInstance, model: [subscribers:subscribers, currentSubscriber:subscribers.find{it.id as Long == userInstance?.subscriberId}?.id, roles: roles, currentRoleId:userInstance?.authorities?.getAt(0)?.id, fake:userInstance?.username]
     }
@@ -225,7 +219,7 @@ class UserController {
         redirect controller:"dashboard", action: "syndDash"
     }
 
-    @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
+    @Secured(["ROLE_ADMIN"])
     @Transactional
     def update(User userInstance) {
         if (userInstance == null) {
@@ -258,7 +252,7 @@ class UserController {
         }
     }
 
-    @Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
+    @Secured(["ROLE_ADMIN"])
     @Transactional
     def delete(User userInstance) {
 

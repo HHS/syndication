@@ -49,7 +49,7 @@ class HtmlControllerSpec extends Specification {
         params["source"] = new Source()
     }
 
-    void "Test the index action returns the correct model"() {
+    void "index action returns the correct model"() {
 
         when:"The index action is executed"
             controller.index()
@@ -60,7 +60,7 @@ class HtmlControllerSpec extends Specification {
             model.htmlInstanceCount == 0
     }
 
-    void "Test the create action returns the correct model"() {
+    void "create action returns the correct model"() {
         when:"The create action is executed"
             controller.create()
 
@@ -69,7 +69,7 @@ class HtmlControllerSpec extends Specification {
             model.htmlInstance!= null
     }
 
-    void "Test the save action correctly persists an instance"() {
+    void "save action correctly persists an instance"() {
         setup:""
             populateValidParams(params)
             def html = new Html(params).save(flush:true)
@@ -94,7 +94,7 @@ class HtmlControllerSpec extends Specification {
             Html.count() == 1
     }
 
-    void "Test that the show action returns the correct model"() {
+    void "show action returns the correct model"() {
         setup:""
             populateValidParams(params)
             def html = new Html(params).save(flush:true)
@@ -115,7 +115,7 @@ class HtmlControllerSpec extends Specification {
             model.htmlInstance == html
     }
 
-    void "Test that the edit action returns the correct model"() {
+    void "edit action returns the correct model"() {
         when:"The edit action is executed with a null domain"
             controller.edit(null)
 
@@ -132,7 +132,7 @@ class HtmlControllerSpec extends Specification {
             model.htmlInstance == html
     }
 
-    void "Test the update action performs an update on a valid domain instance"() {
+    void "update action performs an update on a valid domain instance"() {
         setup:""
             populateValidParams(params)
             def html = new Html(params).save(flush:true)
@@ -164,7 +164,7 @@ class HtmlControllerSpec extends Specification {
             flash.message != null
     }
 
-    void "Test that the delete action deletes an instance if it exists"() {
+    void "delete action deletes an instance if it exists"() {
         when:"The delete action is called for a null instance"
             request.method = 'POST'
             controller.delete(null)

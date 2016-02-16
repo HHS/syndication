@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -14,6 +14,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.cache
 
+import com.ctacorp.syndication.commons.util.Hash
+import com.ctacorp.syndication.media.MediaItem
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.Cache
 import grails.util.Holders
@@ -23,14 +25,13 @@ import java.util.concurrent.TimeUnit
 class GuavaCacheService {
     static transactional = false
     private final int apiResponseCacheSize = Holders.config.disableGuavaCache ? 0 : 5000
-    private final int apiResponseCacheTimeout = 30
+    private final int apiResponseCacheTimeout = 30 //minutes
 
     private final int extractedContentCacheSize = Holders.config.disableGuavaCache ? 0 : 1000
-    private final int extractedContentCacheTimeout = 12
+    private final int extractedContentCacheTimeout = 12 //hours
 
     private final int imageCacheSize = Holders.config.disableGuavaCache ? 0 : 500
-    private final int imageCacheTimeout = 24
-
+    private final int imageCacheTimeout = 24 // hours
 
     def caches = [
             apiResponseCache: CacheBuilder.newBuilder().
@@ -47,20 +48,20 @@ class GuavaCacheService {
                     build()
     ]
 
-    Cache getApiResponseCache(){
+    Cache getApiResponseCache(){//all
         caches.apiResponseCache
     }
 
-    Cache getExtractedContentCache(){
+    Cache getExtractedContentCache(){//by name
         caches.extractedContentCache
     }
-    
-    Cache getImageCache(){
+    //new mediaitemupdateflushmethod
+    Cache getImageCache(){//by name
         caches.imageCache
     }
 
     boolean flushItem(String cacheName, String key){
-        println "FLUSHING ITEM CACHE: ${key}"
+        log.info "FLUSHING ITEM CACHE: ${key}"
         try{
             caches."$cacheName".invalidate(key)
             return true
@@ -71,7 +72,7 @@ class GuavaCacheService {
     }
 
     boolean flushCache(String cacheName){
-        println "FLUSHING ENTIRE CACHE: ${cacheName}"
+        log.info "FLUSHING ENTIRE CACHE: ${cacheName}"
         try{
             caches."$cacheName".invalidateAll()
             return true
@@ -84,7 +85,7 @@ class GuavaCacheService {
 
     //Careful, this flushes **ALL** caches
     boolean flushAllCaches(){
-        println "FLUSHING ALL CACHES"
+        log.info "FLUSHING ALL CACHES"
         try {
             caches.each{ String name, Cache cache ->
                 cache.invalidateAll()
@@ -95,5 +96,22 @@ class GuavaCacheService {
             return false
         }
         true
+    }
+
+    boolean flushCacheForMediaItemUpdate(Long mediaItemId) {
+        return flushAllCaches()
+        //TODO:Implement better way to handle cache flushes
+//        boolean flushPreview = flushItem("imageCache",Hash.md5("preview/${mediaItemId}?"))
+//        boolean flushThumbnail = flushItem("imageCache",Hash.md5("thumbnail/${mediaItemId}?"))
+//        boolean flushExtractedContent = true
+//        boolean flushApiResponses = flushCache("apiResponseCache")
+//        if(MediaItem.get(mediaItemId)?.getClass()?.toString() == "class com.ctacorp.syndication.media.Html") {
+//            flushExtractedContent = flushCache("extractedContentCache")
+//        }
+//
+//        if(flushApiResponses && flushExtractedContent && flushPreview && flushThumbnail) {
+//            return true
+//        }
+//        return false
     }
 }

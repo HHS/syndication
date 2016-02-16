@@ -108,7 +108,7 @@ class GoogleAnalyticsService {
         Webproperties webproperties = analytics.management().webproperties().list(accountId).execute();
 
         if (webproperties.getItems().isEmpty()) {
-            System.err.println("No Webproperties found");
+            println("No Webproperties found")
         } else {
             return webproperties.getItems()
         }
@@ -144,8 +144,7 @@ class GoogleAnalyticsService {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new File("${System.getProperty('user.home')}/.syndication/analytics/analytics_data_store/client_secrets.json").newDataInputStream()));
 
         if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
-            System.out.println(
-                    "Enter Client ID and Secret from https://code.google.com/apis/console/?api=analytics "
+            System.out.println("Enter Client ID and Secret from https://code.google.com/apis/console/?api=analytics "
                             + "into analytics-cmdline-sample/src/main/resources/client_secrets.json");
             System.exit(1);
         }

@@ -69,14 +69,14 @@ class JsoupWrapperService {
 
         extractedContent = getElementByClassFromDocument(doc, extractionCSSClass)
 
-        Jsoup.clean(extractedContent, Whitelist.relaxed().addAttributes(":all", "class"))
-
         extractedContent
     }
 
+    private final targetEmptyTags = ["div","p","span"]
+
     String stripEmptyBlocks(Document doc) {
-        for (Element element : doc.select("*")) {
-            if (!element.hasText() && element.isBlock()) {
+        for (Element element : doc.select(targetEmptyTags.join(", "))) {
+            if (!element.hasText() && element.isBlock() && element.children().size() == 0) {
                 element.remove();
             }
         }

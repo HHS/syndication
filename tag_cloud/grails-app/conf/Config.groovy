@@ -166,3 +166,10 @@ codenarc.properties = {
     EmptyMethod.priority = 1
 //    EmptyMethod.enabled = false
 }
+
+springsecurity{
+    tagCloud{
+        adminUsername = System.getenv("ADMIN_USERNAME")
+        initialAdminPassword = System.getenv("ADMIN_PASSWORD")
+    }
+}

@@ -41,17 +41,10 @@ class TinyUrlService {
             [id:it.id, url:it.sourceUrl]
         }
 
-        def start = System.currentTimeMillis()
         def itemIds = rest.post("${apiUrl}/missingTinyUrls.json"){
             accept "application/json;charset=UTF-8"
             body mediaItems as JSON
         }.json.collect{ it as Long }
-        println "time elapsed: ${System.currentTimeMillis() - start}"
-
-//        println "items without tinyUrls:"
-//        itemIds.each{
-//            println "- ${it}"
-//        }
 
         if(itemIds){
             def mediaItemsWithoutTinyUrls = MediaItem.withCriteria {
@@ -63,7 +56,6 @@ class TinyUrlService {
             }
 
             def result = authorizationService.post(apiUrl + "/bulkAdd.json", bulkData)
-//            println result
             return result
         }
 

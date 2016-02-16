@@ -67,6 +67,7 @@
             <li>username: ${userInstance?.username}</li>
             <li>organization: ${registration?.organization}</li>
             <li>description: ${registration?.description}</li>
+            <li>admin show page: <a href="${adminUrl+"/registration/show/"+ registration?.id}" title="admin registration show page">Registration show page</a></li>
         </ul>
     </div>
     <div class="footer_links">

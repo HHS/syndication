@@ -10,48 +10,69 @@ class OwnershipCleanupController {
     def cmsManagerKeyService
 
     def index(String query) {
+
         def subscribers = cmsManagerKeyService.listSubscribers()
         [query:query, subscribers:subscribers]
     }
 
-    def search(String query){
+    def search(String query, Boolean restrictToUnowned){
         def subscribers = cmsManagerKeyService.listSubscribers()
         def subscribed = MediaItemSubscriber.list()*.mediaItem.id
         def foundMediaItems = MediaItem.findAllBySourceUrlIlike("${query}%")
-        def unownedItems = []
-        foundMediaItems.each{ mi->
-            if(!subscribed.contains(mi.id) && params.restrictToUnowned){
-                unownedItems << mi
-            } else{
-                unownedItems << mi
+        def mediaItems = []
+        if(params.boolean('restrictToUnowned')){
+            foundMediaItems.each{ mi->
+                if((!subscribed.contains(mi.id)) && params.boolean('restrictToUnowned')){
+                    mediaItems << mi
+                }
             }
+        } else{
+            mediaItems = foundMediaItems
         }
-        render view: "index", model:[mediaItems:unownedItems, query:query, subscribers:subscribers]
+        render view: "index", model:[mediaItems:mediaItems, query:query, subscribers:subscribers, restrictToUnowned:restrictToUnowned]
     }
 
-    def list(){
+    def list(boolean restrictToUnowned){
         def subscribers = cmsManagerKeyService.listSubscribers()
         def subscribed = MediaItemSubscriber.list()*.mediaItem.id
         def foundMediaItems = MediaItem.list()
-        def unownedItems = []
-        foundMediaItems.each{ mi->
-            if(!subscribed.contains(mi.id) && params.restrictToUnowned){
-                unownedItems << mi
-            } else{
-                unownedItems << mi
+        def mediaItems = []
+
+        if(restrictToUnowned){
+            foundMediaItems.each{ mi->
+                if((!subscribed.contains(mi.id)) && params.boolean('restrictToUnowned')){
+                    mediaItems << mi
+                }
             }
+        } else{
+            mediaItems = foundMediaItems
         }
-        render view: "index", model:[mediaItems:unownedItems,subscribers:subscribers]
+
+        render view: "index", model:[mediaItems:mediaItems,subscribers:subscribers, query:params.query, restrictToUnowned: params.boolean('restrictToOwned')]
     }
 
-    def associate(Long subscriber, String query){
+    def associate(Long subscriber, String query, boolean restrictToUnowned){
         def mediaItems = MediaItem.findAllBySourceUrlIlike("${query}%")
-        mediaItems.each{ mi ->
-            if(!MediaItemSubscriber.findByMediaItem(mi)){
-                def mis = new MediaItemSubscriber(mediaItem: mi, subscriberId: subscriber)
-                mis.save()
+
+        if(restrictToUnowned){
+            mediaItems.each{ mi ->
+                if(!MediaItemSubscriber.findByMediaItem(mi)){
+                    def mis = new MediaItemSubscriber(mediaItem: mi, subscriberId: subscriber)
+                    mis.save()
+                }
+            }
+        } else{
+            mediaItems.each{ mi ->
+                def mis = MediaItemSubscriber.findByMediaItem(mi)
+                if(mis){
+                    mis.subscriberId = subscriber
+                    mis.save()
+                }else{
+                    log.error("couldn't find subscriber: ${subscriber}")
+                }
             }
         }
-        redirect action:"list"
+
+        redirect action:"search", params:[restrictToUnowned:false, query:query]
     }
 }

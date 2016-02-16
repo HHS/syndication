@@ -57,7 +57,7 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        runtime ("org.grails.plugins:syndication-model:2.3.0"){
+        runtime ("org.grails.plugins:syndication-model:2.5.0-SNAPSHOT"){
             export = false
         }
 

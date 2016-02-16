@@ -32,7 +32,7 @@ class MediaMappingRestController {
             notFound()
             return
         }
-        log.info "Mapping save for ${mediaMappingInstance}"
+        log.info "Mapping save for: ${mediaMappingInstance}"
 
         mediaMappingInstance = mediaMappingService.saveMediaMapping(mediaMappingInstance)
 

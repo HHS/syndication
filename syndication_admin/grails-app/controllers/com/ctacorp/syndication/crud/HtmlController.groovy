@@ -30,7 +30,7 @@ import grails.plugins.rest.client.RestBuilder
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_STATS', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional(readOnly = true)
 class HtmlController {
     def mediaItemsService
@@ -70,7 +70,6 @@ class HtmlController {
         redirect controller: "mediaTestPreview", action: "index", params:[sourceUrl:sourceUrl]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
         Html html = new Html(language:Language.findByIsoCode("eng"))
@@ -78,7 +77,6 @@ class HtmlController {
         respond html, model: [subscribers:subscribers]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(Html htmlInstance) {
         if (htmlInstance == null) {
@@ -104,13 +102,11 @@ class HtmlController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Html htmlInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond htmlInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(htmlInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Html htmlInstance) {
         if (htmlInstance == null) {

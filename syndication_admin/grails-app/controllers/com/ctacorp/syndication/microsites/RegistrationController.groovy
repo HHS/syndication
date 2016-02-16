@@ -27,8 +27,10 @@ class RegistrationController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
     def update(MicrositeRegistration registrationInstance){
-        if(!registrationInstance){
+        if(!registrationInstance?.id){
             flash.error = "Registration Instance doesn't exist."
+            redirect index(10)
+            return
         }
 
         if(params.changeAccess) {
@@ -41,14 +43,14 @@ class RegistrationController {
     }
 
     def delete(MicrositeRegistration registrationInstance) {
-        if(!registrationInstance){
+        if(!registrationInstance?.id){
             flash.error = "Registration Instance doesn't exist."
+            redirect action:"index"
+            return
         }
 
         flash.message = "Registration Form Deleted."
         registrationInstance.delete()
-
-
 
         redirect action:"index"
     }

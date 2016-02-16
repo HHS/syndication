@@ -33,4 +33,13 @@ class RemoteCacheService {
             log.error("Could not flush API cache! ${e}")
         }
     }
+
+    def flushCacheForMediaItemUpdate(Long mediaItemId) {
+        try{
+            log.info "Flushing remote cache for a MediaItem update"
+            authorizationService.getRest(Holders.config.syndication.serverUrl + "/cacheAccess/flushCacheForMediaItemUpdate?mediaItemId=${mediaItemId}")
+        } catch(e){
+            log.error("Could not flush all caches for the media item update! ${e}")
+        }
+    }
 }

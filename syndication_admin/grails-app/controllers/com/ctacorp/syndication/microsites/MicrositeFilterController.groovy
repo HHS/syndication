@@ -17,14 +17,14 @@ class MicrositeFilterController {
         setDefaultParams(max)
         def flaggedMicrosites = FlaggedMicrosite.findAllByIgnored(false)
 
-        [flaggedMicrosites:flaggedMicrosites,totalCount:FlaggedMicrosite.count()]
+        [flaggedMicrosites:flaggedMicrosites,totalCount:flaggedMicrosites.size()]
     }
 
     def ignored(Integer max) {
         setDefaultParams(max)
         def flaggedMicrosites = FlaggedMicrosite.findAllByIgnored(true)
 
-        [flaggedMicrosites:flaggedMicrosites,totalCount:FlaggedMicrosite.count()]
+        [flaggedMicrosites:flaggedMicrosites,totalCount:flaggedMicrosites.size()]
     }
 
     @Transactional

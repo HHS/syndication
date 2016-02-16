@@ -8,17 +8,14 @@ import com.ctacorp.syndication.audit.SystemEvent
 import com.ctacorp.syndication.authentication.Role
 import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.authentication.UserRole
-import com.ctacorp.syndication.media.Audio
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.PDF
-import com.ctacorp.syndication.media.Periodical
 import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.media.Video
-import com.ctacorp.syndication.media.Widget
 import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -31,7 +28,7 @@ import spock.lang.Specification
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(DashboardController)
-@Mock([User, UserRole, Role, MediaItem, SystemEvent, Html, Video, Image, Audio, Infographic, Collection, Widget, Tweet, Periodical, PDF])
+@Mock([User, UserRole, Role, MediaItem, SystemEvent, Html, Video, Image, Infographic, Collection, Tweet, PDF])
 class DashboardControllerSpec extends Specification {
 
     def systemEventService = Mock(SystemEventService)
@@ -90,7 +87,7 @@ class DashboardControllerSpec extends Specification {
             controller.contentTypeDistributionDonut()
 
         then: "the response should be correct"
-            response.text == '[{"label":"Html","value":0},{"label":"Video","value":0},{"label":"Image","value":0},{"label":"Infographic","value":0},{"label":"Collection","value":0},{"label":"Audio","value":0},{"label":"Widget","value":0},{"label":"Tweet","value":0},{"label":"Periodical","value":0},{"label":"pdf","value":0}]'
+            response.text == '[{"label":"Html","value":0},{"label":"Video","value":0},{"label":"Image","value":0},{"label":"Infographic","value":0},{"label":"Collection","value":0},{"label":"Tweet","value":0},{"label":"pdf","value":0}]'
 
     }
 

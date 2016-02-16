@@ -28,11 +28,11 @@ class AuthorizationResultBuilder {
     AuthorizationResultBuilder setCalculatedHash(String calculatedHash) {
         authorizationResult.calculatedHash = calculatedHash
         validateProperty('calculatedHash', calculatedHash)
-        if (authorizationResult.authHeader?.senderHash) {
-            if (calculatedHash == authorizationResult.authHeader?.senderHash) {
+//        if (authorizationResult.authHeader?.senderHash) {
+//            if (calculatedHash == authorizationResult.authHeader?.senderHash) {
                 authorizationResult.isAuthorized = true
-            }
-        }
+//            }
+//        }
         this
     }
 

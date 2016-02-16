@@ -7,17 +7,14 @@ import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.contentextraction.ContentRetrievalService
 import com.ctacorp.syndication.health.FlaggedMedia
-import com.ctacorp.syndication.media.Audio
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.PDF
-import com.ctacorp.syndication.media.Periodical
 import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.media.Video
-import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.preview.MediaPreview
 import com.ctacorp.syndication.preview.MediaThumbnail
 import grails.test.mixin.Mock
@@ -30,7 +27,7 @@ import spock.lang.Specification
  * Created by nburk on 6/16/15.
  */
 @TestFor(MediaItemsService)
-@Mock([User, UserRole, Role, MediaItem, SystemEvent, Html, Video, Image, Audio, Infographic, Collection, Widget, Periodical, Tweet, PDF, MediaItemSubscriber, Campaign, MediaPreview, MediaThumbnail, CachedContent, FlaggedMedia, ExtendedAttribute])
+@Mock([User, UserRole, Role, MediaItem, SystemEvent, Html, Video, Image, Infographic, Collection, Tweet, PDF, MediaItemSubscriber, Campaign, MediaPreview, MediaThumbnail, CachedContent, FlaggedMedia, ExtendedAttribute])
 class MediaItemServiceSpec extends Specification {
 
     def contentRetrievalService = Mock(ContentRetrievalService)
@@ -131,10 +128,9 @@ class MediaItemServiceSpec extends Specification {
             subscriberRollbackCalled
     }
 
-    def "html and periodical items with invalid markup in the sourceUrl get rollbacked"(){
+    def "html items with invalid markup in the sourceUrl get rollbacked"(){
         setup:"create mediaItem"
             MediaItem mi1 = new Html(populateValidParams())
-            MediaItem mi2 = new Periodical(populateValidParams() + ["period":Periodical.Period.ANNUALLY])
 
         when:"the method is called with a html mediaItem and invalid source url"
             service.updateItemAndSubscriber(mi1, 1)
@@ -143,16 +139,6 @@ class MediaItemServiceSpec extends Specification {
             1 * service.contentRetrievalService.getContentAndMd5Hashcode(mi1.sourceUrl)
             mediaRollbackCalled
             subscriberRollbackCalled
-
-        when: "the method is called with a periodical item and invalid source url"
-            service.contentRetrievalService.metaClass.getContentAndMd5Hashcode = {String url -> [content:"random content",hash:"random hash"]}
-            mediaRollbackCalled = false
-            subscriberRollbackCalled = false
-            service.updateItemAndSubscriber(mi2, 1)
-
-        then:"transaction should be rolled back because of content extraction error"
-            !mediaRollbackCalled
-            !subscriberRollbackCalled
     }
 
     def "saving a mediaItem works properly when saving/updating as a publisher"(){

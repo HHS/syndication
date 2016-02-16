@@ -38,7 +38,7 @@ class SecurityFilters {
 
                 setSubscriberRequestAttribute(request)
 
-                if (env == Environment.PRODUCTION) {
+                if (env == Environment.PRODUCTION || Holders.config.syndication.cms.auth.enabled) {
 
                     try {
 
@@ -79,11 +79,9 @@ class SecurityFilters {
                     render status: 401, text: ([message: "Unauthorized: the sender's public key is not valid"] as JSON).toString(), encoding: "UTF-8", contentType: 'application/json'
                     return false
                 }
-
             }
         }
     }
-
 
     private static void setSubscriberRequestAttribute(HttpServletRequest request) {
 

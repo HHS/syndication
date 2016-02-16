@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -44,13 +44,12 @@ environments {
     }
     production {
         dataSource {
-            dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:mysql://localhost:3306/synd3"
+            dbCreate = "update"
+            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('SYNDICATION_DB')}"
             driverClassName = 'com.mysql.jdbc.Driver'
             dialect = org.hibernate.dialect.MySQL5InnoDBDialect
-            pooled = true
             username = 'root'
-            password = ''
+            password = "${System.getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD')}"
             properties {
               jmxEnabled = true
               initialSize = 5

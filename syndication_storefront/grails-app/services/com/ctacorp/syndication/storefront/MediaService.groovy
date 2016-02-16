@@ -54,7 +54,8 @@ class MediaService {
                 visibleInStorefront         : true,
                 syndicationVisibleBeforeDate: new Date().toString(),
                 active                      : true,
-                restrictToSet               : params.topicItems
+                restrictToSet               : params.topicItems,
+                createdByContains           : params.createdBy
         ]).list(max: params.max, offset: params.offset)
     }
 

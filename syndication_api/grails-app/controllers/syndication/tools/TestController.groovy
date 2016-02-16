@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -61,7 +61,7 @@ class TestController {
         }
 
         html.save(flush:true)
-        println html.errors
+        log.info html.errors
         redirect url: "/api/v2/resources/media/${html.id}.json"
 
         return
@@ -82,7 +82,7 @@ class TestController {
     }
 
     def poster(){
-        println params
+        log.info params
         render params
         render "<br/><hr/><br/>"
         render "<ul>"
@@ -90,20 +90,20 @@ class TestController {
         while(headers.hasMoreElements()){
             def h = headers.nextElement()
             render "<li>${h} : ${request.getHeader(h)}</li>"
-            println "${h} : ${request.getHeader(h)}"
+            log.info "${h} : ${request.getHeader(h)}"
         }
         render "</ul>"
 
         render "<p>Body json-----------------------</p>"
-        println "Body json-----------------------"
-        println request?.JSON
+        log.info "Body json-----------------------"
+        log.info request?.JSON
         render request?.JSON
     }
 
     def sendUpdate(Long mediaId){
-        println params
+        log.info params
         MediaItem mediaItem = MediaItem.get(mediaId)
-        println mediaItem?.name
+        log.info mediaItem?.name
         mqService.sendUpdateNotification(mediaItem)
         flash.message = "Sent update for: ${mediaItem.name} (${mediaItem.id})"
         render view:'index'
@@ -149,7 +149,7 @@ class TestController {
         def batch = []
 
         MediaItem.list().each { html ->
-            println html.name
+            log.info html.name
             0.step(300, 5) { days ->
                 batch << new MediaMetric([media: html, day: today - days, apiViewCount: randomViewCount.nextInt(150) + 1, storefrontViewCount: randomViewCount.nextInt(100) + 1])
             }
@@ -161,7 +161,7 @@ class TestController {
         domain.withTransaction {
             batch.each {
                 if (!it.save()) {
-                    println it.errors
+                    log.info it.errors
                 }
             }
         }

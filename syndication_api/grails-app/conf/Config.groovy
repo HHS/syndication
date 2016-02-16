@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -161,7 +161,7 @@ swagger.basePath = "http://localhost:8080/Syndication"
 swagger.api.basePath = "http://localhost:8080/Syndication/api/v2"
 swagger.info.title = "HHS Media Services API"
 swagger.info.description = swaggerDescription
-swagger.info.contact = "syndication@hhs.gov"
+swagger.info.contact = "syndicationadmin@hhs.gov"
 swagger.info.license = "GNU GENERAL PUBLIC LICENSE"
 swagger.info.licenseUrl = "http://www.gnu.org/licenses/gpl.html"
 swagger.info.termsOfServiceUrl = "http://www.hhs.gov/web/socialmedia/policies/tos.html#ready"
@@ -169,34 +169,13 @@ swagger.info.termsOfServiceUrl = "http://www.hhs.gov/web/socialmedia/policies/to
 //scratch directory defaults
 syndication.scratch.root = "${userHome}/.syndication"
 
-//TTL for image data (in seconds)
-syndication.preview.imagettl = 2592000    //30 days
-syndication.preview.pagettl  = 2592000    //30 days
-syndication.html.pagettl     = 2592000    //30 days
-
-//preview defaults
-syndication.preview.thumbnail.width     = 250
-syndication.preview.thumbnail.height    = 188
-syndication.preview.small.width         = 640
-syndication.preview.small.height        = 480
-syndication.preview.medium.width        = 1024
-syndication.preview.medium.height       = 768
-syndication.preview.large.width         = 2048
-syndication.preview.large.height        = 1536
-syndication.preview.browserWindowSize   = 640
-
-//External image tools default locations & settings
-imageMagick.location = "/usr/bin"
-webkit2png.location = "/usr/bin"
-xvfb.location = "/usr/bin"
-cutycapt.location="/usr/bin"
-//syndication.htmlRenderingEngine = "webkit2png"
-//syndication.htmlRenderingEngine = "cutycapt"
-syndication.htmlRenderingEngine = "cutycaptMac"
-
 //Test data
 syndication.generateTestData = false
-syndication.loadExampleRealData = false
+if(System.getenv("SYNDICATION_LOAD_EXAMPLE_DATA") == "true"){
+    syndication.loadExampleRealData = true
+} else{
+    syndication.loadExampleRealData = false
+}
 
 //TinyURL
 tinyUrl.serverAddress = "http://localhost:8082/TinyUrl"
@@ -220,12 +199,6 @@ syndication.contentExtraction.supportedParams = [
     "height",
     "browserWindowSize",
     "callback"
-]
-
-//supported image media types
-syndication.contentExtraction.supportedImageTypes = [
-    "Image",
-    "Infographic"
 ]
 
 syndication.mq.updateExchangeName = "updateExchange"
@@ -279,3 +252,64 @@ grails {
         }
     }
 }
+
+//__________________________
+// Rabbit MQ Settings       \____________________________________________________________
+//_______________________________________________________________________________________
+rabbitmq {
+
+    connection = {
+        connection  host: "${System.getenv('RABBIT_PORT_5672_TCP_ADDR')}",
+                username: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_USER')}",
+                password: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_PASS')}",
+                virtualHost: "${System.getenv('RABBITMQ_VIRTUAL_HOST') ?: '/'}",
+                requestedHeartbeat: 10
+    }
+
+    queues = {
+        exchange name: "updateExchange", type: "fanout", {
+            queue name: "emailUpdateQueue", durable: true
+            queue name: "restUpdateQueue", durable: true
+            queue name: "rhythmyxUpdateQueue", durable: true
+        }
+
+        exchange name: "errorExchange", type: "direct", {
+            queue name: "emailErrorQueue", durable: true, binding: "emailError"
+            queue name: "restErrorQueue", durable: true, binding: "restError"
+            queue name: "rhythmyxErrorQueue", durable: true, binding: "rhythmyxError"
+        }
+
+        queue name: "emailErrorDelayQueue", durable: true, arguments: [
+                'x-message-ttl' : 60*60*1000,
+                'x-dead-letter-exchange' : 'errorExchange',
+                'x-dead-letter-routing-key' : 'emailError'
+        ]
+
+        queue name: "restErrorDelayQueue", durable: true, arguments: [
+                'x-message-ttl' : 60*60*1000,
+                'x-dead-letter-exchange' : 'errorExchange',
+                'x-dead-letter-routing-key' : 'restError'
+        ]
+
+        queue name: "rhythmyxErrorDelayQueue", durable: true, arguments: [
+                'x-message-ttl' : 60*60*1000,
+                'x-dead-letter-exchange' : 'errorExchange',
+                'x-dead-letter-routing-key' : 'rhythmyxError'
+        ]
+    }
+}
+
+//_________________________________________
+// Default passwords and Auth settings     \_____________________________________________
+//_______________________________________________________________________________________
+springsecurity {
+    syndication{
+        adminUsername = System.getenv('ADMIN_USERNAME')
+        initialAdminPassword = System.getenv('ADMIN_PASSWORD')
+    }
+}
+
+//_____________________
+// Youtube API Keys    \_________________________________________________________________
+//_______________________________________________________________________________________
+google.youtube.apiKey = System.getenv("YOUTUBE_API_KEY")

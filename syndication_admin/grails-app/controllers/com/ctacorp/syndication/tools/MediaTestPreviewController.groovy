@@ -4,7 +4,7 @@ import grails.plugin.springsecurity.annotation.Secured
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 
-@Secured(["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_USER", "ROLE_BASIC", "ROLE_STATS", "ROLE_PUBLISHER"])
+@Secured(["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_PUBLISHER"])
 class MediaTestPreviewController {
     def contentRetrievalService
 

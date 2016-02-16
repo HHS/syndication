@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,6 +21,7 @@ import com.ctacorp.syndication.commons.util.Util
 import com.ctacorp.syndication.data.CampaignHolder
 import com.ctacorp.syndication.data.SourceHolder
 import com.ctacorp.syndication.data.TagHolder
+import com.ctacorp.syndication.marshal.QuestionAndAnswerMarshaller
 import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.storefront.UserMediaList
 import grails.transaction.NotTransactional
@@ -32,6 +33,7 @@ import com.ctacorp.syndication.exception.*
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.codehaus.groovy.grails.web.util.WebUtils
 import com.ctacorp.syndication.exception.UnauthorizedException
+import org.hibernate.NonUniqueResultException
 
 import java.security.MessageDigest
 import java.util.concurrent.Callable
@@ -57,11 +59,6 @@ class MediaService {
     String renderHtml(Html html, params){
         String extractedContent = getExtractedContent(html, params)
         groovyPageRenderer.render(template: "/media/htmlView", model: [extractedContent:extractedContent])
-    }
-
-    String renderPeriodical(Periodical periodical, params){
-        String extractedContent = getExtractedContent(periodical, params)
-        groovyPageRenderer.render(template: "/media/periodicalView", model: [extractedContent:extractedContent])
     }
 
     String renderImage(Image img, params){
@@ -146,6 +143,33 @@ class MediaService {
         mediaItems = resolveNestedCollections(mediaItems)
 
         renderMediaList(mediaItems.sort{it.name}, params)
+    }
+
+    String renderFAQ(FAQ faq, params){
+        params.iframeName = params.iframeName ?: faq.name
+        params.id = faq.id
+        params.mediaSource = "faq"
+
+        String content = groovyPageRenderer.render(template: "/media/faqView", model:[faq:faq])
+        content = contentRetrievalService.wrapWithSyndicateDiv(content)
+
+        content = contentRetrievalService.addAttributionToExtractedContent(faq.id, content)
+        content += analyticsService.getGoogleAnalyticsString(faq, params)
+
+        content
+    }
+
+    String renderQuestionAndAnswer(QuestionAndAnswer questionAndAnswer, params){
+        boolean thumbnailGeneration = Util.isTrue(params.thumbnailGeneration)
+        boolean previewGeneration = Util.isTrue(params.previewGeneration)
+
+        String content = groovyPageRenderer.render(template: "/media/questionAndAnswerView", model:[questionAndAnswer:questionAndAnswer, thumbnailGeneration:thumbnailGeneration, previewGeneration:previewGeneration, badImage:assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/questionAndAnswer.jpg")])
+        content = contentRetrievalService.wrapWithSyndicateDiv(content)
+        if(!thumbnailGeneration){
+            content = contentRetrievalService.addAttributionToExtractedContent(questionAndAnswer.id, content)
+            content += analyticsService.getGoogleAnalyticsString(questionAndAnswer, params)
+        }
+        content
     }
 
     private resolveNestedCollections(initialList){
@@ -233,7 +257,7 @@ class MediaService {
         """${excludeJquery ? "" : jqeuryEmbed}<script>\$(document).ready(function(){\$.getJSON('${url}', function(data){\$('#${divId}').html(data.results[0].content);});});</script>${excludeDiv ? "" : includedDiv}""".encodeAsHTML()
     }
 
-    @Transactional
+    @NotTransactional
     def getRenderedContentByMediaType(mediaList, params){
         def mediaItemContent = []
         mediaList.each{ mediaItem ->
@@ -241,11 +265,10 @@ class MediaService {
                 case Collection:
                     //do nothing, we don't do nesting
                     break
+                case FAQ:
+                    //do nothing, don't render whole faq inside list
                 case Html:
                     mediaItemContent << [content:renderHtml(mediaItem as Html, params), meta:mediaItem]
-                    break
-                case Periodical:
-                    mediaItemContent << [content:renderPeriodical(mediaItem as Periodical, params), meta:mediaItem]
                     break
                 case Image:
                     mediaItemContent << [content:renderImage(mediaItem as Image, params), meta:mediaItem]
@@ -258,6 +281,9 @@ class MediaService {
                     break
                 case PDF:
                     mediaItemContent << [content:renderPdf(mediaItem as PDF, params), meta:mediaItem]
+                    break
+                case QuestionAndAnswer:
+                    mediaItemContent << [content:renderQuestionAndAnswer(mediaItem as QuestionAndAnswer, params), meta:mediaItem]
                     break
                 case Tweet:
                     mediaItemContent << [content:renderTweet(mediaItem as Tweet, params), meta:mediaItem]
@@ -314,26 +340,12 @@ class MediaService {
         MediaItem.read(id)
     }
 
-    def saveAudio(Audio audioInstance) {
-        if (!audioInstance.validate()) {
-            return audioInstance
-        }
-
-        MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(audioInstance)
-        
-        audioInstance.manuallyManaged = false
-        audioInstance.save(flush: true)
-        mediaItemSubscriber.save()
-        
-        audioInstance
-    }
-
     @NotTransactional
     String getExtractedContent(MediaItem mi, params){
         try {
             //for debugging
             if(Holders.config.disableGuavaCache){
-                println "cache is disabled for this request"
+                log.warn "cache is disabled for this request"
                 Map extractedContentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mi.sourceUrl, params)
                 String extractedContent = extractedContentAndHash.content
                 String newHash = extractedContentAndHash.hash
@@ -347,7 +359,7 @@ class MediaService {
                     }
                 } else{ //Else update the lastKnownGood if it's out of date
                     if(!lastKnownGood || lastKnownGood.mediaItem.hash != newHash){
-                        contentCacheService.cache(mi, extractedContent)
+                        contentCacheService.cache(mi.id, extractedContent)
                     }
                 }
 
@@ -384,7 +396,7 @@ class MediaService {
                         }
                     } else{ //Else update the lastKnownGood if it's out of date
                         if(!lastKnownGood || lastKnownGood.mediaItem.hash != newHash){
-                            contentCacheService.cache(mi, extractedContent)
+                            contentCacheService.cache(mi.id, extractedContent)
                         }
                     }
                     extractedContent
@@ -409,12 +421,37 @@ class MediaService {
         collectionInstance.manuallyManaged = false
         collectionInstance.save(flush: true)
         mediaItemSubscriber.save()
-        
+
         collectionInstance
     }
 
+    def saveFAQ(FAQ faqInstance) {
+        if (!faqInstance.validate()) {
+            return faqInstance
+        }
+
+        MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(faqInstance)
+
+        faqInstance.manuallyManaged = false
+        faqInstance.save(flush: true)
+        mediaItemSubscriber.save()
+
+        faqInstance
+    }
     private generalMediaItemLoader = { MediaItem item ->
-        MediaItem.findBySourceUrl(item.sourceUrl)
+        def result
+        try {
+            result = MediaItem.createCriteria().get {
+                eq 'sourceUrl', item.sourceUrl
+
+                lock true
+            }
+        } catch (NonUniqueResultException){
+            log.error("Found Duplicate SourceURL! ${item.sourceUrl}")
+        } catch(e){
+            log.error e
+        }
+        result
     }
 
     def saveHtml(Html htmlInstance, params) throws ContentNotExtractableException, ContentUnretrievableException{
@@ -442,7 +479,7 @@ class MediaService {
             htmlInstance = createOrUpdateMediaItem(htmlInstance, generalMediaItemLoader, contentAndHash) as Html      //load or update and existing record if it exists
         }
         if(contentAndHash.content) {
-            contentCacheService.cache(htmlInstance, contentAndHash.content)
+            contentCacheService.cache(htmlInstance.id, contentAndHash.content)
         }
         htmlInstance
     }
@@ -459,29 +496,8 @@ class MediaService {
         createOrUpdateMediaItem(PDFInstance, generalMediaItemLoader) as PDF
     }
 
-    Periodical savePeriodical(Periodical periodicalInstance){
-        def contentAndHash = contentRetrievalService.getContentAndMd5Hashcode(periodicalInstance.sourceUrl)
-        if (!contentAndHash.content) { //Extraction failed
-            log.error("Could not extract content, page was found but not marked up at url: ${periodicalInstance.sourceUrl}")
-            throw new ContentNotExtractableException("Could not extract content, page was found but not marked up at url: ${periodicalInstance.sourceUrl}")
-        } else { // Content extracted fine, can we save?
-            periodicalInstance.hash = contentAndHash.hash                   //rehash content
-
-            //Try to add a meaningful description if one isn't provided
-            if(!periodicalInstance.description){
-                try {
-                    String desc = contentRetrievalService.getDescriptionFromContent(contentAndHash.content, periodicalInstance.sourceUrl)
-                    if(desc){
-                        periodicalInstance.description = desc
-                    }
-                } catch(e){
-                    log.error(e)
-                }
-            }
-
-            periodicalInstance = createOrUpdateMediaItem(periodicalInstance, generalMediaItemLoader, contentAndHash) as Periodical     //load or update and existing record if it exists
-        }
-        periodicalInstance
+    QuestionAndAnswer saveQuestionAndAnswer(QuestionAndAnswer questionAndAnswerInstance){
+        createOrUpdateMediaItem(questionAndAnswerInstance, generalMediaItemLoader) as QuestionAndAnswer
     }
 
     Video saveVideo(Video videoInstance) {
@@ -512,49 +528,43 @@ class MediaService {
         videoInstance
     }
 
-    Widget saveWidget(Widget widgetInstance) {
-        if (!widgetInstance.validate()) {
-            return widgetInstance
-        }
-
-        MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(widgetInstance)
-        widgetInstance.manuallyManaged = false
-        widgetInstance.save(flush: true)
-        mediaItemSubscriber.save()
-        
-        widgetInstance
-    }
-
-    private MediaItem createOrUpdateMediaItem(MediaItem item, Closure mediaFinder, Map contentAndHash = [:]){
+    def MediaItem createOrUpdateMediaItem(MediaItem item, Closure mediaFinder, Map contentAndHash = [:]){
         boolean savetoDB = true
         MediaItem existing = mediaFinder(item)
         
         if (existing) {
             def result = updateMediaItem(existing, item)
             // -- media type specific updates here --
-            boolean checkHash = contentAndHash.hash != null
-            if(!result.changed && (checkHash && contentAndHash.hash == existing.hash)){
+            if(!result.changed && contentAndHash.hash == existing.hash){
                 log.info "Item not changed, skipping update ${result.updatedRecord.sourceUrl}"
                 item = existing // if there were no changes, return the existing record instead
                 savetoDB = false
             } else {
-                log.info "Item changed, updating"
+                log.info "Item changed, updating - ${item.id}: ${item.sourceUrl}"
                 item = result.updatedRecord
             }
         }
-        
+
         if(savetoDB) {
             MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(item)
             item.manuallyManaged = false
-            def result = item.save(flush: true)
+            //Added merge to investigate concurrent publish
+            def result
+            try {
+                result = item.save()
+            } catch (e) {
+                log.error ("Could not save mediaItem: ${item.id}: ${item.sourceUrl}")
+                println e
+            }
             if(!result){
                 log.error "Media mediaSource didn't save. Errors were: ${item.errors}"
-            }
-            mediaItemSubscriber.save(flush:true)
+            } else {
+                mediaItemSubscriber.save()
 
-            log.info "media saved: ${item.id}"
-            if (grailsApplication.config.syndication.solrService.useSolr) {
-               solrIndexingService.inputMediaItem(item, contentAndHash.content)
+                log.info "media saved: ${item.id} - ${item.sourceUrl}"
+                if (grailsApplication.config.syndication.solrService.useSolr) {
+                    solrIndexingService.inputMediaItem(item, contentAndHash.content)
+                }
             }
             log.info "Media Item Created/Updated: ${item.id} - ${item.sourceUrl}"
         }
@@ -579,9 +589,12 @@ class MediaService {
         }
 
         def senderPublicKey = apiKey[0] as String
-        def mediaItemSubscriber
+        def mediaItemSubscriber = null
+        Long subscriberId = null
+        def cmsManagerResponse = null
         try{
-            Long subscriberId = cmsManagerService.getSubscriber(senderPublicKey)?.id as Long
+            cmsManagerResponse = cmsManagerService.getSubscriber(senderPublicKey)
+            subscriberId = cmsManagerResponse?.id as Long
             if(mediaItem.id){
                 mediaItemSubscriber = MediaItemSubscriber.findBySubscriberIdAndMediaItem(subscriberId, mediaItem)
                 if(mediaItemSubscriber?.id) {
@@ -591,9 +604,15 @@ class MediaService {
                 return new MediaItemSubscriber(subscriberId:subscriberId, mediaItem:mediaItem)
             }
         } catch(e){
-            log.error(e)
+            StringWriter sw = new StringWriter()
+            PrintWriter pw = new PrintWriter(sw)
+            e.printStackTrace(pw)
+            log.error("${e} \n ${sw.toString()}")
         }
-        log.error(" Permission denied, could not find or create a valid MediaItemSubscriber for the mediaItem! ")
+        log.error("Permission denied, could not find or create a valid MediaItemSubscriber for the mediaItem! Details: \n" +
+                "mediaItemId: ${mediaItem.id}\nsourceUrl: ${mediaItem.sourceUrl}\nsubscriberId: ${subscriberId}\nmediaItemSubscriber id: ${mediaItemSubscriber?.id}\n" +
+                "Api Key: ${apiKey}\nSender publoc key: ${senderPublicKey}" +
+                "Raw CMS Manager Response:\n${cmsManagerResponse}")
         mediaItem.discard()
         throw new UnauthorizedException("You do not have permission to access this mediaSource.")
     }
@@ -690,7 +709,6 @@ class MediaService {
     }
 
     private static int getMax(params) {
-        //TODO we need to define a global max somewhere, and load that here
         Math.min(params.int("max") ?: 20, 1000)
     }
 
@@ -704,7 +722,7 @@ class MediaService {
     private Map updateMediaItem(MediaItem o, MediaItem u) { //original, updated
         boolean changed = false
 
-        def mediaItemClass = new DefaultGrailsDomainClass(MediaItem)
+        def mediaItemClass = new DefaultGrailsDomainClass(o.getClass())
 
         //Iterate over all MediaItem properties except oneToMany and ManyToMany
         mediaItemClass.getPersistentProperties().findAll{!it.isOneToMany() && !it.isManyToMany()}.each { p ->

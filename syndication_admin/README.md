@@ -19,30 +19,6 @@ This README would normally document whatever steps are necessary to get your app
 
 ### Role Abilities ###
 
-* ### ROLE_STATS ###
-
-    * Can view Home page and Metrics
-
-* ### ROLE_BASIC ###
-
-    * Everything above and:
-    * Can view everything except users and tools
-    * Create tags
-    * Can tag media individually from the show media views
-
-* ### ROLE-USER ###
-
-    * Everything above and:
-    * Create, edit and delete tags
-    * Create, edit, delete tag Languages
-    * Create, edit, delete tagType and bulk Tag
-    * Edit Featured Media
-    * Create, edit, delete extended attributes
-    * Create sources
-    * Create languages
-    * Create update campaigns
-    * Create, update delete alternate images
-
 * ### ROLE-MANAGER ###
 
     * Everything above and:

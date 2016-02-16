@@ -7,18 +7,17 @@ import grails.plugin.springsecurity.annotation.Secured
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
 class MicrositeController {
 
-
     def index() {
-        def userMicrosites = MicroSite.findAllByUser(User.get(springSecurityService.currentUser.id))
+        def userMicrosites = MicroSite.list()
         [
                 userMicrosites:userMicrosites
         ]
     }
 
     def show(MicroSite microsite) {
-        if(!microsite){
+        if(!microsite?.id){
             flash.error = "the microsite does not exist"
-            redirect controller: "dashboard", action: "syndDash"
+            redirect controller: "micrositeFilter", action: "index"
         }
 
         render view:"show", model:[
@@ -28,19 +27,16 @@ class MicrositeController {
     }
 
     def delete(MicroSite microSite){
-        println "deleting" + microSite
         if(!microSite?.id){
             flash.error = "Could not find microSite"
             redirect controller: "micrositeFilter", action:"index"
             return
         }
-
         def name = microSite.title
         def flaggedMicrosite = FlaggedMicrosite.findByMicrosite(microSite)
         if(flaggedMicrosite){
             flaggedMicrosite.delete()
         }
-
         microSite.delete(flush: true)
         flash.message = "Microsite '${name}' has been deleted!"
 

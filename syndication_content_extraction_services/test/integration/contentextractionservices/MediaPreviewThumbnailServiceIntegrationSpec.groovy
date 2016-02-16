@@ -35,7 +35,7 @@ class MediaPreviewThumbnailServiceIntegrationSpec extends IntegrationSpec {
         when:
             Html html = Html.first()
         then:
-            mediaPreviewThumbnailService.generate(html)
+            mediaPreviewThumbnailService.generate(html.id)
             def previewAndThumnail = mediaPreviewThumbnailService.previewAndThumbnail(html)
             previewAndThumnail.preview != null
             previewAndThumnail.preview.imageData.size() > 0

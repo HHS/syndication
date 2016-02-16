@@ -1,7 +1,6 @@
 //= require jquery
+//= require_tree bower_components
 //= require_self
-//= require bootstrap
-//= require jquery.dataTables.min
 
 $(document).ready(function()
 {

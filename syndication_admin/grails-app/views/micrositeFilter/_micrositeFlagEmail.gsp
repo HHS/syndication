@@ -67,6 +67,7 @@
             <li>username: ${userInstance?.username}</li>
             <li>micrositeId: ${microsite?.id}</li>
             <li>microsite title: ${microsite?.title ?: "No Title"}</li>
+            <li>Microsite show page: <a href="${serverUrl+"/microsite/show/"+ microsite?.id}" title="flagged microsite show page">Admins show page</a></li>
         </ul>
     </div>
     <div class="footer_links">

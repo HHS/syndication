@@ -15,6 +15,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
+import com.ctacorp.syndication.Source
+import groovyx.net.http.URIBuilder
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -29,7 +31,7 @@ import com.ctacorp.syndication.media.Video
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_STATS', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional(readOnly = true)
 class VideoController {
 
@@ -63,7 +65,6 @@ class VideoController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         flash.error = null
         def subscribers = cmsManagerKeyService.listSubscribers()
@@ -72,7 +73,6 @@ class VideoController {
         respond video, model: [subscribers:subscribers]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(Video videoInstance) {
         if (videoInstance == null) {
@@ -97,13 +97,11 @@ class VideoController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Video videoInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond videoInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(videoInstance)?.subscriberId)]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Video videoInstance) {
         if (videoInstance == null) {
@@ -154,8 +152,6 @@ class VideoController {
         }
     }
 
-
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def importVideo(String videoUrl) {
         flash.error = null
@@ -163,6 +159,18 @@ class VideoController {
             notFound()
             return
         }
+
+        def url = new URIBuilder(videoUrl)
+        if(!url.query?.v && url.query?.list){
+            render view: "create", model:[playlist:true, sourceUrl:videoUrl]
+            return
+        }
+
+        if(url.query?.v && url.query?.list && params._action_importVideo != "Import Single Video"){
+            render view: "create", model:[possiblePlaylist:true, sourceUrl:videoUrl]
+            return
+        }
+
         Video videoInstance = youtubeService.getVideoInstanceFromUrl(videoUrl)
 
         if (!videoInstance) {
@@ -171,6 +179,42 @@ class VideoController {
             return
         }
         respond videoInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]
+    }
+
+    @Transactional
+    def importPlaylist(String videoUrl) {
+        flash.error = null
+        if (!videoUrl) {
+            notFound()
+            return
+        }
+
+        if(params._action_importPlaylist == "Import Entire Playlist") {
+            render view: "create", model:[playlist:true, sourceUrl:videoUrl]
+            return
+        }
+
+        Collection collectionInstance = youtubeService.getCollectionInstanceFromVideoPlaylist(videoUrl,Language.get(params.int("language.id")), Source.get(params.int("source.id")))
+
+        if (!collectionInstance) {
+            flash.error = "The playlist could not be imported, either it doesn't exist or is private. Please verify the video url is correct and the visibility on the video is public."
+            render view: "create"
+            return
+        }
+
+        collectionInstance.save()
+        if(collectionInstance.hasErrors()){
+            if(!params.videoAndPlaylist){
+                flash.errors = collectionInstance.errors.allErrors.collect { [message: g.message([error: it])] }
+            }
+            render view: "create", model:[playlist:true, sourceUrl:videoUrl]
+            return
+        }
+
+        youtubeService.saveMediaItemSubscriber(collectionInstance)
+
+        flash.message = "Created all videos in the playlist and placed them in the following Collection."
+        redirect controller: "collection", action:'show',id: collectionInstance.id, model:[subscribers:cmsManagerKeyService.listSubscribers()]
     }
 
 

@@ -8,9 +8,8 @@ class DelayedMediaPreviewThumbnailJob {
     def execute(context) {
         def mediaId = context.mergedJobDataMap.get('mediaId')
         if(mediaId){
-            MediaItem mi = MediaItem.get(mediaId)
             try {
-                mediaPreviewThumbnailService.generate(mi)
+                mediaPreviewThumbnailService.generate(mediaId)
             } catch(ConnectException e){
                 log.error("Couldn't connect to Manet Preview Server for mediaId: ${mediaId}")
             } catch(e){

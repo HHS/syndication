@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -23,7 +23,6 @@ grails.project.source.level = 1.6
 
 def home = System.getProperty('user.home')
 def config = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedBuildConfig.groovy").toURI().toURL())
-def runtimeConfig = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedConfig.groovy").toURI().toURL())
 
 //grails.project.fork = false
 grails.project.fork = [
@@ -108,8 +107,8 @@ grails.project.dependency.resolution = {
         }
 
         // plugins for the compile step --------------------------------------------------------------------------------
-        compile ":syndication-model:2.4.0"   //syndication domain models
-        compile ":content-extraction-services:1.8.0"   //syndication content extraction tools
+        compile ":syndication-model:2.6.0"   //syndication domain models
+        compile ":content-extraction-services:1.10.0"   //syndication content extraction tools
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
         compile ":asset-pipeline:2.6.5"
@@ -136,7 +135,7 @@ grails.project.dependency.resolution = {
         // Solr --------------------------------------------------------------------------------------------------------
         // |  Leave this at the bottom, moving it causes dependency problems at the moment                             |
         // -------------------------------------------------------------------------------------------------------------
-        compile ":solr-operations:1.3.0"      //syndication solr stuff
+        compile ":solr-operations:1.4.0"      //syndication solr stuff
 
         // uncomment these to enable additional asset-pipeline capabilities
         //compile ":sass-asset-pipeline:1.5.5"

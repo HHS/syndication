@@ -1,6 +1,6 @@
 
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -33,7 +33,7 @@ class InitController {
     def tags(){
         flash.message = null
         flash.error = null
-        println "Running tagInit"
+        log.info "Running tagInit"
         if(initTagService()){
             flash.message = "Tags created."
         } else{
@@ -45,7 +45,7 @@ class InitController {
     def tiny(){
         flash.message = null
         flash.error = null
-        println "Running tinyInit"
+        log.info "Running tinyInit"
         if(initTinyUrlService()){
             flash.message = "Tiny URLs created."
         } else{
@@ -55,12 +55,12 @@ class InitController {
     }
 
     def seedSolr() {
-        println "seeding solr "
+        log.info "seeding solr "
 
         solrService.inputMediaItems()
         solrService.inputCampaigns()
         solrService.inputSources()
-        println "solr is seeded"
+        log.info "solr is seeded"
     }
 
     private boolean ping(String serverAddress, String name){
@@ -68,10 +68,10 @@ class InitController {
         try{
             assert url.text
             log.info "${name} Server found"
-            println "${name} Server found"
+            log.info "${name} Server found"
             return true
         } catch(e){
-            println "${name} Server Not found!"
+            log.info "${name} Server Not found!"
             return false
         }
     }
@@ -81,13 +81,13 @@ class InitController {
             MediaItem.list().each{ MediaItem mi->
                 def tinyInfo = tinyUrlService.getMappingByMediaItemId(mi.id)
                 if(tinyInfo.error){
-                    println "Creating TinyURL for ${mi.sourceUrl}"
+                    log.info "Creating TinyURL for ${mi.sourceUrl}"
                     tinyUrlService.createMapping(mi.sourceUrl, mi.id, mi.externalGuid)
                 }
             }
             return true
         } else{
-            println "Can't reach server: ${grailsApplication.config.tinyUrl.serverAddress}${grailsApplication.config.syndication.tinyUrl.mappingBase}.json"
+            log.info "Can't reach server: ${grailsApplication.config.tinyUrl.serverAddress}${grailsApplication.config.syndication.tinyUrl.mappingBase}.json"
         }
         false
     }
@@ -97,7 +97,7 @@ class InitController {
             MediaItem.list().each{ MediaItem mi->
                 (ran.nextInt(3)+1).times{
                     def tag = randomTag()
-                    println "Tagging ${mi.name} with ${tag}"
+                    log.info "Tagging ${mi.name} with ${tag}"
                     tagsService.tagMediaItemByName(mi.id, tag, 1, 1)
                 }
             }
@@ -114,7 +114,7 @@ class InitController {
             def mediaItems = MediaItem.list()
 
             if(subscriber && !MediaItemSubscriber.list()){
-                println "adding ownership to media Items"
+                log.info "adding ownership to media Items"
                 flash.message = "Ownership added!"
                 mediaItems.each{mediaItem ->
                     new MediaItemSubscriber([mediaItem:mediaItem,subscriberId:subscriber.id as Long]).save(flush:true)
@@ -122,7 +122,7 @@ class InitController {
             }
 
         } catch (e) {
-            println "Can't connect to CMS Manager!"
+            log.info "Can't connect to CMS Manager!"
         }
         render view: 'index'
     }

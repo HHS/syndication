@@ -7,13 +7,17 @@ import grails.plugin.springsecurity.annotation.Secured
 class RedirController {
 
     def resolveTinyToken(String token) {
-        Long id = token.decodeBase32()
-        MediaMapping mm = MediaMapping.get(id)
-        log.info "Redirecting to ${mm?.targetUrl}"
-        if(mm) {
-            redirect(url: mm.targetUrl)
-        } else{
-            response.sendError(404)
+        try {
+            Long id = token.decodeBase32()
+            MediaMapping mm = MediaMapping.get(id)
+            if(mm) {
+                log.info "Redirecting to ${mm?.targetUrl}"
+                redirect(url: mm.targetUrl)
+                return
+            }
+        } catch(e){
+            log.error(e)
         }
+        response.sendError(404)
     }
 }

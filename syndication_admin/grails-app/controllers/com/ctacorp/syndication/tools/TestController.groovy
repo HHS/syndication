@@ -75,7 +75,7 @@ class TestController {
     }
 
     def generate(MediaItem m) {
-        previewService.generate(m)
+        previewService.generate(m.id)
         render m
     }
 

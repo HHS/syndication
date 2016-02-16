@@ -1,4 +1,3 @@
-
 /*
 Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -14,10 +13,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 
 import com.ctacorp.syndication.MediaItemChangeListener
-import com.ctacorp.syndication.authentication.*
-import com.ctacorp.syndication.commons.mq.Message
-import com.ctacorp.syndication.commons.mq.MessageType
 import com.ctacorp.syndication.contact.EmailContact
+import com.ctacorp.syndication.authentication.*
 import grails.util.Environment
 import grails.util.Holders
 
@@ -74,11 +71,10 @@ class BootStrap {
     private void initUsers() {
         def adminRole      = Role.findOrSaveByAuthority('ROLE_ADMIN')
         def managerRole    = Role.findOrSaveByAuthority('ROLE_MANAGER')
-        def statsRole      = Role.findOrSaveByAuthority('ROLE_STATS')
-        def basicRole      = Role.findOrSaveByAuthority('ROLE_BASIC')
-        def userRole       = Role.findOrSaveByAuthority('ROLE_USER')
         def storefrontRole = Role.findOrSaveByAuthority('ROLE_STOREFRONT_USER')
         def publisherRole  = Role.findOrSaveByAuthority('ROLE_PUBLISHER')
+
+        assert adminRole && storefrontRole && publisherRole
 
         if(Environment.getCurrent() == Environment.DEVELOPMENT){
             if(!User.findByUsername("publisher@example.com")){
@@ -97,6 +93,7 @@ class BootStrap {
         }
 
         String initialPassword = config.springsecurity.syndicationAdmin.initialAdminPassword
+
         def adminUser = new User(username: adminUserName, enabled: true, password: initialPassword)
         adminUser.save(flush: true)
 

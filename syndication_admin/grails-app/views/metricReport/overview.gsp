@@ -70,7 +70,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h1 class="panel-title">
-                        Total's
+                        Totals
                     </h1>
                 </div>
 
@@ -101,11 +101,19 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                 <div class="panel-body">
                     <div class="form-group">
-                        <div class="btn-group btn-group-sm btn-group-justified" role="group" aria-label="...">
-                            <a href="#" id="totalWeek" data-totalrange="week" class="btn totalRange btn-default active">Week</a>
-                            <a href="#" id="totalMonth" data-totalrange="month" class="btn totalRange btn-default">Month</a>
-                            <a href="#" id="totalYear" data-totalrange="year" class="btn totalRange btn-default">Year</a>
-                            <a href="#" id="totalAll" data-totalrange="all" class="btn totalRange btn-default">All Time</a>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>Select a Time Range</h4>
+                                <div class="form-group">
+                                    <label for="fromDay" class="padded">From:</label>
+                                    <g:datePicker name="fromDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${fromDay}"/>
+                                </div>
+                                <div class="form-group">
+                                    <label for="toDay" class="padded">To:</label>
+                                    <g:datePicker name="toDay" precision="day" class="form-control" relativeYears="[-10..10]" value="${toDay}"/>
+                                    <input type="button" class="btn btn-success btn-xs totalRange" value="Apply Range"/>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <ul class="list-group">
@@ -158,24 +166,20 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 </div>
 <script>
     $(document).ready(function(){
-        updateTotalHits(document.getElementById("totalWeek"));
+        updateTotalHits();
     });
 
 
     $(".totalRange").on("click", function(){
-        document.getElementById("totalWeek").className = "btn totalRange btn-default";
-        document.getElementById("totalMonth").className = "btn totalRange btn-default";
-        document.getElementById("totalYear").className = "btn totalRange btn-default";
-        document.getElementById("totalAll").className = "btn totalRange btn-default";
-        updateTotalHits(this);
+        updateTotalHits();
     });
 
-    function updateTotalHits(currentTag){
-        currentTag.className = "btn totalRange btn-default active";
+    function updateTotalHits(){
         $.ajax({
             method: "POST",
             url: "${g.createLink(controller: 'metricReport', action: 'generalOverviewAjax')}",
-            data: {totalRange:currentTag.getAttribute('data-totalrange')},
+            data: {fromDay_day:document.getElementById("fromDay_day").value, fromDay_month:document.getElementById("fromDay_month").value, fromDay_year:document.getElementById("fromDay_year").value,
+                toDay_day:document.getElementById("toDay_day").value, toDay_month:document.getElementById("toDay_month").value, toDay_year:document.getElementById("toDay_year").value},
             success: function(data) {
                 document.getElementById("storefrontTotal").innerHTML = data.storefrontCount;
                 document.getElementById("apiTotal").innerHTML = data.apiCount;

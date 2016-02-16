@@ -29,6 +29,14 @@
         </tr>
         <tr>
             <td class="col1">
+                <label for="createdBy">
+                    Created By:
+                </label>
+            </td>
+            <td class="col2">
+                <input id="createdBy" type="text" value="${createdBy}" name="createdBy"/>
+            </td>
+            <td class="col1">
                 <label>
                     Source:
                 </label>

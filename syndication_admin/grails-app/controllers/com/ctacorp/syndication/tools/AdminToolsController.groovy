@@ -2,7 +2,9 @@ package com.ctacorp.syndication.tools
 
 import com.ctacorp.syndication.jobs.HashResetJob
 import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.Tweet
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
 @Secured(["ROLE_ADMIN"])
@@ -10,6 +12,7 @@ class AdminToolsController {
     def tinyUrlService
     def mediaItemsService
     def twitterService
+    def remoteCacheService
 
     def index() {
     }
@@ -28,6 +31,35 @@ class AdminToolsController {
         render view: "index"
     }
 
+    def flushAllCaches(){
+        remoteCacheService.flushRemoteCache()
+        flash.message = "Remote Cache Flush requested"
+        redirect action: 'index'
+    }
+
+    def findDuplicates(){
+        def allMedia = MediaItem.list()
+        def alreadyChecked = []
+        def dupes = []
+        allMedia.each{ mi ->
+            log.info("Checking ${mi.id} for duplicates")
+            if(!(mi.id in alreadyChecked)) {
+                def found = MediaItem.findAllBySourceUrl(mi.sourceUrl, [sort: 'id', order: 'ASC'])
+                if (found.size() > 1) {
+                    log.info("Duplicate Found!! ${found}")
+                    dupes << [
+                            oldest: found[0],
+                            dupes: found[1..-1]
+                    ]
+                }
+                found.each{
+                    alreadyChecked << it.id
+                }
+            }
+        }
+        render view:'index', model:[duplicates:dupes]
+    }
+
     def resetAllHashes(Boolean restrictToDomain, String domain) {
         HashResetJob.triggerNow(restrictToDomain: restrictToDomain, domain: domain)
         flash.message = "Hash reset job has been triggered, it may take minutes to hours to complete"
@@ -42,5 +74,30 @@ class AdminToolsController {
             return
         }
         render view: 'index', model: [tweetData: tweetData, tweetId: tweetId]
+    }
+
+    def downloadDatabaseAsJsonFile(){
+        def allItems = MediaItem.list()
+
+        def allData = []
+        allItems.each{ MediaItem mi ->
+            def data = [
+                    name:mi.name,
+                    sourceUrl:mi.sourceUrl,
+                    sourceId:mi.sourceId,
+                    languageId:mi.languageId,
+                    description:mi.description,
+                    mediaType:mi.getClass().simpleName.toLowerCase()
+            ]
+            allData << data
+        }
+
+        response.setContentType("APPLICATION/OCTET-STREAM")
+        response.setHeader("Content-Disposition", "Attachment;Filename=\"SyndicationData_${new Date().format('yyyy_mm_dd-HH:mm')}.json\"")
+
+        def outputStream = response.getOutputStream()
+        outputStream << ((allData as JSON).toString(params.boolean('pretty') ?: false))
+        outputStream.flush()
+        outputStream.close()
     }
 }

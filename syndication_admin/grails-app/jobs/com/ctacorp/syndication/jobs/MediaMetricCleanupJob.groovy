@@ -21,24 +21,25 @@ class MediaMetricCleanupJob {
         log.info "Initiated Daily Media Metric Cleanup job"
         def sql = new Sql(dataSource)
         MediaMetric.withTransaction{ status ->
-            def duplicateMediaMetrics = sql.rows("SELECT *, COUNT(*) FROM media_metric GROUP BY media_id, day HAVING COUNT(*) > 1")
-            duplicateMediaMetrics.each{ metric ->
-                def searches = sql.rows("SELECT SUM(api_view_count) AS apiViewCount,SUM(storefront_view_count) AS storefrontViewCount,media_id AS media,day AS day FROM media_metric WHERE day = ${metric.day} and media_id = ${metric.media_id}")
-                try{
+            try{
+                def yesterday = new Date() - 1
+                def duplicateMediaMetrics = sql.rows("SELECT *, COUNT(*) FROM media_metric WHERE media_metric.day <= :yesterday GROUP BY media_id, day HAVING COUNT(*) > 1",[yesterday:yesterday.format('yyyy-MM-dd')])
+                duplicateMediaMetrics.each{ metric ->
+                    def searches = sql.rows("SELECT SUM(api_view_count) AS apiViewCount,SUM(storefront_view_count) AS storefrontViewCount,media_id AS media,day AS day FROM media_metric WHERE day = ${metric.day} and media_id = ${metric.media_id}")
+
                     def tempSearchObjects = searches as MediaMetric[]
-                SearchQuery.executeUpdate("DELETE MediaMetric m WHERE m.day >= :beginDay And m.day < :endDay AND m.media.id = :mediaId",[beginDay:metric.day.clearTime(), endDay:metric.day.clearTime() + 1,mediaId:metric.media_id])
+                    SearchQuery.executeUpdate("DELETE MediaMetric m WHERE m.day = :day AND m.media.id = :mediaId",[day:metric.day.clearTime(),mediaId:metric.media_id])
                     tempSearchObjects.each{query ->
-                    if(!query.save(flush:true)){
+                    if(!query.save()){
+                        log.error "Could not save query for media item: ${metric.media_id} with date: ${metric.day}"
                         status.setRollbackOnly()
                     }
                     }
-                } catch(e){
-                    log.error(e)
-                    log.error("could not properly combine Media Metirc rows for the date of : " + new Date().clearTime() - 2)
                 }
+            } catch(e){
+                log.error(e)
+                log.error("could not properly combine Media Metirc rows for the date of : " + (new Date() - 1).clearTime())
             }
-
         }
-
     }
 }

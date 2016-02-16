@@ -8,13 +8,14 @@ import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.TagService
 import com.ctacorp.syndication.FeaturedMedia
 import com.ctacorp.syndication.media.Collection
+import com.ctacorp.syndication.social.TwitterStatusCollector
 import grails.test.mixin.TestFor
 import grails.test.mixin.Mock
 import solr.operations.SolrIndexingService
 import spock.lang.Specification
 
 @TestFor(CollectionController)
-@Mock([Collection, MediaItemSubscriber, FeaturedMedia])
+@Mock([Collection, MediaItemSubscriber, FeaturedMedia,TwitterStatusCollector])
 class CollectionControllerSpec extends Specification {
 
     def mediaItemsService = Mock(MediaItemsService)

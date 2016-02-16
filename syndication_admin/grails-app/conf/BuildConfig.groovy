@@ -23,7 +23,6 @@ grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 def home = System.getProperty('user.home')
 def config = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedBuildConfig.groovy").toURI().toURL())
-def runtimeConfig = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedConfig.groovy").toURI().toURL())
 
 grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
@@ -102,9 +101,9 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the compile step ----------------------------------------------------
-        compile "org.grails.plugins:syndication-model:2.4.0"       //Syndication domain classes
-        compile "org.grails.plugins:content-extraction-services:1.8.0"      //syndication content extraction tools
-        compile "org.grails.plugins:solr-operations:1.3.0"                  //syndication solr stuff
+        compile "org.grails.plugins:syndication-model:2.6.0"       //Syndication domain classes
+        compile "org.grails.plugins:content-extraction-services:1.10.0"       //syndication content extraction tools
+        compile "org.grails.plugins:solr-operations:1.4.0"                  //syndication solr stuff
 
         //plugins for the compile step
         compile ":scaffolding:2.1.2"

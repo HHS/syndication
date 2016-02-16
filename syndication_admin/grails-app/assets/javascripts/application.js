@@ -6,11 +6,8 @@
 // to create separate JavaScript files as needed.
 //
 //= require jquery
-//= require bootstrap
-//= require plugins/metisMenu/jquery.metisMenu.js
+//= require_tree bower_components
 //= require sb-admin.js
-//= require jquery.magnific-popup.min.js
-//= require jquery-ui-1.10.4.custom.min.js
 //= require_self
 
 if (typeof jQuery !== 'undefined') {

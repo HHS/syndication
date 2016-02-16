@@ -1,0 +1,28 @@
+{
+  "name": "syndication-admin",
+  "authors": [
+    "nburk <nburk@ctacorp.com>"
+  ],
+  "description": "static asset management",
+  "main": [
+    "dist/metisMenu.js",
+    "dist/metisMenu.css"
+  ],
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery-ui": "1.10.4",
+    "bootstrap": "3.1.0",
+    "metisMenu": "2.2.0",
+    "magnific-popup": "1.0.1",
+    "font-awesome": "4.2.0"
+  }
+}

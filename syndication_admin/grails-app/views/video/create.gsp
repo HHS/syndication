@@ -50,5 +50,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			</div>
 		</div>
         <g:render template="importVideo"/>
+		<g:render template="importPlaylist"/>
+		<g:render template="importPossiblePlaylist"/>
 	</body>
 </html>

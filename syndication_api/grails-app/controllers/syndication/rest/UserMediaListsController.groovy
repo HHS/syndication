@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -24,7 +24,6 @@ import com.ctacorp.grails.swagger.annotations.Parameter
 import com.ctacorp.grails.swagger.annotations.PropertyAttribute
 import com.ctacorp.grails.swagger.annotations.ResponseMessage
 import com.ctacorp.syndication.AlternateImage
-import com.ctacorp.syndication.media.Audio
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Image
@@ -34,7 +33,6 @@ import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.media.Video
-import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.storefront.UserMediaList
 import org.codehaus.groovy.grails.web.mime.MimeType
 import com.ctacorp.syndication.api.ApiResponse
@@ -85,15 +83,13 @@ import com.ctacorp.syndication.api.Pagination
         Message,
         Collection,
         AlternateImage,
-        Audio,
         Html,
         Image,
         Infographic,
         Language,
         Source,
         Tweet,
-        Video,
-        Widget
+        Video
     ]
 )
 class UserMediaListsController {

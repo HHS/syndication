@@ -1,50 +1,38 @@
 package com.ctacorp.syndication.jobs
 
-import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.preview.MediaThumbnail
 
 class DelayedMediaPreviewThumbnailJob {
     def mediaPreviewThumbnailService
-    def remoteCacheService
 
     def execute(context) {
-
         if(context.mergedJobDataMap.mediaId){
             log.info "regen thumbnail for ${context.mergedJobDataMap.mediaId}"
-            MediaItem mi = MediaItem.read(context.mergedJobDataMap.mediaId as Long)
-            mediaPreviewThumbnailService.generate(mi)
-            flushRemoteCache(mi)
+            Long mediaId = context.mergedJobDataMap.mediaId as Long
+            mediaPreviewThumbnailService.generate(mediaId)
         } else{
-            def mediaIds = MediaItem.executeQuery('select mi.id from MediaItem mi order by mi.id')
+            def mediaItems = MediaItem.list(sort:"id", order:"DESC")
 
-            mediaIds.each{ mediaId ->
+            mediaItems.each{ mediaItem ->
                 try {
-                    MediaItem mi = MediaItem.read(mediaId)
-                    def className = mi.getClass().simpleName.toLowerCase()
-                    if (className in ["html", "image", "infographic", "periodical", "video"]) {
+                    def className = mediaItem.getClass().simpleName.toLowerCase()
+                    if (className in ["html", "image", "infographic", "video"]) {
                         if (context.mergedJobDataMap.get('scope') == "all") {
-                            mediaPreviewThumbnailService.generate(mi)
-                            log.info "regen thumbnail for ${mi.id}"
-                            flushRemoteCache(mi)
+                            mediaPreviewThumbnailService.generate(mediaItem.id)
+                            log.info "regen thumbnail for ${mediaItem.id}"
                         } else {
-                            MediaThumbnail existingThumb = MediaThumbnail.findByMediaItem(mi)
+                            MediaThumbnail existingThumb = MediaThumbnail.findByMediaItem(mediaItem)
                             if (!existingThumb) {
-                                log.info "regen thumbnail for ${mi.id}"
-                                mediaPreviewThumbnailService.generate(mi)
-                                flushRemoteCache(mi)
+                                log.info "regen thumbnail for ${mediaItem.id}"
+                                mediaPreviewThumbnailService.generate(mediaItem.id)
                             }
                         }
                     }
                 } catch(e){
-                    log.error "Problem generating thumbnail for ${mediaId}"
+                    log.error "Problem generating thumbnail for ${mediaItem.id}: ${mediaItem.sourceUrl}"
                 }
             }
         }
-    }
-
-    private flushRemoteCache(mi){
-        String key = Hash.md5("thumbnail/${mi.id}?[action:[GET:thumbnail], controller:media, id:${mi.id}]")
-        remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", key)
     }
 }

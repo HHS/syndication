@@ -3,7 +3,7 @@ package com.ctacorp.syndication.dashboard
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
-@Secured(["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_USER", "ROLE_BASIC"])
+@Secured(["ROLE_ADMIN", "ROLE_MANAGER"])
 class FeaturedMediaController {
     def featuredMediaService
 
@@ -13,7 +13,6 @@ class FeaturedMediaController {
         [featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'])
     def featureMediaItems(String featuredMedia){
         if(!featuredMedia){
             featuredMediaService.clear()
@@ -37,7 +36,6 @@ class FeaturedMediaController {
         redirect action:'index'
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'])
     def featureItem(Long id){
         flash.message = "The media item has been featured. <a href='${createLink(controller: 'featuredMedia', action: 'index')}'>Click here for feature page</a>"
 

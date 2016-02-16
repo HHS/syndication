@@ -30,7 +30,7 @@ import com.ctacorp.syndication.media.Image
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_STATS', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional(readOnly = true)
 class ImageController {
 
@@ -63,7 +63,6 @@ class ImageController {
         ]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     def create() {
         def subscribers = cmsManagerKeyService.listSubscribers()
         Image image = new Image(params)
@@ -71,7 +70,6 @@ class ImageController {
         respond image, model: [subscribers:subscribers, formats:["jpg", "png"]]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
     @Transactional
     def save(Image imageInstance) {
         if (imageInstance == null) {
@@ -96,13 +94,11 @@ class ImageController {
         }
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def edit(Image imageInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
         respond imageInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(imageInstance)?.subscriberId), formats:["jpg", "png"]]
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     @Transactional
     def update(Image imageInstance) {
         if (imageInstance == null) {

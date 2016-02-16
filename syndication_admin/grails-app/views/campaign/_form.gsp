@@ -26,7 +26,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <!-- Textarea -->
 <div class="form-group">
-    <label class="col-md-5 control-label" for="description">description</label>
+    <label class="col-md-5 control-label" for="description">Description</label>
     <div class="col-md-7">
         <textarea class="form-control" id="description" name="description" maxlength="2000" >${campaignInstance?.description}</textarea>
     </div>

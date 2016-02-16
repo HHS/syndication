@@ -43,11 +43,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <table class="table table-striped table-bordered table-hover">
                         <thead>
                         <tr>
-                            <g:sortableColumn class="idTables" property="id" title="${message(code: 'audio.id.label', default: 'ID')}"/>
+                            <g:sortableColumn class="idTables" property="id" title="${message(code: 'html.id.label', default: 'ID')}"/>
 
-                            <g:sortableColumn property="name" title="${message(code: 'audio.name.label', default: 'Name')}"/>
+                            <g:sortableColumn property="name" title="${message(code: 'html.name.label', default: 'Name')}"/>
 
-                            <g:sortableColumn property="email" title="${message(code: 'audio.description.label', default: 'Email Address')}"/>
+                            <g:sortableColumn property="email" title="${message(code: 'html.description.label', default: 'Email Address')}"/>
                         </tr>
                         </thead>
                         <tbody>

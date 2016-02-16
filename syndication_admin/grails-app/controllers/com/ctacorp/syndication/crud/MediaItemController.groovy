@@ -15,22 +15,12 @@ package com.ctacorp.syndication.crud
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.media.Audio
-import com.ctacorp.syndication.media.Collection
-import com.ctacorp.syndication.media.Html
-import com.ctacorp.syndication.media.Image
-import com.ctacorp.syndication.media.Infographic
-import com.ctacorp.syndication.media.PDF
-import com.ctacorp.syndication.media.Periodical
-import com.ctacorp.syndication.media.Tweet
-import com.ctacorp.syndication.media.Video
-import com.ctacorp.syndication.media.Widget
 import com.ctacorp.syndication.authentication.UserRole
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.plugins.rest.client.RestBuilder
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 class MediaItemController {
     def tagService
     def mediaItemsService
@@ -39,41 +29,58 @@ class MediaItemController {
 
     def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id}
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_PUBLISHER'])
     def show(Long id) {
-        MediaItem mi = MediaItem.get(id)
+        MediaItem mi = MediaItem.read(id)
         flash.error = flash.error
         flash.message = flash.message
-        switch(mi) {
-            case Audio: redirect controller:        "Audio",       action: 'show', id: id, model:[audioInstance:mi];        break;
-            case Collection: redirect controller:   "Collection",  action: 'show', id: id, model:[collectionInstance:mi];   break;
-            case Html: redirect controller:         "Html",        action: 'show', id: id, model:[htmlInstance:mi];         break;
-            case Image: redirect controller:        "Image",       action: 'show', id: id, model:[imageInstance:mi];        break;
-            case Infographic: redirect controller:  "Infographic", action: 'show', id: id, model:[infographicInstance:mi];  break;
-            case PDF:         redirect controller:  "PDF",         action: 'show', id: id, model:[PDFInstance:mi];          break;
-            case Periodical:  redirect controller:  "Periodical",  action: 'show', id: id, model:[periodicalInstance:mi];   break;
-            case Tweet: redirect controller:        "Tweet",       action: 'show', id: id, model:[tweetInstance:mi];        break;
-            case Video: redirect controller:        "Video",       action: 'show', id: id, model:[videoInstance:mi];        break;
-            case Widget: redirect controller:       "Widget",      action: 'show', id: id, model:[widgetInstance:mi];       break;
+        redirect controller: "${mi.getClass().simpleName}", action:"show", id:id, model:["${getInstanceName(mi.getClass().simpleName)}":mi]
+    }
+
+    private String getInstanceName(String input){
+        //special case for acronyms like PDF, FAQ, etc...
+        def chars = input.chars
+        if(chars[0].isUpperCase() && chars[1].isUpperCase()){
+            return input
         }
+        return input[0].toLowerCase() + input.substring(1)
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def deleteAll(){
+        def checks = params.findAll{
+            it.key.startsWith("deleteChecked")
+        }
+
+        def deleted = []
+
+        checks.each{
+            if(it.value == "on"){
+                def id = it.key.split("_")[1] as Long
+                deleted << id
+                mediaItemsService.delete(id)
+            }
+        }
+
+        flash.message = "Deleted items with IDs: ${deleted}"
+
+        if(params.whereToController) {
+            if (params.whereToAction) {
+                redirect controller: params.whereToController, action: params.whereToAction
+                return
+            } else {
+                redirect controller: params.whereToController, action: 'index'
+                return
+            }
+        }
+
+        redirect controller:"dashboard", action: "syndDash"
     }
 
     def edit(Long id) {
         MediaItem mi = MediaItem.get(id)
         flash.error = flash.error
         flash.message = flash.message
-        switch(mi) {
-            case Audio: redirect controller:        "Audio",       action: 'edit', id: id, model:[audioInstance:mi];        break;
-            case Collection: redirect controller:   "Collection",  action: 'edit', id: id, model:[collectionInstance:mi];   break;
-            case Html: redirect controller:         "Html",        action: 'edit', id: id, model:[htmlInstance:mi];         break;
-            case Image: redirect controller:        "Image",       action: 'edit', id: id, model:[imageInstance:mi];        break;
-            case Infographic: redirect controller:  "Infographic", action: 'edit', id: id, model:[infographicInstance:mi];  break;
-            case PDF:         redirect controller:  "PDF",         action: 'edit', id: id, model:[PDFInstance:mi];          break;
-            case Periodical:  redirect controller:  "Periodical",  action: 'edit', id: id, model:[periodicalInstance:mi];   break;
-            case Tweet: redirect controller:        "Tweet",       action: 'edit', id: id, model:[tweetInstance:mi];        break;
-            case Video: redirect controller:        "Video",       action: 'edit', id: id, model:[videoInstance:mi];        break;
-            case Widget: redirect controller:       "Widget",      action: 'edit', id: id, model:[widgetInstance:mi];       break;
-        }
+        redirect controller: "${mi.getClass().simpleName}", action:"edit", id:id
     }
 
     // for token input searches

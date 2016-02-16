@@ -23,11 +23,10 @@ class MediaValidationService {
     def mediaItemsService
     def springSecurityService
 
-    @NotTransactional
     HealthReport performValidation(Long mediaId) {
         MediaItem mediaItem = MediaItem.get(mediaId)
-        if(!mediaItem) {
-            log.error "Tried to validate a media item that doesn't exist ${mediaId}"
+        if(!mediaItem || !mediaItem.active) {
+            log.error "Tried to validate a media item that doesn't exist ${mediaId} or is inactive."
             return null
         }
 
@@ -65,7 +64,6 @@ class MediaValidationService {
         FlaggedMedia.findAllByMediaItemInList(MediaItemSubscriber.findAllBySubscriberId(subscriberId).mediaItem)
     }
 
-    @NotTransactional
     def rescanItem(Long mediaId){
         HealthReport report = performValidation(mediaId)
         if(report != null && !report.valid){
@@ -92,24 +90,24 @@ class MediaValidationService {
         def mediaItem = MediaItem.load(report.mediaId)
         def alreadyFlagged = FlaggedMedia.findByMediaItem(mediaItem)
         if(!alreadyFlagged){
-            String reason = messageSource.getMessage("healthReport.failure.${report.failureType}" as String, null, Locale.US)
+            String reason = (report.statusCode ? "[${report.statusCode}] " : "") + messageSource.getMessage("healthReport.failure.${report.failureType}" as String, null, Locale.US)
             def flaggedItem = new FlaggedMedia(mediaItem:mediaItem, message:reason, failureType: report.failureType)
-            assert flaggedItem.save(flush:true)
+            flaggedItem.save(flush:true)
         } else if(!alreadyFlagged.ignored){
             alreadyFlagged.dateFlagged = new Date()
-            alreadyFlagged.message = messageSource.getMessage("healthReport.failure.${report.failureType}" as String, null, Locale.US)
-            assert alreadyFlagged.save(flush:true)
+            alreadyFlagged.failureType = report.failureType
+            alreadyFlagged.message = (report.statusCode ? "[${report.statusCode}] " : "") + messageSource.getMessage("healthReport.failure.${report.failureType}" as String, null, Locale.US)
+            alreadyFlagged.save(flush:true)
         }
     }
 
-//TODO: These private methods do not have units tests for them
     private HealthReport processValidation(MediaItem mi){
         rest = new RestBuilder()
         rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
         def sourceUrlCode = null
         try{
             sourceUrlCode = rest.head(URI.decode(mi.sourceUrl)).getStatus()
-        }catch(error){println "error thrown: " + error
+        }catch(error){
             return new HealthReport(mediaId: mi.id, statusCode: 404, details:error, failureType: FlaggedMedia.FailureType.UNREACHABLE)
         }
         

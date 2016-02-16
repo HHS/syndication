@@ -14,6 +14,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
+import com.ctacorp.syndication.media.FAQ
+import com.ctacorp.syndication.media.QuestionAndAnswer
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -21,22 +24,19 @@ import static org.springframework.http.HttpStatus.NOT_FOUND
 
 import grails.plugin.springsecurity.annotation.Secured
 
-import com.ctacorp.syndication.media.Audio
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.PDF
-import com.ctacorp.syndication.media.Periodical
 import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.media.Video
-import com.ctacorp.syndication.media.Widget
 
 import com.ctacorp.syndication.ExtendedAttribute
 import grails.transaction.Transactional
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional(readOnly = true)
 class ExtendedAttributeController {
 
@@ -189,16 +189,15 @@ class ExtendedAttributeController {
         }
 
         switch (mi) {
-            case Audio: redirect controller: "audio", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Collection: redirect controller: "collection", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
+            case FAQ: redirect controller: "FAQ", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Html: redirect controller: "html", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Image: redirect controller: "image", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Infographic: redirect controller: "infographic", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case PDF: redirect controller: "PDF", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
-            case Periodical: redirect controller: "periodical", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
+            case QuestionAndAnswer: redirect controller: "questionAndAnswer", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Tweet: redirect controller: "tweet", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
             case Video: redirect controller: "video", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
-            case Widget: redirect controller: "widget", action: "edit", id: mi.id, params: [languageId: params.languageId, tagTypeId: params.tagTypeId]; break
         }
     }
 }

@@ -64,7 +64,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                                 <td><span class="limited-width-lg ellipse abv60">${fieldValue(bean: tweetInstance, field: "description")}</span></td>
 
-                                <td><span class="limited-width-lg ellipse break-url">${fieldValue(bean: tweetInstance, field: "sourceUrl")}</span></td>
+                                <td><span class="limited-width-lg ellipse break-url"><a href="${tweetInstance.sourceUrl}" target="_blank">${fieldValue(bean: tweetInstance, field: "sourceUrl")}</a></span></td>
 
                                 <td><g:formatDate date="${tweetInstance.dateSyndicationCaptured}"/></td>
 

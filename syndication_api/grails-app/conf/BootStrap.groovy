@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -52,12 +52,16 @@ class BootStrap {
         //Demo data stuff
         TestDataPopulator td = new TestDataPopulator(grailsApplication: grailsApplication, youtubeService: youtubeService, tinyUrlService: tinyUrlService, names:new File(servletContext.getRealPath("/"), "names.txt").readLines())
         if (config.syndication.loadExampleRealData) {
+            println "loading example data..."
             if (MediaItem.count() == 0) {
                 td.seedRealExamples()
                 td.seedMicrositeData()
                 td.seedNihContent()
+            } else{
+                println "There are already ${MediaItem.count()} items in the system, skipping example data creation..."
             }
         } else{
+            println "no example data loaded."
             td.seedSources()
             td.seedLanguages()
         }
@@ -87,7 +91,6 @@ class BootStrap {
 
     private void initUsers() {
         def adminRole = Role.findOrSaveByAuthority('ROLE_ADMIN')
-        def userRole = Role.findOrSaveByAuthority('ROLE_USER')
         def storefrontRole = Role.findOrSaveByAuthority('ROLE_STOREFRONT_USER')
 
         String adminUsername = config.springsecurity.syndication.adminUsername
@@ -163,11 +166,10 @@ class BootStrap {
             new LanguageMarshaller(),
             new AlternateImageMarshaller(),
             new MediaTypeHolderMarshaller(),
-            new AudioMarshaller(),
             new TweetMarshaller(),
             new PDFMarshaller(),
-            new PeriodicalMarshaller(),
-            new WidgetMarshaller()
+            new FAQMarshaller(),
+            new QuestionAndAnswerMarshaller()
         ]
 
         def services = [

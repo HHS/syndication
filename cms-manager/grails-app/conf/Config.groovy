@@ -190,7 +190,8 @@ log4j.main = {
         error 'errorFile', 'infoFile', 'stdout'
     }
 
-    info   'grails.app', 'org.codehaus.groovy.grails.web.servlet'
+    info  'grails.app',
+          'org.codehaus.groovy.grails.web.servlet'
 
     fatal  'org.hibernate.tool.hbm2ddl.SchemaExport'
 

@@ -25,7 +25,7 @@ import com.ctacorp.syndication.Source
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
-@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_PUBLISHER'])
+@Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional(readOnly = true)
 class SourceController {
 
@@ -41,12 +41,10 @@ class SourceController {
         respond sourceInstance
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'])
     def create() {
         respond new Source(params)
     }
 
-    @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER'])
     @Transactional
     def save(Source sourceInstance) {
         if (sourceInstance == null) {

@@ -21,9 +21,6 @@
                     <div class="form-group">
                         <label class="sr-only" for="role">Role</label>
                         <div class="col-md-4">
-                            <sec:ifAnyGranted roles="ROLE_MANAGER">
-                                <g:select name="role" from="${com.ctacorp.syndication.authentication.Role.findAllByAuthorityInList(["ROLE_USER", "ROLE_BASIC", "ROLE_STATS"])}" optionKey="authority" noSelection="['Any':'Any']" class="form-control" value="${currentRole}"/>
-                            </sec:ifAnyGranted>
                             <sec:ifAnyGranted roles="ROLE_ADMIN">
                                 <g:select name="role" from="${com.ctacorp.syndication.authentication.Role.list()}" noSelection="['Any':'Any Role']" optionKey="authority" class="form-control" value="${currentRole}"/>
                             </sec:ifAnyGranted>

@@ -3,6 +3,7 @@ package com.ctacorp.syndication.mq
 import com.budjb.rabbitmq.publisher.RabbitMessagePublisher
 import com.ctacorp.syndication.commons.mq.Message
 import com.ctacorp.syndication.jobs.DelayedNotificationJob
+import com.ctacorp.syndication.media.MediaItem
 import grails.util.Holders
 import com.ctacorp.syndication.GenericQueueService
 
@@ -45,5 +46,9 @@ class QueueService implements GenericQueueService{
 
     void flushCache(){
         remoteCacheService.flushRemoteCache()
+    }
+
+    void flushCacheForMediaItemUpdate(Long mediaItemId){
+        remoteCacheService.flushCacheForMediaItemUpdate(mediaItemId)
     }
 }

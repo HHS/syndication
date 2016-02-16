@@ -10,6 +10,7 @@ class MicrositeRegistrationController {
 
     def springSecurityService
     def mailService
+    def grailsApplication
 
     def registration() {
 
@@ -25,16 +26,17 @@ class MicrositeRegistrationController {
         }
         def mailRecipiants = EmailContact.list()?.email ?: "syndication@ctacorp.com"
 
+        flash.message = "Mircosite Registration Sent!"
+        registration.save()
+
         mailService.sendMail {
             multipart true
             async true
             to mailRecipiants
             subject "Microsite registration request"
-            html g.render(template: 'registrationEmail', model:[userInstance: User.get(springSecurityService.currentUser.id),registration: registration])
+            html g.render(template: 'registrationEmail', model:[userInstance: User.get(springSecurityService.currentUser.id), registration: registration, adminUrl:grailsApplication.config.admin.serverUrl])
         }
 
-        flash.message = "Mircosite Registration Sent!"
-        registration.save()
         redirect controller: "storefront", action:"index"
     }
 

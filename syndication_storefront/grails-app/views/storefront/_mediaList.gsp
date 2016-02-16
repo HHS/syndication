@@ -4,10 +4,15 @@
     </g:if>
     <g:each in="${mediaItemInstanceList}" var="mediaItemInstance">
         <div class="content_row">
+            <g:link class="sourceLink" action="listMediaForSource" id="${mediaItemInstance.source.id}">${mediaItemInstance.source.acronym} </g:link>
+            <g:if test="${mediaItemInstance?.createdBy}">
+                - <span>${mediaItemInstance?.createdBy}</span>
+            </g:if>
             <p class="mediaRow">
+
                 <span class="expando" mediaid="${mediaItemInstance.id}"><i class="fa fa-plus-circle icons"></i></span>
                 <span class="mediaName"><a href="${createLink(action: 'showContent', id:mediaItemInstance.id)}">${mediaItemInstance.name}</a></span>
-                <g:link class="sourceLink" action="listMediaForSource" id="${mediaItemInstance.source.id}">${mediaItemInstance.source.acronym}</g:link>
+
                 <g:if test="${tagsForMedia}">
                     <span class="mediaTagListing">
                         <g:each in="${tagsForMedia[mediaItemInstance.id]}" var="tag">
@@ -58,6 +63,7 @@
                                                 topic:params.topic,
                                                 sourceId: sourceId,
                                                 source: source,
+                                                createdBy: createdBy,
                                                 tag:tag]" total="${total ?: 0}"/>
     </div>
 </g:if>

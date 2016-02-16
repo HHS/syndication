@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2014, Health and Human Services - Web Communications (ASPA)
+Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,14 +21,22 @@ class SecurityFilters {
     def grailsApplication
 
     def filters = {
-//        log the header values for debugging
+//        //log the header values for debugging
 //        allTheStuff(controller:'*', action:'*'){
 //            before = {
+//                String headers = ""
 //                request.getHeaderNames().each { name ->
-//                    println request.getHeader(name)
+//                    headers += "$name: ${request.getHeader(name)}"
 //                }
+//                log.debug headers
 //            }
 //        }
+        addHeader(controller:'*', action:'*') {
+            before={
+                response.addHeader("Access-Control-Allow-Origin", "*")
+            }
+        }
+
         if (Environment.getCurrent() == Environment.PRODUCTION || grailsApplication.config.syndication.cms.auth.enabled) {
             mediaPosts(controller: 'media', action: 'save*') {
                 before = {
@@ -51,9 +59,7 @@ class SecurityFilters {
     }
 
     private boolean handleAuthRequest(filter, request){
-        def dateHeader = request.getHeader("date")
-        boolean authorized = checkAuthorization(dateHeader, request)
-
+        boolean authorized = checkAuthorization(request)
         if (!authorized) {
             def url = "Requested URL ------------------\n${grailsApplication.config.grails.serverURL}${request.forwardURI[request.contextPath.size()..-1]}"
             String requestHeaders = "Headers --------------------\n"
@@ -61,25 +67,31 @@ class SecurityFilters {
                 requestHeaders += " -> ${name}:${request.getHeader(name)}\n"
             }
             def body = "Body ---------------------\n${request.reader.text}"
-            log.info("Not Authorized: Request: ${requestHeaders}\n${url}\n${body}")
+            log.info("Not Authorized: Request: \n${requestHeaders}\n${url}\n${body}")
             filter.redirect(controller: "error", action: "unauthorized")
             return false
         }
 
         success(request)
-        return true
+        true
     }
 
     private boolean success(request){
-        log.info("Authentication succeeded for request ${request}")
+        try {
+            log.info("Authentication succeeded for request: ${request.reader.text}")
+        } catch(ignore){
+            log.info("Authentication succeeded for request: ${request.forwardURI}")
+        }
     }
 
-    private boolean checkAuthorization(dateHeader, request){
+    private boolean checkAuthorization(request){
+        //Get the requested URL
         def url = grailsApplication.config.grails.serverURL + request.forwardURI[request.contextPath.size()..-1]
+        log.debug "API: RequestURL: ${url}"
 
         def authHeaders = [
                 authorizationHeader: request.getHeader("Authorization"),
-                dateHeader         : dateHeader,
+                dateHeader         : request.getHeader("date"),
                 contentTypeHeader  : request.getHeader("content-type"),
                 contentLengthHeader: request.getHeader("Content-Length"),
                 url                : url,
@@ -87,9 +99,12 @@ class SecurityFilters {
                 dataMd5            : authorizationService.hashBody(request.reader.text)
         ]
 
+        log.debug "API: AuthHeaders as seen before authorization check: ${authHeaders}"
+
         def authorized = authorizationService.checkAuthorization(authHeaders)
+        log.debug "API: Authorized?: ${authorized}"
         if(!authorized){
-            log.error("Request (${request}) was not not authorized")
+            log.error("Request was not not authorized")
             log.error("Computed authHeaders were: \n${(authHeaders as JSON).toString(true)}")
         }
 

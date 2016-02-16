@@ -39,16 +39,14 @@ class AuthorizationController {
     }
 
     def authorize(AuthorizationRequest authorizationRequest) {
-
+        log.debug "CMS: authorize(): ${authorizationRequest}"
         if (!authorizationRequest.validate()) {
-
             loggingService.logDomainErrors(authorizationRequest)
             badRequest()
-
         } else {
-
             try {
                 AuthorizationResult authResult = authorizationService.authorize(authorizationRequest)
+                log.debug "CMS: AuthorizationResult: ${authResult.toString()}"
                 doAuthorization(authResult)
             } catch (Throwable t) {
                 serverError(t)
