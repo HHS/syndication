@@ -46,6 +46,9 @@ function syndicated_content_disable()
         node_types_rebuild();
     }
 }
+/**
+* Custom function ability
+*/
 function syndicated_content_update_7000() {
   // Add meta_canonical
     $spec = array(
@@ -56,6 +59,9 @@ function syndicated_content_update_7000() {
     );
     db_add_field('syndicated_content_types', 'drupal_field', $spec);
 }
+/**
+* Adds SSL Bypass to SSL hosts with bad certificates
+*/
 function syndicated_content_update_7001() {
     $spec = array(
         'description'   => t('Bypass SSL'),
@@ -64,6 +70,18 @@ function syndicated_content_update_7001() {
         'default'       => 0
     );
     db_add_field('syndicated_content_sources', 'ssl_auth', $spec);
+}
+/**
+* Adds Real URL for Syndication
+*/
+function syndicated_content_update_7002() {
+    $spec = array(
+        'description'   => t('CMS Real URL'),
+        'type'          => 'varchar',
+        'length'        => 128,
+        'default'       => ''
+    );
+    db_add_field('syndicated_content_sources', 'cms_url', $spec);
 }
 function syndicated_content_schema()
 {

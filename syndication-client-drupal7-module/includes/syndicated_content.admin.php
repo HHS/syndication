@@ -111,6 +111,7 @@ function _syndicated_content_admin_sources_form($form, &$form_state)
             'syndication_tinyurl' => '',
             'cms_manager_url'     => '',
             'cms_manager_id'      => '',
+            'cms_url'		  => '',
             'key_private'         => '',
             'key_public'          => '',
             'key_secret'          => ''
@@ -174,7 +175,7 @@ function _syndicated_content_create_admin_source_form($form,&$form_state,$source
 
         $form["syndication_sources_{$source['id']}"]["api_urls"] = array(
             '#type'  => 'fieldset',
-            '#title' => t('API URLs'),
+            '#title' => t('URLs'),
             '#attributes' => array('class'=>($syndication_error == "url" ? array("synd_error") : array('synd')))
         );
 
@@ -200,6 +201,11 @@ function _syndicated_content_create_admin_source_form($form,&$form_state,$source
             '#type'          => 'checkbox',
             '#title'         => t('Bypass SSL'),
             '#default_value' => isset($source['ssl_auth']) ? $source['ssl_auth'] : "",
+        );
+        $form["syndication_sources_{$source['id']}"]["api_urls"]["cms_url_{$source['id']}"] = array(
+            '#type'          => 'textfield',
+            '#title'         => t('Public URL'),
+            '#default_value' => isset($source["cms_url"]) ? $source["cms_url"] : "",
         );
         $form["syndication_sources_{$source['id']}"]["api_identiy"] = array(
             '#type'  => 'fieldset',
@@ -346,9 +352,11 @@ function _syndicated_content_create_source_from_form($form, &$form_state)
     $cms_manager_url = rtrim($cms_manager_url, '/');
     $source_org_id_new_source = isset($form_state['values']['source_org_id_new_source']) ? $form_state['values']['source_org_id_new_source'] : "";
     $ssl_auth_new_source = isset($form_state['values']['ssl_auth_new_source']) ? $form_state['values']['ssl_auth_new_source'] : "";
+    $cms_url = rtrim((isset($form_state['values']['cms_url']) ? $form_state['values']['cms_url'] : $cms_manager_url), '/').'/';
+	
     
     $source_id = db_insert('syndicated_content_sources')
-        ->fields(array('name','syndication_url','syndication_tinyurl','key_public','key_private','key_secret','cms_manager_url','cms_manager_id', 'ssl_auth' ))
+        ->fields(array('name','syndication_url','syndication_tinyurl','key_public','key_private','key_secret','cms_manager_url','cms_manager_id', 'cms_url', 'ssl_auth' ))
         ->values(array(
             'name'                 => "Syndication Service",
             'source_org_id'        => $source_org_id_new_source,
@@ -359,6 +367,7 @@ function _syndicated_content_create_source_from_form($form, &$form_state)
             'key_secret'           => $key_secret,
             'cms_manager_url'      => $cms_manager_url,
             'cms_manager_id'       => "ss_manager_id", //$form_state['values']['cms_manager_id_new_source']
+            'cms_url'		   => $cms_url,
             'ssl_auth'             => $ssl_auth_new_source
             ))
         ->execute();
@@ -396,6 +405,7 @@ function _syndicated_content_update_source_from_form($form, &$form_state, $sourc
     $cms_manager_url = rtrim($cms_manager_url, '/');
     $source_org_id = isset($form_state['values']["source_org_id_{$source_id}"]) ? $form_state['values']["source_org_id_{$source_id}"] : "";
     $ssl_auth = isset($form_state['values']["ssl_auth_{$source_id}"]) ? $form_state['values']["ssl_auth_{$source_id}"] : "";
+    $cms_url = rtrim((isset($form_state['values']["cms_url_".$source_id]) ? $form_state['values']["cms_url_".$source_id] : $cms_manager_url), '/').'/';
     
     db_update('syndicated_content_sources')
         ->fields(array(
@@ -408,6 +418,7 @@ function _syndicated_content_update_source_from_form($form, &$form_state, $sourc
             'key_secret'           => $key_secret,
             'cms_manager_url'      => $cms_manager_url,
             'cms_manager_id'       => "ss_manager_id",
+            'cms_url'		   => $cms_url,
             'ssl_auth'             => $ssl_auth
              ))
         ->condition('id', $source_id)

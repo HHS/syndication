@@ -12,6 +12,9 @@ function _syndicated_content_node_validate( $node, $form, &$form_state )
     $syndicatable_content_types = _syndicated_content_type_mapping();
     // is this node_type syndicatable?
     
+    $sources        = _syndicated_content_api_sources();
+    $source         = array_pop($sources);
+    
     //if ( !empty($syndicatable_content_types['by_drupal_type'][$form['type']['#value']]) && !empty($form_state['values']['syndication_action']) )
     if ( !empty($syndicatable_content_types['by_drupal_type'][$form['type']['#value']]) )
     {
@@ -87,7 +90,9 @@ function _syndicated_content_node_validate( $node, $form, &$form_state )
                     form_set_error('syndication_action', t('This node is not subscribed to any syndicated content.'));
                     return;
                 } else {
-                    $local_url = url('node/'.$drupaldata->node_id);
+                    //$local_url = url('node/'.$drupaldata->node_id);
+                    $local_url = $source['cms_url'].'node/'.$drupaldata->node_id;
+                    //error_log('update: (local_url) - '.$local_url);
                     if ( !empty($drupaldata->locally_owned) )
                     {
                         form_set_error('syndication_action', t('You cannot update locally owned content. You may only publish changes.'));
@@ -179,6 +184,10 @@ function _syndicated_content_node_insert( $node )
 function _syndicated_content_form_submit( $form, &$form_state )
 {
     global $user;
+	
+    $sources        = _syndicated_content_api_sources();
+    $source         = array_pop($sources);
+	
     if ( in_array($form['#form_id'],array('syndicated_content_node_form')) )
     {
         if ( empty($form_state['values']['syndication_media_id']) )
@@ -198,7 +207,9 @@ function _syndicated_content_form_submit( $form, &$form_state )
 
         if ( $drupaldata )
         {
-            $local_url = url('node/'.$drupaldata->node_id);
+            //$local_url = url('node/'.$drupaldata->node_id);
+            $local_url = $source['cms_url'].'node/'.$drupaldata->node_id;
+            //error_log('update: (local_url) - '.$local_url);
             if ( !empty($drupaldata->locally_owned) )
             {
                 drupal_set_message("You cannot ingest locally authored content (<a href=\"{$local_url}\">{$local_url}</a>)");
@@ -316,7 +327,8 @@ function _syndicated_content_update($node, $params, $publish = false) {
     
     switch(strtolower($type)) {
         case "html":
-            $params['sourceUrl'] = url('node/'.$node->nid, array('absolute'=>true) );
+            $params['sourceUrl'] = $source['cms_url'].'node/'.$node->nid;
+            //error_log('update: (\$params[\'sourceUrl\']) - '.$params['sourceUrl']);
             break;
         case "infographic":
         case "image":
@@ -348,10 +360,11 @@ function _syndicated_content_update($node, $params, $publish = false) {
             if(isset($imgObj[$node->language][0])) {
                 $params['height'] = $imgObj[$node->language][0]['height'];
                 $params['width'] = $imgObj[$node->language][0]['width'];
-                $params['sourceUrl'] = $base_url."/".(variable_get('file_public_path', conf_path() . '/files/'.$imgObj[$node->language][0]['filename']));
+                $params['sourceUrl'] = $source['cms_url'].(variable_get('file_public_path', conf_path() . '/files/'.$imgObj[$node->language][0]['filename']));
                 $params['imageFormat'] = isset($imgObj[$node->language][0]['filemime']) ? $imgObj[$node->language][0]['filemime'] : $ext;
                 $params['altText'] = ($imgObj[$node->language][0]['alt'] != "" ? $imgObj[$node->language][0]['alt'] : $node->title);
                 $params['description'] = isset($imgObj[$node->language][0]['description']) ? $imgObj[$node->language][0]['description'] : "Image File";
+                //error_log('update: (\$params[\'sourceUrl\']) - '.$params['sourceUrl']);
             }
             break;
         case 'video':

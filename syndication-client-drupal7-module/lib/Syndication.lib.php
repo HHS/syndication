@@ -239,6 +239,7 @@ class SyndicationAPIClient
         'cms_manager_base'    => '',
         'cms_manager_url'     => '',
         'cms_manager_id'      => '',
+        'cms_url'             => '',
         'key_secret'          => '',
         'key_public'          => '', 
         'key_private'         => ''
