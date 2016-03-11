@@ -16,9 +16,9 @@ The Syndicated Content module adds the capability to publish local content to an
 
 REQUIREMENTS
 ------------
-This module requires Drupal 7. No other modules are required. 
+This module requires Drupal 7. No other modules are required.
 
-Searching and Importing content do not require an *api identity*. 
+Searching and Importing content do not require an *api identity*.
 
 Publishing and Subscribing to content does require an *api identity*.
 
@@ -30,10 +30,10 @@ INSTALLATION
 * Install as you would normally install a contributed drupal module. Uncompress the module file into the modules directory, install and enable. See:
    https://drupal.org/documentation/install/modules-themes/modules-7
    for further information.
-   
+
 CONFIGURATION
 -------------
-Configure user permissions in *Administration » Config » Syndicated Content Sources*: 
+Configure user permissions in *Administration » Config » Syndicated Content Sources*:
 
 **API Urls**
 
@@ -45,9 +45,9 @@ Configure user permissions in *Administration » Config » Syndicated Content So
 
 Enter the keys as acquired by your source's manager.
 
-The *Test Credentials* button sends  your keys to your Syndication Source and reports back their validity status. 
+The *Test Credentials* button sends  your keys to your Syndication Source and reports back their validity status.
 
-**Content Types** 
+**Content Types**
 
 Choose which local content types should be used by this module.
 
@@ -59,9 +59,9 @@ USAGE
 ------------
 **Ingestion**
 
-A new *Syndicated Content* content type is provided. 
+A new *Syndicated Content* content type is provided.
 
-Adding a new *Syndicated Content* type brings you to a page providing browsing and searching of all public content available in your external source. Advanced Searching is available. Preview of content is provided if you know the id of the item you want to preview. 
+Adding a new *Syndicated Content* type brings you to a page providing browsing and searching of all public content available in your external source. Advanced Searching is available. Preview of content is provided if you know the id of the item you want to preview.
 
 Pressing the *Subscribe* button will send you to an auto-populated local content type creation page. You must complete the creation process normally.
 
@@ -71,10 +71,18 @@ Local Content Types chosen as *syndicatable* get a new section in their edit scr
 
 Download Link
 ----------------------
-[Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication-client-drupal7-module.zip?raw=true)
+[Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication-client-drupal7-module.1.16.03.11.zip?raw=true)
 
 CHANGE LOG
 ------------
+**1.16.3.11**
+
+Custom Patching Level to fix updates
+
+**1.16.3.2**
+
+Add support for custom public URLs when publishing content.
+
 **1.15.5.29**
 
 Organization Save and send to API Fix

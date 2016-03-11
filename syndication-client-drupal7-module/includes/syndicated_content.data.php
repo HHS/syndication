@@ -92,7 +92,7 @@ function _syndicated_content_node_validate( $node, $form, &$form_state )
                 } else {
                     //$local_url = url('node/'.$drupaldata->node_id);
                     $local_url = $source['cms_url'].'node/'.$drupaldata->node_id;
-                    //error_log('update: (local_url) - '.$local_url);
+                    error_log('update: (local_url) - '.$local_url);
                     if ( !empty($drupaldata->locally_owned) )
                     {
                         form_set_error('syndication_action', t('You cannot update locally owned content. You may only publish changes.'));
@@ -327,8 +327,9 @@ function _syndicated_content_update($node, $params, $publish = false) {
     
     switch(strtolower($type)) {
         case "html":
-            $params['sourceUrl'] = $source['cms_url'].'node/'.$node->nid;
+            $params['sourceUrl'] = rtrim($source['cms_url'], '/').url('node/'.$node->nid);
             //error_log('update: (\$params[\'sourceUrl\']) - '.$params['sourceUrl']);
+            //error_log('URL: '.url('node/'.$node->nid));
             break;
         case "infographic":
         case "image":

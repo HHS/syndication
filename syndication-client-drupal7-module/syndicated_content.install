@@ -74,7 +74,7 @@ function syndicated_content_update_7001() {
 /**
 * Adds Real URL for Syndication
 */
-function syndicated_content_update_7002() {
+function syndicated_content_update_7003() {
     $spec = array(
         'description'   => t('CMS Real URL'),
         'type'          => 'varchar',
