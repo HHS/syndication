@@ -107,8 +107,8 @@ grails.project.dependency.resolution = {
         }
 
         // plugins for the compile step --------------------------------------------------------------------------------
-        compile ":syndication-model:2.6.0"   //syndication domain models
-        compile ":content-extraction-services:1.10.0"   //syndication content extraction tools
+        compile ":syndication-model:2.7.0"   //syndication domain models
+        compile ":content-extraction-services:1.11.0"   //syndication content extraction tools
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
         compile ":asset-pipeline:2.6.5"

@@ -11,6 +11,9 @@
     <meta name="layout" content="main">
     <title>Consumers of Your Content</title>
 
+    <asset:javascript src="plugins/morris/raphael-2.1.0.min.js"/>
+    <asset:javascript src="plugins/morris/morris.js"/>
+    <asset:stylesheet src="plugins/morris/morris-0.4.3.min.css"/>
     <asset:javascript src="tokenInput/jquery.tokeninput.js"/>
     <asset:stylesheet src="tokenInput/token-input.css"/>
     <g:javascript>
@@ -45,6 +48,7 @@
 <g:if test="${flash.message}">
     <div class="message" role="status">${flash.message}</div>
 </g:if>
+
 <g:form action="generalViews">
     <div class="row">
         <div class="col-md-12">
@@ -77,11 +81,9 @@
                             <a href="#totalTable" id="totalTable" data-totalType="TABLE" class="btn totalGraphType btn-default">Table</a>
                         </div>
                     </div>
+
                     <div id="totalViews-container"></div>
 
-                    <div>
-                        <b>*Month of Year Format  YYYYMM</b>
-                    </div>
                 </div>
             </div>
         </div>
@@ -101,9 +103,6 @@
 
                     <div id="mobileViews-container"></div>
 
-                    <div>
-                        <b>*Month of Year Format  YYYYMM</b>
-                    </div>
                 </div>
             </div>
         </div>
@@ -190,106 +189,63 @@
     function updateTotalViews(currentTag) {
         var type = currentTag.getAttribute('data-totalType');
         currentTag.className = "btn totalGraphType btn-default active";
-        var dataChart3 = new gapi.analytics.googleCharts.DataChart({
-            query: {
-                'ids': 'ga:84359809',
-                metrics: 'ga:pageviews',
-                dimensions: 'ga:yearMonth',
-                'start-date': '365daysAgo',
-                'end-date': 'today',
-                'filters':'${mediaFilters}'
-            },
-            chart: {
-                container: 'totalViews-container',
-                type: type,
-                options: {
-                    width: '100%'
-                }
-            }
+        $("#totalViews-container").html('<div id="spinnerDiv" style="width:50px;" class="center-block"><asset:image src="spinner.gif"/></div>');
+        $.get('${grailsApplication.config.grails.serverURL}' + "/consumerMetrics/getTotalViews?&mediaToGraph="+"${mediaToGraph}", function(data){
+            renderData(data, type, "totalViews-container");
         });
-
-        dataChart3.execute();
     }
     function updateMobileTotalViews(currentTag) {
         var type = currentTag.getAttribute('data-totalType');
         currentTag.className = "btn mobileTotalGraphType btn-default active";
-
-        var dataChart4 = new gapi.analytics.googleCharts.DataChart({
-            query: {
-                'ids': 'ga:84359809',
-                metrics: 'ga:pageviews',
-                dimensions: 'ga:yearMonth',
-                segment: 'gaid::-11',
-                'start-date': '365daysAgo',
-                'end-date': 'today',
-                'filters':'${mediaFilters}'
-            },
-            chart: {
-                container: 'mobileViews-container',
-                type: type,
-                options: {
-                    width: '100%'
-                }
-            }
+        $("#mobileViews-container").html('<div id="spinnerDiv" style="width:50px;" class="center-block"><asset:image src="spinner.gif"/></div>');
+        $.get('${grailsApplication.config.grails.serverURL}' + "/consumerMetrics/getTotalMobileViews?&mediaToGraph="+"${mediaToGraph}", function(data){
+            renderData(data, type, "mobileViews-container");
         });
-        dataChart4.execute();
     }
 
-    gapi.analytics.ready(function() {
+    function renderData(rows, graphType, container) {
+        switch (graphType) {
+            case "TABLE":
+                var contents = '<table class="table table-striped"><thead><tr><th>Month</th><th>Pageviews</th></tr></thead><tbody>';
 
-        /**
-         * Authorize the user immediately if the user has already granted access.
-         * If no access has been created, render an authorize button inside the
-         * element with the ID "embed-api-auth-container".
-         */
-        gapi.analytics.auth.authorize({
-            'serverAuth': {
-                'access_token': '${tempAccessToken}'
-            }
-        });
-
-        var dataChart3 = new gapi.analytics.googleCharts.DataChart({
-            query: {
-                'ids': 'ga:84359809',
-                metrics: 'ga:pageviews',
-                dimensions: 'ga:yearMonth',
-                'start-date': '365daysAgo',
-                'end-date': 'today',
-                'filters':'${mediaFilters}'
-            },
-            chart: {
-                container: 'totalViews-container',
-                type: 'LINE',
-                options: {
-                    width: '100%'
+                for(var row in rows){
+                    contents += '<tr><td>'+ rows[row][0] +'</td><td>'+ rows[row][1] +'</td></tr>'
                 }
-            }
-        });
-
-        dataChart3.execute();
-
-        var dataChart4 = new gapi.analytics.googleCharts.DataChart({
-            query: {
-                'ids': 'ga:84359809',
-                metrics: 'ga:pageviews',
-                dimensions: 'ga:yearMonth',
-                segment: 'gaid::-11',
-                'start-date': '365daysAgo',
-                'end-date': 'today',
-                'filters':'${mediaFilters}'
-            },
-            chart: {
-                container: 'mobileViews-container',
-                type: 'LINE',
-                options: {
-                    width: '100%'
+                contents += '</tbody></table>';
+                $("#"+container).html(contents);
+                break;
+            case "LINE":
+                var data = [];
+                var labels = [];
+                var values = [];
+                for(var row in rows){
+                    data.push({label:rows[row][0],value:Math.round(rows[row][1])});
+                    labels.push(rows[row][0]);
+                    values.push(rows[row][1]);
                 }
-            }
-        });
-
-        dataChart4.execute();
-
-    });
+                $("#" + container).text("");
+                Morris.Line({
+                    // ID of the element in which to draw the chart.
+                    element: container,
+                    // Chart data records -- each entry in this array corresponds to a point on
+                    // the chart.
+                    data: data,
+                    // The name of the data record attribute that contains x-values.
+                    xkey: "label",
+//                    xLabels: 'month',
+                    // A list of names of data record attributes that contain y-values.
+                    ykeys: ["value"],
+                    // Labels for the ykeys -- will be displayed when you hover over the
+                    // chart.
+                    smooth:false,
+                    parseTime:false,
+                    labels: ["pageviews"],
+                    hideHover: 'auto',
+                    resize: true
+                });
+                break;
+        }
+    }
 
     $(".totalGraphType").on("click", function(){
         document.getElementById("totalTable").className = "btn totalGraphType btn-default";
@@ -301,6 +257,12 @@
         document.getElementById("mobileTotalLine").className = "btn mobileTotalGraphType btn-default";
         updateMobileTotalViews(this);
     });
+
+    $( document ).ready(function() {
+        updateMobileTotalViews(document.getElementById("mobileTotalLine"));
+        updateTotalViews(document.getElementById("totalLine"));
+    });
+
 </script>
 </body>
 </html>

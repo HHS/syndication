@@ -12,7 +12,6 @@ import javax.annotation.PostConstruct
 @Transactional(readOnly = true)
 class TagService {
     def grailsApplication
-    def authorizationService
     def languageService
     def springSecurityService
 
@@ -291,7 +290,16 @@ class TagService {
 
     private post(String path, params) {
         try {
-            return authorizationService.post(grailsApplication.config.tagCloud.serverAddress + path, params)
+
+            def resp = rest.post((grailsApplication.config.tagCloud.serverAddress ?: "") + path) {
+                header 'Date', new Date().toString()
+                header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+                header 'Content-Type', "application/json;charset=UTF-8"
+                accept 'application/json'
+
+                json (params as JSON)
+            }
+            return resp.json
         } catch (e) {
             log.error "Could not connect to: ${path}"
             return [errors:"Could not connect to: ${path}"]
@@ -300,7 +308,12 @@ class TagService {
 
     private delete(String path) {
         try {
-            return authorizationService.delete(grailsApplication.config.tagCloud.serverAddress + path)
+            def resp = rest.delete((grailsApplication.config.tagCloud.serverAddress ?: "") + path) {
+                header 'Date', new Date().toString()
+                header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+                header 'Content-Type', "application/json;charset=UTF-8"
+            }
+            return resp
         } catch (e) {
             log.error "Could not connect to: ${path}"
             return null

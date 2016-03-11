@@ -91,6 +91,33 @@ class GoogleAnalyticsService {
                         .setMaxResults(10000)
                         .setStartIndex(params.startIndex)
                         .execute();
+            case "whosEmbedding":
+                return analytics.data().ga().get("ga:" + profileId, // Table Id. ga: + profile id.
+                        start, // Start date.
+                        end, // End date.
+                        "ga:pageviews") //Metrics
+                        .setDimensions("ga:hostname")
+                        .setFilters("${params.mediaFilters}")
+                        .setSort("-ga:pageviews")
+                        .setMaxResults(params.size ?: 5)
+                        .execute();
+            case "generalTotalViews":
+                return analytics.data().ga().get("ga:" + profileId, // Table Id. ga: + profile id.
+                        "365daysAgo", // Start date.
+                        "today", // End date.
+                        "ga:pageviews") // Metrics.
+                        .setDimensions("ga:yearMonth")
+                        .setFilters("${params.mediaFilters}")
+                        .execute();
+            case "generalTotalMobileViews":
+                return analytics.data().ga().get("ga:" + profileId, // Table Id. ga: + profile id.
+                        "365daysAgo", // Start date.
+                        "today", // End date.
+                        "ga:pageviews") // Metrics.
+                        .setDimensions("ga:yearMonth")
+                        .setSegment("gaid::-11")
+                        .setFilters("${params.mediaFilters}")
+                        .execute();
         }
     }
 
@@ -155,4 +182,91 @@ class GoogleAnalyticsService {
         // authorize
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
+
+
+    def restrictItemsToSize(def items, int size) {
+        def tempItems = []
+        def topItems = []
+        if(items.size() > size){
+            tempItems.add(items[0])
+            //sorting list
+            for(int i = 1;i<items.size();i++) {
+                def count = 0
+                def index = 0
+                tempItems.each{
+                    if((items[i][1] as int) > (it[1] as int)){
+                        index = count
+                        count -- //keeps count the same until the end
+                    } else if(count == (tempItems.size() - 1)) {
+                        index = -1
+                    }
+                    count ++
+                }
+                if(index == -1 && tempItems.size() <= i) {
+                    tempItems.add(items[i])
+                } else if(index <= size) {
+                    tempItems.add(index,items[i])
+                }
+            }
+            //trimming list to size
+            for(int i = 0;i<size;i++){
+                topItems[i] = tempItems[i]
+            }
+        }
+        return topItems
+    }
+
+    def mergeResults(def items, def newItems) {
+        boolean addToList = true
+        newItems.each{ newItem ->
+            items.each{oldItem ->
+                if(oldItem[0] == newItem[0]){
+                    oldItem[1] = (oldItem[1] as int) + (newItem[1] as int)
+                    addToList = false
+                }
+            }
+            if(addToList){
+                items.add(newItem)
+            }
+            addToList = true
+        }
+
+        return items
+    }
+
+    def formatResponseDate(def items) {
+        items.each{item ->
+            def year = item[0].toString().substring(0,4)
+            def month = item[0].toString().substring(4,6)
+            switch(month) {
+                case "01":month = "Jan"
+                    break;
+                case "02":month = "Feb"
+                    break;
+                case "03":month = "Mar"
+                    break;
+                case "04":month = "Apr"
+                    break;
+                case "05":month = "May"
+                    break;
+                case "06":month = "Jun"
+                    break;
+                case "07":month = "Jul"
+                    break;
+                case "08":month = "Aug"
+                    break;
+                case "09":month = "Sep"
+                    break;
+                case "10":month = "Oct"
+                    break;
+                case "11":month = "Nov"
+                    break;
+                case "12":month = "Dec"
+                    break;
+            }
+            item[0] = month + ", " + year
+        }
+        items
+    }
+
 }

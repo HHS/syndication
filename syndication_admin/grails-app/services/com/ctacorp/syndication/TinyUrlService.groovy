@@ -25,7 +25,6 @@ import javax.annotation.PostConstruct
 @Transactional(readOnly = true)
 class TinyUrlService {
     def grailsApplication
-    def authorizationService
     private String apiUrl
     private RestBuilder rest = new RestBuilder()
 
@@ -55,8 +54,16 @@ class TinyUrlService {
                 [url:it.sourceUrl, id:it.id, guid:it.externalGuid]
             }
 
-            def result = authorizationService.post(apiUrl + "/bulkAdd.json", bulkData)
-            return result
+            def resp = rest.post(apiUrl + "/bulkAdd.json") {
+                header 'Date', new Date().toString()
+                header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+                header 'Content-Type', "application/json;charset=UTF-8"
+                accept 'application/json'
+
+                json (bulkData as JSON)
+            }
+
+            return resp.json
         }
 
         []
@@ -94,7 +101,15 @@ class TinyUrlService {
 
     @NotTransactional
     def createMapping(String targetUrl, Long syndicationId, String guid){
-        authorizationService.post(apiUrl, [targetUrl:targetUrl, syndicationId:syndicationId, guid:guid])
+        def resp = rest.post(apiUrl) {
+            header 'Date', new Date().toString()
+            header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+            header 'Content-Type', "application/json;charset=UTF-8"
+            accept 'application/json'
+
+            json ([targetUrl:targetUrl, syndicationId:syndicationId, guid:guid]as JSON)
+        }
+        return resp.json
     }
 
     @NotTransactional

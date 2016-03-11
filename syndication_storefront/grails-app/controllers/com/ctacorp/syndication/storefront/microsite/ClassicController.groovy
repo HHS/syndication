@@ -7,6 +7,7 @@ import com.ctacorp.syndication.microsite.MediaSelector
 import com.ctacorp.syndication.microsite.MicroSite
 import com.ctacorp.syndication.storefront.UserMediaList
 import com.ctacorp.syndication.microsite.FlaggedMicrosite
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
@@ -14,6 +15,7 @@ class ClassicController {
     
     def micrositeService
     def tagService
+    def micrositeFilterService
 
     def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
     def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
@@ -57,6 +59,7 @@ class ClassicController {
             ]
             return
         }
+        micrositeFilterService.performValidation(microSite)
 
         redirect action: "show", id:microSite.id, params:[showAdminControls:true]
     }
@@ -91,14 +94,31 @@ class ClassicController {
 
         def pane3MediaItems = micrositeService.getMediaItems(microSite.mediaArea3)
         def pane2MediaItems = micrositeService.getMediaItems(microSite.mediaArea2)
-        def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, 50)
+
+        def maxClassics = 15
+        def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, maxClassics)
 
         render view:"show", model:[microSite: microSite,
                                         pane1MediaItems:pane1MediaItems,
                                         pane2MediaItems:pane2MediaItems,
                                         pane3MediaItems:pane3MediaItems,
                                         collection:params.collection,
-                                        apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath]
+                                        apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                        classicOffset:0,
+                                        maxClassics:maxClassics
+        ]
+
+    }
+
+    @Secured(['permitAll'])
+    def getMoreClassics() {
+        def microSite = MicroSite.get(params.long("id"))
+        def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, params.int("maxClassics"), params.int("classicOffset"))
+
+        if(!pane1MediaItems) {
+            render [:] as JSON
+        }
+        render template: "classicList", model:[pane1MediaItems:pane1MediaItems,apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath]
     }
 
     def update(MicroSite microSite){
@@ -123,6 +143,7 @@ class ClassicController {
                                         microSite:microSite]
             return
         }
+        micrositeFilterService.validateOnUpdate(microSite)
 
         microSite.save(flush: true)
         flash.message = "microsite  Updated!"

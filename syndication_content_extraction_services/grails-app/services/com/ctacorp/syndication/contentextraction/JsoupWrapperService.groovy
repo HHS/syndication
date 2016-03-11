@@ -14,10 +14,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.contentextraction
 
 import com.ctacorp.syndication.commons.util.Util
+import groovy.json.JsonSlurper
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import org.jsoup.safety.Whitelist
 import org.jsoup.select.Elements
 
 class JsoupWrapperService {
@@ -25,6 +25,12 @@ class JsoupWrapperService {
     def grailsApplication
     def webUtilService
 
+    /**
+     * This is where the magic happens
+     * @param sourceContent
+     * @param params
+     * @return
+     */
     String extract(String sourceContent, Map params){
         Document doc = Jsoup.parse(sourceContent)
         //Read the class defined in params if it exists, else use config file class if exists, else fall back to 'syndicate'
@@ -34,6 +40,8 @@ class JsoupWrapperService {
         String newUrlBase = params.newUrlBase
 
         doc = Jsoup.parse(extractedContent)
+
+        String jsonLDText = getJsonLDMetaDataAsString(doc)
 
         if(Util.isTrue(params.stripStyles, true)){
             removeInlineStylesFromDocument(doc)
@@ -67,6 +75,7 @@ class JsoupWrapperService {
 
         stripEmptyBlocks(doc)
 
+        //String
         extractedContent = getElementByClassFromDocument(doc, extractionCSSClass)
 
         extractedContent
@@ -82,12 +91,71 @@ class JsoupWrapperService {
         }
     }
 
+    //JSON-LD Methods --------------------------------------------------------------------------------------------------
+
+    String updateJsonLD(String inputSnippet, String updatedJsonLdString){
+        Document doc = Jsoup.parse(inputSnippet)
+        def existingJsonLd = doc.select('script[type=application/ld+json]')
+        if(existingJsonLd){
+            existingJsonLd.html(updatedJsonLdString)
+        } else{
+            doc.body().appendElement('script').attr("type", "application/ld+json").html(updatedJsonLdString)
+            return doc.body().toString()
+        }
+    }
+
+    def getJsonLDMetaDataAsJSON(String inputSnippet){
+        Document doc = Jsoup.parse(inputSnippet)
+        getJsonLDMetaDataAsJSON(doc)
+    }
+
+    def getJsonLDMetaDataAsJSON(Document doc){
+        def jsonLdText = getJsonLDMetaDataAsString(doc)
+        if(jsonLdText) {
+            JsonSlurper slurp = new JsonSlurper()
+            return slurp.parseText(jsonLdText)
+        }
+        null
+    }
+
+    String getJsonLDMetaDataAsString(Document doc){
+        def jsonLdElement = doc.select('script[type=application/ld+json]')
+        if(jsonLdElement){
+            return jsonLdElement.html()
+        }
+        null
+    }
+
+    // end JSON-LD Methods ---------------------------------------------------------------------------------------------
+
     String getMetaDescription(String url){
         String page = webUtilService.getPage(url)
         Document doc = Jsoup.parse(page)
         def descriptionMetas = doc.getElementsByAttributeValue("name", "description")
 
-        descriptionMetas[0]?.attr("content")
+        def desc = descriptionMetas[0]?.attr("content")
+        //CDC Bad metadata hack
+        if(desc.startsWith("<p>")){
+            try {
+                return desc[3..(-1) - 4]
+            }catch (e){
+                log.error("Tried to trim <p> tag, but failed: ${desc}")
+                return desc
+            }
+        }
+        desc
+    }
+
+    Collection getMetaTags(String url){
+        String page = webUtilService.getPage(url)
+        Document doc = Jsoup.parse(page)
+        def descriptionMetas = doc.getElementsByAttributeValue("name", "keywords")
+
+        def keywords = descriptionMetas[0]?.attr("content")
+        if(keywords){
+            return keywords.split(",").collect(){it.trim()}
+        }
+        null
     }
 
     String getDescriptionFromContent(String content, int sentenceCount = 1){
@@ -207,7 +275,11 @@ class JsoupWrapperService {
     private Document removeScriptsFromDocument(Document doc){
         Elements scripts = doc.select("script")
         scripts.each{ script ->
-            script.remove()
+            if(script.attr('type') == "application/ld+json"){
+                //preserve json-ld data in the extracted content
+            } else{
+                script.remove()
+            }
         }
         doc
     }

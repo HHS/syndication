@@ -69,7 +69,8 @@ grails.project.dependency.resolution = {
 
     plugins {
         compile ":rest-client-builder:2.1.1"
-        compile "org.grails.plugins:syndication-model:2.5.0"
+        compile "org.grails.plugins:syndication-model:2.7.0"
+        compile "org.grails.plugins:content-extraction-services:1.11.0"
 
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
         compile ":recaptcha:0.6.9"

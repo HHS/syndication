@@ -33,7 +33,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <synd:error/>
     <div class="row">
         <div class="col-md-10 col-md-offset-2">
-                <dl class="dl-horizontal">
+            <dl class="dl-horizontal">
                 <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: htmlInstance, mediaType:'html']"/>
 
                 <g:if test="${htmlInstance?.structuredContentType}">
@@ -53,17 +53,20 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-danger" action="delete" onclick="return confirm('${message(code: 'default.button.delete.mediaItem.confirm', default: 'Are you sure?')}');" value="Delete"/>
             </sec:ifAnyGranted>
-            <g:link class="button" action="index">
-                <button type="button" class="btn">Cancel</button>
+            <g:link class="btn btn-default" action="index">
+                Cancel
             </g:link>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                <g:link controller="featuredMedia" id="${htmlInstance?.id}" action="featureItem">
-                    <button type="button" class="btn btn-success pull-right">Feature this Item</button>
+                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${htmlInstance?.id}" action="featureItem">
+                    Feature this Item
                 </g:link>
             </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_ADMIN">
-                <g:link controller="mediaItem" id="${htmlInstance?.id}" action="resetHash">
-                    <button type="button" class="btn btn-primary pull-right" style="margin-right:5px;">Reset Hash</button>
+                <g:link controller="mediaItem" class="btn btn-primary pull-right" style="margin-right: 3px;" id="${htmlInstance?.id}" action="resetHash">
+                    Reset Hash
+                </g:link>
+                <g:link controller="mediaItem" class="btn btn-warning pull-right" style="margin-right: 3px;" id="${htmlInstance?.id}" action="resetDBCache">
+                    Flush DB Cache
                 </g:link>
             </sec:ifAnyGranted>
         </g:form>

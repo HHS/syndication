@@ -51,6 +51,7 @@ class WebUtilService {
         }
         con.connect();
         int status = con.getResponseCode();
+        log.info "Status: ${status} Getting content from ${url}"
         boolean redirected = false
         if (status != HttpURLConnection.HTTP_OK) {
             if (status == HttpURLConnection.HTTP_MOVED_TEMP

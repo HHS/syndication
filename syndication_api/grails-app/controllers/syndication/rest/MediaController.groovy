@@ -20,6 +20,8 @@ import com.ctacorp.syndication.api.Embedded
 import com.ctacorp.syndication.api.Message
 import com.ctacorp.syndication.api.Meta
 import com.ctacorp.syndication.api.Pagination
+import com.ctacorp.syndication.jobs.DelayedTaggingJob
+import com.ctacorp.syndication.jobs.DelayedTinyUrlJob
 import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.commons.util.*
 import com.ctacorp.syndication.jobs.DelayedMetricAddJob
@@ -96,11 +98,11 @@ class MediaController {
     def urlService
     def likeService
     def youtubeService
-    def tinyUrlService
-    def tagsService
     def resourcesService
     def guavaCacheService
     def assetResourceLocator
+    def jsoupWrapperService
+
     RestBuilder rest = new RestBuilder()
 
     def beforeInterceptor = {
@@ -295,28 +297,28 @@ class MediaController {
                 return
         }
 
-        String key = Hash.md5("preview/${id}?" + params.sort().toString())
         byte[] renderedResponse
-        renderedResponse = guavaCacheService.imageCache.get(key, new Callable<byte[]>() {
-            @Override
-            public byte[] call() {
-                MediaPreview preview = MediaPreview.findByMediaItem(mi)
-                if(preview?.customImageData) {
-                    return preview.customImageData
-                }
-                if (!preview || !preview.imageData) {
-                    switch (mi) {
-                        case Tweet:
-                            InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/twitter.jpg").inputStream
-                            return f.bytes
-                        default:
-                            InputStream f  = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/bad.jpg").inputStream
-                            return f.bytes
-                    }
-                }
-                return preview.imageData
+
+        Closure getImage = {
+            MediaPreview preview = MediaPreview.findByMediaItem(mi)
+            if(preview?.customImageData) {
+                return preview.customImageData
             }
-        });
+            if (!preview?.imageData) {
+                switch (mi) {
+                    case Tweet:
+                        InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/twitter.jpg").inputStream
+                        return f.bytes
+                    default:
+                        InputStream f  = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/bad.jpg").inputStream
+                        return f.bytes
+                }
+            }
+            return preview.imageData
+        }
+
+        renderedResponse = guavaCacheService.getImageCachesForId(id,"preview/${id}?" + params.sort().toString(), getImage)
+
         renderBytes(renderedResponse)
     }
 
@@ -356,11 +358,8 @@ class MediaController {
                 break
         }
 
-        String key = Hash.md5("thumbnail/${id}?" + params.sort().toString())
         byte[] renderedResponse
-        renderedResponse = guavaCacheService.imageCache.get(key, new Callable<byte[]>() {
-            @Override
-            public byte[] call() {
+            Closure getImage =  {
                 MediaThumbnail thumbnail = MediaThumbnail.findByMediaItem(mi)
                 if(thumbnail?.customImageData) {
                     return thumbnail.customImageData
@@ -377,7 +376,8 @@ class MediaController {
                 }
                 return  thumbnail.imageData
             }
-        });
+        renderedResponse = guavaCacheService.getImageCachesForId(id,"thumbnail/${id}?" + params.sort().toString(), getImage)
+
         renderBytes(renderedResponse)
     }
 
@@ -404,7 +404,8 @@ class MediaController {
             switch (mi) {
                 case Html:
                     Html html = mi as Html
-                    String extractedContent = contentRetrievalService.extractSyndicatedContent(html.sourceUrl, params)
+                    def extractionResult = contentRetrievalService.extractSyndicatedContent(html.sourceUrl, params)
+                    String extractedContent = extractionResult.extractedContent
                     renderHtml(extractedContent)
                     return
                 case PDF:
@@ -599,6 +600,7 @@ class MediaController {
         }
     }
 
+    //TODO we need to add support for the new createdBy here, along with the new StructuredContentType
     @APIResource(path="/resources/media.json", description="Media Items Listings", operations=[
         @Operation(httpMethod = "GET", notes="Returns the list of MediaItems matching the specified query parameters.", nickname="getMedia", type="MediaItems", summary="Get MediaItems", responseMessages=[
             @ResponseMessage(code = 400, description = "Bad Request"),
@@ -808,9 +810,6 @@ class MediaController {
         if (!htmlInstance) { // 400 -- no json body
             log.error "Instance couldn't be created from publish"
             apiResponse = ApiResponse.get400ResponseCustomMessage("Could not create instance from request, did you provide the correct JSON payload in your post?").autoFill(params)
-        }else if(!htmlInstance.validate()){ //Check validation first before something like a bad or missing url
-            log.error "Instance wasn't valid: ${htmlInstance.errors}"
-            apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(htmlInstance).autoFill(params)
         } else{
             try{
                 htmlInstance = mediaService.saveHtml(htmlInstance, params)
@@ -831,17 +830,12 @@ class MediaController {
         mediaPostSaveAndRespond(apiResponse, htmlInstance)
     }
 
-
-
     def saveImage(Image imageInstance){
         log.info "Attempting to publish: ${imageInstance} - ${imageInstance.sourceUrl}"
         ApiResponse apiResponse
         if (!imageInstance) { // 400 -- no json body
             log.error "Instance couldn't be created from publish"
             apiResponse = ApiResponse.get400ResponseCustomMessage("Could not create instance from request, did you provide the correct JSON payload in your post?").autoFill(params)
-        }else if(!imageInstance.validate()){ //Check validation first before something like a bad or missing url
-            log.error "Instance wasn't valid: ${imageInstance.errors}"
-            apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(imageInstance).autoFill(params)
         } else {
             try{
                 imageInstance = mediaService.saveImage(imageInstance)
@@ -867,9 +861,6 @@ class MediaController {
         if (!infographicInstance) { // 400 -- no json body
             log.error "Instance couldn't be created from publish"
             apiResponse = ApiResponse.get400ResponseCustomMessage("Could not create instance from request, did you provide the correct JSON payload in your post?").autoFill(params)
-        }else if(!infographicInstance.validate()){ //Check validation first before something like a bad or missing url
-            log.error "Instance wasn't valid: ${infographicInstance.errors}"
-            apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(infographicInstance).autoFill(params)
         } else {
             try{
                 infographicInstance = mediaService.saveInfographic(infographicInstance)
@@ -894,9 +885,6 @@ class MediaController {
         if (!PDFInstance) { // 400 -- no json body
             log.error "savePDF failed, no instance provided (maybe missing body?)"
             apiResponse = ApiResponse.get400ResponseCustomMessage("Could not create instance from request, did you provide the correct JSON payload in your post?").autoFill(params)
-        }else if(!PDFInstance.validate()){ //Check validation first for something like a bad or missing url
-            log.error "Instance wasn't valid: ${PDFInstance.errors}"
-            apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(PDFInstance).autoFill(params)
         } else {
             try{
                 PDFInstance = mediaService.savePDF(PDFInstance)
@@ -925,9 +913,6 @@ class MediaController {
         if (!questionAndAnswerInstance) { // 400 -- no json body
             log.error "saveQuestionAndAnswer failed, no instance provided (maybe missing body?)"
             apiResponse = ApiResponse.get400ResponseCustomMessage("Could not create instance from request, did you provide the correct JSON payload in your post?").autoFill(params)
-        } else if(!questionAndAnswerInstance.validate()){ //Check validation first for something like a bad or missing url
-            log.error "Instance wasn't valid: ${questionAndAnswerInstance.errors}"
-            apiResponse = ApiResponse.get400InvalidInstanceErrorResponse(questionAndAnswerInstance).autoFill(params)
         } else {
             try{
                 questionAndAnswerInstance = mediaService.saveQuestionAndAnswer(questionAndAnswerInstance)
@@ -1026,20 +1011,24 @@ class MediaController {
             def requestJson = request.getJSON()
             //Tag media
             if(requestJson.tags) {
-                tagsService.tagMedia(instance.id, requestJson.tags)
+                DelayedTaggingJob.schedule(new Date(System.currentTimeMillis() + 5000), [mediaId:instance.id, requestJson:requestJson.tags, methodName:"tagMedia"])
             }
 
             if(requestJson.tagNames){
-                tagsService.tagMediaItemByNames(instance.id, requestJson.tagNames)
+                DelayedTaggingJob.schedule(new Date(System.currentTimeMillis() + 5000), [mediaId:instance.id, requestJson:requestJson.tagNames, methodName:"tagMediaItemByNames"])
             }
 
             if(requestJson.tagDetails){
-                tagsService.tagMediaItemByNamesAndLanguageAndType(instance.id, requestJson.tagDetails)
+                DelayedTaggingJob.schedule(new Date(System.currentTimeMillis() + 5000), [mediaId:instance.id, requestJson:requestJson.tagDetails, methodName:"tagMediaItemByNamesAndLanguageAndType"])
+            }
+
+            def metaTags = jsoupWrapperService.getMetaTags(instance.sourceUrl)
+            if(metaTags){
+                DelayedTaggingJob.schedule(new Date(System.currentTimeMillis() + 5000), [mediaId:instance.id, requestJson:metaTags, methodName:"tagMediaItemByNames"])
             }
 
             //Add URL Mapping
-            //TODO this is causing some publishes to fail - is a try/catch enough to avoid that?
-//            tinyUrlService.createMapping(instance.sourceUrl, instance.id, instance.externalGuid)
+            DelayedTinyUrlJob.schedule(new Date(System.currentTimeMillis() + 5000), [mediaId:instance.id, sourceUrl: instance.sourceUrl, externalGuid:instance.externalGuid])
 
             response.status = 200
         } else{

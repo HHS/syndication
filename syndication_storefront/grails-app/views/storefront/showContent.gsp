@@ -26,7 +26,7 @@
 <div>
     <br/>
     <g:if test="${mediaItemInstance.structuredContentType}">
-        <strong>${mediaItemInstance.structuredContentType}</strong>
+        <strong>${mediaItemInstance.structuredContentType.prettyName}</strong>
     </g:if>
     <g:else>
         <strong>Media Type: ${mediaItemInstance.class.simpleName}</strong>

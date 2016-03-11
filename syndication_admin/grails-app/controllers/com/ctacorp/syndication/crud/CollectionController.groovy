@@ -52,25 +52,25 @@ class CollectionController {
     def show(Collection collectionInstance) {
         def tagData = tagService.getTagInfoForMediaShowViews(collectionInstance, params)
 
-        respond collectionInstance, model:[tags:tagData.tags,
-                                      languages:tagData.languages,
-                                      tagTypes:tagData.tagTypes,
-                                      languageId:params.languageId,
-                                      tagTypeId:params.tagTypeId,
-                                      selectedLanguage:tagData.selectedLanguage,
-                                      selectedTagType:tagData.selectedTagType,
-                                      apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+        respond collectionInstance, model:[tags         :tagData.tags,
+                                      languages         :tagData.languages,
+                                      tagTypes          :tagData.tagTypes,
+                                      languageId        :params.languageId,
+                                      tagTypeId         :params.tagTypeId,
+                                      selectedLanguage  :tagData.selectedLanguage,
+                                      selectedTagType   :tagData.selectedTagType,
+                                      apiBaseUrl        :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                      subscriber        :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(collectionInstance)?.subscriberId)
         ]
     }
 
     def create(Collection collectionInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        def featuredMedia = collectionInstance?.mediaItems
-        String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
+        def mediaItems = collectionInstance?.mediaItems
+        String mediaForTokenInput = mediaItems.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
         Collection collection = new Collection(params)
         collection.language = Language.findByIsoCode("eng")
-        respond collection, model: [featuredMedia:featuredMedia,
-                                                featuredMediaForTokenInput:featuredMediaForTokenInput,
+        respond collection, model: [mediaForTokenInput:mediaForTokenInput,
                                                 subscribers:subscribers]
     }
 
@@ -85,7 +85,10 @@ class CollectionController {
         if(collectionInstance.hasErrors()){
             flash.errors = collectionInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             def subscribers = cmsManagerKeyService.listSubscribers()
-            respond collectionInstance, view:'create', model: [subscribers:subscribers]
+            def mediaItems = collectionInstance?.mediaItems
+            String mediaForTokenInput = mediaItems.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
+            respond collectionInstance, view:'create', model: [mediaForTokenInput:mediaForTokenInput,
+                                                               subscribers:subscribers]
             return
         }
         
@@ -106,11 +109,11 @@ class CollectionController {
 
     def edit(Collection collectionInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        String collectionMediaForTokenInput = collectionInstance?.mediaItems?.collect{
+        String mediaForTokenInput = collectionInstance?.mediaItems?.collect{
             [id:it.id, name:"${it.name}"]
         } as JSON
 
-        respond collectionInstance, model:[collectionMediaForTokenInput:collectionMediaForTokenInput,
+        respond collectionInstance, model:[mediaForTokenInput:mediaForTokenInput,
                                            subscribers   :subscribers,
                                            currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(collectionInstance)?.subscriberId)
         ]

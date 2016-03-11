@@ -135,11 +135,7 @@ ul.tabs li:hover {
     }
 }
 </style>
-<g:javascript library="application"/>
-<g:javascript library="jquery"/>
-<g:javascript library="tokenInput"/>
-<r:require module="jqvalidator"/>
-<g:javascript>
+<script>
             jQuery(document).ready(function () {
                 jQuery("#tag-token-input").tokenInput("${request.contextPath + '/tag/tokenListForMerge'}", {
                     theme: "facebook",
@@ -228,7 +224,7 @@ ul.tabs li:hover {
             %{--});--}%
 
 });
-</g:javascript>
+</script>
 
 </head>
 

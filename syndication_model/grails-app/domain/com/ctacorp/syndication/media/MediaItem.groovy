@@ -20,6 +20,7 @@ import com.ctacorp.syndication.ExtendedAttribute
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.metric.MediaMetric
 import com.ctacorp.syndication.Source
+import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.preview.MediaPreview
 import com.ctacorp.syndication.preview.MediaThumbnail
 
@@ -50,6 +51,7 @@ class MediaItem {
     String name
     String description
     String sourceUrl
+    String sourceUrlHash
     String targetUrl
     String customThumbnailUrl
     String customPreviewUrl
@@ -72,8 +74,9 @@ class MediaItem {
     String createdBy
 
     enum StructuredContentType{
-        BLOG_POST("Blog Post"),
-        NEWS_RELEASE("News Release")
+        BLOG_POSTING("BlogPosting"),                // https://schema.org/BlogPosting
+        NEWS_ARTICLE("NewsArticle"),                // https://schema.org/NewsArticle
+        ARTICLE("Article")                          // https://schema.org/Article
 
         String prettyName
 
@@ -95,6 +98,7 @@ class MediaItem {
         name                    nullable: false,    blank: false,               maxSize: 255
         description             nullable: true,     blank: false,               maxSize: 2000
         sourceUrl               nullable: false,    blank: false,   url:true,   maxSize: 2000
+        sourceUrlHash           nullable: false,    blank: false,   unique: true
         targetUrl               nullable: true,     blank:false,    url:true,   maxSize: 2000
         customThumbnailUrl      nullable: true,     blank:false,    url:true,   maxSize: 2000
         customPreviewUrl        nullable: true,     blank:false,    url:true,   maxSize: 2000
@@ -129,6 +133,12 @@ class MediaItem {
         "${id} - ${name}"
     }
 
+    def beforeValidate() {
+        if(sourceUrl){
+            sourceUrlHash = Hash.md5(sourceUrl)
+        }
+    }
+
     def beforeUpdate () {
         dateSyndicationUpdated = new Date()
     }
@@ -143,8 +153,9 @@ class MediaItem {
             "questionandanswer" : "com.ctacorp.syndication.media.QuestionAndAnswer",
             "tweet"             : "com.ctacorp.syndication.media.Tweet",
             "video"             : "com.ctacorp.syndication.media.Video",
-            "blog_post"         : "STRUCTURED-BLOG_POST-com.ctacorp.syndication.media.Html",
-            "news_release"      : "STRUCTURED-NEWS_RELEASE-com.ctacorp.syndication.media.Html"
+            "blog_posting"      : "STRUCTURED-BLOG_POSTING-com.ctacorp.syndication.media.Html",
+            "news_article"      : "STRUCTURED-NEWS_ARTICLE-com.ctacorp.syndication.media.Html",
+            "article"           : "STRUCTURED-ARTICLE-com.ctacorp.syndication.media.Html"
     ]
 
     static namedQueries = {

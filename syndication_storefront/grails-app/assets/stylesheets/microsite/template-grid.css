@@ -53,7 +53,8 @@
   margin-top: 10px;
 }
 
-.grid .panel .btn {border: 1px solid #bbb;}
+.grid .panel .btn,
+.load-more-buttons .btn {border: 1px solid #bbb;}
 
 
 /* Small devices (tablets, 768px and up) */

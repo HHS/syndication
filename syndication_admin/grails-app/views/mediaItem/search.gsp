@@ -52,6 +52,13 @@
                     <input id="id" name="id" type="number" value="${id}" placeholder="search by id" class="form-control input-md">
                   </div>
                 </div>
+
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="CreatedBy">Created By</label>
+                  <div class="col-md-8">
+                    <input id="createdBy" name="createdBy" value="${createdBy}" placeholder="search created by" class="form-control input-md">
+                  </div>
+                </div>
               </div>
 
               <div class="col-md-6">
@@ -66,6 +73,22 @@
                   <label class="col-md-4 control-label" for="language">Language</label>
                   <div class="col-md-8">
                     <g:select class="form-control" from="${languageList}" name="language" optionKey="id" value="${language}" noSelection="['':'-Any Language-']"/>
+                  </div>
+                </div>
+
+                <g:if test="${subscriberList}">
+                  <div class="form-group">
+                    <label class="col-md-4 control-label" for="subscriberId">Subscriber</label>
+                    <div class="col-md-8">
+                      <g:select class="form-control" from="${subscriberList}" name="subscriberId" optionValue="name" optionKey="id" value="${subscriberId}" noSelection="['':'-Any Subscriber-']"/>
+                    </div>
+                  </div>
+                </g:if>
+
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="source">Source</label>
+                  <div class="col-md-8">
+                    <g:select class="form-control" from="${sourceList}" name="sourceId" optionValue="name" optionKey="id" value="${sourceId}" noSelection="['':'-Any Source-']"/>
                   </div>
                 </div>
 

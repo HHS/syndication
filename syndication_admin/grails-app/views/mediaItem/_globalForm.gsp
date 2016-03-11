@@ -35,7 +35,7 @@
     <g:hiddenField name="sourceUrl" value="https://www.example.com/collection/${System.nanoTime()}"/>
 </g:if>
 <g:else>
-    <div class="form-group ${hasErrors(bean:mediaItemInstance, field:'sourceUrl', 'errors')}">
+    <div class="form-group ${hasErrors(bean:mediaItemInstance, field:'sourceUrlHash', 'errors')}">
         <label class="col-md-4 control-label" for="sourceUrl">Source Url<span class="required-indicator">*</span></label>
 
         <g:if test="${mediaItemInstance.getClass().simpleName == 'Html'}">

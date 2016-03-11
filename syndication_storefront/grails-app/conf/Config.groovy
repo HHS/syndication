@@ -14,6 +14,19 @@ grails.war.resources = { stagingDir, args ->
     copy(file: "MetaData.groovy", tofile: "${stagingDir}/MetaData.groovy")
 }
 
+environments {
+    development {
+        grails.logging.jul.usebridge = true
+        grails.serverURL = "http://localhost:8082/SyndicationStorefront"
+    }
+    production {
+        grails.logging.jul.usebridge = false
+        if(System.getenv("USING_DOCKER") == "true"){
+            grails.serverURL = "http://docker.local/store"
+        }
+    }
+}
+
 
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
@@ -133,10 +146,11 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
         '/**/favicon.ico':                ['permitAll']
 ]
 
-syndication.swaggerAddress = "http://localhost:8080/Syndication"
+syndication.swaggerAddress = System.getenv("API_URL")
+
 
 //TagCloud
-tagCloud.serverAddress = "http://localhost:8090/TagCloud"
+tagCloud.serverAddress = System.getenv("TAGCLOUD_URL")
 
 // Mail plugin defaults:
 grails {

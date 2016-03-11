@@ -1,4 +1,4 @@
-        <div class="microsite-footer row">
+        <div class="microsite-footer row" style="margin-right:-0px;">
 
             <div class="footer-left col-xs-6">
                 <p>${microSite?.footerText}</p>

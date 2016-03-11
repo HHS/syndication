@@ -71,8 +71,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <g:link class="btn btn-success" action="edit" params="[mediaId:params.mediaId]" resource="${alternateImageInstance}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
                         <g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
                         <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                            <g:link class="button" action="index">
-                                <button type="button" class="btn">Cancel</button>
+                            <g:link class="btn btn-cancel" action="index">
+                                Cancel
                             </g:link>
                         </sec:ifAnyGranted>
                     </fieldset>

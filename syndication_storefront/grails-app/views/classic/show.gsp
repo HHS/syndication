@@ -26,75 +26,35 @@
 
         <div class="microsite-classic-content row">
 
-            <div class="microsite-classic-left-col col-sm-7 col-xs-12">
+            <div class="microsite-classic-left-col col-sm-7 col-xs-12 clearfix">
 
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel-group classics" id="accordion" role="tablist" aria-multiselectable="true">
+
                     <g:set var="firstPanel" value="${true}"/>
-                    <g:each in="${pane1MediaItems}" var="media">
-                        <g:if test="${firstPanel}">
-                            <div class="panel panel-default">
-                                <a class="collapsable-link" data-toggle="collapse" data-parent="#accordion" href="#collapse${media.id}"
-                                           aria-expanded="true" aria-controls="collapse${media.id}">
-                                    <div class="panel-heading microsite-article" role="button" id="${media.id}">
-                                        <h2 class="microsite-article-title panel-title">
-                                            ${media.name}
 
-                                        </h2>
-                                    </div>
-
-                                </a>
-
-                                <div id="collapse${media.id}" class="panel-collapse collapse in" role="tabpanel"
-                                     aria-labelledby="${media.id}">
-
-                                    <div class="panel-body">
-                                            <img style="width:100%" alt="Thumbnail for ${media.name}" class="microsite-article-pic"
-                                                 src="${apiBaseUrl}/resources/media/${media?.id}/preview.jpg"/>
-
-                                        <p>${media.description}</p>
-                                        <br>
-                                        <g:link type="button" url="${media.sourceUrl}"
-                                                class="btn btn-default pull-right" target="_blank">View</g:link>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                            <g:set var="firstPanel" value="${false}"/>
-                        </g:if>
-                        <g:else>
-                            <div class="panel panel-default">
-
-                                <a class="collapsed collapsable-link" data-toggle="collapse" data-parent="#accordion"
-                                           href="#collapse${media.id}" aria-expanded="false"
-                                           aria-controls="collapse${media.id}">
-
-                                    <div class="panel-heading" role="button" id="${media.id}">
-                                        <h2 class="microsite-article-title panel-title">
-                                            ${media.name}
-                                        </h2>
-                                    </div>
-                                </a>
-                                <div id="collapse${media.id}" class="panel-collapse collapse" role="tabpanel"
-                                     aria-labelledby="${media.id}">
-
-                                    <div class="panel-body">
-                                        <div class="microssite-article on-white col-md-3 col-xs-4">
-                                            <img style="width:100%" alt="thumbnail for ${media.name}" class="microsite-article-pic"
-                                                 src="${apiBaseUrl}/resources/media/${media?.id}/thumbnail.jpg"/>
-                                        </div>
-
-                                        <p>${media.description}</p>
-                                        <br>
-                                        <g:link type="button" url="${media.sourceUrl}"
-                                                class="btn btn-default pull-right" target="_blank">View</g:link>
-                                    </div>
-                                </div>
-                            </div>
-                        </g:else>
-                    </g:each>
+                    <g:render template="classicList"/>
 
                 </div>
+                <br>
+                <div class='row' id="noMoreContent" style="display: none;">
+                    <div class='col-md-12'>
+                        <div class="alert alert-info alert-dismissable break-word">No More Content
+                            <button type="button" class="close" style='top:-8px;' data-dismiss="alert" aria-hidden="true">&times;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row load-more">
+                    <div class="col-md-6">
+                        <input type="button" class="form-group btn btn-default text-center" id="loadClassicsButton" value="Load More"/>
+                        <div id="spinnerDiv" style="width:50px;display: none;" class="text-center"><i class="fa fa-refresh fa-spin fa-lg"></i></div>
+                    </div>
+                    <div class="col-md-6">
+                        <button class="form-group btn btn-default pull-right" id="returnTop">Back To Top <i class='fa fa-arrow-up'></i></button>
+                    </div>
+
+                </div>
+
 
             </div><!-- end col-sm-7 col-xs-12-->
 
@@ -142,7 +102,48 @@
                 }
                 this.setAttribute("aria-expanded", true);
             }
-        })
+        });
+
+
+        var classicOffset = ${classicOffset};
+        var currentlyProcessed = false;
+
+        $("#loadClassicsButton").on("click", function(){
+            $("#loadClassicsButton").hide();
+            $("#spinnerDiv").show();
+
+            classicOffset = classicOffset + ${maxClassics};
+            $.ajax({ // create an AJAX call...
+                data: {classicOffset:classicOffset, maxClassics:"${maxClassics}", id:"${microSite.id}"}, // get the form data
+                type: 'POST', // GET or POST
+                url: '${g.createLink(controller: 'classic', action: 'getMoreClassics')}', // the file to call
+                success: function (response) { // on success..
+                    $("#spinnerDiv").fadeOut("fast",function(){
+                        if(response.constructor.name == "String"){
+                            $('.classics').append(response); // update the DIV
+                            $("#loadClassicsButton").show();
+                            currentlyProcessed = false;
+                        } else {
+                            $("#loadClassicsButton").show();
+                            $('#noMoreContent').show();
+                            currentlyProcessed = false;
+                        }
+                    });
+                }
+            });
+        });
+
+        $("#returnTop").on("click", function(){
+            $('html, body').animate({ scrollTop: 0 }, 'slow');
+        });
+
+        $(window).scroll(function() {
+            if($(window).scrollTop() + $(window).height() == $(document).height() && !currentlyProcessed) {
+                currentlyProcessed = true;
+                $("#loadClassicsButton").trigger("click");
+            }
+        });
+
     })
 
 

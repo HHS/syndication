@@ -47,14 +47,15 @@ class FAQController {
     def show(FAQ faqInstance) {
         def tagData = tagService.getTagInfoForMediaShowViews(faqInstance, params)
 
-        respond faqInstance, model: [tags            : tagData?.tags,
-                                     languages       : tagData?.languages,
-                                     tagTypes        : tagData?.tagTypes,
-                                     selectedLanguage: tagData?.selectedLanguage,
-                                     selectedTagType : tagData?.selectedTagType,
-                                     languageId      : params.languageId,
-                                     tagTypeId       : params.tagTypeId,
-                                     apiBaseUrl      : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+        respond faqInstance, model: [tags               : tagData?.tags,
+                                     languages          : tagData?.languages,
+                                     tagTypes           : tagData?.tagTypes,
+                                     selectedLanguage   : tagData?.selectedLanguage,
+                                     selectedTagType    : tagData?.selectedTagType,
+                                     languageId         : params.languageId,
+                                     tagTypeId          : params.tagTypeId,
+                                     apiBaseUrl         : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                     subscriber         : cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(faqInstance)?.subscriberId)
         ]
     }
 
@@ -82,12 +83,13 @@ class FAQController {
         }
 
         faqInstance = mediaItemsService.updateItemAndSubscriber(faqInstance, params.long('subscriberId'))
-        faqInstance.save flush: true
 
         if (faqInstance.hasErrors()) {
             flash.errors = faqInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             def subscribers = cmsManagerKeyService.listSubscribers()
-            respond faqInstance, view: 'create', model: [subscribers : subscribers]
+            respond faqInstance, view: 'create', model: [subscribers : subscribers,
+                                                         questionAndAnswerList: mediaItemsService.getPublisherItemsByType(QuestionAndAnswer),
+                                                         selectedQuestionAndAnswerList: faqInstance?.questionAndAnswers]
             return
         }
 

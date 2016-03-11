@@ -42,9 +42,10 @@ class BootStrap {
 
     private void initUsers() {
         String adminUsername = grailsApplication.config.springsecurity.tinyUrl.adminUsername
+        String adminPassword = grailsApplication.config.springsecurity.tinyUrl.initialAdminPassword
         User adminUser = User.findByUsername(adminUsername)
         if(!adminUser){
-            adminUser = new User(username: grailsApplication.config.springsecurity.tinyUrl.adminUsername, enabled: true, password: grailsApplication.config.springsecurity.tinyUrl.initialAdminPassword)
+            adminUser = new User(username: adminUsername, enabled: true, password: adminPassword)
             adminUser.save(flush:true)
         }
 

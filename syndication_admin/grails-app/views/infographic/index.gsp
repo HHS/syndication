@@ -61,7 +61,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                                 <td><span class="limited-width-lg ellipse abv60">${fieldValue(bean: infographicInstance, field: "description")}</span></td>
 
-                                <td><span class="limited-width-lg ellipse break-url">${fieldValue(bean: infographicInstance, field: "sourceUrl")}</span></td>
+                                <td><span class="limited-width-lg ellipse break-url"><a target="_blank" href="${infographicInstance.sourceUrl}">${fieldValue(bean: infographicInstance, field: "sourceUrl")}</a></span></td>
 
                                 <td><g:formatDate date="${infographicInstance.dateSyndicationCaptured}"/></td>
 

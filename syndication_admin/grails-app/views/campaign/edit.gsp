@@ -48,8 +48,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 								<label class="col-md-5 control-label" for="create"></label>
 								<div class="col-md-7">
 								<g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-								<g:link class="button" resource="${campaignInstance}" action="show">
-									<button type="button" class="btn">Cancel</button>
+								<g:link class="btn btn-default" resource="${campaignInstance}" action="show">
+									Cancel
 								</g:link>
 								</div>
 							</div>

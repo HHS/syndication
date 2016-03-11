@@ -163,11 +163,11 @@ class MicrositeService {
         resp
     }
     
-    def getMediaContents(def mediaItems){
+    def getMediaContents(def mediaItems, int offset = 0, int amount = 10){
         def resp = []
-        mediaItems.each{ item ->
+        for(int index = offset;index<(offset + amount) && (mediaItems?.size() ?: 0) > index;index++){
             try {
-                resp << rest.get(grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath + "/resources/media/${item.id}/syndicate.json?autoplay=false")
+                resp << rest.get(grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath + "/resources/media/${mediaItems[index].id}/syndicate.json?autoplay=false")
             }catch(e){
                 log.error(e)
                 println "error: " + e

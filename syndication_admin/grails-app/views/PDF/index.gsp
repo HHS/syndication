@@ -54,7 +54,13 @@
 
                                     <td><span class="limited-width-lg ellipse abv60">${fieldValue(bean: PDFInstance, field: "description")}</span></td>
 
-                                    <td><span class="wrappedText ellipse break-url">${fieldValue(bean: PDFInstance, field: "sourceUrl")}</span></td>
+                                    <td>
+                                        <span class="wrappedText ellipse break-url"><a target="_blank" href="${PDFInstance.sourceUrl}">
+
+                                            ${fieldValue(bean: PDFInstance, field: "sourceUrl")}
+
+                                        </a></span>
+                                    </td>
 
                                     <td>${fieldValue(bean: PDFInstance, field: "dateSyndicationCaptured")}</td>
 

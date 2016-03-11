@@ -3,6 +3,7 @@ package com.ctacorp.syndication.storefront.microsite
 import com.ctacorp.syndication.Campaign
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.authentication.User
+import com.ctacorp.syndication.contentextraction.MicrositeFilterService
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.microsite.MediaSelector
 import com.ctacorp.syndication.microsite.MicroSite
@@ -22,12 +23,14 @@ import spock.lang.Specification
 class GridControllerSpec extends Specification {
     def tagService = Mock(TagService)
     def micrositeService = Mock(MicrositeService)
+    def micrositeFilterService = Mock(MicrositeFilterService)
     def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
     def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
 
     def setup() {
         controller.tagService = tagService
         controller.micrositeService = micrositeService
+        controller.micrositeFilterService = micrositeFilterService
         controller.micrositeService.metaClass.saveBuild = {Map params, String micrositeType -> return new MicroSite()}
     }
 

@@ -72,8 +72,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this Tweet Auto Importer?!');" value="Delete" action="delete"/>
             </sec:ifAnyGranted>
-            <g:link class="button" action="index">
-                <button type="button" class="btn">Cancel</button>
+            <g:link class="btn btn-default" action="index">
+                Cancel
             </g:link>
         </g:form>
     </fieldset>

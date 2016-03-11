@@ -1,6 +1,5 @@
 package com.ctacorp.syndication.storefront.microsite
 
-import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.microsite.MediaSelector
 import com.ctacorp.syndication.storefront.UserMediaList
 import com.ctacorp.syndication.microsite.MicroSite
@@ -8,6 +7,7 @@ import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.Campaign
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.microsite.FlaggedMicrosite
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
@@ -15,6 +15,7 @@ class GridController {
     
     def tagService
     def micrositeService
+    def micrositeFilterService
 
     def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
     def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
@@ -58,6 +59,7 @@ class GridController {
             ]
             return
         }
+        micrositeFilterService.performValidation(microSite)
         
         redirect action: "show", id:microSite.id, params:[showAdminControls:true]
     }
@@ -84,6 +86,7 @@ class GridController {
                                           microSite:microSite]
             return
         }
+        micrositeFilterService.validateOnUpdate(microSite)
 
         microSite.save(flush: true)
         flash.message = "microsite  Updated!"
@@ -101,7 +104,9 @@ class GridController {
 
         def pane3MediaItems = micrositeService.getMediaItems(microSite.mediaArea3)
         def pane2MediaItems = micrositeService.getMediaItems(microSite.mediaArea2)
-        def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, 50)
+
+        def maxGrids = 15
+        def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, maxGrids)
 
         [
             microSite:microSite,
@@ -110,7 +115,21 @@ class GridController {
             pane3MediaItems:pane3MediaItems,
             collection:params.collection,
             apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+            gridOffset:0,
+            maxGrids:maxGrids
         ]
+    }
+
+    @Secured(['permitAll'])
+    def getMoreGrids() {
+        def microSite = MicroSite.get(params.long("id"))
+        def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, params.int("maxGrids"), params.int("gridOffset"))
+
+        if(!pane1MediaItems) {
+            render [:] as JSON
+        }
+        render template: "gridList", model:[pane1MediaItems:pane1MediaItems,gridOffset: params.int("gridOffset"),apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath]
+
     }
     
     def edit(){

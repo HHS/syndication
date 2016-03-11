@@ -141,9 +141,10 @@ class TwitterService {
         }
 
         twitterStatusCollector.collection.name = "Twitter collection for the accounts " + twitterStatusCollector.twitterAccounts.toString().substring(1,twitterStatusCollector.twitterAccounts.toString().size() -1) +" and hashtags "+ twitterStatusCollector.hashTags
-        twitterStatusCollector.collection.sourceUrl = "http://www.twitter.com"
+        twitterStatusCollector.collection.sourceUrl = "https://www.example.com/collection/${System.nanoTime()}"
         twitterStatusCollector.collection.language = Language.findByIsoCode("eng")
         twitterStatusCollector.collection.description = "twitter collection for the accounts " + twitterStatusCollector.twitterAccounts.toString() +" and hashtags "+ twitterStatusCollector.hashTags
+        twitterStatusCollector.collection.validate()
 
         if(!twitterStatusCollector.collection.save() || !twitterStatusCollector.validate() ||
         !(new MediaItemSubscriber(mediaItem: twitterStatusCollector.collection, subscriberId: twitterStatusCollector.twitterAccounts[0].subscriberId).save())) {

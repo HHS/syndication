@@ -21,12 +21,12 @@ class ConsumerMetricsController {
     def viewLocation() {
         String profileId = Holders.config.google.analytics.profileId
         def results
-        def items
+        def items = []
 
         def mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(',') ?: []) ?: []
         String mediaForTokenInput = mediaToGraph.collect{ [id:it.id, name:"${it.name}"] } as JSON
 
-        String mediaFilters = getMediaFilters(mediaToGraph)
+        def mediaFilters = getPublisherFilters(mediaToGraph)
 
         def startDate = Calendar.getInstance()
         startDate.add(Calendar.DAY_OF_MONTH, -30)
@@ -38,9 +38,14 @@ class ConsumerMetricsController {
             endDate.set(params.int("end_year"), params.int("end_month") - 1, params.int("end_day"))
         }
 
-        results = googleAnalyticsService.executeQuery(profileId, startDate, endDate, "viewsByLocation", [mediaFilters: ";"+mediaFilters, startIndex: 1])
-        items = mapAnalyticsResults(results)
-        def numPages = Math.ceil(results.getTotalResults() / 10000)
+        def totalResults = 0
+        mediaFilters.each{filterSet ->
+            results = googleAnalyticsService.executeQuery(profileId, startDate, endDate, "viewsByLocation", [mediaFilters: ";"+filterSet, startIndex: 1])
+            items.addAll(mapAnalyticsResults(results))
+            totalResults += results.getTotalResults()
+        }
+
+        def numPages = Math.ceil(totalResults / 10000)
 
         [
                 items:items as JSON,
@@ -52,8 +57,10 @@ class ConsumerMetricsController {
         ]
     }
 
+
+
     def getpaginatedLocations() {
-        String mediaFilters = getMediaFilters([])
+        def mediaFilters = getPublisherFilters([])
 
         def startDate = Calendar.getInstance()
         startDate.add(Calendar.DAY_OF_MONTH, -30)
@@ -69,8 +76,10 @@ class ConsumerMetricsController {
         def pagination = params.int("pagination")
         def results
         ArrayList<Map> items = []
-        results = googleAnalyticsService.executeQuery(profileId, startDate, endDate, "viewsByLocation", [mediaFilters: ";"+mediaFilters,startIndex: pagination * 10000 + 1])
-        items.addAll(mapAnalyticsResults(results))
+        mediaFilters.each { filterSet ->
+            results = googleAnalyticsService.executeQuery(profileId, startDate, endDate, "viewsByLocation", [mediaFilters: ";" + filterSet, startIndex: pagination * 10000 + 1])
+            items.addAll(mapAnalyticsResults(results))
+        }
         render items as JSON
     }
 
@@ -81,16 +90,36 @@ class ConsumerMetricsController {
         def mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(',') ?: []) ?: []
         String mediaForTokenInput = mediaToGraph.collect{ [id:it.id, name:"${it.name}"] } as JSON
 
-        String mediaFilters = getMediaFilters(mediaToGraph, ";ga:hostname!=digitalmedia.hhs.gov;ga:hostname!=api.digitalmedia.hhs.gov;ga:hostname!=digitalmedia.hhs.gov.googleweblight.com")
-
         [
                 mediaForTokenInput: mediaForTokenInput,
                 tempAccessToken:cred.getAccessToken(),
                 totalMediaItems:MediaItem.count(),
                 totalSubscribers:cmsManagerKeyService.listSubscribers().size(),
                 header:"Embedders by Domain Name",
-                mediaFilters:mediaFilters
+                mediaToGraph:params.mediaItem
         ]
+    }
+
+    def getWhosEmbedding() {
+        String profileId = Holders.config.google.analytics.profileId
+        def items = []
+        def results
+        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',') ?: []) ?: []
+
+        def mediaFilters = getPublisherFilters(mediaToGraph, ";ga:hostname!=digitalmedia.hhs.gov;ga:hostname!=api.digitalmedia.hhs.gov;ga:hostname!=digitalmedia.hhs.gov.googleweblight.com")
+        mediaFilters.each { filterSet ->
+            if(mediaFilters.size() == 1){
+                results = googleAnalyticsService.executeQuery(profileId, params.startDate, params.endDate, "whosEmbedding", [mediaFilters: filterSet, startIndex: 1,size:params.int("size")])
+                items.addAll(results.rows)
+            } else {
+                results = googleAnalyticsService.executeQuery(profileId, params.startDate, params.endDate, "whosEmbedding", [mediaFilters: filterSet, startIndex: 1,size:10000])
+                items = googleAnalyticsService.mergeResults(items,results.rows)
+            }
+        }
+        if(mediaFilters.size() != 1){
+            items = googleAnalyticsService.restrictItemsToSize(items,params.int("size"))
+        }
+        render items as JSON
     }
 
     def generalViews() {
@@ -101,7 +130,7 @@ class ConsumerMetricsController {
         def mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(',') ?: []) ?: []
         String mediaForTokenInput = mediaToGraph.collect{ [id:it.id, name:"${it.name}"] } as JSON
 
-        String mediaFilters = getMediaFilters(mediaToGraph)
+        def mediaFilters = getPublisherFilters(mediaToGraph)
 
         def startDate = Calendar.getInstance()
         startDate.add(Calendar.DAY_OF_MONTH, -30)
@@ -111,19 +140,21 @@ class ConsumerMetricsController {
 
         def googleOverview = null
         try{
-            def googleResponse = googleAnalyticsService.executeQuery(profileId,startDate, new Date(), "overview",[mediaFilters: mediaFilters ?: "ga:dimension2!=-1"])
-            googleOverview = [
-                    stats : [:],
-                    error : googleResponse.error
-            ]
-            if(googleResponse?.rows && googleResponse?.rows[0]?.size() > 0){
-                for(def i = 0; i < googleResponse.rows[0].size(); i++){
-                    googleOverview.stats[googleResponse.columnHeaders[i].name-'ga:'] = googleResponse.rows[0][i]
-                }
-            } else{
-                googleOverview.error = "There are no metrics available for the select date range."
-            }
+            mediaFilters.each { filterSet ->
+                def googleResponse = googleAnalyticsService.executeQuery(profileId, startDate, new Date(), "overview", [mediaFilters: filterSet ?: "ga:dimension2!=-1"])
 
+                googleOverview = [
+                        stats: [:],
+                        error: googleResponse.error
+                ]
+                if (googleResponse?.rows && googleResponse?.rows[0]?.size() > 0) {
+                    for (def i = 0; i < googleResponse.rows[0].size(); i++) {
+                        googleOverview.stats[googleResponse.columnHeaders[i].name - 'ga:'] = googleResponse.rows[0][i]
+                    }
+                } else {
+                    googleOverview.error = "There are no metrics available for the select date range."
+                }
+            }
         }catch(e){
             log.error "Couldn't retrieve google anayltics info"
             StringWriter sw = new StringWriter()
@@ -141,32 +172,74 @@ class ConsumerMetricsController {
                 header:"General Views",
                 mediaFilters:mediaFilters,
                 googleOverview: googleOverview,
-                startDate: startDate
+                startDate: startDate,
+                mediaToGraph:params.mediaItem
         ]
     }
 
-    /**
-     *
-     * @param mediaItemsToSearchFor - the mediaItems the the filter will restrict the set to
-     * @param replacementOfCharacter - The first character needs replaced with ';' instead of '' if it is being added
-     * on to existing filters.
-     * @param additionalFilter - custom filters seperated by ;
-     * @return
-     */
-    private getMediaFilters(def mediaItemsToSearchFor, String additionalFilter = "") {
-        String mediaFilters = ""
-        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER" && !mediaItemsToSearchFor) {
-            publisherItems().each{
-                mediaFilters+=",ga:dimension2==" + it + additionalFilter
+    def getTotalViews() {
+        String profileId = Holders.config.google.analytics.profileId
+        def items = []
+        def results
+        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',') ?: []) ?: []
+
+        def mediaFilters = getPublisherFilters(mediaToGraph)
+        mediaFilters.each { filterSet ->
+            if(mediaFilters.size() == 1){
+                results = googleAnalyticsService.executeQuery(profileId, null, null, "generalTotalViews", [mediaFilters: filterSet, startIndex: 1])
+                items.addAll(results.rows)
+            } else {
+                results = googleAnalyticsService.executeQuery(profileId, null, null, "generalTotalViews", [mediaFilters: filterSet, startIndex: 1])
+                items = googleAnalyticsService.mergeResults(items,results.rows)
             }
-        }else if (mediaItemsToSearchFor){
+        }
+        items = googleAnalyticsService.formatResponseDate(items)
+        render items as JSON
+    }
+
+    def getTotalMobileViews() {
+        String profileId = Holders.config.google.analytics.profileId
+        def items = []
+        def results
+        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',') ?: []) ?: []
+
+        def mediaFilters = getPublisherFilters(mediaToGraph)
+        mediaFilters.each { filterSet ->
+            if(mediaFilters.size() == 1){
+                results = googleAnalyticsService.executeQuery(profileId, null, null, "generalTotalMobileViews", [mediaFilters: filterSet, startIndex: 1])
+                items.addAll(results.rows)
+            } else {
+                results = googleAnalyticsService.executeQuery(profileId, null, null, "generalTotalMobileViews", [mediaFilters: filterSet, startIndex: 1])
+                items = googleAnalyticsService.mergeResults(items,results.rows)
+            }
+        }
+        items = googleAnalyticsService.formatResponseDate(items)
+        render items as JSON
+    }
+
+    private getPublisherFilters(def mediaItemsToSearchFor, String additionalFilter = "") {
+        ArrayList<String> mediaFilters = []
+        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER" && !mediaItemsToSearchFor) {
+            int count = 0
+            publisherItems().each{
+                mediaFilters[(count/100) as int] = (mediaFilters[(count/100) as int] ?: "") + ",ga:dimension2==" + it
+                count ++
+            }
+        } else if(mediaItemsToSearchFor){
             mediaItemsToSearchFor.each{
-                mediaFilters+=",ga:dimension2==" + it.id + additionalFilter
+                mediaFilters[0] = (mediaFilters[0] ?: "") + ",ga:dimension2==" + it.id
             }
         } else {
-            mediaFilters=",ga:pageviews!=-1" + additionalFilter
+            mediaFilters[0]=",ga:pageviews!=-1"
         }
-        return mediaFilters.replaceFirst(',',"")
+
+        int index = 0
+        mediaFilters.each{filterSet ->
+            mediaFilters[index] =  (mediaFilters[index] + additionalFilter).replaceFirst(',',"")
+            index++
+        }
+
+        mediaFilters
     }
 
     private mapAnalyticsResults(results) {

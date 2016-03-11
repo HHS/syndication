@@ -37,8 +37,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <label class="col-md-5 control-label" for="update"></label>
                         <div class="col-md-7">
                             <g:submitButton name="update" class="btn btn-success" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                            <g:link class="button" action="show" params="[id:twitterAccountInstance?.id]">
-                                <button type="button" class="btn">Cancel</button>
+                            <g:link class="btn btn-default" action="show" params="[id:twitterAccountInstance?.id]">
+                                Cancel
                             </g:link>
                         </div>
                     </div>

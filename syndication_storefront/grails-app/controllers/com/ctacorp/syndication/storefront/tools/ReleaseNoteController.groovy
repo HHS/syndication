@@ -97,7 +97,7 @@ class ReleaseNoteController {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.deleted.message', args: [message(code: 'ReleaseNote.label', default: 'ReleaseNote'), releaseNoteInstance.id])
-                redirect action:"index", method:"GET"
+                redirect controller:"storefront", action:"releaseInfo", method:"GET"
             }
             '*'{ render status: NO_CONTENT }
         }

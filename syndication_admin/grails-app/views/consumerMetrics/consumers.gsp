@@ -5,6 +5,9 @@
     <meta name="layout" content="main">
     <title>Consumers of Your Content</title>
 
+    <asset:javascript src="plugins/morris/raphael-2.1.0.min.js"/>
+    <asset:javascript src="plugins/morris/morris.js"/>
+    <asset:stylesheet src="plugins/morris/morris-0.4.3.min.css"/>
     <asset:javascript src="tokenInput/jquery.tokeninput.js"/>
     <asset:stylesheet src="tokenInput/token-input.css"/>
     <g:javascript>
@@ -97,7 +100,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <div class="btn-group btn-group-sm btn-group-justified" role="group" aria-label="...">
-                                <a href="#domainsLine" id="domainsLine" data-graphType="LINE" class="btn syndicatingDomainsGraph btn-default active">Line Graph</a>
+                                <a href="#domainsLine" id="domainsLine" data-graphType="LINE" class="btn syndicatingDomainsGraph btn-default active">Bar Graph</a>
                                 <a href="#domainsTable" id="domainsTable" data-graphType="TABLE" class="btn syndicatingDomainsGraph btn-default">Table</a>
                                 <a href="#domainsPie" id="domainsPie" data-graphType="PIE" class="btn syndicatingDomainsGraph btn-default">Pie</a>
                             </div>
@@ -211,26 +214,65 @@
     }
 
     function domainsBySyndicationGraph(endDate,startDate,size,graphType) {
-        var dataChart2 = new gapi.analytics.googleCharts.DataChart({
-            query: {
-                'ids': 'ga:84359809',
-                metrics: 'ga:pageviews',
-                dimensions: 'ga:hostname',
-                'start-date': startDate,
-                'end-date': endDate,
-                'max-results': size,
-                'sort':'-ga:pageviews',
-                'filters': '${mediaFilters}'
-            },
-            chart: {
-                container: 'endUser-container',
-                type: graphType,
-                options: {
-                    width: '100%'
-                }
-            }
+        $("#endUser-container").html('<div id="spinnerDiv" style="width:50px;" class="center-block"><asset:image src="spinner.gif"/></div>');
+        $.get('${grailsApplication.config.grails.serverURL}' + "/consumerMetrics/getWhosEmbedding?startDate="+startDate+"&endDate="+endDate+"&size="+size+"&mediaToGraph="+"${mediaToGraph}", function(data){
+            renderData(data, graphType);
         });
-        dataChart2.execute();
+    }
+
+    function renderData(rows, graphType){
+        switch(graphType) {
+            case "TABLE":
+                    var contents = '<table class="table table-striped"><thead><tr><th>Hostname</th><th>Pageviews</th></tr></thead><tbody>';
+
+                    for(var row in rows){
+                        contents += '<tr><td>'+ rows[row][0] +'</td><td>'+ rows[row][1] +'</td></tr>'
+                    }
+                    contents += '</tbody></table>';
+                $("#endUser-container").html(contents);
+                break;
+            case "LINE":
+                var data = [];
+                var labels = [];
+                var values = [];
+                for(var row in rows){
+                    data.push({label:rows[row][0],value:Math.round(rows[row][1])});
+                    labels.push(rows[row][0]);
+                    values.push(rows[row][1]);
+                }
+                $("#endUser-container").text("");
+                Morris.Bar({
+                    // ID of the element in which to draw the chart.
+                    element: "endUser-container",
+                    // Chart data records -- each entry in this array corresponds to a point on
+                    // the chart.
+                    data: data,
+                    // The name of the data record attribute that contains x-values.
+                    xkey: "label",
+//                    xLabels: 'month',
+                    // A list of names of data record attributes that contain y-values.
+                    ykeys: ["value"],
+                    // Labels for the ykeys -- will be displayed when you hover over the
+                    // chart.
+                    labels: ["pageviews"],
+                    hideHover: 'auto',
+                    resize: true
+                });
+                break;
+            case "PIE":
+                    var data = [];
+                for(var row in rows){
+                    data.push({label:rows[row][0],value:rows[row][1]})
+                }
+                $("#endUser-container").text("");
+                Morris.Donut({
+                    // ID of the element in which to draw the chart.
+                    element: "endUser-container",
+                    data: data,
+                    resize: true
+                });
+                break;
+        }
     }
 
 //   generate graphs on page load
@@ -247,7 +289,6 @@
                 'access_token': '${tempAccessToken}'
             }
         });
-
 
         domainsBySyndicationGraph(getSyndicatorsEndDay(),getSyndicatorsStartDay(), 5, "LINE");
 

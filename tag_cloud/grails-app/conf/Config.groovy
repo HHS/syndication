@@ -109,7 +109,9 @@ environments {
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = "http://localhost:8090/TagCloud"
+        if(System.getenv("USING_DOCKER") == "true"){
+            grails.serverURL = "http://docker.local/tag"
+        }
     }
 }
 
@@ -172,4 +174,8 @@ springsecurity{
         adminUsername = System.getenv("ADMIN_USERNAME")
         initialAdminPassword = System.getenv("ADMIN_PASSWORD")
     }
+}
+
+syndication{
+    internalAuthHeader = System.getenv("AUTHORIZATION_HEADER")
 }

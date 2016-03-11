@@ -9,21 +9,8 @@ class SecurityFilters {
     def filters = {
         all(controller:'mediaMappingRest', action:'save|update|delete') {
             before = {
-                def url = grailsApplication.config.grails.serverURL + request.forwardURI[request.contextPath.size()..-1]
 
-                def authHeaders  = [
-                    authorizationHeader: request.getHeader("Authorization"),
-                    dateHeader: request.getHeader("Date"),
-                    contentTypeHeader: request.getHeader("content-type"),
-                    contentLengthHeader: request.getHeader("Content-Length"),
-                    url: url,
-                    httpMethod: request.getMethod(),
-                    dataMd5: authorizationService.hashBody(request.reader.text)
-                ]
-
-                boolean authorized = authorizationService.checkAuthorization(authHeaders)
-
-                if(!authorized){
+                if(request.getHeader("Authorization") != grailsApplication.config.syndication.internalAuthHeader){
                     response.status = 400
                     response.contentType = "application/json"
                     render ([error:'not authorized'] as JSON)

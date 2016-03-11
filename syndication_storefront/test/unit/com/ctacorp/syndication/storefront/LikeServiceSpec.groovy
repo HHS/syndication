@@ -91,8 +91,8 @@ class LikeServiceSpec extends Specification {
 
     def "Get all media like info"() {
         given:"valid mediaItems exist with like counts"
-            MediaItem mi1 = new MediaItem(name:"Some Item1", sourceUrl:"http://www.example.com/jhgfjhg", language: new Language(), source: new Source()).save(flush:true)
-            MediaItem mi2 = new MediaItem(name:"Some Item2", sourceUrl:"http://www.example.com/jhgfjhg", language: new Language(), source: new Source()).save(flush:true)
+            MediaItem mi1 = new MediaItem(name:"Some Item1", sourceUrl:"http://www.example.com/1", language: new Language(), source: new Source()).save(flush:true)
+            MediaItem mi2 = new MediaItem(name:"Some Item2", sourceUrl:"http://www.example.com/2", language: new Language(), source: new Source()).save(flush:true)
             new User(username: "user1@example.com", password: "ABC123def",likes: [mi1]).save(flush:true)
             new User(username: "user2@example.com", password: "ABC123def",likes: [mi1]).save(flush:true)
         when:"getAllMediaLikeInfo is called"
@@ -105,8 +105,8 @@ class LikeServiceSpec extends Specification {
 
     def "Get all media like info from Json"() {
         given:"valid mediaItems exist with like counts"
-            MediaItem mi1 = new MediaItem(name:"Some Item1", sourceUrl:"http://www.example.com/jhgfjhg", language: new Language(), source: new Source()).save(flush:true)
-            MediaItem mi2 = new MediaItem(name:"Some Item2", sourceUrl:"http://www.example.com/jhgfjhg", language: new Language(), source: new Source()).save(flush:true)
+            MediaItem mi1 = new MediaItem(name:"Some Item1", sourceUrl:"http://www.example.com/1", language: new Language(), source: new Source()).save(flush:true)
+            MediaItem mi2 = new MediaItem(name:"Some Item2", sourceUrl:"http://www.example.com/2", language: new Language(), source: new Source()).save(flush:true)
             new User(username: "user1@example.com", password: "ABC123def",likes: [mi1]).save(flush:true)
             new User(username: "user2@example.com", password: "ABC123def",likes: [mi1]).save(flush:true)
 

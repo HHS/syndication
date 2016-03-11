@@ -52,14 +52,15 @@ class ImageController {
         def tagData = tagService.getTagInfoForMediaShowViews(imageInstance, params)
 
         respond imageInstance, model:[tags:tagData.tags,
-                                           languages:tagData.languages,
-                                           tagTypes:tagData.tagTypes,
-                                           languageId:params.languageId,
-                                           tagTypeId:params.tagTypeId,
-                                           selectedLanguage:tagData.selectedLanguage,
-                                           selectedTagType:tagData.selectedTagType,
-                                           collections: Collection.findAll("from Collection where ? in elements(mediaItems)", [imageInstance]),
-                                           apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+                                           languages        :tagData.languages,
+                                           tagTypes         :tagData.tagTypes,
+                                           languageId       :params.languageId,
+                                           tagTypeId        :params.tagTypeId,
+                                           selectedLanguage :tagData.selectedLanguage,
+                                           selectedTagType  :tagData.selectedTagType,
+                                           collections      :Collection.findAll("from Collection where ? in elements(mediaItems)", [imageInstance]),
+                                           apiBaseUrl       :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                           subscriber       :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(imageInstance)?.subscriberId)
         ]
     }
 

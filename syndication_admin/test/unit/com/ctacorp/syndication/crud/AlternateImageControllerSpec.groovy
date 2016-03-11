@@ -16,6 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.AlternateImage
+import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.Source
@@ -34,12 +35,13 @@ class AlternateImageControllerSpec extends Specification {
 
     }
 
-    def populateValidParams(params) {
+    def populateValidParams(params = [:]) {
         assert params != null
         // TODO: Populate valid properties like...
         params["name"] = 'flu'
         params["url"] = 'http://www.example.com/1'
-        params["mediaItem"] = new MediaItem([name:"a valid name",sourceUrl:"http://www.example.com/jhgfjhg", language:new Language(), source:new Source()]).save(flush:true)
+        params["mediaItem"] = new MediaItem([name:"a valid name",sourceUrl:"http://www.example.com/jhgfjhg",sourceUrlHash:Hash.md5("http://www.example.com/jhgfjhg"), language:new Language(), source:new Source()]).save(flush:true)
+        params
     }
 
     void "Test the index action returns the correct model"() {

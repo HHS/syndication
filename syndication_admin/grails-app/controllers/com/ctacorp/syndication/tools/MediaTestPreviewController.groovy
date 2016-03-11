@@ -13,7 +13,7 @@ class MediaTestPreviewController {
         if(params.sourceUrl) {
             try {
                 extractedContent = contentRetrievalService.extractSyndicatedContent(sourceUrl, params)
-                extractedContent = Jsoup.clean(extractedContent, Whitelist.relaxed().addAttributes(":all", "class"))
+                extractedContent = Jsoup.clean(extractedContent.extractedContent, Whitelist.relaxed().addAttributes(":all", "class"))
                 if(!extractedContent){
                     flash.error = "The system could not find syndication markup at the provided URL. Please verify the media source to ensure it contains at least one <div> element containing the 'syndicate' class."
                 }
@@ -35,7 +35,7 @@ class MediaTestPreviewController {
         if(params.sourceUrl) {
             try {
                 extractedContent = contentRetrievalService.extractSyndicatedContent(sourceUrl, params)
-                extractedContent = Jsoup.clean(extractedContent, Whitelist.relaxed().addAttributes(":all", "class"))
+                extractedContent = Jsoup.clean(extractedContent.extractedContent, Whitelist.relaxed().addAttributes(":all", "class"))
                 if(!extractedContent){
                     flash.error = "The system could not find syndication markup at the provided URL. Please verify the media source to ensure it contains at least one <div> element containing the 'syndicate' class."
                 }

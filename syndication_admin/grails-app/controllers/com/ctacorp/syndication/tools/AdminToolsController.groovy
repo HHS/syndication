@@ -1,9 +1,12 @@
 package com.ctacorp.syndication.tools
 
+import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.jobs.HashResetJob
+import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.Tweet
+import com.ctacorp.syndication.metric.MediaMetric
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
@@ -13,6 +16,8 @@ class AdminToolsController {
     def mediaItemsService
     def twitterService
     def remoteCacheService
+
+    static allowedMethods = [ himssReset: 'POST']
 
     def index() {
     }
@@ -37,11 +42,13 @@ class AdminToolsController {
         redirect action: 'index'
     }
 
-    def findDuplicates(){
-        def allMedia = MediaItem.list()
+    def duplicateFinder(){
+        params.max = Math.min(params.int('max') ?: 100, 1000)
+        params.sort = "id"
+        def mediaList = MediaItem.list(params)
         def alreadyChecked = []
         def dupes = []
-        allMedia.each{ mi ->
+        mediaList.each{ mi ->
             log.info("Checking ${mi.id} for duplicates")
             if(!(mi.id in alreadyChecked)) {
                 def found = MediaItem.findAllBySourceUrl(mi.sourceUrl, [sort: 'id', order: 'ASC'])
@@ -57,7 +64,7 @@ class AdminToolsController {
                 }
             }
         }
-        render view:'index', model:[duplicates:dupes]
+        render view:'duplicateFinder', model:[duplicates:dupes, total:MediaItem.count()]
     }
 
     def resetAllHashes(Boolean restrictToDomain, String domain) {
@@ -99,5 +106,28 @@ class AdminToolsController {
         outputStream << ((allData as JSON).toString(params.boolean('pretty') ?: false))
         outputStream.flush()
         outputStream.close()
+    }
+
+    def updateSourceUrlHash() {
+        log.info("start cleaning up incorrect collection source urls")
+        Collection.list().each{
+            if(!(it.sourceUrl ==~ /^https:\/\/www.example.com\/collection\/.*/)){
+                it.sourceUrl = "https://www.example.com/collection/${System.nanoTime()}"
+                it.save()
+            }
+        }
+        log.info("finished cleaning collection source urls")
+        log.info("------------------------begin adding source url md5 hashes----------------------")
+        MediaItem.list().each{
+            if(MediaItem.findAllBySourceUrl(it.sourceUrl).size() == 1) {
+                it.validate()
+                log.info("updated sourceUrlHash for media id: " + it.id)
+                it.save()
+            }
+
+        }
+        log.info("------------------------finished adding source url md5 hashes-----------------------")
+        flash.message = " Updated!!! "
+        render view:"index"
     }
 }

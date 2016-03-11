@@ -1,12 +1,14 @@
 package com.ctacorp.syndication.storefront.microsite
 
 import com.ctacorp.syndication.Campaign
+import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.microsite.MediaSelector
 import com.ctacorp.syndication.microsite.MicroSite
 import com.ctacorp.syndication.storefront.UserMediaList
 import com.ctacorp.syndication.microsite.FlaggedMicrosite
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
@@ -14,6 +16,7 @@ class BlogController {
     
     def tagService
     def micrositeService
+    def micrositeFilterService
 
     def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
     def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
@@ -53,6 +56,7 @@ class BlogController {
                                          ]
             return
         }
+        micrositeFilterService.performValidation(microSite)
 
         redirect action: "show", id:microSite.id, params:[showAdminControls:true]
     }
@@ -60,7 +64,7 @@ class BlogController {
     def edit(){
         def microSite = MicroSite.get(params.long("id"))
         def userMediaLists = UserMediaList.list()
-        def collections = Collection.list()
+        def collections = Collection.findAllByLanguageAndActiveAndVisibleInStorefront(Language.get(params.long("language") ?: 1),true,true)
         def sources = Source.list()
         def tags = tagService.getTagsByType("General")
         def campaigns = Campaign.list()
@@ -87,15 +91,33 @@ class BlogController {
         def pane3MediaItems = micrositeService.getMediaItems(microSite.mediaArea3)
         def pane2MediaItems = micrositeService.getMediaItems(microSite.mediaArea2)
         def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, 50)
+        def maxBlogs = 5
 
-        def blogs = micrositeService.getMediaContents(pane1MediaItems)
+        def blogs = micrositeService.getMediaContents(pane1MediaItems, 0, maxBlogs)
 
-        render view:"show", model:[microSite: microSite,
+        render view:"show", model:[
+                                        microSite: microSite,
                                         blogs:blogs,
                                         pane2MediaItems:pane2MediaItems,
                                         pane3MediaItems:pane3MediaItems,
                                         collection:params.collection,
-                                        apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath]
+                                        apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                        blogOffset:0,
+                                        maxBlogs:maxBlogs
+        ]
+
+    }
+
+    @Secured(['permitAll'])
+    def getMoreBlogs() {
+        def microSite = MicroSite.get(params.long("id"))
+        def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, 50)
+        def blogs = micrositeService.getMediaContents(pane1MediaItems, params.int("blogOffset"), params.int("maxBlogs"))
+
+        if(!blogs) {
+            render [:] as JSON
+        }
+        render template: "blogList", model:[blogs:blogs]
     }
 
     def update(MicroSite microSite){
@@ -120,6 +142,7 @@ class BlogController {
                                         microSite:microSite]
             return
         }
+        micrositeFilterService.validateOnUpdate(microSite)
 
         microSite.save(flush: true)
         flash.message = "microsite  Updated!"

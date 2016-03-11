@@ -37,8 +37,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <label class="col-md-4 control-label" for="edit"></label>
                         <div class="col-md-8">
                             <g:actionSubmit id="edit" class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                            <g:link class="button" resource="${sourceInstance}" action="show">
-                                <button type="button" class="btn">Cancel</button>
+                            <g:link class="btn btn-dfault" resource="${sourceInstance}" action="show">
+                                Cancel
                             </g:link>
                         </div>
                     </div>

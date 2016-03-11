@@ -19,6 +19,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'extendedAttribute.label', default: 'Extended Attribute')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
+		<asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
+		<asset:stylesheet src="/tokenInput/token-input.css"/>
+		<g:javascript>
+        $(document).ready(function(){
+            $("#allMediaItems").tokenInput("${g.createLink(controller: 'mediaItem', action: 'tokenMediaSearch')}.json", {
+                prePopulate:${mediaForTokenInput.encodeAsRaw()},
+                tokenLimit:1
+			});
+        });
+		</g:javascript>
 	</head>
 	<body>
 		<div id="create-extendedAttribute" class="content scaffold-create" role="main">
@@ -35,8 +45,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <label class="col-md-4 control-label" for="create"></label>
                         <div class="col-md-8">
 					        <g:submitButton name="create" class="btn btn-success" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-                            <g:link class="button" action="index">
-                                <button type="button" class="btn">Cancel</button>
+                            <g:link class="btn btn-default" action="index">
+                                Cancel
                             </g:link>
                         </div>
                     </div>

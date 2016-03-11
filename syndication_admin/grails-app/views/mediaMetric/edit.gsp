@@ -34,8 +34,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 				</fieldset>
 				<fieldset class="buttons">
 					<g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                    <g:link class="button" resource="${mediaMetricInstance}" id="${mediaMetricInstance.id}" action="show">
-                        <button type="button" class="btn">Cancel</button>
+                    <g:link class="btn btn-default" resource="${mediaMetricInstance}" id="${mediaMetricInstance.id}" action="show">
+                        Cancel
                     </g:link>
 				</fieldset>
 			</g:form>

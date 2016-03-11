@@ -19,6 +19,7 @@ import com.ctacorp.syndication.media.MediaItem
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.Cache
 import grails.util.Holders
+import java.util.concurrent.Callable
 
 import java.util.concurrent.TimeUnit
 
@@ -60,6 +61,57 @@ class GuavaCacheService {
         caches.imageCache
     }
 
+    def getExtractedContentCachesForId(def id, String url, Closure c) {
+        def key = Hash.md5("${id}")
+
+        Map map = extractedContentCache.get(key, new Callable<Map>() {
+            @Override
+            public Map call(){
+                // "regenerating full map cache"
+                return [:]
+            }
+        });
+        return getIndividualCacheForId(id, url, map, c, "content")
+    }
+
+    def getImageCachesForId(long id, String url, Closure c) {
+        def key = Hash.md5("${id}")
+
+        Map map = imageCache.get(key, new Callable<Map>() {
+            @Override
+            public Map call(){
+                // "regenerating full map cache"
+                return [:]
+            }
+        });
+        return getIndividualCacheForId(id, url, map, c, "image")
+    }
+
+    def getIndividualCacheForId(def id, String url, def map, Closure c, String cacheName) {
+        def individualKey = Hash.md5(url)
+        if(map."$individualKey" == null) {
+            //execute closure to put the value inside the cached map
+            map."$individualKey" = c()
+            def key  = Hash.md5("${id}")
+            putCache(cacheName, key, map)
+        }
+        return map?."$individualKey"
+    }
+
+    def putCache(String cacheName, def key, def map) {
+        switch(cacheName) {
+            case "response" : apiResponseCache.put(key,map)
+                break;
+            case "content" : extractedContentCache.put(key,map)
+                break;
+            case "image" : imageCache.put(key,map)
+                break;
+            default: log.error("cache for ${cacheName} did not perform a put() correctly")
+                break;
+        }
+
+    }
+
     boolean flushItem(String cacheName, String key){
         log.info "FLUSHING ITEM CACHE: ${key}"
         try{
@@ -99,19 +151,16 @@ class GuavaCacheService {
     }
 
     boolean flushCacheForMediaItemUpdate(Long mediaItemId) {
-        return flushAllCaches()
-        //TODO:Implement better way to handle cache flushes
-//        boolean flushPreview = flushItem("imageCache",Hash.md5("preview/${mediaItemId}?"))
-//        boolean flushThumbnail = flushItem("imageCache",Hash.md5("thumbnail/${mediaItemId}?"))
-//        boolean flushExtractedContent = true
-//        boolean flushApiResponses = flushCache("apiResponseCache")
-//        if(MediaItem.get(mediaItemId)?.getClass()?.toString() == "class com.ctacorp.syndication.media.Html") {
-//            flushExtractedContent = flushCache("extractedContentCache")
-//        }
-//
-//        if(flushApiResponses && flushExtractedContent && flushPreview && flushThumbnail) {
-//            return true
-//        }
-//        return false
+        boolean flushImages = flushItem("imageCache",Hash.md5("${mediaItemId}"))
+        boolean flushExtractedContent = true
+        boolean flushApiResponses = flushCache("apiResponseCache")
+        if(MediaItem.get(mediaItemId)?.getClass()?.toString() == "class com.ctacorp.syndication.media.Html") {
+            flushExtractedContent = flushItem("extractedContentCache",Hash.md5("${mediaItemId}"))
+        }
+
+        if(flushApiResponses && flushExtractedContent && flushImages) {
+            return true
+        }
+        return false
     }
 }

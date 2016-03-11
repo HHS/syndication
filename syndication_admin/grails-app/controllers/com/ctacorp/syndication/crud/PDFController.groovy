@@ -45,16 +45,17 @@ class PDFController {
             return
         }
 
-        render view:'show', model:[ pdfInstance:pdfInstance,
-                                    tags:tagData.tags,
-                                    languages:tagData.languages,
-                                    tagTypes:tagData.tagTypes,
-                                    languageId:params.languageId,
-                                    tagTypeId:params.tagTypeId,
+        render view:'show', model:[ pdfInstance     :pdfInstance,
+                                    tags            :tagData.tags,
+                                    languages       :tagData.languages,
+                                    tagTypes        :tagData.tagTypes,
+                                    languageId      :params.languageId,
+                                    tagTypeId       :params.tagTypeId,
                                     selectedLanguage:tagData.selectedLanguage,
-                                    selectedTagType:tagData.selectedTagType,
-                                    collections: Collection.findAll("from Collection where ? in elements(mediaItems)", [pdfInstance]),
-                                    apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+                                    selectedTagType :tagData.selectedTagType,
+                                    collections     : Collection.findAll("from Collection where ? in elements(mediaItems)", [pdfInstance]),
+                                    apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                    subscriber      :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(pdfInstance)?.subscriberId)
         ]
     }
 

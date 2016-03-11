@@ -49,15 +49,16 @@ class QuestionAndAnswerController {
     def show(QuestionAndAnswer questionAndAnswerInstance) {
         def tagData = tagService.getTagInfoForMediaShowViews(questionAndAnswerInstance, params)
 
-        respond questionAndAnswerInstance, model: [tags            : tagData?.tags,
-                                                   languages       : tagData?.languages,
-                                                   tagTypes        : tagData?.tagTypes,
-                                                   languageId      : params.languageId,
-                                                   tagTypeId       : params.tagTypeId,
-                                                   selectedLanguage: tagData?.selectedLanguage,
-                                                   selectedTagType : tagData?.selectedTagType,
-                                                   collections     : Collection.findAll("from Collection where ? in elements(mediaItems)", [questionAndAnswerInstance]),
-                                                   apiBaseUrl      : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+        respond questionAndAnswerInstance, model: [tags             : tagData?.tags,
+                                                   languages        : tagData?.languages,
+                                                   tagTypes         : tagData?.tagTypes,
+                                                   languageId       : params.languageId,
+                                                   tagTypeId        : params.tagTypeId,
+                                                   selectedLanguage : tagData?.selectedLanguage,
+                                                   selectedTagType  : tagData?.selectedTagType,
+                                                   collections      : Collection.findAll("from Collection where ? in elements(mediaItems)", [questionAndAnswerInstance]),
+                                                   apiBaseUrl       : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                                   subscriber       :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(questionAndAnswerInstance)?.subscriberId)
         ]
     }
 

@@ -1,15 +1,9 @@
-package com.ctacorp.syndication.microsites
+package com.ctacorp.syndication.contentextraction
 
-import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.contact.EmailContact
-import com.ctacorp.syndication.health.HealthReport
 import com.ctacorp.syndication.microsite.FlaggedMicrosite
-import com.ctacorp.syndication.microsite.MediaSelector
 import com.ctacorp.syndication.microsite.MicroSite
 import grails.gsp.PageRenderer
-import grails.transaction.NotTransactional
-import java.util.regex.Pattern
-import java.util.regex.Matcher
 import grails.transaction.Transactional
 
 @Transactional
@@ -20,8 +14,8 @@ class MicrositeFilterService {
     def grailsApplication
 
     def scanAllMicrosites() {
-            MicroSite.list().each { site ->
-                performValidation(site)
+        MicroSite.list().each { site ->
+            performValidation(site)
         }
     }
 
@@ -42,6 +36,14 @@ class MicrositeFilterService {
         fm.delete()
     }
 
+    def validateOnUpdate(MicroSite site) {
+        if(FlaggedMicrosite.findByMicrosite(site)){
+            rescanItem(site.id)
+        } else{
+            performValidation(site)
+        }
+    }
+
     def rescanItem(Long mediaId){
         boolean flag = performValidation(MicroSite.get(mediaId))
         if(!flag){
@@ -53,8 +55,8 @@ class MicrositeFilterService {
         List profanityList = getProfanityMap()
         boolean flag = false
         profanityList.each { word ->
-                def pattern = ~/(^$word(\\.|\s+))|(\s+$word(\\.|\s+))|(\s+$word(\\.|$))|(^$word(\\.|$))/
-                def matcher =  pattern.matcher(site.title)
+            def pattern = ~/(^$word(\\.|\s+))|(\s+$word(\\.|\s+))|(\s+$word(\\.|$))|(^$word(\\.|$))/
+            def matcher =  pattern.matcher(site.title)
 
             if(pattern.matcher(site.title) ||
                     pattern.matcher(site.logoUrl.toString()) ||
@@ -73,7 +75,7 @@ class MicrositeFilterService {
                     pattern.matcher(site?.mediaArea2?.description ?: "")||
                     pattern.matcher(site?.mediaArea3?.header ?: "")||
                     pattern.matcher(site?.mediaArea3?.description ?: ""))
-                        {
+            {
 
                 flag = true
             }

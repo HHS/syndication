@@ -27,7 +27,7 @@ class MediaPreviewThumbnailService {
             return null
         }
         def htmlUrl = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/media/${mi.id}/content?imageFloat=left&imageMargin=0,10,10,0"
-        def imageAndVideoUrl = "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/syndicate.html?thumbnailGeneration=1"
+        def imageAndVideoUrl = "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/syndicate.html"
 
         switch(mi){
             case Html:
@@ -37,12 +37,9 @@ class MediaPreviewThumbnailService {
             case Image:
             case Infographic:
             case Video:
-                savePreview(mi, generatePreview(imageAndVideoUrl))
-                saveThumbnail(mi, generateThumbnail(imageAndVideoUrl))
-                break
             case Tweet:
-                savePreview(mi, generatePreview(imageAndVideoUrl))
-                saveThumbnail(mi, generateThumbnail(imageAndVideoUrl))
+                savePreview(mi, generatePreview(imageAndVideoUrl  + "?previewGeneration=1"))
+                saveThumbnail(mi, generateThumbnail(imageAndVideoUrl + "?thumbnailGeneration=1"))
                 break
             default:
                 log.error("Tried to generate thumbnail for an unsupported media type: ${mi.getClass()}")

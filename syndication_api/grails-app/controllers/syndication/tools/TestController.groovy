@@ -37,26 +37,64 @@ class TestController {
         flash.message = null
     }
 
+    def one(){
+        def sleep = 1 * 60 * 1000
+        Thread.sleep(sleep)
+        render "Done, slept for $sleep"
+    }
+
+    def two(){
+        def sleep = 2 * 60 * 1000
+        Thread.sleep(sleep)
+        render "Done, slept for $sleep"
+    }
+
+    def three(){
+        def sleep = 3 * 60 * 1000
+        Thread.sleep(sleep)
+        render "Done, slept for $sleep"
+    }
+
+    def four(){
+        def sleep = 4 * 60 * 1000
+        Thread.sleep(sleep)
+        render "Done, slept for $sleep"
+    }
+
+    def five(){
+        def sleep = 5 * 60 * 1000
+        Thread.sleep(sleep)
+        render "Done, slept for $sleep"
+    }
+
+    def six(){
+        def sleep = 6 * 60 * 1000
+        Thread.sleep(sleep)
+        render "Done, slept for $sleep"
+    }
+
+    def ten(){
+        def sleep = 10 * 60 * 1000
+        Thread.sleep(sleep)
+        render "Done, slept for $sleep"
+    }
+
     def createStructuredItem(){
-        Html html
+        Html html = new Html(
+                sourceUrl: params.sourceUrl,
+                language: Language.findByIsoCode('eng'),
+                source: Source.first(),
+                name:params.name
+        )
         switch(MediaItem.StructuredContentType."${params.structuredType}"){
-            case BLOG_POST:
-                    html = new Html(
-                            structuredContentType: MediaItem.StructuredContentType.BLOG_POST,
-                            sourceUrl: params.sourceUrl,
-                            language: Language.findByIsoCode('eng'),
-                            source: Source.first(),
-                            name:params.name
-                    )
+            case BLOG_POSTING:
+                    html.structuredContentType = MediaItem.StructuredContentType.BLOG_POSTING
                 break
-            case NEWS_RELEASE:
-                html = new Html(
-                        structuredContentType: MediaItem.StructuredContentType.NEWS_RELEASE,
-                        sourceUrl: params.sourceUrl,
-                        language: Language.findByIsoCode('eng'),
-                        source: Source.first(),
-                        name:params.name
-                )
+            case NEWS_ARTICLE:
+                html.structuredContentType = MediaItem.StructuredContentType.NEWS_ARTICLE
+                break
+            case ARTICLE:
+                html.structuredContentType = MediaItem.StructuredContentType.ARTICLE
                 break
         }
 
@@ -68,7 +106,9 @@ class TestController {
     }
 
     def extractTest(){
-        render contentRetrievalService.extractSyndicatedContent("http://localhost:9090/Slow/connect")
+        def extractionResult = contentRetrievalService.extractSyndicatedContent("http://localhost:9090/Slow/connect")
+        String extractedContent = extractionResult.extractedContent
+        render extractedContent
     }
 
     def redir(){

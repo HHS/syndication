@@ -16,6 +16,7 @@ package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.media.FAQ
 import com.ctacorp.syndication.media.QuestionAndAnswer
+import grails.converters.JSON
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -63,7 +64,8 @@ class ExtendedAttributeController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
     def create() {
-        respond new ExtendedAttribute(params)
+        String mediaForTokenInput = [].collect{ [id:it?.id, name:"$it.id - ${it?.name}"] } as JSON
+        respond new ExtendedAttribute(params), model:[mediaForTokenInput:mediaForTokenInput]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
@@ -76,7 +78,8 @@ class ExtendedAttributeController {
 
         if (extendedAttributeInstance.hasErrors()) {
             flash.errors = extendedAttributeInstance.errors.allErrors.collect{[message:g.message([error : it])]}
-            redirect action: 'create', params:params
+            String mediaForTokenInput = featuredMedia.collect{ [id:it?.id, name:"$it.id - ${it?.name}"] } as JSON
+            redirect action: 'create', params:params, model:[mediaForTokenInput:mediaForTokenInput]
             return
         }
 
@@ -101,8 +104,10 @@ class ExtendedAttributeController {
             response.sendError(404)
             return
         }
-
-        respond extendedAttributeInstance, model:[user:springSecurityService.currentUser]
+        def mediaItem = [extendedAttributeInstance?.mediaItem]
+        String mediaForTokenInput = mediaItem.collect{ [id:it?.id, name:"$it.id - ${it?.name}"] } as JSON
+        println "items: " + mediaForTokenInput
+        respond extendedAttributeInstance, model:[user:springSecurityService.currentUser,mediaForTokenInput:mediaForTokenInput]
     }
 
     @Transactional
@@ -119,7 +124,9 @@ class ExtendedAttributeController {
         
         if (extendedAttributeInstance.hasErrors()) {
             flash.errors = extendedAttributeInstance.errors.allErrors.collect{[message:g.message([error : it])]}
-            redirect action: 'edit', id:extendedAttributeInstance.id, params:[mediaId:params.mediaId]
+            def mediaItem = [extendedAttributeInstance?.mediaItem]
+            String mediaForTokenInput = mediaItem.collect{ [id:it?.id, name:"$it.id - ${it?.name}"] } as JSON
+            redirect action: 'edit', id:extendedAttributeInstance.id, params:[mediaId:params.mediaId], model:[mediaForTokenInput:mediaForTokenInput]
             return
         }
         

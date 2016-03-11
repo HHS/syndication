@@ -13,22 +13,25 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.contentextraction
 
-import com.ctacorp.syndication.media.MediaItem
-import com.ctacorp.syndication.media.PDF
+import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.exception.ContentUnretrievableException
+import grails.converters.JSON
+import grails.transaction.NotTransactional
+import grails.transaction.Transactional
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+@Transactional(readOnly = true)
 class ContentRetrievalService {
-    static transactional = false
-
     def webUtilService
     def jsoupWrapperService
+    def tagsService
 
-    String extractSyndicatedContent(String url, params = [:]) throws ContentUnretrievableException{
+    @NotTransactional
+    Map extractSyndicatedContent(String url, params = [:]) throws ContentUnretrievableException{
         if(url.endsWith("/")){
             url = url[0..-2]
         }
@@ -37,19 +40,88 @@ class ContentRetrievalService {
         String content = null
         try{
             content = webUtilService.getPage(url, params.disableFailFast)
-            return wrap(jsoupWrapperService.extract(content, params), params)
+            String extractedContent = jsoupWrapperService.extract(content, params)
+            def jsonLD = jsoupWrapperService.getJsonLDMetaDataAsJSON(content)
+            return [
+                extractedContent:extractedContent,
+                jsonLD:jsonLD
+            ]
         } catch(ContentUnretrievableException e){
             log.error("Tried to extract content from a bad URL: ${url}\nError: ${e}")
             throw e
         }
-        null
     }
 
+    String addJsonLDMetadata(Long mediaId, String extractedContent){
+        MediaItem mi = MediaItem.read(mediaId)
+        String jsonLdData = buildJsonLdDataString(mi)
+
+        def updatedContent = jsoupWrapperService.updateJsonLD(extractedContent, jsonLdData)
+        updatedContent
+    }
+
+    @NotTransactional
+    String buildJsonLdDataString(MediaItem mi) {
+        String schemaType = ""
+
+        switch(mi){
+            case Html:
+                schemaType = mi.structuredContentType?.prettyName?.replace(" ", "") ?: "Article"
+                break
+            case Image:
+                schemaType = "ImageObject"
+                break
+            case Infographic:
+                schemaType = "ImageObject"
+                break
+            case PDF:
+                schemaType = mi.structuredContentType?.prettyName?.replace(" ", "") ?: "Article"
+                break
+            case Tweet:
+                schemaType = "SocialMediaPosting"
+                break
+            case Video:
+                schemaType = "VideoObject"
+                break
+            case com.ctacorp.syndication.media.Collection:
+                schemaType = "ItemList"
+                break
+        }
+
+        String aboutField = ""
+        String audienceField = ""
+
+        def tags = tagsService.getTagsForMediaId(mi.id)
+        println tags
+        def generalTags = tags.findAll{ it.type.name == "General" && it.language.isoCode == "eng" }.collect{ it.name }
+        def audienceTags = tags.findAll{ it.type.name == "Audience" && it.language.isoCode == "eng" }.collect{ it.name }
+
+        aboutField = generalTags.join(", ")
+        audienceField = audienceTags.join(", ")
+
+        def jsonLdData = [
+                "@context"          : "http://schema.org",
+                "@type"             : schemaType,
+                "headline"          : mi.name,
+                "datePublished"     : mi.dateContentPublished?.format("YYYY-mm-dd'T'HH:mm:ss'Z'") ?: mi.dateSyndicationCaptured.format("YYYY-mm-dd'T'HH:mm:ss'Z'"),
+                "description"       : mi.description,
+                "about"             : aboutField,
+                "audience"          : audienceField,
+                "dateCreated"       : mi.dateSyndicationCaptured.format("YYYY-mm-dd'T'HH:mm:ss'Z'"),
+                "dateModified"      : mi.dateSyndicationUpdated.format("YYYY-mm-dd'T'HH:mm:ss'Z'"),
+                "sourceOrganization": mi.source.name
+        ]
+        (jsonLdData as JSON).toString()
+    }
+
+    @NotTransactional
     Map getContentAndMd5Hashcode(String url, params = [:]){
-        String extracted = extractSyndicatedContent(url, params)
-        [content:extracted, hash:Hash.md5(extracted)]
+        def extractionResult = extractSyndicatedContent(url, params)
+        String extracted = extractionResult.extractedContent
+        [content:extracted, hash:Hash.md5(extracted), jsonLD:extractionResult.jsonLD]
     }
 
+    @NotTransactional
     String getDescriptionFromContent(String content, String sourceUrl){
         String desc = jsoupWrapperService.getMetaDescription(sourceUrl)
         if(!desc) {
@@ -58,6 +130,7 @@ class ContentRetrievalService {
         desc
     }
 
+    @NotTransactional
     String wrapWithSyndicateDiv(String content, MediaItem item = null){
         if(item && item.instanceOf(PDF)){
             return "<div class='syndicate' style='height: 350px;'>${content}</div>"
@@ -66,8 +139,9 @@ class ContentRetrievalService {
         }
     }
 
+
     String addAttributionToExtractedContent(Long mediaId, String content){
-        MediaItem mi = MediaItem.get(mediaId)
+        MediaItem mi = MediaItem.read(mediaId)
         Source src = mi.source
 
         if(!mi || !src){
@@ -75,27 +149,16 @@ class ContentRetrievalService {
         }
 
         String attr = "" +
-            "<div class='syndicate'>" +
-            "<span><Strong>Syndicated Content Details:</strong></span><br/>" +
-            "<span>Source URL: <a href='${mi.sourceUrl}'>${mi.sourceUrl}</a></span><br/>" +
-            "<span>Source Agency: <a href='${src.websiteUrl}'>${src.name} (${src.acronym})</a></span><br/>" +
-            "<span>Captured Date: ${mi.dateSyndicationCaptured}</span><br/>" +
-            "</div>"
+                "<div class='syndicate'>" +
+                "<span><Strong>Syndicated Content Details:</strong></span><br/>" +
+                "<span>Source URL: <a href='${mi.sourceUrl}'>${mi.sourceUrl}</a></span><br/>" +
+                "<span>Source Agency: <a href='${src.websiteUrl}'>${src.name} (${src.acronym})</a></span><br/>" +
+                "<span>Captured Date: ${mi.dateSyndicationCaptured}</span><br/>" +
+                "</div>"
         content + attr
     }
 
-    private String wrap(String content, params){
-        //This looks hella sketchy, are we really doing this anywhere? Looks legacy to me -Steffen
-        if(params.jsonP){
-            StringBuilder sb = new StringBuilder()
-            content.eachLine(){
-                sb.append("document.write('" + it.trim().replace("'","’") + "');\n")
-            }
-            return sb.toString()
-        }
-        content
-    }
-
+    @NotTransactional
     private String removeSuffix(String input) {
         Pattern p = Pattern.compile("http[s]*://.+/(.+\\..+)")
         Matcher m = p.matcher(input)

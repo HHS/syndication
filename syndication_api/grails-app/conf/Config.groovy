@@ -108,7 +108,9 @@ environments {
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = "http://syndication.hhs.gov"
+        if(System.getenv("USING_DOCKER") == "true"){
+            grails.serverURL = "http://docker.local/api"
+        }
     }
 }
 
@@ -313,3 +315,7 @@ springsecurity {
 // Youtube API Keys    \_________________________________________________________________
 //_______________________________________________________________________________________
 google.youtube.apiKey = System.getenv("YOUTUBE_API_KEY")
+
+if(System.getenv("USING_DOCKER") == "true") {
+    syndication.solrService.serverAddress = "http" + (System.getenv("SOLR_PORT_8983_TCP") - "tcp") + "/solr/syndication"
+}

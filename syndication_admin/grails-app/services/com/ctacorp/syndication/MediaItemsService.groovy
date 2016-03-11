@@ -3,6 +3,7 @@ package com.ctacorp.syndication
 import com.ctacorp.syndication.authentication.Role
 import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.authentication.UserRole
+import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.FAQ
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.MediaItem
@@ -10,6 +11,7 @@ import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.health.FlaggedMedia
 import com.ctacorp.syndication.media.QuestionAndAnswer
 import com.ctacorp.syndication.media.Video
+import com.ctacorp.syndication.metric.MediaMetric
 import com.ctacorp.syndication.preview.MediaPreview
 import com.ctacorp.syndication.preview.MediaThumbnail
 import com.ctacorp.syndication.storefront.UserMediaList
@@ -60,6 +62,15 @@ class MediaItemsService {
         if(!mi){
             return
         }
+        //Alternate Images -----------------------------------------------
+        def alternateImages = AlternateImage.where {
+            mediaItem == mi
+        }.list()
+
+        for (altImage in alternateImages) {
+            altImage.delete()
+        }
+
         def campaigns = []
         campaigns.addAll(mi.campaigns ?: [])
 
@@ -76,6 +87,24 @@ class MediaItemsService {
 
         for (collection in collections) {
             collection.removeFromMediaItems(mi)
+        }
+
+        //Extended Attributes -----------------------------------------------
+        def extendedAttributes = ExtendedAttribute.where {
+            mediaItem == mi
+        }.list()
+
+        for (extendedAttr in extendedAttributes) {
+            extendedAttr.delete()
+        }
+
+        //Media Metrics -----------------------------------------------
+        def mediaMetrics = MediaMetric.where {
+            media == mi
+        }.list()
+
+        for (metric in mediaMetrics) {
+            metric.delete()
         }
 
         //User Media Lists ------------------------------------------
@@ -102,6 +131,10 @@ class MediaItemsService {
             }
         }
 
+        if(mi instanceof Collection) {
+            mi.mediaItems = []
+        }
+
         def users = User.where {
             likes {
                 id == mi.id
@@ -121,19 +154,13 @@ class MediaItemsService {
             mediaItem == mi
         }.deleteAll()
 
-        // Media Preview and thumbnails --------------------------------
-        MediaPreview.where {
-            mediaItem == mi
-        }.deleteAll()
-
-        MediaThumbnail.where {
-            mediaItem == mi
-        }.deleteAll()
-
         CachedContent.findByMediaItem(mi)?.delete(flush: true)
         FlaggedMedia.findByMediaItem(mi)?.delete(flush: true)
         MediaItemSubscriber.findByMediaItem(mi)?.delete(flush: true)
-        mi.delete(flush: true)
+
+        MediaItem.where{
+            id == mi.id
+        }.deleteAll()
     }
 
     @Transactional(readOnly = true)
@@ -212,6 +239,7 @@ class MediaItemsService {
         params.sourceUrlContains = params.url
         params.restrictToSet = params.inList
         params.mediaTypes = params.mediaType
+        params.createdByContains = params.createdBy ?: ""
         if (params.order == "desc" && params.sort[0] != '-') {
             params.sort = "-" + params.sort
         }
@@ -270,9 +298,6 @@ class MediaItemsService {
         if (!isValid) {
             log.error("Instance is invalid:\n${mediaItem.errors}")
         }
-        if (isDuplicateUrl(mediaItem)) {
-            mediaItem.errors.rejectValue("sourceUrl", "Duplicate Url", "The Source Url is already in use.")
-        }
 
         mediaItem = updateHash(mediaItem)
 
@@ -321,7 +346,6 @@ class MediaItemsService {
         return mediaItem
     }
 
-    @Transactional
     def scanContentForUpdates() {
         log.info "Daily Html Scan initiated"
         def htmlItems = Html.findAllByManuallyManaged(true)
@@ -344,23 +368,22 @@ class MediaItemsService {
         //remote cache flushed in syndication model MediaItemChangeListener
     }
 
-    @Transactional(readOnly = true)
-    def isDuplicateUrl(MediaItem mediaItem) {
-        if (!mediaItem.id && MediaItem.facetedSearch(sourceUrl: mediaItem.sourceUrl).count() == 1) {
-            return true
-        } else if (mediaItem.id && MediaItem.facetedSearch(sourceUrl: mediaItem.sourceUrl).count() == 2) {
-            return true
+    def resetHash(Long mediaId) {
+        log.info "resetting hash for ${mediaId}"
+        MediaItem mi = MediaItem.get(mediaId)
+        mi.hash = -1
+        if(!mi.validate()){
+            log.error "Couldn't reset hash because: ${mi.errors}"
         }
-        return false
     }
 
-    def resetHash(Long mediaId) {
-        MediaItem mi = MediaItem.get(mediaId)
-        def oldHash = mi.hash
-        mi.hash = null
-        mi = updateHash(mi)
-        mi.save(flush: true)
-        log.info "resetting hash for ${mediaId}\n${oldHash} --> ${mi.hash}"
-        mi
+    def resetDBCache(Long mediaId){
+        log.info "resetting db cached content for for ${mediaId}"
+        MediaItem mi = MediaItem.read(mediaId)
+        if(mi){
+            CachedContent.where{
+                mediaItem == mi
+            }.deleteAll()
+        }
     }
 }

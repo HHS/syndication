@@ -41,7 +41,7 @@
                 <li><a href="http://www.hhs.gov/privacy.html">Privacy Policy</a></li>
                 <li><a href="http://www.hhs.gov/disclaimer.html">Disclaimers</a></li>
                 <li><a href="http://www.hhs.gov/plugins.html">Viewers &amp; Players</a></li>
-                <li class="last"><a href="http://www.hhs.gov/surveyconfirm.html">Site Feedback</a></li>
+                <li class="last"><a href="http://www.hhs.gov/about/careers/index.html">Careers</a></li>
             </ul>
 
             <ul class="links">
@@ -53,7 +53,7 @@
             </ul>
 
             <ul class="links">
-                <li><a href="http://www.hhs.gov/answers/">FAQs</a></li>
+                <li><a href="http://www.hhs.gov/answers/">HHS FAQs</a></li>
                 <li><a href="https://oig.hhs.gov/">Inspector General</a></li>
                 <li><a href="https://forms.oig.hhs.gov/hotlineoperations/">Report Fraud</a></li>
                 <li><a href="http://www.paymentaccuracy.gov">PaymentAccuracy.gov</a></li>

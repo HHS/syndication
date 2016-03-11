@@ -22,10 +22,8 @@ class MediaPreviewThumbnailController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def flush(MediaItem mi) {
         mediaPreviewThumbnailService.generate(mi.id)
-        String key = Hash.md5("thumbnail/${mi.id}?[action:[GET:thumbnail], controller:media, id:${mi.id}]")
-        String previewkey = Hash.md5("preview/${mi.id}?[action:[GET:preview], controller:media, id:${mi.id}]")
+        String key = Hash.md5("${mi.id}")
         remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", key)
-        remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", previewkey)
         flash.message = "The media item's thumbnail and preview images are now being regenerated."
         redirect controller:'mediaItem', action:'show', id: mi.id
     }
@@ -41,10 +39,8 @@ class MediaPreviewThumbnailController {
         def errorCode = System.nanoTime()
         try {
             mediaPreviewThumbnailService.generate(mi.id)
-            String key = Hash.md5("thumbnail/${mi.id}?[action:[GET:thumbnail], controller:media, id:${mi.id}]")
-            String previewkey = Hash.md5("preview/${mi.id}?[action:[GET:preview], controller:media, id:${mi.id}]")
+            String key = Hash.md5("${mi.id}")
             remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", key)
-            remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", previewkey)
             render """<img src="${grails.util.Holders.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/thumbnail.jpg"/>"""
         } catch(e){
             log.error("Error Code: ${errorCode}\n"+e)

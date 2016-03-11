@@ -6,13 +6,13 @@
             function updatePreview() {
                 var url;
                 if("${mediaItemInstance}"){
-                    url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/media/${mediaItemInstance?.id}/embed.json?autoplay=0&" + getQueryString()
+                    url = "${grails.util.Holders.config.syndication.swaggerAddress}/api/v2/resources/media/${mediaItemInstance?.id}/embed.json?autoplay=0&" + getQueryString()
                 } else if("${userMediaListInstance}"){
-                    url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/userMediaLists/${userMediaListInstance?.id}/embed.json?autoplay=0&" + getQueryString()
+                    url = "${grails.util.Holders.config.syndication.swaggerAddress}/api/v2/resources/userMediaLists/${userMediaListInstance?.id}/embed.json?autoplay=0&" + getQueryString()
                 } else if("${renderTagList}"){
-                    url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/tags/${id}/embed.json?autoplay=0&" + getQueryString()
+                    url = "${grails.util.Holders.config.syndication.swaggerAddress}/api/v2/resources/tags/${id}/embed.json?autoplay=0&" + getQueryString()
                 }else if("${renderSourceList}"){
-                    url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/sources/${id}/embed.json?autoplay=0&" + getQueryString()
+                    url = "${grails.util.Holders.config.syndication.swaggerAddress}/api/v2/resources/sources/${id}/embed.json?autoplay=0&" + getQueryString()
                 } else{
                     console.error("Could not find an instance to work with!")
                 }
@@ -25,13 +25,13 @@
             function updateSnippet() {
                 var url;
                 if("${mediaItemInstance}"){
-                    url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/media/${mediaItemInstance?.id}/embed.json?autoplay=0&" + getQueryString()
+                    url = "${grails.util.Holders.config.syndication.swaggerAddress}/api/v2/resources/media/${mediaItemInstance?.id}/embed.json?autoplay=0&" + getQueryString()
                 } else if("${userMediaListInstance}"){
-                    url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/userMediaLists/${userMediaListInstance?.id}/embed.json?autoplay=0&" + getQueryString()
+                    url = "${grails.util.Holders.config.syndication.swaggerAddress}/api/v2/resources/userMediaLists/${userMediaListInstance?.id}/embed.json?autoplay=0&" + getQueryString()
                 } else if("${renderTagList}"){
-                    url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/tags/${id}/embed.json?autoplay=0&" + getQueryString()
+                    url = "${grails.util.Holders.config.syndication.swaggerAddress}/api/v2/resources/tags/${id}/embed.json?autoplay=0&" + getQueryString()
                 }else if("${renderSourceList}"){
-                    url = "${grails.util.Holders.config.syndication.serverUrl + grails.util.Holders.config.syndication.apiPath}/resources/sources/${id}/embed.json?autoplay=0&" + getQueryString()
+                    url = "${grails.util.Holders.config.syndication.swaggerAddress}/api/v2/resources/sources/${id}/embed.json?autoplay=0&" + getQueryString()
                 } else{
                     console.error("Could not find an instance to work with!")
                 }

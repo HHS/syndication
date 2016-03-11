@@ -163,22 +163,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <div class="row">
                 <div class="col-lg-12">
                     <h3>Duplicate Finder</h3>
-                    <g:link action="findDuplicates" class="btn btn-primary">Find Duplicates</g:link>
+                    <g:link action="duplicateFinder" class="btn btn-primary">Find Duplicates</g:link>
                 </div>
-                <g:if test="${duplicates}">
-                    <div class="col-lg-12">
-                        <ul>
-                            <g:each in="${duplicates}" var="dupeSet">
-                                <li><g:link controller="mediaItem" action="show" id="${dupeSet.oldest.id}">${dupeSet.oldest.id}</g:link>: ${dupeSet.oldest.sourceUrl}</li>
-                                <ul>
-                                    <g:each in="${dupeSet.dupes}" var="dupe">
-                                        <li><g:link controller="mediaItem" action="show" id="${dupe.id}">${dupe.id}</g:link>: ${dupe.sourceUrl}</li>
-                                    </g:each>
-                                </ul>
-                            </g:each>
-                        </ul>
-                    </div>
-                </g:if>
             </div>
             <hr/>
             %{--Cache Management ---------------------------------------------------------------------------------------------}%
@@ -186,6 +172,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <div class="col-lg-12">
                     <h3>Cache Flusher</h3>
                     <g:link action="flushAllCaches" class="btn btn-primary">Flush All Caches</g:link>
+                </div>
+            </div>
+            %{--update source url md5 hash ------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Source Url Hashing</h3>
+                    <g:form action="updateSourceUrlHash">
+                        <g:submitButton class="btn btn-primary" name="sourceUrlmd5" value="update sourceUrl md5 hash"/>
+                    </g:form>
                 </div>
             </div>
         </div>

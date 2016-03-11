@@ -20,6 +20,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'alternateImage.label', default: 'Alternate Image')}" />
 		<title><g:message code="default.edit.label" args="[entityName]" /></title>
+		<asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
+		<asset:stylesheet src="/tokenInput/token-input.css"/>
+		<g:javascript>
+        $(document).ready(function(){
+            $("#allMediaItems").tokenInput("${g.createLink(controller: 'mediaItem', action: 'tokenMediaSearch')}.json", {
+                prePopulate:${mediaForTokenInput.encodeAsRaw()},
+                tokenLimit:1
+			});
+        });
+		</g:javascript>
 	</head>
 	<body>
 		<div id="edit-alternateImage" class="content scaffold-edit" role="main">
@@ -38,8 +48,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <label class="col-md-4 control-label" for="update"></label>
                         <div class="col-md-8">
                             <g:actionSubmit id="update" class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                            <g:link class="button" resource="${alternateImageInstance}" action="show" params="[mediaId:params.mediaId]" >
-                                <button type="button" class="btn">Cancel</button>
+                            <g:link class="btn btn-default" resource="${alternateImageInstance}" action="show" params="[mediaId:params.mediaId]" >
+                                Cancel
                             </g:link>
                         </div>
                     </div>

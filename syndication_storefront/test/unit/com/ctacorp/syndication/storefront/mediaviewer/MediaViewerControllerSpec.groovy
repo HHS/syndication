@@ -4,6 +4,7 @@ import com.ctacorp.syndication.Campaign
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.authentication.User
+import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.storefront.ApiService
@@ -25,7 +26,7 @@ class MediaViewerControllerSpec extends Specification {
         controller.apiService = Mock(ApiService)
         Language eng = Language.build(isoCode:"eng")
         4.times{
-            MediaItem.build(language: eng)
+            MediaItem.build(language: eng,sourceUrl: "http://www.example.com/${it}")
         }
         User usr = new User(name:"someName", username: "someEmail@example.com", password:"somePassword").save()
         assert usr

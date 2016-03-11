@@ -60,7 +60,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                                 <td><span class="limited-width-lg ellipse abv60">${fieldValue(bean: videoInstance, field: "description")}</span></td>
 
-                                <td><span class="limited-width-lg ellipse break-url">${fieldValue(bean: videoInstance, field: "sourceUrl")}</span></td>
+                                <td>
+                                    <span class="limited-width-lg ellipse break-url">
+
+                                        <a target="_blank" href="${videoInstance.sourceUrl}">${fieldValue(bean: videoInstance, field: "sourceUrl")}</a>
+
+                                    </span>
+                                </td>
 
                                 <td><g:formatDate date="${videoInstance.dateSyndicationCaptured}"/></td>
 

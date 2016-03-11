@@ -78,7 +78,7 @@ class MicrositeController {
                 def currentCollection = Collection.get(MediaSelector.get(params.int("mediaAreaId")).selectionId)
                 render template: "collections", model:[
                         selectorType:"COLLECTION",
-                        collections: Collection.findAllByLanguage(Language.get(currentCollection?.language.id ?: 1)),
+                        collections: Collection.findAllByLanguageAndActiveAndVisibleInStorefront(Language.get(currentCollection?.language.id ?: 1),true,true),
                         area:params.mediaAreaValue,
                         selectedLanguage:Collection.get(currentCollection.id).language.id,
                         languages:Language.findAllByIsActive(true),

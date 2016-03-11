@@ -96,7 +96,9 @@ environments {
     }
     production {
         grails.logging.jul.usebridge = false
-//        grails.serverURL = "http://tiny.hhs.gov"
+        if(System.getenv("USING_DOCKER") == "true"){
+            grails.serverURL = "http://docker.local/tiny"
+        }
     }
 }
 
@@ -141,3 +143,17 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/**/images/**':                  ['permitAll'],
 	'/**/favicon.ico':                ['permitAll']
 ]
+
+//_________________________________________
+// Default passwords and Auth settings     \_____________________________________________
+//_______________________________________________________________________________________
+springsecurity {
+    tinyUrl{
+        adminUsername = System.getenv('ADMIN_USERNAME')
+        initialAdminPassword = System.getenv('ADMIN_PASSWORD')
+    }
+}
+
+syndication{
+    internalAuthHeader = System.getenv("AUTHORIZATION_HEADER")
+}

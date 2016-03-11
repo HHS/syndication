@@ -82,8 +82,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}"
                             onclick="return confirm('${message(code: 'user.delete.confirm.message', default: 'Are you sure?')}');"/>
             </g:if>
-            <g:link class="button" action="index">
-                <button type="button" class="btn">Cancel</button>
+            <g:link class="btn btn-default" action="index">
+                Cancel
             </g:link>
         </fieldset>
     </g:form>

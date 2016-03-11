@@ -25,11 +25,11 @@
                     </fieldset>
                     <fieldset class="buttons">
                         <g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                        <g:link class="button" id="${PDFInstance.id}" resource="${PDFInstance}" action="show">
-                            <button type="button" class="btn">Cancel</button>
+                        <g:link class="btn btn-dfault" id="${PDFInstance.id}" resource="${PDFInstance}" action="show">
+                            Cancel
                         </g:link>
-                        <g:link controller="mediaPreviewThumbnail" id="${PDFInstance?.id}" action="flush">
-                            <button type="button" class="btn btn-warning pull-right">Regenerate Thumbnail & Preview</button>
+                        <g:link controller="mediaPreviewThumbnail" class="btn btn-warning pull-right" id="${PDFInstance?.id}" action="flush">
+                            Regenerate Thumbnail & Preview
                         </g:link>
                     </fieldset>
                 </g:form>

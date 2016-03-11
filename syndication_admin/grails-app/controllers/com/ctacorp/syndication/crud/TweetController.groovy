@@ -107,7 +107,6 @@ class TweetController {
 
     @NotTransactional
     def saveTweets(Long sourceId){
-        println params
         flash.errors = []
         if(!sourceId){
             flash.errors << [message:"No source selected!"]
@@ -167,15 +166,16 @@ class TweetController {
     def show(Tweet tweetInstance) {
         def tagData = tagService.getTagInfoForMediaShowViews(tweetInstance, params)
 
-        respond tweetInstance, model:[tags:tagData.tags,
-                                            languages:tagData.languages,
-                                            tagTypes:tagData.tagTypes,
-                                            languageId:params.languageId,
-                                            tagTypeId:params.tagTypeId,
+        respond tweetInstance, model:[      tags            :tagData.tags,
+                                            languages       :tagData.languages,
+                                            tagTypes        :tagData.tagTypes,
+                                            languageId      :params.languageId,
+                                            tagTypeId       :params.tagTypeId,
                                             selectedLanguage:tagData.selectedLanguage,
-                                            selectedTagType:tagData.selectedTagType,
-                                            collections: Collection.findAll("from Collection where ? in elements(mediaItems)", [tweetInstance]),
-                                            apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+                                            selectedTagType :tagData.selectedTagType,
+                                            collections     : Collection.findAll("from Collection where ? in elements(mediaItems)", [tweetInstance]),
+                                            apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                            subscriber      :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(tweetInstance)?.subscriberId)
         ]
     }
 

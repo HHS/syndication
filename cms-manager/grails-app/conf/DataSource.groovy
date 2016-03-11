@@ -47,12 +47,12 @@ environments {
     production {
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:mysql://localhost:3306/cms_manager"
+            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('CMS_DB')}"
             driverClassName = 'com.mysql.jdbc.Driver'
             dialect = org.hibernate.dialect.MySQL5InnoDBDialect
             pooled = true
             username = 'root'
-            password = ''
+            password = "${System.getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD')}"
             //noinspection GroovyAssignabilityCheck
             properties {
                 jmxEnabled = true

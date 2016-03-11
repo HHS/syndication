@@ -14,6 +14,7 @@ import grails.plugin.springsecurity.annotation.Secured
 class CarouselController {
     def tagService
     def micrositeService
+    def micrositeFilterService
 
     def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
     def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
@@ -58,6 +59,7 @@ class CarouselController {
             ]
             return
         }
+        micrositeFilterService.performValidation(microSite)
 
         redirect action: "show", id:microSite.id, params:[showAdminControls:true]
     }
@@ -135,6 +137,7 @@ class CarouselController {
                                         microSite:microSite]
             return
         }
+        micrositeFilterService.validateOnUpdate(microSite)
 
         microSite.save(flush: true)
         flash.message = "microsite  Updated!"

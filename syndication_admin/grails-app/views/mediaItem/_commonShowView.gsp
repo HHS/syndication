@@ -35,6 +35,11 @@
     <dd class="word_wrap"><a target="_blank" href="${mediaItemInstance.sourceUrl}"><g:fieldValue bean="${mediaItemInstance}" field="sourceUrl"/></a></dd>
 </g:if>
 
+<g:if test="${mediaItemInstance?.sourceUrlHash && mediaItemInstance.getClass().simpleName != 'Collection'}">
+    <dt class="word_wrap"><g:message code="${mediaType}.sourceUrlHash.label" default="Source Url Hash"/></dt>
+    <dd class="word_wrap"><g:fieldValue bean="${mediaItemInstance}" field="sourceUrlHash"/></dd>
+</g:if>
+
 <g:if test="${mediaItemInstance?.targetUrl}">
     <dt id="targetUrl-label" class="word_wrap"><g:message code="${mediaType}.targetUrl.label" default="Target Url"/></dt>
     <dd class="word_wrap"><a target="_blank" href="${mediaItemInstance?.targetUrl}"><g:fieldValue bean="${mediaItemInstance}" field="targetUrl"/></a></dd>
@@ -59,6 +64,16 @@
     <dt id="language-label" class="word_wrap"><g:message code="${mediaType}.language.label" default="Language"/></dt>
     <dd class="word_wrap">${mediaItemInstance?.language?.encodeAsHTML()}</dd>
 </g:if>
+
+<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
+    <g:if test="${subscriber?.name}">
+        <dt class="word_wrap"><g:message code="${mediaType}.subscriberName.label" default="Subscriber Name"/></dt>
+        <dd class="word_wrap">${subscriber.name}</dd>
+
+        <dt class="word_wrap"><g:message code="${mediaType}.subscriberId.label" default="Subscriber Id"/></dt>
+        <dd class="word_wrap">${subscriber.id}</dd>
+    </g:if>
+</sec:ifAnyGranted>
 
 <g:if test="${mediaItemInstance?.description}">
     <dt class="word_wrap"><g:message code="${mediaType}.description.label" default="Description"/></dt>
@@ -115,7 +130,7 @@
 </g:if>
 
 <g:if test="${mediaItemInstance?.hash}">
-    <dt id="hash-label" class="word_wrap"><g:message code="${mediaType}.hash.label" default="Hash"/></dt>
+    <dt id="hash-label" class="word_wrap"><g:message code="${mediaType}.hash.label" default="Content Hash"/></dt>
     <dd class="word_wrap"><g:fieldValue bean="${mediaItemInstance}" field="hash"/></dd>
 </g:if>
 

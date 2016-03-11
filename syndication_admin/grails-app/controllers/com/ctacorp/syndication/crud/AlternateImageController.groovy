@@ -14,6 +14,7 @@ package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.media.FAQ
 import com.ctacorp.syndication.media.QuestionAndAnswer
+import grails.converters.JSON
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -58,7 +59,8 @@ class AlternateImageController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
     def create() {
-        respond new AlternateImage(params)
+        String mediaForTokenInput = [].collect{ [id:it?.id, name:"$it.id - ${it?.name}"] } as JSON
+        respond new AlternateImage(params), model:[mediaForTokenInput:mediaForTokenInput]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
@@ -71,7 +73,9 @@ class AlternateImageController {
 
         if (alternateImageInstance.hasErrors()) {
             flash.errors = alternateImageInstance.errors.allErrors.collect{[message:g.message([error : it])]}
-            respond alternateImageInstance, view:'create'
+            def featuredMedia = [alternateImageInstance?.mediaItem]
+            String mediaForTokenInput = featuredMedia.collect{ [id:it?.id, name:"${it?.id} - ${it?.name}"] } as JSON
+            respond alternateImageInstance, view:'create', model:[mediaForTokenInput:mediaForTokenInput]
             return
         }
 
@@ -91,8 +95,11 @@ class AlternateImageController {
             response.sendError(404)
             return
         }
+        def mediaItem = [alternateImageInstance?.mediaItem]
+        String mediaForTokenInput = mediaItem.collect{ [id:it?.id, name:"${it?.id} - ${it?.name}"] } as JSON
 
-        respond alternateImageInstance, model:[user:springSecurityService.currentUser]
+        respond alternateImageInstance, model:[user:springSecurityService.currentUser,
+                                               mediaForTokenInput:mediaForTokenInput]
     }
 
     @Transactional
@@ -114,7 +121,10 @@ class AlternateImageController {
                 response.sendError(404)
                 return
             }
-            respond alternateImageInstance, view:'edit', params:[mediaId:params.mediaId, user:springSecurityService.currentUser]
+            def mediaItem = [alternateImageInstance?.mediaItem]
+            String mediaForTokenInput = mediaItem.collect{ [id:it?.id, name:"${it?.id} - ${it?.name}"] } as JSON
+            respond alternateImageInstance, view:'edit', model:[user:springSecurityService.currentUser,
+                                                                 mediaForTokenInput:mediaForTokenInput]
             return
         }
 

@@ -1,5 +1,6 @@
 package com.ctacorp.syndication
 
+import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.media.MediaItem
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -30,7 +31,8 @@ class FeaturedMediaServiceSpec extends Specification {
         assert params != null
         //mediaItem required attributes
         params["name"] = 'someValidName'
-        params["sourceUrl"] = 'http://www.example.com/jhgfjhg'
+        params["sourceUrl"] = params.sourceUrl ?: 'http://www.example.com/jhgfjhg'
+        params["sourceUrlHash"] = Hash.md5(params.sourceUrl ?: "")
         params["language"] = new Language()
         params["source"] = new Source()
         params
@@ -96,9 +98,9 @@ class FeaturedMediaServiceSpec extends Specification {
 
     def "clear deletes all featuredMedia items"() {
         setup:"multiple featured media items"
-            def mi = new MediaItem(populateValidParams()).save(flush:true)
-            def mi2 = new MediaItem(populateValidParams()).save(flush:true)
-            def mi3 = new MediaItem(populateValidParams()).save(flush:true)
+            def mi = new MediaItem(populateValidParams(sourceUrl: 'http://www.example.com/1')).save(flush:true)
+            def mi2 = new MediaItem(populateValidParams(sourceUrl: 'http://www.example.com/2')).save(flush:true)
+            def mi3 = new MediaItem(populateValidParams(sourceUrl: 'http://www.example.com/3')).save(flush:true)
             new FeaturedMedia([mediaItem:mi]).save()
             new FeaturedMedia([mediaItem:mi2]).save()
             new FeaturedMedia([mediaItem:mi3]).save()

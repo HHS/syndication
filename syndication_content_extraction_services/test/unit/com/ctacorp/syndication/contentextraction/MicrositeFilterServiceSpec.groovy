@@ -1,4 +1,4 @@
-package com.ctacorp.syndication.microsites
+package com.ctacorp.syndication.contentextraction
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification

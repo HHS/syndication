@@ -20,6 +20,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'extendedAttribute.label', default:'Extended Attribute')}" />
 		<title><g:message code="default.edit.label" args="[entityName]" /></title>
+		<asset:javascript src="/tokenInput/jquery.tokeninput.js"/>
+		<asset:stylesheet src="/tokenInput/token-input.css"/>
+		<g:javascript>
+        $(document).ready(function(){
+            $("#allMediaItems").tokenInput("${g.createLink(controller: 'mediaItem', action: 'tokenMediaSearch')}.json", {
+                prePopulate:${mediaForTokenInput.encodeAsRaw()},
+                tokenLimit:1
+			});
+        });
+		</g:javascript>
 	</head>
 	<body>
 		<div id="edit-extendedAttribute" class="content scaffold-edit" role="main">
@@ -38,8 +48,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <label class="col-md-4 control-label" for="edit"></label>
                         <div class="col-md-8">
 					        <g:actionSubmit id="edit" class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                            <g:link class="button" params="[mediaId:params.mediaId]" id="${extendedAttributeInstance.id}" resource="${extendedAttributeInstance}" action="show">
-                                <button type="button" class="btn">Cancel</button>
+                            <g:link class="btn btn-default" params="[mediaId:params.mediaId]" id="${extendedAttributeInstance.id}" resource="${extendedAttributeInstance}" action="show">
+                                Cancel
                             </g:link>
                         </div>
                     </div>

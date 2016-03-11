@@ -41,9 +41,11 @@ class HtmlMarshaller {
             def mediaType
 
             switch (h.structuredContentType){
-                case BLOG_POST: mediaType = "BlogPost"
+                case BLOG_POSTING: mediaType = "BlogPosting"
                     break
-                case NEWS_RELEASE: mediaType = "NewsRelease"
+                case NEWS_ARTICLE: mediaType = "NewsArticle"
+                    break
+                case ARTICLE: mediaType = "Article"
                     break
                 default: mediaType = "Html"
             }

@@ -10,8 +10,7 @@
 <head>
     <title>User info</title>
     <meta name="layout" content="main"/>
-    <r:require module="jquery"/>
-    <g:javascript>
+    <script>
         $(document).ready(function(){
             $("#verifyPassword").on('input', function(){
                 if(!($("#verifyPassword").val() === $("#password").val())){
@@ -23,7 +22,7 @@
                 }
             })
         });
-    </g:javascript>
+    </script>
 </head>
 
 <body>

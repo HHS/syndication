@@ -54,15 +54,16 @@ class HtmlController {
     def show(Html htmlInstance) {
         def tagData = tagService.getTagInfoForMediaShowViews(htmlInstance, params)
 
-        respond htmlInstance, model: [tags            : tagData?.tags,
-                                      languages       : tagData?.languages,
-                                      tagTypes        : tagData?.tagTypes,
-                                      languageId      : params.languageId,
-                                      tagTypeId       : params.tagTypeId,
-                                      selectedLanguage: tagData?.selectedLanguage,
-                                      selectedTagType : tagData?.selectedTagType,
-                                      collections: Collection.findAll("from Collection where ? in elements(mediaItems)", [htmlInstance]),
-                                      apiBaseUrl      : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+        respond htmlInstance, model: [tags              : tagData?.tags,
+                                      languages         : tagData?.languages,
+                                      tagTypes          : tagData?.tagTypes,
+                                      languageId        : params.languageId,
+                                      tagTypeId         : params.tagTypeId,
+                                      selectedLanguage  : tagData?.selectedLanguage,
+                                      selectedTagType   : tagData?.selectedTagType,
+                                      collections       : Collection.findAll("from Collection where ? in elements(mediaItems)", [htmlInstance]),
+                                      apiBaseUrl        : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                      subscriber        : cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(htmlInstance)?.subscriberId)
         ]
     }
 

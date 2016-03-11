@@ -27,7 +27,7 @@ import javax.annotation.PostConstruct
 class TagsService {
     String serverAddress
     RestBuilder rest = new RestBuilder()
-    def authorizationService
+    def grailsApplication
 
     @PostConstruct
     void init() {
@@ -71,9 +71,17 @@ class TagsService {
         String body = [syndicationId:instance.id,
                        url:instance.sourceUrl,
                        tagIds:tagIds] as JSON
-        def resp = authorizationService.post(body.toString(), "${serverAddress}/tags/tagSyndicatedItemByTagIds")
 
-        return resp
+        def resp = rest.post("${serverAddress}/tags/tagSyndicatedItemByTagIds") {
+            header 'Date', new Date().toString()
+            header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+            header 'Content-Type', "application/json;charset=UTF-8"
+            accept 'application/json'
+
+            json body
+        }
+
+        return resp.json
     }
 
     @NotTransactional
@@ -104,8 +112,16 @@ class TagsService {
                        tagName:tagName,
                        languageId:languageId,
                        typeId:typeId] as JSON
-        def resp = authorizationService.post(body.toString(), "${serverAddress}/tags/tagSyndicatedItemByTagName")
-        resp
+        def resp = rest.post("${serverAddress}/tags/tagSyndicatedItemByTagName") {
+            header 'Date', new Date().toString()
+            header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+            header 'Content-Type', "application/json;charset=UTF-8"
+            accept 'application/json'
+
+            json body
+        }
+
+        resp.json
     }
 
     @NotTransactional

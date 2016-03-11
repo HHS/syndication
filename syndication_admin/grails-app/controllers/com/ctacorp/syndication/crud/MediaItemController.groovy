@@ -12,6 +12,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
+import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.Language
@@ -25,6 +26,7 @@ class MediaItemController {
     def tagService
     def mediaItemsService
     def springSecurityService
+    def cmsManagerKeyService
     RestBuilder rest = new RestBuilder()
 
     def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id}
@@ -107,6 +109,7 @@ class MediaItemController {
     def search(){
         params.max = params.max ?: 15
         def mediaItems = null
+        def subscriberList = null
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
             params.inList = publisherItems().join(",")
             if(params.inList){
@@ -114,7 +117,11 @@ class MediaItemController {
             }
 
         } else {
+            if(params.subscriberId){
+                params.inList = MediaItemSubscriber?.findAllBySubscriberId(params.int("subscriberId") ?: 0)?.id?.toString()?.replace("[","")?.replace("]","") ?: "-1"
+            }
             mediaItems = mediaItemsService.findMediaByAll(params)
+            subscriberList = cmsManagerKeyService.listSubscribers()
         }
 
         render view:"search", model:[mediaItemInstanceList:mediaItems,
@@ -126,7 +133,13 @@ class MediaItemController {
                                      languageList:Language.findAllByIsActive(true),
                                      language:params.language,
                                      mediaTypeList:mediaItemsService.getMediaTypes(),
-                                     mediaType:params.mediaType]
+                                     mediaType:params.mediaType,
+                                     subscriberList:subscriberList,
+                                     subscriberId:params.subscriberId,
+                                     sourceList:Source.list(),
+                                     sourceId:params.sourceId,
+                                     createdBy:params.createdBy
+        ]
     }
 
     @Secured(['ROLE_ADMIN'])
@@ -184,6 +197,14 @@ class MediaItemController {
     @Secured(['ROLE_ADMIN'])
     def resetHash(Long id){
         mediaItemsService.resetHash(id)
+        flash.message = "Hash cleared for item ${id}"
+        redirect action: "show", id:id
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def resetDBCache(Long id){
+        mediaItemsService.resetDBCache(id)
+        flash.message = "Database cache reset for item ${id}"
         redirect action: "show", id:id
     }
 }

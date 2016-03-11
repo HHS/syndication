@@ -88,7 +88,15 @@ class TinyUrlService {
     def createMapping(String targetUrl, Long syndicationId, String guid) {
         try {
             String body = ([targetUrl: targetUrl, syndicationId: syndicationId, guid: guid] as JSON).toString()
-            return authorizationService.post(body, tServer)
+            def resp = rest.post(tServer) {
+                header 'Date', new Date().toString()
+                header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+                header 'Content-Type', "application/json;charset=UTF-8"
+                accept 'application/json'
+
+                json body
+            }
+            return resp.json
         } catch (e) {
             log.error e.getMessage()
         }

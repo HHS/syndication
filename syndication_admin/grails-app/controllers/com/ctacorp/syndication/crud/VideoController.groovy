@@ -53,15 +53,16 @@ class VideoController {
     def show(Video videoInstance) {
         def tagData = tagService.getTagInfoForMediaShowViews(videoInstance, params)
 
-        respond videoInstance, model:[tags:tagData.tags,
-                                            languages:tagData.languages,
-                                            tagTypes:tagData.tagTypes,
-                                            languageId:params.languageId,
-                                            tagTypeId:params.tagTypeId,
+        respond videoInstance, model:[      tags            :tagData.tags,
+                                            languages       :tagData.languages,
+                                            tagTypes:       tagData.tagTypes,
+                                            languageId      :params.languageId,
+                                            tagTypeId       :params.tagTypeId,
                                             selectedLanguage:tagData.selectedLanguage,
-                                            selectedTagType:tagData.selectedTagType,
-                                            collections: Collection.findAll("from Collection where ? in elements(mediaItems)", [videoInstance]),
-                                            apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+                                            selectedTagType :tagData.selectedTagType,
+                                            collections     : Collection.findAll("from Collection where ? in elements(mediaItems)", [videoInstance]),
+                                            apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                            subscriber      :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(videoInstance)?.subscriberId)
         ]
     }
 

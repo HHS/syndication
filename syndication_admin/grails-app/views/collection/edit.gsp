@@ -24,7 +24,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <g:javascript>
         $(document).ready(function(){
             $("#allMediaItems").tokenInput("${g.createLink(controller: 'mediaItem', action: 'tokenMediaSearch')}.json", {
-                prePopulate:${collectionMediaForTokenInput.encodeAsRaw()}
+                prePopulate:${mediaForTokenInput.encodeAsRaw()}
             });
         });
         </g:javascript>
@@ -45,8 +45,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 							</fieldset>
 							<fieldset class="buttons">
 								<g:actionSubmit class="btn btn-default btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-								<g:link class="button" id="${collectionInstance.id}" resource="${collectionInstance}" action="show">
-									<button type="button" class="btn">Cancel</button>
+								<g:link class="btn btn-default" id="${collectionInstance.id}" resource="${collectionInstance}" action="show">
+									Cancel
 								</g:link>
 							</fieldset>
 						</g:form>

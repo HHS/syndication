@@ -1,6 +1,4 @@
-<g:if test="${thumbnailGeneration == true || previewGeneration == true}">
-    <g:set var="width" value="${thumbnailGeneration ? 250 : 1024}"/>
-    <g:set var="height" value="${thumbnailGeneration ? 188 : 768}"/>
+<g:if test="${thumbnailGeneration || previewGeneration}">
     <!DOCTYPE html>
     <html>
         <head>
@@ -19,9 +17,7 @@
             </style>
         </head>
         <body>
-
             <div class="preview-container"><img id="previewImage" src='${img.sourceUrl}' alt='${img.altText}'/></div>
-             <h1>${width}</h1>
             <script type="text/javascript">
                 var img = document.getElementById('previewImage');
                 img.onload = function() {

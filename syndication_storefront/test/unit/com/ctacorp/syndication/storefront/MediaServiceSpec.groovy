@@ -24,7 +24,7 @@ class MediaServiceSpec extends Specification {
 
     def setup() {
         service.grailsApplication = [domainClasses: [[clazz: Html]]]
-        def mi1 = new MediaItem(name: "Some Item", description: "scared from ebola", sourceUrl: "http://www.example.com/jhgfjhg", language: new Language(), source: new Source()).save(flush: true)
+        def mi1 = new MediaItem(name: "Some Item", description: "scared from ebola", sourceUrl: "http://www.example.com/1", language: new Language(), source: new Source()).save(flush: true)
         RestBuilder.metaClass.get = { String s -> [json: [results: mi1]] }
     }
 
@@ -33,8 +33,8 @@ class MediaServiceSpec extends Specification {
 
     def "get featured media"() {
         given: "items that are featured"
-            def mi1 = new MediaItem(name: "Some Item", sourceUrl: "http://www.example.com/jhgfjhg", language: new Language(), source: new Source()).save(flush: true)
-            def mi2 = new MediaItem(name: "Some Item2", sourceUrl: "http://www.example.com/fdfdfdf", language: new Language(), source: new Source()).save(flush: true)
+            def mi1 = new MediaItem(name: "Some Item", sourceUrl: "http://www.example.com/2", language: new Language(), source: new Source()).save(flush: true)
+            def mi2 = new MediaItem(name: "Some Item2", sourceUrl: "http://www.example.com/3", language: new Language(), source: new Source()).save(flush: true)
             new FeaturedMedia(mediaItem: mi1).save(flush: true)
             new FeaturedMedia(mediaItem: mi2).save(flush: true)
 
@@ -49,7 +49,7 @@ class MediaServiceSpec extends Specification {
         when: "get mediaTypes is called"
             def types = service.getMediaTypes()*.name
         then: "list all of the current types"
-            types == ["Blog Post", "Html", "News Release"]
+            types == ["Article", "BlogPosting", "Html", "NewsArticle"]
     }
 
     def "findMediaByAll should find media by multiple criteria"() {

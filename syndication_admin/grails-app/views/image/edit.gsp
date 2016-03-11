@@ -37,11 +37,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 							</fieldset>
 							<fieldset class="buttons">
 								<g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-								<g:link class="button" id="${imageInstance.id}" resource="${imageInstance}" action="show">
-									<button type="button" class="btn">Cancel</button>
+								<g:link class="btn btn-default" id="${imageInstance.id}" resource="${imageInstance}" action="show">
+									Cancel
 								</g:link>
-                                <g:link controller="mediaPreviewThumbnail" id="${imageInstance?.id}" action="flush">
-                                    <button type="button" class="btn btn-warning pull-right">Regenerate Thumbnail & Preview</button>
+                                <g:link controller="mediaPreviewThumbnail" class="btn btn-warning pull-right" id="${imageInstance?.id}" action="flush">
+                                    Regenerate Thumbnail & Preview
                                 </g:link>
 							</fieldset>
 						</g:form>

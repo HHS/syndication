@@ -15,13 +15,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.rest
 
-import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.commons.util.Util
 import com.ctacorp.syndication.data.CampaignHolder
 import com.ctacorp.syndication.data.SourceHolder
 import com.ctacorp.syndication.data.TagHolder
-import com.ctacorp.syndication.marshal.QuestionAndAnswerMarshaller
+import com.ctacorp.syndication.jobs.DelayedTaggingJob
 import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.storefront.UserMediaList
 import grails.transaction.NotTransactional
@@ -36,7 +35,6 @@ import com.ctacorp.syndication.exception.UnauthorizedException
 import org.hibernate.NonUniqueResultException
 
 import java.security.MessageDigest
-import java.util.concurrent.Callable
 
 @Transactional
 class MediaService {
@@ -64,10 +62,20 @@ class MediaService {
     String renderImage(Image img, params){
         boolean thumbnailGeneration = Util.isTrue(params.thumbnailGeneration)
         boolean previewGeneration = Util.isTrue(params.previewGeneration)
+        def width
+        def height
 
-        String content = groovyPageRenderer.render(template: "/media/imageView", model:[img:img, thumbnailGeneration:thumbnailGeneration, previewGeneration:previewGeneration])
+        if(thumbnailGeneration){
+            width = 250
+            height = 188
+        } else if(previewGeneration){
+            width = 1024
+            height = 768
+        }
+
+        String content = groovyPageRenderer.render(template: "/media/imageView", model:[img:img, width:width, height:height, thumbnailGeneration:thumbnailGeneration, previewGeneration:previewGeneration])
         content = contentRetrievalService.wrapWithSyndicateDiv(content)
-        if(!thumbnailGeneration){
+        if(!thumbnailGeneration && !previewGeneration){
             content = contentRetrievalService.addAttributionToExtractedContent(img.id, content)
             content += analyticsService.getGoogleAnalyticsString(img, params)
         }
@@ -376,32 +384,30 @@ class MediaService {
             keyParts.remove("controllerContext")
             keyParts.remove("newUrlBase")
 
-            String key = Hash.md5(mi.sourceUrl + keyParts.sort().toString())
+            Closure getContent = {
+                log.info "cache miss: ${keyParts}"
+                Map extractedContentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mi.sourceUrl, params)
+                String extractedContent = extractedContentAndHash.content
+                String newHash = extractedContentAndHash.hash
+                def lastKnownGood = contentCacheService.get(mi)
 
-            String extractedContent = guavaCacheService.extractedContentCache.get(key, new Callable<String>() {
-                @Override
-                public String call(){
-                    log.info "cache miss: ${keyParts}"
-                    Map extractedContentAndHash = contentRetrievalService.getContentAndMd5Hashcode(mi.sourceUrl, params)
-                    String extractedContent = extractedContentAndHash.content
-                    String newHash = extractedContentAndHash.hash
-                    def lastKnownGood = contentCacheService.get(mi)
-
-                    if(!extractedContent){
-                        if(lastKnownGood && lastKnownGood.content){
-                            extractedContent = lastKnownGood.content
-                        } else {
-                            throw new ContentNotExtractableException("There is no syndicated markup/content found!")
-                            return
-                        }
-                    } else{ //Else update the lastKnownGood if it's out of date
-                        if(!lastKnownGood || lastKnownGood.mediaItem.hash != newHash){
-                            contentCacheService.cache(mi.id, extractedContent)
-                        }
+                if(!extractedContent){
+                    if(lastKnownGood && lastKnownGood.content){
+                        extractedContent = lastKnownGood.content
+                    } else {
+                        throw new ContentNotExtractableException("There is no syndicated markup/content found!")
+                        return
                     }
-                    extractedContent
+                } else{ //Else update the lastKnownGood if it's out of date
+                    if(!lastKnownGood || lastKnownGood.mediaItem.hash != newHash){
+                        contentCacheService.cache(mi.id, extractedContent)
+                    }
                 }
-            });
+                extractedContent
+            }
+
+            String extractedContent = guavaCacheService.getExtractedContentCachesForId(mi.id,mi.sourceUrl + keyParts.sort().toString(), getContent)
+            extractedContent = contentRetrievalService.addJsonLDMetadata(mi.id, extractedContent)
             extractedContent = contentRetrievalService.addAttributionToExtractedContent(mi.id, extractedContent)
             extractedContent += analyticsService.getGoogleAnalyticsString(mi, params)
             return extractedContent
@@ -417,7 +423,7 @@ class MediaService {
         }
 
         MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(collectionInstance)
-        
+
         collectionInstance.manuallyManaged = false
         collectionInstance.save(flush: true)
         mediaItemSubscriber.save()
@@ -441,15 +447,18 @@ class MediaService {
     private generalMediaItemLoader = { MediaItem item ->
         def result
         try {
+            def sourceUrlHash = Hash.md5(item.sourceUrl)
             result = MediaItem.createCriteria().get {
-                eq 'sourceUrl', item.sourceUrl
+                eq 'sourceUrlHash', sourceUrlHash
 
                 lock true
             }
-        } catch (NonUniqueResultException){
+        } catch (NonUniqueResultException e){
             log.error("Found Duplicate SourceURL! ${item.sourceUrl}")
+            throw e
         } catch(e){
             log.error e
+            throw e
         }
         result
     }
@@ -457,23 +466,33 @@ class MediaService {
     def saveHtml(Html htmlInstance, params) throws ContentNotExtractableException, ContentUnretrievableException{
         //Extract the content (or try to)
         params.disableFailFast = true
-        def contentAndHash = contentRetrievalService.getContentAndMd5Hashcode(htmlInstance.sourceUrl, params)
+
+        //Special treatment for HHS until app-wide cache busting feature is added
+        def cacheBuster = ""
+        def uri = new URI(htmlInstance.sourceUrl)
+        if(uri.authority.toLowerCase().contains("hhs.gov")){
+            cacheBuster = "syndicationCacheBuster=${System.nanoTime()}"
+            if(uri.query){
+                cacheBuster = "&${cacheBuster}"
+            } else{
+                if(!htmlInstance.sourceUrl.endsWith("?")){
+                    cacheBuster = "?${cacheBuster}"
+                }
+            }
+        }
+
+        def contentAndHash = contentRetrievalService.getContentAndMd5Hashcode(htmlInstance.sourceUrl + cacheBuster, params)
         if (!contentAndHash.content) { //Extraction failed
             log.error("Could not extract content, page was found but not marked up at url: ${htmlInstance.sourceUrl}")
             throw new ContentNotExtractableException("Could not extract content, page was found but not marked up at url: ${htmlInstance.sourceUrl}")
         } else { // Content extracted fine, can we save?
             htmlInstance.hash = contentAndHash.hash
 
+            updateDataFromJsonLD(htmlInstance, contentAndHash)
+
             //Try to add a meaningful description if one isn't provided
             if(!htmlInstance.description){
-                try {
-                    String desc = contentRetrievalService.getDescriptionFromContent(contentAndHash.content, htmlInstance.sourceUrl)
-                    if(desc){
-                        htmlInstance.description = desc
-                    }
-                } catch(e){
-                    log.error(e)
-                }
+                loadDescription(htmlInstance, contentAndHash)
             }
 
             htmlInstance = createOrUpdateMediaItem(htmlInstance, generalMediaItemLoader, contentAndHash) as Html      //load or update and existing record if it exists
@@ -481,7 +500,84 @@ class MediaService {
         if(contentAndHash.content) {
             contentCacheService.cache(htmlInstance.id, contentAndHash.content)
         }
+
+        try {
+            def addTags = false
+            def tagDetails = []
+            if (contentAndHash?.jsonLD?.about) {
+                def tags = contentAndHash.jsonLD.about.split(",").collect { it.trim() }
+                tags.each {
+                    tagDetails << [name: it, typeId: 1, languageId: 1]
+                }
+                addTags = true
+            }
+            if(contentAndHash?.jsonLD?.audience){
+                def tags = contentAndHash.jsonLD.audience.split(",").collect { it.trim() }
+                tags.each {
+                    tagDetails << [name: it, typeId: 3, languageId: 1]
+                }
+                addTags = true
+            }
+
+            if(addTags)
+                DelayedTaggingJob.schedule(new Date(System.currentTimeMillis() + 5000), [mediaId:htmlInstance.id, requestJson:tagDetails, methodName:"tagMediaItemByNamesAndLanguageAndType"])
+        }catch (e){
+            log.error "Tagging media item from json/LD failed. Tags were: ${contentAndHash?.jsonLD?.about}. Error was: \n${e}"
+        }
+
         htmlInstance
+    }
+
+    private updateDataFromJsonLD(Html html, Map contentAndHash){
+        if(contentAndHash.jsonLD){
+            def jsonLD = contentAndHash.jsonLD
+            def structuredType = lookupStructuredType(jsonLD."@type")
+            if(structuredType) {
+                html.structuredContentType = structuredType
+            }
+            html.name = jsonLD.headline
+            html.description = jsonLD.description
+            if(jsonLD.sourceOrganization) {
+                html.createdBy = jsonLD.sourceOrganization
+            } else if(jsonLD.creator){
+                html.createdBy = jsonLD.sourceOrganization
+            }
+
+            try{
+                String dateFormat = "yyyy-MM-dd HH:mm:ss"
+                if(jsonLD.datePublished){
+                    html.dateContentPublished = Date.parse(dateFormat, jsonLD.datePublished)
+                }
+                if(jsonLD.dateCreated){
+                    html.dateContentAuthored = Date.parse(dateFormat, jsonLD.dateCreated)
+                }
+                if(jsonLD.dateModified){
+                    html.dateContentUpdated = Date.parse(dateFormat, jsonLD.dateModified)
+                }
+            }catch(ignored){
+                log.warn "Parsing date on JSONLD payload failed and will be ignored: datePublished: ${jsonLD.datePublished}, dateCreated: ${jsonLD.dateCreated}, dateModified: ${jsonLD.dateModified}"
+            }
+        }
+    }
+
+    private MediaItem.StructuredContentType lookupStructuredType(String name){
+        for(structuredType in MediaItem.StructuredContentType.values()){
+            if("${structuredType.prettyName}" == "${name}"){
+                return structuredType
+            }
+        }
+        null
+    }
+
+    private loadDescription(htmlInstance, contentAndHash){
+        try {
+            String desc = contentRetrievalService.getDescriptionFromContent(contentAndHash.content, htmlInstance.sourceUrl)
+            if(desc){
+                htmlInstance.description = desc
+            }
+        } catch(e){
+            log.error(e)
+        }
     }
 
     Image saveImage(Image imageInstance) {
@@ -531,7 +627,7 @@ class MediaService {
     def MediaItem createOrUpdateMediaItem(MediaItem item, Closure mediaFinder, Map contentAndHash = [:]){
         boolean savetoDB = true
         MediaItem existing = mediaFinder(item)
-        
+
         if (existing) {
             def result = updateMediaItem(existing, item)
             // -- media type specific updates here --

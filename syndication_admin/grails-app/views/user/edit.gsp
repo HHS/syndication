@@ -48,7 +48,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <g:hiddenField name="version" value="${userInstance?.version}"/>
                     <g:render template="form"/>
                     <g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}"/>
-                    <g:link class="button" action="show" resource="${userInstance}" value="Cancel"><button type="button" class="btn">Cancel</button></g:link>
+                    <g:link class="btn btn-default" action="show" resource="${userInstance}" value="Cancel">Cancel</g:link>
             </g:form>
         </div>
         <div class="hidden-lg hidden-md col-sm-12"><br></div>

@@ -35,8 +35,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 					</fieldset>
 					<fieldset class="buttons">
 						<g:submitButton name="create" class="btn btn-success" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-						<g:link class="button" action="index">
-							<button type="button" class="btn">Cancel</button>
+						<g:link class="btn btn-default" action="index">
+							Cancel
 						</g:link>
 					</fieldset>
 				</g:form>
