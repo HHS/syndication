@@ -41,7 +41,7 @@ class FAQController {
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         def indexResponse = mediaItemsService.getIndexResponse(params, FAQ)
-        respond indexResponse.mediaItemList, model: [faqInstanceCount: indexResponse.mediaItemInstanceCount]
+        respond indexResponse.mediaItemList, model: [faqInstanceCount: indexResponse.mediaItemInstanceCount, mediaType:"FAQ"]
     }
 
     def show(FAQ faqInstance) {

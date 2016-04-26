@@ -35,7 +35,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <label class="col-md-4 control-label" for="create"></label>
                         <div class="col-md-8">
 					        <g:submitButton name="create" class="btn btn-success" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-                            <g:link class="btn btn-dfault" action="index">
+                            <g:link class="btn btn-default" action="index">
                                 Cancel
                             </g:link>
                         </div>

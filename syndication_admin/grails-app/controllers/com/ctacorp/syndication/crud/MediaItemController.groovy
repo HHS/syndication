@@ -35,7 +35,7 @@ class MediaItemController {
         MediaItem mi = MediaItem.read(id)
         flash.error = flash.error
         flash.message = flash.message
-        redirect controller: "${mi.getClass().simpleName}", action:"show", id:id, model:["${getInstanceName(mi.getClass().simpleName)}":mi]
+        redirect controller: "${mi.getClass().simpleName}", action:"show", id:id, model:["${getInstanceName(mi.getClass().simpleName)}":mi], params:params
     }
 
     private String getInstanceName(String input){
@@ -118,7 +118,7 @@ class MediaItemController {
 
         } else {
             if(params.subscriberId){
-                params.inList = MediaItemSubscriber?.findAllBySubscriberId(params.int("subscriberId") ?: 0)?.id?.toString()?.replace("[","")?.replace("]","") ?: "-1"
+                params.inList = MediaItemSubscriber?.findAllBySubscriberId(params.int("subscriberId") ?: 0)?.mediaItem?.id?.toString()?.replace("[","")?.replace("]","") ?: "-1"
             }
             mediaItems = mediaItemsService.findMediaByAll(params)
             subscriberList = cmsManagerKeyService.listSubscribers()
@@ -138,7 +138,8 @@ class MediaItemController {
                                      subscriberId:params.subscriberId,
                                      sourceList:Source.list(),
                                      sourceId:params.sourceId,
-                                     createdBy:params.createdBy
+                                     createdBy:params.createdBy,
+                                     max: params.max
         ]
     }
 

@@ -26,6 +26,10 @@ class WebUtilService {
         try{
             content = getContentFromUrl(url, disableFailFast)
         }catch (e){
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            log.error "There was an exception when trying to download content from the url ${url}. Falling back to saved version if possible. Exception trace: ${sw.toString()}"
             CachedContent cached = contentCacheService.get(url)
             if(!cached){
                 throw new ContentUnretrievableException("Could not load content located at ${url} from original location or cache.")
@@ -41,7 +45,9 @@ class WebUtilService {
             return null
         }
 
-        HttpURLConnection con = (HttpURLConnection) (new URL(url).openConnection());
+        def cacheBuster = contentCacheService.getCacheBuster(url)
+
+        HttpURLConnection con = (HttpURLConnection) (new URL(url+cacheBuster).openConnection());
         if(disableFailFast) {
             con.setConnectTimeout(1000 * 60 * 5) //5 min
             con.setReadTimeout(1000 * 60 * 5)

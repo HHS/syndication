@@ -1,5 +1,3 @@
-package com.ctacorp.syndication
-
 /*
 Copyright (c) 2014-2016, Health and Human Services - Web Communications (ASPA)
  All rights reserved.
@@ -12,6 +10,7 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package com.ctacorp.syndication
 
 import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import com.icegreen.greenmail.imap.AuthorizationException
@@ -24,18 +23,17 @@ import javax.annotation.PostConstruct
 
 class AuthorizationService {
     static transactional = false
-
-    def grailsApplication
-
+    
     private AuthorizationHeaderGenerator generator
     private AuthorizationHeaderGenerator.KeyAgreement keyAgreement
     def config = Holders.config
 
     @PostConstruct
     void init() {
-        String privateKey = grailsApplication.config.cmsManager.privateKey
-        String publicKey = grailsApplication.config.cmsManager.publicKey
-        String secret = grailsApplication.config.cmsManager.secret
+        String privateKey = config.cmsManager.privateKey
+        String publicKey = config.cmsManager.publicKey
+        String secret = config.cmsManager.secret
+
         if (privateKey && publicKey && secret) {
             RestBuilder rest = new RestBuilder()
             rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
@@ -58,7 +56,7 @@ class AuthorizationService {
         log.debug "The authorizationRequest is \n${authorizationRequest}"
 
         String date = new Date().toString()
-        String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.verifyAuthPath
+        String requestUrl = config.cmsManager.serverUrl + config.cmsManager.verifyAuthPath
         log.debug "The requestUrl is ${requestUrl}"
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([
                 date: date,
@@ -86,7 +84,7 @@ class AuthorizationService {
         ]
         if (body) {
             requestHeaders['Content-Length'] = body.bytes.size() as String
-        } else if(!grailsApplication.config.cmsManager.headerContentLength){
+        } else if(!config.cmsManager.headerContentLength){
             requestHeaders['Content-Length'] = "0"
         }
 
@@ -157,7 +155,7 @@ class AuthorizationService {
 
     boolean amIAuthorized() {
         String date = new Date().toString()
-        String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.selfAuthPath
+        String requestUrl = config.cmsManager.serverUrl + config.cmsManager.selfAuthPath
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([date: date], requestUrl, "GET", null)
         RestBuilder rest = new RestBuilder()
         def resp = rest.get(requestUrl) {

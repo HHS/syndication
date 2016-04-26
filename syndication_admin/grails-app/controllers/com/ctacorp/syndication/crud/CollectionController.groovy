@@ -46,7 +46,7 @@ class CollectionController {
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         def indexResponse = mediaItemsService.getIndexResponse(params, Collection)
-        respond indexResponse.mediaItemList, model: [collectionInstanceCount: indexResponse.mediaItemInstanceCount]
+        respond indexResponse.mediaItemList, model: [collectionInstanceCount: indexResponse.mediaItemInstanceCount, mediaType:"Collection"]
     }
 
     def show(Collection collectionInstance) {

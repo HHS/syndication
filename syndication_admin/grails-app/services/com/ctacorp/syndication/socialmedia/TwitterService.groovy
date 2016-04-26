@@ -137,6 +137,7 @@ class TwitterService {
         statuses.each{status ->
             Tweet tweet = Tweet.findOrCreateByTweetId(status.id)
             setMetaData(tweet,status, twitterStatusCollector.collection.source.id)
+            tweet.validate()
             twitterStatusCollector.collection.mediaItems.add(tweet)
         }
 

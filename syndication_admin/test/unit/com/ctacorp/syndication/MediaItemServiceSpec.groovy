@@ -7,6 +7,7 @@ import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.contentextraction.ContentRetrievalService
 import com.ctacorp.syndication.health.FlaggedMedia
+import com.ctacorp.syndication.jobs.DelayedTinyUrlJob
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Image
@@ -35,12 +36,15 @@ class MediaItemServiceSpec extends Specification {
     def mediaRollbackCalled = false
     def subscriberRollbackCalled = false
     def extendedAttributeService = Mock(ExtendedAttributeService)
+    def tinyJob = Mock(DelayedTinyUrlJob)
 
     def setup(){
         User user = new User(name:"admin", username: "test@example.com", enabled: true, password: "SomerandomPass1").save()
         Role role = new Role(authority: "ROLE_ADMIN").save()
         UserRole.create user, role, true
         service.springSecurityService = [currentUser:User.get(1)]
+
+        DelayedTinyUrlJob.metaClass.'static'.schedule = {Date date, Map map -> return null}
 
         service.extendedAttributeService = extendedAttributeService
         service.contentRetrievalService = contentRetrievalService

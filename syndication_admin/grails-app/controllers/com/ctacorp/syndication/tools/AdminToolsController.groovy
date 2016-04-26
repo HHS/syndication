@@ -1,14 +1,14 @@
 package com.ctacorp.syndication.tools
 
-import com.ctacorp.syndication.commons.util.Hash
+import com.ctacorp.syndication.authentication.Role
+import com.ctacorp.syndication.authentication.User
+import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.jobs.HashResetJob
 import com.ctacorp.syndication.media.Collection
-import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.MediaItem
-import com.ctacorp.syndication.media.Tweet
-import com.ctacorp.syndication.metric.MediaMetric
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import grails.transaction.Transactional
 
 @Secured(["ROLE_ADMIN"])
 class AdminToolsController {
@@ -17,9 +17,89 @@ class AdminToolsController {
     def twitterService
     def remoteCacheService
 
-    static allowedMethods = [ himssReset: 'POST']
+    static allowedMethods = [ sendMessages:"POST"]
 
     def index() {
+    }
+
+    def massMessage(){
+        params
+    }
+
+    def sendMessages(){
+        if(!params.subject || !params.body){
+            flash.error = "You must provide both a subject and a body"
+            redirect action: "massMessage", params:[subject:params.subject, body:params.body, whichUsers:params.whichUsers]
+            return
+        }
+
+        def sentToWhom
+
+        switch(params.whichUsers){
+            case 'all':
+                sentToWhom = "all users";
+                getUserList("ANY").each{ user ->
+                    sendMessage(user.username, params.subject, params.body, params.boolean('htmlMessage'))
+                }
+                break
+            case 'store':
+                sentToWhom = "all storefront users"
+                getUserList("ROLE_STOREFRONT_USER").each{ user ->
+                    sendMessage(user.username, params.subject, params.body, params.boolean('htmlMessage'))
+                }
+                break;
+            case 'pub':
+                sentToWhom = "all publishers"
+                getUserList("ROLE_PUBLISHER").each{ user ->
+                    sendMessage(user.username, params.subject, params.body, params.boolean('htmlMessage'))
+                }
+                break;
+            case 'man':
+                getUserList("ROLE_MANAGER").each{ user ->
+                    sendMessage(user.username, params.subject, params.body, params.boolean('htmlMessage'))
+                }
+                sentToWhom = "all managers"
+                break
+            case 'admin':
+                getUserList("ROLE_ADMIN").each{ user ->
+                    sendMessage(user.username, params.subject, params.body, params.boolean('htmlMessage'))
+                }
+                sentToWhom = "all admins"
+                break;
+            default:
+                sentToWhom = "Unknown recipient: ${params.whichUsers}"
+                flash.error = "Unknown recipient: ${sentToWhom}"
+                redirect action: "massMessage", params:[subject:params.subject, body:params.body, whichUsers:params.whichUsers]
+                return
+        }
+
+        flash.message = "Message sent to ${sentToWhom}"
+        redirect action: "massMessage"
+    }
+
+    private sendMessage(recip, sub, bod, isHtml=false){
+        println "Sending email to ${recip}, subject ${sub}, body: ${bod}, isHtml?: ${isHtml}"
+        if(isHtml){
+            sendMail{
+                to "${recip}"
+                subject sub
+                html bod
+            }
+        } else{
+            sendMail{
+                to "${recip}"
+                subject sub
+                body bod
+            }
+        }
+    }
+
+    @Transactional
+    public getUserList(role){
+        if(role == "ANY") {
+           return User.list()
+        }
+        UserRole.findAllByRole(Role.findByAuthority(role)).user
     }
 
     def updateMissingTinyUrls() {

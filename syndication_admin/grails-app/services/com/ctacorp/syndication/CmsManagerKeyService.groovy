@@ -1,16 +1,18 @@
 package com.ctacorp.syndication
 
+import grails.util.Holders
+
 /**
  * Created by nburk on 11/26/14.
  */
 class CmsManagerKeyService {
 
-    def grailsApplication
     def authorizationService
+    def config = Holders.config
 
     def getSubscriberById(subscriberId){
         try{
-            authorizationService.getRest(grailsApplication.config.cmsManager.serverUrl + "/api/v1/subscriber.json?id=${subscriberId}")
+            return authorizationService.getRest(config.cmsManager.serverUrl + "/api/v1/subscriber.json?id=${subscriberId}")
         } catch (e) {
             log.error("Can't connect to CMS Manager!")
             return []
@@ -18,14 +20,15 @@ class CmsManagerKeyService {
     }
 
     def listSubscribers(){
+        def resp
         try{
-            def resp = authorizationService.getRest(grailsApplication.config.cmsManager.serverUrl + "/api/v1/subscribers.json?sort=name")
+            resp = authorizationService.getRest(config.cmsManager.serverUrl + "/api/v1/subscribers.json?sort=name")
             def validSubscribers = resp.findAll{ subscriber ->
                 subscriber.id as String != "null"
             }
             return validSubscribers
         } catch (e) {
-            log.error("CMS Manager is either unavailable, or the keys are invalid")
+            log.error("CMS Manager is either unavailable, or the keys are invalid. Response was: ${resp}")
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);

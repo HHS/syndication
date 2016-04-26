@@ -119,7 +119,7 @@
 
 ##### **Edit**
 
-+ From the Collection List screen, click the link desired collection ID link.  
++ From the Collection List screen, click the link desired collection Name link.
 
 ![Collection List with ID highlighted.png](../images/Collection_List_with_ID_highlighted.png)
 
@@ -209,7 +209,7 @@
 
 ##### **Edit**
 
-+ From the HTML List screen, click the link desired HTML ID link.  
++ From the HTML List screen, click the link desired HTML Name link.  
 
 ![HTML List screen with ID highlighted.png](../images/HTML_List_screen_with_ID_highlighted.png)
 
@@ -315,7 +315,7 @@
 
 ##### **Edit**
 
-+ From the Image List screen, click the link desired Image ID link.  
++ From the Image List screen, click the link desired Image Name link.  
  
 ![Image List with ID highlighted.png](../images/Image_List_with_ID_highlighted.png)
 
@@ -423,7 +423,7 @@
 
 ##### **Edit**
 
-+ From the Infographic List screen, click the link desired Infographic ID link.  
++ From the Infographic List screen, click the link desired Infographic Name link.  
 
 ![Infographic List screen with ID highlighted.png](../images/Infographic_List_screen_with_ID_highlighted.png)
 
@@ -557,106 +557,65 @@
 
 ![PDF_List](../images/PDF_List_with_PDF_Media_item.png)
 
-
-## Social Media
+## Tweets
 
 ##### **View**
- 
-+ From the Syndication Dashboard, click the Media menu and Social Media submenu.  
 
-![Left menu Media Social Media submenu highlighted.png](../images/Left_menu_Media_Social_Media_submenu_highlighted.png)
++ From the Syndication Dashboard, click the Media menu and Tweets submenu.
 
-+ The Social Media List screen will appear.
+![Left menu Media Tweets submenu highlighted.png](../images/Left_menu_Media_Tweets_submenu_highlighted.png)
 
-![Social Media List screen.png](../images/Social_Media_List_screen.png)
++ The Tweet List screen will appear.
 
-##### **Create**
+![Tweet List screen.png](../images/Tweet_List_screen.png)
 
-+ From the Social Media List screen, click the New button.  The Create Social Media screen will appear.
- 
-![Create Social Media screen.png](../images/Create_Social_Media_screen.png)
+##### **Create/Import Tweets**
 
-+ Enter the Name.  Note: there is a 255 character limit.
++ From the Tweet List screen, click the Import Tweets button.  The Import Tweet screen will appear.
 
-+ Optionally, enter the Description.  Note: there is a 2000 character limit.
+![Create Tweet screen.png](../images/Create_Tweet_screen.png)
 
-+ Enter the Source URL.  Note: this should begin with http or https.
++ Select a Twitter Account [(or first create one)](other.html#twitter-account) then click the Find Tweets button.
 
-+ Optionally, enter the Target URL.  Note: this should begin with http or https.
++ a list of twitter posts will be be shown.
 
-+ Optionally, enter the Date Content Authored.
+![import Tweets screen.png](../images/import_Tweets_screen.png)
 
-+ Optionally, enter the Date Content Updated.
++ Select the twitter posts that you want to import as a Tweet MediaItem
 
-+ Optionally, enter the Date Content Published.
++ Select a source from the drop-down menu at the bottom of the list.
 
-+ Optionally, enter the Date Content Reviewed.
++ Select Subscriber from drop-down menu only if you are an admin.
 
-+ Enter the Date Syndication Captured.
++ Click the Import Tweets button.  The Tweet index screen will appear with a confirmation message.
 
-+ Enter the Date Syndication Updated.
-
-+ Enter the Date Syndication Visible.
-
-+ Select the Language from the drop-down menu.
-
-+ Confirm the Active checkbox is checked by default.
-
-+ Confirm Visible in Storefront checkbox is checked by default.
-
-+ Confirm Manually Managed checkbox is checked by default.
-
-+ Optionally, enter the External GUID.  Note: there is a 255 character limit.
-
-+ Optionally, enter the Hash.  Note: there is a 255 character limit.
-
-+ Select the Source from the drop-down menu.
-
-+ Enter the Social Media Type.
-
-+ Click the Create button.  The Show Social Media screen will appear with a confirmation message.  Note: only the fields completed will appear.
-
-![Show Social Media with created confirmation message.png](../images/Show_Social_Media_with_created_confirmation_message.png)
-
-+ Click the List button.  The Social Media List screen will appear.
-
-![Social Media List screen with data.png](../images/Social_Media_List_screen_with_data.png)
-
-+ Optionally, click the Add Alternate Image link.  For detailed instructions go to Create an Alternate Image.
-
-+ Optionally, select a Campaign, if available.
-
-+ Optionally, select or add an Extended Attribute, if available.  For detailed instructions go to Create an Extended Attribute.
+![Show Tweet screen with created confirmation message.png](../images/Show_Tweet_screen_with_created_confirmation_message.png)
 
 ##### **Sort**
 
-+ From the Social Media List screen, click the desired heading (ID, Name, Description, Source URL, Date Syndication Captured, Date Syndication Updated).
++ From the Tweet List screen, click the desired heading (ID, Name, Description, Source URL, Date Syndication Captured, Date Syndication Updated).
 
 + Click again.  The order will be changed (descending to ascending).
 
 ##### **Edit**
 
-+ From the Social Media List screen, click the link desired Social Media ID link.  
++ From the Tweet List screen, click the desired Tweet Name link.
 
-![Social Media List with ID highlighted.png](../images/Social_Media_List_with_ID_highlighted.png)
+![Tweet List screen with ID highlighted.png](../images/Tweet_List_screen_with_ID_highlighted.png)
 
-+ The Show Social Media screen will appear.
++ The Show Tweet screen will appear.
 
-![Show Social Media screen.png](../images/Show_Social_Media_screen.png)
+![Show Tweet screen.png](../images/Show_Tweet_screen.png)
 
-+ Click the Edit button.  The Edit Social Media screen will appear.
++ Click the Edit button.  The Edit Tweet screen will appear.
 
-![Edit Social Media screen.png](../images/Edit_Social_Media_screen.png)
+![Edit Tweet screen.png](../images/Edit_Tweet_screen.png)
 
 + Modify the desired fields.
 
-+ Either click the Cancel or Update button. The Show Social Media screen will appear.  If the Update button was selected then a confirmation message will appear as in the example below.
- 
-![Show Social Media screen with updated confirmation message.png](../images/Show_Social_Media_screen_with_updated_confirmation_message.png)
++ Either click the Cancel or Update button. The Show Tweet screen will appear.  If the Update button was selected then a confirmation message will appear as in the example below.
 
-+ Click the List button.  The Social Media List screen will appear.
-
-![Social Media List screen with data.png](../images/Social_Media_List_screen_with_data.png)
+![Show Tweet screen with confirmation message.png](../images/Show_Tweet_screen_with_confirmation_message.png)
 
 ## Video
 
@@ -740,7 +699,7 @@
 
 ##### **Edit**
 
-+ From the Video List screen, click the link desired Video ID link.  
++ From the Video List screen, click the link desired Video Name link.
 
 ![Video List with iD highlighted.png](../images/Video_List_with_iD_highlighted.png)
 

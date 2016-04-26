@@ -383,7 +383,7 @@ The Create Extended Attribute screen will appear.
 
 #### Edit
 
-+ From the Source List screen, click the link desired Source ID link.  
++ From the Source List screen, click the desired Source Name link.
  
 ![Source List for Edit.png](../images/Source_List_for_Edit.png)
 
@@ -407,7 +407,7 @@ The Create Extended Attribute screen will appear.
  
 #### Delete
 
-+ Click the desired Source ID link.
++ Click the desired Source Name link.
 
 ![Source List for Delete.png](../images/Source_List_for_Delete.png)
 
@@ -422,8 +422,171 @@ The Create Extended Attribute screen will appear.
 + Click the OK button.  The Source List screen will appear with a confirmation message.
 
 ![Source List Screen With Deleted Confirmation Message.png](../images/Source_List_Screen_With_Deleted_Confirmation_Message.png)
- 
- 
+
+## Twitter Account
+
++ Twitter Accounts should be the exact name of the twitter account that created the twitter posts that you want to import.
+
+#### View
+
++ From the Syndication Dashboard, click the Other menu and Twitter Accounts submenu.
+
+![Left menu Other Twitter Accounts submenu highlighted.png](../images/Left_menu_Other_Twitter_Accounts_submenu_highlighted.png)
+
++ The Twitter Account List screen will appear.
+
+![Twitter Account List Screen.png](../images/Twitter_Account_List_Screen.png)
+
+#### Create
+
++ From the Twitter Account List screen, click the New button.
+
+![twitter account list screen for create.png](../images/twitter_account_list_screen_for_create.png)
+
++ The Create Twitter Account screen will appear.
+
+![Create Twitter Account screen.png](../images/Create_Twitter_Account_screen.png)
+
++ Enter the Name.  Note: there is a 255 character limit.
+
++ Select a Subscriber from the drop-down menu only if you are an admin.
+
++ Click the Add button.  The Show Twitter Account screen will appear with a confirmation message.
+
+![Show Twitter Account with created confirmation message.png](../images/Show_Twitter_Account_with_created_confirmation_message.png)
+
++ Click the List button.  The Show Twitter Account screen will appear.
+
+![Twitter Account List With Updated item.png](../images/Twitter_Account_List_With_Updated_item.png)
+
+#### Sort
+
++ From the Twitter Account List screen, click the desired heading (ID, Account Name) to sort.
+
++ Click again.  The order will be changed (descending to ascending).
+
+#### Edit
+
++ From the Twitter Account List screen, click the link desired Source Name link.
+
+![Twitter Account List for Edit.png](../images/Twitter_Account_List_for_Edit.png)
+
++ The Show Twitter Account screen will appear.
+
+![Show Twitter Account screen with edit highlighted.png](../images/Show_Twitter_Account_screen_with_edit_highlighted.png)
+
++ Click the Edit button.  The Edit Twitter Account screen will appear.
+
+![Edit Twitter Account screen.png](../images/Edit_Twitter_Account_screen.png)
+
++ Modify the desired fields.
+
++ Either click the Cancel or click the Update button.  The Show Twitter Account screen will appear.  If the Update Link was selected then a confirmation message will appear as in the example below.
+
+![Show Twitter Account screen with updated confirmation message.png](../images/Show_Twitter_Account_screen_with_updated_confirmation_message.png)
+
++ Click the List button.  The Twitter Account List screen will appear.
+
+![Twitter Account List Screen With Updated Item.png](../images/Twitter_Account_List_Screen_With_Updated_Item.png)
+
+#### Delete
+
++ Click the desired TwitterAccount Name link.
+
+![Twitter Account List for Delete.png](../images/Twitter_Account_List_for_Delete.png)
+
++ The Show Twitter Account screen will appear.
+
+![Show Twitter Account with delete highlighted.png](../images/Show_Twitter_Account_with_delete_highlighted.png)
+
++ Click the Delete button.  The Are You Sure pop-up window will appear.
+
+![Are you sure.png](../images/Are_you_sure.png)
+
++ Click the OK button.  The Twitter Account List screen will appear with a confirmation message.
+
+![Twitter Account List Screen With Deleted Confirmation Message.png](../images/Twitter_Account_List_Screen_With_Deleted_Confirmation_Message.png)
+
+## Tweet Auto Importer
+
+#### View
+
++ From the Syndication Dashboard, click the Other menu and Tweet Auto Importer submenu.
+
+![Left menu Other Tweet Auto Importer submenu highlighted.png](../images/Left_menu_Other_Tweet_Auto_Importer_submenu_highlighted.png)
+
++ The Tweet Auto Importer List screen will appear.
+
+![Tweet Auto Importer List Screen.png](../images/Tweet_Auto_Importer_List_Screen.png)
+
+#### Create
+
++ From the Tweet Auto Importer List screen, click the New button.
+
+![tweet auto importer list screen for create.png](../images/tweet_auto_importer_list_screen_for_create.png)
+
++ The Create Tweet Auto Importer screen will appear.
+
+![Create Tweet Auto Importer screen.png](../images/Create_Tweet_Auto_Importer_screen.png)
+
++ Enter Hashtag(s) to have the importer import all tweets form the selected twitter account that contain the hashtag(s) used.
+
++ Select a start and end date for when the importer will start and stop importing new tweets.
+
++ Select the Twitter Account that created the posts you want imported.
+
++ Select a source to give the tweet media items that will be generated from the imports.
+
++ Click the Create button.  The Show Twitter Auto Importer screen will appear with a link to the collection that will contain all of the tweets imported.
+
+![Show Tweet Auto Importer with created confirmation message.png](../images/Show_Tweet_Auto_Importer_with_created_confirmation_message.png)
+
++ Click the List button.  The list Tweet Auto Importer screen will appear.
+
+![Tweet Auto Importer List With Updated item.png](../images/Tweet_Auto_Importer_List_With_Updated_item.png)
+
+#### Sort
+
++ From the Tweet Auto Importer List screen, click the desired heading (ID, Hash Tags) to sort.
+
++ Click again.  The order will be changed (descending to ascending).
+
+#### View Imports
+
++ From the Tweet Auto Importer List screen, click the desired Twitter Auto Importer Hash Tags link.
+
+![Tweet Auto Importer List for Edit.png](../images/Tweet_Auto_Importer_List_for_Edit.png)
+
++ The Show Tweet Auto Importer screen will appear.
+
+![Show Tweet Auto Importer screen with edit highlighted.png](../images/Show_Tweet_Auto_Importer_screen_with_edit_highlighted.png)
+
++ Click on the Collection Status name to view the Mediaitem collection that contains all of the imported tweets.
+
+![Show Tweet Auto Importer screen with collection highlighted.png](../images/Show_Tweet_Auto_Importer_screen_with_collection_highlighted.png)
+
++ You will be brought to the collection MediaItem's show page.
+
+![Tweet Auto Importer Collection show page.png](../images/Tweet_Auto_Importer_collection_show_page.png)
+
+#### Delete
+
++ Click the desired Tweet Auto Importer Name link.
+
+![Tweet Auto Importer List for Delete.png](../images/Tweet_Auto_Importer_List_for_Delete.png)
+
++ The Show Tweet Auto Importer screen will appear.
+
+![Show Source with delete highlighted.png](../images/Show_Tweet_Auto_Importer_with_delete_highlighted.png)
+
++ Click the Delete button.  The Are You Sure pop-up window will appear.
+
+![Are you sure.png](../images/Are_you_sure.png)
+
++ Click the OK button.  The Tweet Auto Importer List screen will appear with a confirmation message.
+
+![Tweet Auto Importer List Screen With Deleted Confirmation Message.png](../images/Tweet_Auto_Importer_List_Screen_With_Deleted_Confirmation_Message.png)
+
 ## Featured Media
 
 #### View

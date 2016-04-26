@@ -9,7 +9,7 @@ class RemoteCacheService {
 
     def flushRemoteCacheByNameAndKey(String cacheName, String key){
         try{
-            log.info "Flushing remote cache: ${cacheName} : ${key}"
+            log.info "Flushing remote cache: ${cacheName} : ${key} :" + Holders.config.syndication.serverUrl + "/cacheAccess/flushCacheByNameAndKey?cacheName=${cacheName}&key=${key}"
             authorizationService.getRest(Holders.config.syndication.serverUrl + "/cacheAccess/flushCacheByNameAndKey?cacheName=${cacheName}&key=${key}")
         } catch(e){
             log.error("Could not flush API cache! ${e}")
@@ -18,7 +18,7 @@ class RemoteCacheService {
 
     def flushRemoteCacheByName(String cacheName){
         try{
-            log.info "Flushing remote cache"
+            log.info "Flushing remote cache: ${Holders.config.syndication.serverUrl}/cacheAccess/flushCacheByName?cacheName=${cacheName}"
             authorizationService.getRest(Holders.config.syndication.serverUrl + "/cacheAccess/flushCacheByName?cacheName=${cacheName}")
         } catch(e){
             log.error("Could not flush API cache! ${e}")
@@ -27,7 +27,7 @@ class RemoteCacheService {
 
     def flushRemoteCache() {
         try{
-            log.info "Flushing remote cache"
+            log.info "Flushing remote cache: " + Holders.config.syndication.serverUrl + "/cacheAccess/flushCache"
             authorizationService.getRest(Holders.config.syndication.serverUrl + "/cacheAccess/flushCache")
         } catch(e){
             log.error("Could not flush API cache! ${e}")

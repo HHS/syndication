@@ -34,7 +34,18 @@ class SourceController {
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        respond Source.list(params), model: [sourceInstanceCount: Source.count()]
+        String name = params.name ?: ""
+        def sourceInstanceList
+        def count = 0
+        if(params.name) {
+            sourceInstanceList = Source.findAllByNameIlike("%" + name + "%", [max:params.max,offset:params.offset,sort:params.sort ?: "id", order:params.order])
+            count = Source.countByNameIlike("%" + name + "%",[max:params.max,offset:params.offset])
+        } else {
+            sourceInstanceList = Source.list(params)
+            count = Source.count()
+        }
+
+        render view:"index", model: [sourceInstanceCount: count, sourceInstanceList:sourceInstanceList]
     }
 
     def show(Source sourceInstance) {

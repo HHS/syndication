@@ -231,19 +231,6 @@ class RhythmyxSubscriptionControllerSpec extends Specification {
         rhythmyxSubscription.subscription
     }
 
-    void "save action correctly handles a null instance"() {
-
-        when: "calling the save action with a null instance"
-
-        request.method = 'POST'
-        controller.save(null)
-
-        then: "redirect to the index view with a not found message"
-
-        response.redirectUrl == "/index" || response.redirectUrl == "/rhythmyxSubscription/index"
-        flash.errors == ["default.not.found.message"]
-    }
-
     void "save action correctly handles a null rhythmyx subscriber"() {
 
         given: "an unsaved instance with a null subscriber"
@@ -448,11 +435,12 @@ class RhythmyxSubscriptionControllerSpec extends Specification {
     }
 
     void "edit action handles null instance correctly"() {
+        setup:
+            RhythmyxSubscription rhythmyxSubscription = null
 
         when: "calling the edit action with a null instance"
 
-        request.method = 'POST'
-        controller.edit(null)
+        controller.edit(rhythmyxSubscription)
 
         then: "redirect to the index view with a not found message"
 

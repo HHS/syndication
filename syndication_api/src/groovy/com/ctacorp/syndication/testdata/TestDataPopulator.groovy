@@ -244,51 +244,6 @@ class TestDataPopulator {
             }
         }
 
-//        // Real cost content
-//        items = [
-//            [title: "Support", url: "http://ctacdev.com/drupal_fda_tobacco/?q=support/index.html", description: "If you smoke, or have experimented with smoking, here are some tools that can help provide the support you need."],
-//            [title: "How It Begins", url: "http://ctacdev.com/drupal_fda_tobacco/?q=decisions/how-it-begins/index.html", description: "Experimenting with cigarettes is a slippery slope, and first-timers often underestimate how addictive it can be."],
-//            [title: "Tobacco Plant", url: "http://ctacdev.com/drupal_fda_tobacco/?q=facts/tobacco-plant/index.html", description: "Some people believe that tobacco products that are “natural” or “free of additives” are a safer option. But that’s not true."],
-//            [title: "Social Pressures", url: "http://ctacdev.com/drupal_fda_tobacco/?q=decisions/how-to-deal/social-pressures/index.html", description: "Even smoking just a little bit opens the door to addiction and smoking-related disease.1 In fact, research shows that just a few cigarettes per month can lead to cravings in some teens."],
-//            [title: "Depression", url: "http://ctacdev.com/drupal_fda_tobacco/?q=decisions/how-to-deal/depression/index.html", description: "Everyone occasionally feels blue or sad. But these feelings are usually short-lived and pass within a couple of days."],
-//            [title: "Stress", url: "http://ctacdev.com/drupal_fda_tobacco/?q=decisions/how-to-deal/stress/index.html", description: "Life is stressful. Some people say they smoke as a way of coping with stress — family problems, school problems, work stress, etc. The truth is that smoking doesn’t fix your problems or make them any better."],
-//            [title: "How To Deal", url: "http://ctacdev.com/drupal_fda_tobacco/?q=decisions/how-to-deal/index.html", description: "Some people smoke because they believe it can help them cope with the difficult situations in their life. The truth is that smoking doesn’t fix your problems or make them any better."],
-//            [title: "Addiction", url: "http://ctacdev.com/drupal_fda_tobacco/?q=costs/addiction/index.html", description: "There’s no way we can have a conversation about smoking without talking about addiction. Everyone knows that cigarettes are bad for you, but most smokers get hooked before they even realize it."],
-//            [title: "Health Costs", url: "http://ctacdev.com/drupal_fda_tobacco/?q=costs/health-costs/index.html", description: "Smoking may stain your teeth1 and turn your fingers yellow. It can also harm your skin by destroying its elastic fibers and weakening its ability to repair itself."],
-//            [title: "Menthol", url: "http://ctacdev.com/drupal_fda_tobacco/?q=facts/menthol/index.html", description: "What’s different about menthol cigarettes? A mint flavor additive with cooling properties. A menthol cigarette is still a cigarette — complete with all the chemicals and addictiveness of any other tobacco product."],
-//            [title: "Smokeless Tobacco", url: "http://ctacdev.com/drupal_fda_tobacco/?q=facts/smokeless-tobacco/index.html", description: "Smokeless tobacco is different from cigarettes, tobacco used in cigarettes, and roll-your-own tobacco."],
-//            [title: "Smoked Tobacco", url: "http://ctacdev.com/drupal_fda_tobacco/?q=facts/smoked-tobacco/index.html", description: "How do you add even more chemicals to a cigarette? Light it. "],
-//            [title: "Other Factors", url: "http://ctacdev.com/drupal_fda_tobacco/?q=decisions/how-to-deal/other-factors/index.html", description: "Research shows that one of the reasons teens start smoking is that they are surrounded with images of smoking — from being around friends and family who smoke, to images of smoking in the movies, to advertisements in convenience stores."],
-//            [title: "Quitting", url: "http://ctacdev.com/drupal_fda_tobacco/?q=decisions/quitting/index.html", description: "If you smoke, or have experimented with smoking, now is the time to take back control."],
-//            //Linked Images
-//            [title: "Nearly 9 out of 10 high schoolers don't smoke", url: "http://ctacdev.com/drupal_fda_tobacco/4-out-5.html"],
-//            [title: "Health Benefits of Quitting", url: "http://ctacdev.com/drupal_fda_tobacco/health-benefits-quitting.html"],
-//            [title: "Smoking Could Cost You Teeth", url: "http://ctacdev.com/drupal_fda_tobacco/smoking-could-cost-you-teeth.html"],
-//            [title: "A Deadly Mix", url: "http://ctacdev.com/drupal_fda_tobacco/deadly-mix.html"],
-//            [title: "Are You Hooked?", url: "http://ctacdev.com/drupal_fda_tobacco/are-you-hooked.html"],
-//            [title: "Can You Afford The Costs of Smoking?", url: "http://ctacdev.com/drupal_fda_tobacco/can-you-afford-costs-smoking.html"]
-//        ]
-//
-//        batch = []
-//
-//        items.each { item ->
-//            batch << new Html(
-//                name: item.title,
-//                description: item.description,
-//                sourceUrl: item.url,
-//                dateSyndicationCaptured: new Date(),
-//                dateSyndicationUpdated: new Date(),
-//                dateContentAuthored: new Date() - 30,
-//                dateContentUpdated: new Date() - 30,
-//                dateContentPublished: new Date() - 30,
-//                dateContentReviewed: new Date() - 30,
-//                language: english,
-//                source: Source.findByAcronym("FDA")
-//            )
-//        }
-//
-//        batchSaver(Html, batch)
-
         batch = []
 
         def desc = "June 14, 2012; The U.S. Department of Health and Human Services (HHS) and the U.S. Food and Drug Administration (FDA), in partnership with state and local public health authorities and tobacco prevention professionals throughout the Pacific Northwest, held a Youth and Tobacco Town Hall Meeting on the Seattle campus of the University of Washington. The town hall was part of the broader HHS effort to prevent children from starting to use tobacco and to help current tobacco users quit. Three top U.S. health leaders, public health professionals, tobacco use prevention specialists, educators, advocates, policy makers and—importantly—young people from around the Pacific Northwest attended the meeting. The goals of the event were to share information, tools, and best practices in tobacco use prevention, to enhance existing efforts and to devise new strategies to help youth and young people resist social and industry pressure to initiate tobacco use, or to end tobacco use if it has already begun."
@@ -630,11 +585,6 @@ class TestDataPopulator {
                 source:Source.findByAcronym("HHS"),
                 mediaItems: MediaItem.findAllBySourceUrlInList(["http://www.youtube.com/watch?v=zhbXENhrkTA", "http://www.youtube.com/watch?v=asarKLMCvdo", "http://www.youtube.com/watch?v=a_M9tTwLb9A","http://www.youtube.com/watch?v=mcteRv08Aco"])
         )
-        //Real Cost videos
-//        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=zhbXENhrkTA", english, fda)
-//        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=asarKLMCvdo", english, fda)
-//        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=a_M9tTwLb9A", english, fda)
-//        assert youtubeService.importYoutubeVideo("http://www.youtube.com/watch?v=mcteRv08Aco", english, fda)
         
         batchSaver(Campaign, batch)
     }
@@ -745,32 +695,6 @@ class TestDataPopulator {
         }
 
         batchSaver(Html, batch)
-    }
-
-    def seedSocialMedia() {
-//        def smediaTypes = ["facebook", "twitter", "googlePlus", "pinterest"]
-//
-//        def batch = []
-//
-//        smediaTypes.each {
-//            def lang = Language.first()
-//            def source = Source.last()
-//            batch << new SocialMedia(name: "${it}",
-//                description: "${it}",
-//                socialMediaType: "${it}",
-//                sourceUrl: "http://localhost/Syndication/socialMedia/${it}",
-//                dateSyndicationCaptured: new Date(),
-//                dateSyndicationUpdated: new Date(),
-//                dateContentAuthored: new Date()-ran.nextInt(365)+30,
-//                dateContentUpdated: new Date()-ran.nextInt(15),
-//                dateContentPublished: new Date()-ran.nextInt(10),
-//                dateContentReviewed: new Date()-ran.nextInt(5),
-//                language: lang,
-//                externalGuid: "http://localhost/Syndication/socialMedia/${it}".toString().hashCode(),
-//                source: source)
-//        }
-//
-//        batchSaver(SocialMedia, batch)
     }
 
     def seedInfographics() {

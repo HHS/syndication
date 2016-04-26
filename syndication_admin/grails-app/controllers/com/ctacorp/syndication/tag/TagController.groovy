@@ -185,12 +185,15 @@ class TagController {
         } else {
             tags = tagService.findTagsByTagName(q, params)
         }
-
-        tags.each { tag ->
-            resp << [id: tag.id, name: "${tag.name}"]
+        if(tagService.checkTagExistence(q,params.long("tagTypeId") ?: 1, params.long("languageId") ?: 1) && !tags.name.contains(q)) {
+            tags << tagService.checkTagExistence(q,params.long("tagTypeId") ?: 1, params.long("languageId") ?: 1)
         }
 
-        if (!tags.name.contains(q) && !q.isInteger()) {
+        tags.each { tag ->
+            resp << [id: tag.id, name: "${tag.name}", lowerName:tag.name.toLowerCase() as String]
+        }
+
+        if (!resp.lowerName.contains(q.toLowerCase()) && !q.isInteger()) {
             resp << [id: "'" + "${q}" + "'", name: "${q} - Create New"]
         }
 

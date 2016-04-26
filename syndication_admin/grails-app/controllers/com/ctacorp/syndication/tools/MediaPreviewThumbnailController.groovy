@@ -7,6 +7,7 @@ import com.ctacorp.syndication.preview.MediaPreview
 import com.ctacorp.syndication.preview.MediaThumbnail
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
+import grails.util.Holders
 import org.apache.commons.io.IOUtils
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
@@ -41,7 +42,7 @@ class MediaPreviewThumbnailController {
             mediaPreviewThumbnailService.generate(mi.id)
             String key = Hash.md5("${mi.id}")
             remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", key)
-            render """<img src="${grails.util.Holders.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/thumbnail.jpg"/>"""
+            render """<img src="${Holders.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/thumbnail.jpg"/>"""
         } catch(e){
             log.error("Error Code: ${errorCode}\n"+e)
             e.printStackTrace()

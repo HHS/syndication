@@ -171,7 +171,11 @@ class ApiKeyUtils {
     }
 
     static def getKeyAgreement(AuthorizationHeader authorizationHeader) {
-        return com.ctacorp.syndication.manager.cms.KeyAgreement.findByEntity2PublicKey(authorizationHeader.senderPublicKey)
+        def keyAgreement = com.ctacorp.syndication.manager.cms.KeyAgreement.findByEntity2PublicKey(authorizationHeader.senderPublicKey)
+        if(!keyAgreement){
+            log.error "Could not find a matching key agreement - the sender's key isn't authorized."
+        }
+        keyAgreement
     }
 
     @SuppressWarnings("GrMethodMayBeStatic")
@@ -180,7 +184,6 @@ class ApiKeyUtils {
         def builder = new AuthorizationResultBuilder()
 
         try {
-
             builder.setLogFileId(System.currentTimeMillis())
                     .setRawAuthHeader(authorizationRequest.authorizationHeader)
                     .setAuthHeader(getAuthHeader(builder.authorizationResult))

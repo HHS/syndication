@@ -21,7 +21,7 @@
                         </div>
 
                         <div class="timeline-body">
-                            <img class="timeline_thumbnail" src="${grailsApplication.config.syndication.contentExtraction.urlBase}/${timelineEvent.id}/preview.jpg"/>
+                            <img class="timeline_thumbnail" src="${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${timelineEvent.id}/preview.jpg"/>
                             <p><synd:shortenString string="${timelineEvent?.message}"/></p>
                         </div>
                     </div>

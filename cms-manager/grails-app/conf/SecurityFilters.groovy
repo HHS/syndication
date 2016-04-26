@@ -31,17 +31,12 @@ class SecurityFilters {
     def loggingService
 
     def filters = {
-
         someURIs(uri: filteredUri) {
-
             before = {
-
                 setSubscriberRequestAttribute(request)
 
                 if (env == Environment.PRODUCTION || Holders.config.syndication.cms.auth.enabled) {
-
                     try {
-
                         AuthorizationResult authorizationResult = authorizationService.authorize(request)
 
                         if (!authorizationResult.isAuthorized) {
@@ -51,13 +46,11 @@ class SecurityFilters {
                         }
 
                     } catch (e) {
-
                         def errorMessage = loggingService.logError('Unexpected error occurred when trying to authorize request', e)
                         def json = ([message: errorMessage] as JSON).toString(true)
                         render status: 500, contentType: 'application/json', text: json, encoding: "UTF-8"
                         return false
                     }
-
                 } else {
                     log.info("Skipping auth check because the environment is ${env}")
                 }
@@ -67,9 +60,7 @@ class SecurityFilters {
         }
 
         someURIs(controller: 'authorization') {
-
             before = {
-
                 setSubscriberRequestAttribute(request)
                 String senderPublicKey = request.getAttribute('senderPublicKey')
 
@@ -84,7 +75,6 @@ class SecurityFilters {
     }
 
     private static void setSubscriberRequestAttribute(HttpServletRequest request) {
-
         def rawAuthHeader = request.getHeader("Authorization")
         def authHeader = ApiKeyUtils.getAuthHeader(rawAuthHeader, System.currentTimeMillis())
         request.setAttribute("senderPublicKey", authHeader?.senderPublicKey)

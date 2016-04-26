@@ -47,7 +47,7 @@ environments {
     production {
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('CMS_DB')}"
+            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('CMS_DB')}?useSSL=false"
             driverClassName = 'com.mysql.jdbc.Driver'
             dialect = org.hibernate.dialect.MySQL5InnoDBDialect
             pooled = true

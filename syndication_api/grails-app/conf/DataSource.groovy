@@ -45,7 +45,7 @@ environments {
     production {
         dataSource {
             dbCreate = "update"
-            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('SYNDICATION_DB')}"
+            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('SYNDICATION_DB')}?useSSL=false"
             driverClassName = 'com.mysql.jdbc.Driver'
             dialect = org.hibernate.dialect.MySQL5InnoDBDialect
             username = 'root'

@@ -33,6 +33,8 @@
   border-bottom: 1px solid #fff;
   border-radius: none;
   color: #fff;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
 }
 
 .microsite-article.on-color:last-child {border: none;}
@@ -42,10 +44,12 @@
 .microsite-article.on-color h3,
 .microsite-article.on-color h4,
 .microsite-article.on-color p,
+.microsite-article.on-color p > a,
 .microsite-article.on-color a,
-.microsite-article.on-color li {
-  color: #fff;
-  margin-left: 15px;
+.microsite-article.on-color li,
+.microsite-article.on-color li > a
+{
+  color: #fff !important;
   text-shadow: 0 1px 0 rgba(0,0,0,0.3);
 }
 
@@ -83,8 +87,9 @@
 .microsite-article img {
   border: 1px solid #efefef;
   float: left;
-  margin-bottom: 5px;
-  margin-right: 15px;
+  margin-top: 15px;
+  margin-right: 100%;
+  margin-bottom: 15px;
  }
 
 .microsite-header.row {padding: 10px; }

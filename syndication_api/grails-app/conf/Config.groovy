@@ -10,7 +10,6 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-import org.springframework.core.io.ClassPathResource
 
 def userHome = userHome ?: System.getProperty("user.home")
 grails.config.locations = ["file:${userHome}/syndicationConfig.groovy", "file:${userHome}/syndicationSharedConfig.groovy"]
@@ -18,10 +17,6 @@ grails.config.locations = ["file:${userHome}/syndicationConfig.groovy", "file:${
 grails.war.resources = { stagingDir, args ->
     copy(file: "MetaData.groovy", tofile: "${stagingDir}/MetaData.groovy")
 }
-
-// if (System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
 
 grails.project.groupId = "com.ctacorp.syndication.api" // change this to alter the default package name and Maven publishing destination
 
@@ -101,18 +96,13 @@ grails.hibernate.cache.queries = false
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://localhost:8080/Syndication"
-    }
-    test {
-        grails.serverURL = "http://localhost:8080/Syndication"
     }
     production {
         grails.logging.jul.usebridge = false
-        if(System.getenv("USING_DOCKER") == "true"){
-            grails.serverURL = "http://docker.local/api"
-        }
     }
 }
+
+grails.serverURL = System.getenv("API_PUBLIC_URL")
 
 //log4j configuration
 new File("${userHome}/syndicationLogs/api").mkdirs() //Create logging dir
@@ -156,18 +146,6 @@ def swaggerDescription = """
 </div>
 """
 
-//swaggerDefaults
-swagger.apiVersion = "v2"
-swagger.swaggerVersion = "1.2"
-swagger.basePath = "http://localhost:8080/Syndication"
-swagger.api.basePath = "http://localhost:8080/Syndication/api/v2"
-swagger.info.title = "HHS Media Services API"
-swagger.info.description = swaggerDescription
-swagger.info.contact = "syndicationadmin@hhs.gov"
-swagger.info.license = "GNU GENERAL PUBLIC LICENSE"
-swagger.info.licenseUrl = "http://www.gnu.org/licenses/gpl.html"
-swagger.info.termsOfServiceUrl = "http://www.hhs.gov/web/socialmedia/policies/tos.html#ready"
-
 //scratch directory defaults
 syndication.scratch.root = "${userHome}/.syndication"
 
@@ -178,18 +156,6 @@ if(System.getenv("SYNDICATION_LOAD_EXAMPLE_DATA") == "true"){
 } else{
     syndication.loadExampleRealData = false
 }
-
-//TinyURL
-tinyUrl.serverAddress = "http://localhost:8082/TinyUrl"
-tinyUrl.mappingBase = "/api/v1/mediaMappings"
-
-//TagCloud
-tagCloud.serverAddress = "http://localhost:8084/TagCloud"
-
-//CMS Manager
-cmsManager.serverUrl = "http://ctacdev.com:8090/CmsManager"
-cmsManager.selfAuthPath = "/api/v1/debug/status.json"
-cmsManager.verifyAuthPath = "/api/v1/authorizations.json"
 
 //Supported extraction commands
 syndication.contentExtraction.supportedParams = [
@@ -221,13 +187,21 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/**/favicon.ico':                ['permitAll']
 ]
 
-syndication.contentExtraction.urlBase = "http://localhost:8080/Syndication/api/v2/resources/media"
-
+//swaggerDefaults
 swagger{
-    api.basePath = "http://localhost:8080/Syndication/api/v2"
+    basePath = System.getenv("SWAGGER_BASE_PATH")
+    api.basePath = swagger.basePath + "/api/v2"
     apiVersion = "2"
     swaggerVersion = "1.2"
     customView = "/swagger/index"
+    info{
+        title = "HHS Media Services API"
+        description = swaggerDescription
+        contact = "syndicationadmin@hhs.gov"
+        license = "GNU GENERAL PUBLIC LICENSE"
+        licenseUrl = "http://www.gnu.org/licenses/gpl.html"
+        termsOfServiceUrl = "http://www.hhs.gov/web/socialmedia/policies/tos.html#ready"
+    }
 }
 
 grails.plugin.springsecurity.useSecurityEventListener = true
@@ -318,4 +292,32 @@ google.youtube.apiKey = System.getenv("YOUTUBE_API_KEY")
 
 if(System.getenv("USING_DOCKER") == "true") {
     syndication.solrService.serverAddress = "http" + (System.getenv("SOLR_PORT_8983_TCP") - "tcp") + "/solr/syndication"
+}
+
+manet{
+    server.url = System.getenv("MANET_PORT_8891_TCP")?.replace("tcp://", "http://")
+}
+
+//CMS Manager
+cmsManager{
+    serverUrl = System.getenv("CMS_PUBLIC_URL")
+    privateKey = System.getenv("CMS_PRIVATE_KEY")
+    publicKey = System.getenv("CMS_PUBLIC_KEY")
+    secret = System.getenv("CMS_SECRET")
+    cmsManager.selfAuthPath = "/api/v1/debug/status.json"
+    cmsManager.verifyAuthPath = "/api/v1/authorizations.json"
+}
+
+disableGuavaCache = System.getenv("DISABLE_GUAVA_CACHE")
+
+
+//TinyURL
+tinyUrl.serverAddress = System.getenv("TINY_PUBLIC_URL")
+tinyUrl.mappingBase = "/api/v1/mediaMappings"
+
+//TagCloud
+tagCloud.serverAddress = System.getenv("TAG_PUBLIC_URL")
+
+syndication{
+    internalAuthHeader = System.getenv("AUTHORIZATION_HEADER")
 }

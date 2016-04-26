@@ -183,6 +183,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     </g:form>
                 </div>
             </div>
+            %{--Mass Message users ------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Mass Email Users</h3>
+                    <g:form action="massMessage">
+                        <g:submitButton class="btn btn-primary" name="massMessage" value="Send a Mass email to users"/>
+                    </g:form>
+                </div>
+            </div>
         </div>
     </div>
 

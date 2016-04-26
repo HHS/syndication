@@ -50,11 +50,6 @@ class RestSubscriptionController {
 
     @Transactional
     def save(RestSubscription restSubscription) {
-
-        if (!restSubscription) {
-            return notFound()
-        }
-
         def sourceUrl = restSubscription.sourceUrl
         if (!sourceUrl) {
             restSubscription.validate()

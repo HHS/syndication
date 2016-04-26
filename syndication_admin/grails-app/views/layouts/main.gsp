@@ -61,6 +61,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                 <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
                             </g:if>
                         </g:else>
+                        <g:if test="${params.controller in ["collection","html","image","infographic", "PDF", "tweet", "video", "questionAndAnswer", "FAQ"]}">
+                            <g:link action="search" controller="mediaItem" params="[mediaType:mediaType]" class="navbar-brand"><i class="fa fa-search"></i> Search</g:link>
+                        </g:if>
                     </div>
                 </nav>
             </g:if>
@@ -77,6 +80,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <g:link class="navbar-brand" action="importTweets"><i class="fa fa-cloud-download"></i> Import Tweets</g:link>
                             <g:link class="navbar-brand" controller="twitterAccount" action="create"><i class="fa fa-plus"></i> Add Twitter Account</g:link>
                         </g:elseif>
+                        <g:if test="${params.controller in ["collection","html","image","infographic", "PDF", "tweet", "video", "questionAndAnswer", "FAQ"]}">
+                            <g:link action="search" controller="mediaItem" params="[mediaType:mediaType]" class="navbar-brand"><i class="fa fa-search"></i> Search</g:link>
+                        </g:if>
                     </div>
                 </nav>
             </g:if>
@@ -94,6 +100,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                             <g:link class="navbar-brand" action="index"><i class="fa fa-list-ol"></i> List</g:link>
                             <g:link class="navbar-brand" action="create"><i class="fa fa-plus"></i> New</g:link>
                         </g:else>
+                        <g:if test="${params.controller in ["collection","html","image","infographic", "PDF", "tweet", "video", "questionAndAnswer", "FAQ"]}">
+                            <g:link action="search" controller="mediaItem" params="[mediaType:mediaType]" class="navbar-brand"><i class="fa fa-search"></i> Search</g:link>
+                        </g:if>
                     </div>
                 </nav>
             </g:if>

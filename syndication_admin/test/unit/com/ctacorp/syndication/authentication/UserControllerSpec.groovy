@@ -126,17 +126,6 @@ class UserControllerSpec extends Specification {
             populateValidParams(params)
             def user1 = new User(params).save(flush: true)
 
-        when: "Update is called for a domain instance that doesn't exist"
-            request.method = 'PUT'
-            params.authority = 1
-            request.contentType = FORM_CONTENT_TYPE
-            controller.updateMyAccount(null)
-
-        then: "A 404 error is returned"
-            response.redirectedUrl == '/user/index'
-            flash.message != null
-
-
         when: "An invalid domain instance is passed to the update action"
             response.reset()
             def user = new User()
@@ -158,12 +147,7 @@ class UserControllerSpec extends Specification {
             response.redirectedUrl == "/dashboard/syndDash"
     }
 
-    void "update action performs an update on a valid domain instance"() {
-        setup:
-            controller.passwordService = [validatePassword:{ p1, p2 -> [valid:true]}]
-            populateValidParams(params)
-            def user1 = new User(params).save(flush: true)
-
+    void "update action performs an update on a invalid domain instance"() {
         when: "Update is called for a domain instance that doesn't exist"
             request.method = 'PUT'
             params.authority = 1
@@ -173,12 +157,21 @@ class UserControllerSpec extends Specification {
         then: "A 404 error is returned"
             response.redirectedUrl == '/user/index'
             flash.message != null
+    }
 
+    void "update action performs an update on a valid domain instance"() {
+        setup:
+            controller.passwordService = [validatePassword:{ p1, p2 -> [valid:true]}]
+            populateValidParams(params)
+            def user1 = new User(params).save(flush: true)
+            def user = new User()
+            user.validate()
 
         when: "An invalid domain instance is passed to the update action"
             response.reset()
-            def user = new User()
-            user.validate()
+            request.method = 'PUT'
+            params.authority = 1
+            request.contentType = FORM_CONTENT_TYPE
             controller.update(user)
 
         then: "The edit view is rendered again with the invalid instance"

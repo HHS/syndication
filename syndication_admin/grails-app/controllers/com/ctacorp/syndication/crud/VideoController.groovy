@@ -47,7 +47,7 @@ class VideoController {
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         def indexResponse = mediaItemsService.getIndexResponse(params, Video)
-        respond indexResponse.mediaItemList, model: [videoInstanceCount: indexResponse.mediaItemInstanceCount]
+        respond indexResponse.mediaItemList, model: [videoInstanceCount: indexResponse.mediaItemInstanceCount, mediaType:"Video"]
     }
 
     def show(Video videoInstance) {

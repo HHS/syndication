@@ -109,15 +109,13 @@ grails.resources.adhoc.excludes = ['/WEB-INF/**']
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://localhost:8086/SyndicationAdmin"
     }
     production {
         grails.logging.jul.usebridge = false
-        if(System.getenv("USING_DOCKER") == "true"){
-            grails.serverURL = "http://docker.local/admin"
-        }
     }
 }
+
+grails.serverURL = System.getenv("ADMIN_PUBLIC_URL")
 
 //log4j configuration
 new File("${userHome}/syndicationLogs/admin").mkdirs() //Create logging dir
@@ -264,12 +262,23 @@ springsecurity {
     }
 }
 
-tagCloud.serverAddress = System.getenv("TAGCLOUD_URL")
+tagCloud.serverAddress = System.getenv("TAG_PUBLIC_URL")
+manet{
+    server.url = System.getenv("MANET_PORT_8891_TCP")?.replace("tcp://", "http://")
+}
 
 syndication{
     internalAuthHeader = System.getenv("AUTHORIZATION_HEADER")
+    serverUrl = System.getenv("API_PUBLIC_URL")
+}
+
+cmsManager{
+    serverUrl = System.getenv("CMS_PUBLIC_URL")
+    privateKey = System.getenv("CMS_PRIVATE_KEY")
+    publicKey = System.getenv("CMS_PUBLIC_KEY")
+    secret = System.getenv("CMS_SECRET")
 }
 
 if(System.getenv("USING_DOCKER") == "true") {
-    syndication.solrService.serverAddress = "http" + (System.getenv("SOLR_PORT_8983_TCP") - "tcp") + "/solr/syndication"
+    syndication.solrService.serverAddress = System.getenv("SOLR_ADDRESS")
 }

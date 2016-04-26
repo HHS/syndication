@@ -105,15 +105,13 @@ grails.resources.adhoc.excludes = ['/WEB-INF/**']
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://localhost:8084/TagCloud"
     }
     production {
         grails.logging.jul.usebridge = false
-        if(System.getenv("USING_DOCKER") == "true"){
-            grails.serverURL = "http://docker.local/tag"
-        }
     }
 }
+
+grails.serverURL = System.getenv("TAG_PUBLIC_URL")
 
 //log4j configuration
 new File("${userHome}/syndicationLogs/tag").mkdirs() //Create logging dir

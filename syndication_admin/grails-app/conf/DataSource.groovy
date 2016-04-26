@@ -28,7 +28,7 @@ hibernate {
 environments {
     development {
         dataSource {
-            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('SYNDICATION_DB')}"
+            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('SYNDICATION_DB')}?useSSL=false"
             password = "${System.getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD')}"
             dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
         }
@@ -46,7 +46,7 @@ environments {
         dataSource {
             dbCreate = "update"
             driverClassName = "com.mysql.jdbc.Driver"
-            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('SYNDICATION_DB')}"
+            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('SYNDICATION_DB')}?useSSL=false"
             password = "${System.getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD')}"
             properties {
                 maxActive = -1

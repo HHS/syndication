@@ -20,6 +20,8 @@
         <sf:hasErrors/>
 
         <form action='${postUrl}' method='POST' id='loginForm' class='cssform' autocomplete='off'>
+            %{--hidden field to determine the redirect url after logging in--}%
+            <input type='text' hidden class='text_' name='spring-security-redirect' value="${params.'spring-security-redirect'}" />
             <div class="login_box auth">
                 <p>Enter the e-mail address and password you used to register on this site.</p>
 

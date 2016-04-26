@@ -47,16 +47,16 @@
                 </div>
 
                 <!-- Controls -->
-                <a id="left-carousel-button" class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
-                    <span class="glyphicon glyphicon-chevron-left builder-direction" aria-hidden="true"><p>previous section</p></span>
-                    <span class="sr-only">Previous</span>
-                </a>
-                <a id="right-carousel-button" class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
-                    <span class="glyphicon glyphicon-chevron-right builder-direction" aria-hidden="true"><p>next section</p></span>
-                    <span class="sr-only">Next</span>
-                </a>
-                <button type="button" id="modal-done-button" class="pull-right btn btn-submit hide" hidden data-dismiss="modal">
-                    Done
+                %{--<a id="left-carousel-button" class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">--}%
+                    %{--<span class="glyphicon glyphicon-chevron-left builder-direction" aria-hidden="true"><p>previous section</p></span>--}%
+                    %{--<span class="sr-only">Previous</span>--}%
+                %{--</a>--}%
+                %{--<a id="right-carousel-button" class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">--}%
+                    %{--<span class="glyphicon glyphicon-chevron-right builder-direction" aria-hidden="true"><p>next section</p></span>--}%
+                    %{--<span class="sr-only">Next</span>--}%
+                %{--</a>--}%
+                <button type="button" id="modal-done-button" class="pull-right btn btn-submit" hidden data-dismiss="modal">
+                    Close
                 </button>
             </div>
 

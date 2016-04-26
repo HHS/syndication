@@ -48,7 +48,7 @@ class HtmlController {
         params.max = Math.min(max ?: 10, 100)
         
         def indexResponse = mediaItemsService.getIndexResponse(params, Html)
-        respond indexResponse.mediaItemList, model: [htmlInstanceCount: indexResponse.mediaItemInstanceCount]
+        respond indexResponse.mediaItemList, model: [htmlInstanceCount: indexResponse.mediaItemInstanceCount, mediaType:"Html"]
     }
 
     def show(Html htmlInstance) {

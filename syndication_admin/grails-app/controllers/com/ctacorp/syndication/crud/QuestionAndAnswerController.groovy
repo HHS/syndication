@@ -43,7 +43,7 @@ class QuestionAndAnswerController {
         params.max = Math.min(max ?: 10, 100)
 
         def indexResponse = mediaItemsService.getIndexResponse(params, QuestionAndAnswer)
-        respond indexResponse.mediaItemList, model: [questionAndAnswerInstanceCount: indexResponse.mediaItemInstanceCount]
+        respond indexResponse.mediaItemList, model: [questionAndAnswerInstanceCount: indexResponse.mediaItemInstanceCount, mediaType:"QuestionAndAnswer"]
     }
 
     def show(QuestionAndAnswer questionAndAnswerInstance) {

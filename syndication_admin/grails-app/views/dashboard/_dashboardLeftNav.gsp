@@ -94,6 +94,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                         class="fa fa-picture-o fa-fw"></i> Alternate Images</g:link>
                             </li>
                             <li>
+                                <g:link controller="cacheBuster"><i
+                                        class="fa fa-gavel fa-fw"></i> Cache Buster</g:link>
+                            </li>
+                            <li>
                                 <g:link controller="language"><i class="fa fa-language fa-fw"></i> Media Languages</g:link>
                             </li>
                             <li>

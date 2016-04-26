@@ -160,8 +160,7 @@ class RestSubscriberControllerSpec extends Specification {
 
         then: "redirect to the index view with a not found message"
 
-        response.redirectUrl == "/restSubscriber/index"
-        flash.errors == ["default.not.found.message"]
+        view == "create"
     }
 
     void "save action correctly handles a duplicate rest subscriber"() {

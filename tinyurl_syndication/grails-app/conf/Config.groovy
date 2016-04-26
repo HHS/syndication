@@ -92,15 +92,13 @@ grails.resources.adhoc.excludes = ['/WEB-INF/**']
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://localhost:8082/TinyUrl"
     }
     production {
         grails.logging.jul.usebridge = false
-        if(System.getenv("USING_DOCKER") == "true"){
-            grails.serverURL = "http://docker.local/tiny"
-        }
     }
 }
+
+grails.serverURL = System.getenv("TINY_PUBLIC_URL")
 
 //log4j configuration
 new File("${userHome}/syndicationLogs/tiny").mkdirs() //Create logging dir

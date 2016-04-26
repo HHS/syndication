@@ -50,7 +50,7 @@ class MediaMappingQueryController {
         def missing = []
         MediaMapping.withSession {
             data.each{ entry ->
-                def mediaMapping = MediaMapping.findByTargetUrl(entry.url)
+                def mediaMapping = MediaMapping.findByTargetUrlAndSyndicationId(entry.url, entry.id)
                 if(!mediaMapping){
                     missing << entry.id
                 }

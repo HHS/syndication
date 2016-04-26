@@ -75,7 +75,7 @@ grails.project.dependency.resolution = {
 
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes e.g.
-        runtime 'mysql:mysql-connector-java:5.1.29'
+        runtime 'mysql:mysql-connector-java:5.1.38'
         runtime 'com.ctacorp:syndication-commons:1.3.0'
 
         compile "com.google.guava:guava:18.0"           //in memory cache
@@ -107,14 +107,14 @@ grails.project.dependency.resolution = {
         }
 
         // plugins for the compile step --------------------------------------------------------------------------------
-        compile ":syndication-model:2.7.0"   //syndication domain models
-        compile ":content-extraction-services:1.11.0"   //syndication content extraction tools
+        compile ":syndication-model:2.8.0"   //syndication domain models
+        compile ":content-extraction-services:1.13.0"   //syndication content extraction tools
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
         compile ":asset-pipeline:2.6.5"
         compile ":release:3.1.1"
         compile ":rest-client-builder:2.1.1"
-        compile ":spring-security-core:2.0-RC5"
+        compile ":spring-security-core:2.0.0"
         compile ":rabbitmq-native:3.1.2"                       //mq
         compile ":quartz:1.0.2"                                 //quartz
         compile ":bruteforce-defender:1.1"
@@ -135,7 +135,7 @@ grails.project.dependency.resolution = {
         // Solr --------------------------------------------------------------------------------------------------------
         // |  Leave this at the bottom, moving it causes dependency problems at the moment                             |
         // -------------------------------------------------------------------------------------------------------------
-        compile ":solr-operations:1.4.0"      //syndication solr stuff
+        compile ":solr-operations:1.5.0"      //syndication solr stuff
 
         // uncomment these to enable additional asset-pipeline capabilities
         //compile ":sass-asset-pipeline:1.5.5"

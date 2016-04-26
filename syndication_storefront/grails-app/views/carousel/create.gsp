@@ -71,7 +71,7 @@
                 <a id="bottom-right-modal" tabIndex="-1" data-toggle="modal" data-target="#modal-header" data-slide-to="3"></a>
                 <div class="outlined right" onkeypress="if(event.keyCode==13){$('#bottom-right-modal').click();return false;}" data-toggle="modal" data-target="#modal-header" data-slide-to="3" tabindex="0" role="link">
                     <div class="section"><span>right<br>sidebar</span>
-                        <span class="checked"><img id="check-area3" hidden src="${assetPath(src: '/microsite/check.png')}" alt="Section complete, check mark" class="check-image"/></span>
+                        <span id="check-area3" class="checked"></span>
                     </div>
                 </div>
 

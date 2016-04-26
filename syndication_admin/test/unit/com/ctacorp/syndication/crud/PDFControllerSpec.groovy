@@ -183,24 +183,34 @@ class PDFControllerSpec extends Specification {
         flash.message != null
     }
 
-    void "Test that the delete action deletes an instance if it exists"() {
+    void "Test that the delete action deletes an instance if its null"() {
+        setup:
+            populateValidParams(params)
+            PDF pdf = null
+
         when:"The delete action is called for a null instance"
             request.method = 'POST'
-            controller.delete(null)
+            controller.delete(pdf)
 
         then:"A 404 is returned"
             response.redirectedUrl == '/PDF/index'
             flash.message != null
+    }
+
+    void "Test that the delete action deletes an instance if it exists"() {
+        setup:
+            populateValidParams(params)
+            PDF pdf = new PDF(params).save(flush: true)
 
         when:"A domain instance is created"
+            request.method = 'POST'
             response.reset()
-            populateValidParams(params)
-            def pdf = new PDF(params).save(flush: true)
 
         then:"It exists"
             PDF.count() == 1
 
         when:"The domain instance is passed to the delete action"
+            request.contentType = FORM_CONTENT_TYPE
             controller.delete(pdf)
 
         then:"The instance is deleted"

@@ -105,7 +105,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 							<div class="col-md-2 checkbox form-group">
 								<div class="checkbox">
 									<label>
-										<input type="checkbox" name="tweetId_${tweet.id}"> Import Tweet
+										<g:set var="tweetId" value="tweetId_${tweet.id}"/>
+										<g:if test="${params[tweetId]}">
+											<input type="checkbox" checked name="tweetId_${tweet.id}"> Import Tweet
+										</g:if>
+										<g:else>
+											<input type="checkbox" name="tweetId_${tweet.id}"> Import Tweet
+										</g:else>
 									</label>
 								</div>
 							</div>

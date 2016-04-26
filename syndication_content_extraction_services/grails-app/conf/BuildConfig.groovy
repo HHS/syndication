@@ -33,14 +33,9 @@ grails.project.dependency.resolution = {
             updatePolicy "always"
         }
 
-        grailsCentral()
         mavenLocal()
+        grailsCentral()
         mavenCentral()
-        // uncomment the below to enable remote dependency resolution
-        // from public Maven repositories
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
@@ -57,11 +52,11 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        runtime ("org.grails.plugins:syndication-model:2.7.0"){
+        runtime ("org.grails.plugins:syndication-model:2.8.0"){
             export = false
         }
 
-        build(":release:3.1.1") {
+        build(":release:3.1.2") {
             excludes "rest-client-builder"
             export = false
         }

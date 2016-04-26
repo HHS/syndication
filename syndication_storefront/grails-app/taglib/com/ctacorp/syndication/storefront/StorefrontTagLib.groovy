@@ -24,7 +24,7 @@ class StorefrontTagLib {
         out << "<ul>"
         if(!user){
             out <<  "<li> ${g.link(controller:'login', action:'register'){'<i class=\'fa fa-plus\'></i> Register'}}</li>" +
-                    "<li> ${g.link(controller:'login', action:'auth'){'<i class=\'fa fa-sign-in\'></i> Login'}}</li>"
+                    "<li> ${g.link(controller:'login', action:'auth', params:['spring-security-redirect':request.forwardURI - request.contextPath]){'<i class=\'fa fa-sign-in\'></i> Login'}}</li>"
             return
         }
         def displayName = user.name.encodeAsHTML()

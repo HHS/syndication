@@ -12,6 +12,7 @@
     margin: 0px;
     font-size: 12px;
     padding-left: 3px;
+    word-wrap: break-word;
 }
 .even{
     background-color: #ffffff;

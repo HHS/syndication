@@ -19,9 +19,6 @@ grails.project.work.dir = "target/work"
 grails.project.target.level = 1.6
 grails.project.source.level = 1.6
 
-def home = System.getProperty('user.home')
-def config = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedBuildConfig.groovy").toURI().toURL())
-
 grails.project.fork = [
         test: false,
         run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve: false],
@@ -40,16 +37,7 @@ grails.project.dependency.resolution = {
     legacyResolve false
 
     repositories {
-
-        String artifactoryUrl = config.artifactory.repo
-        mavenRepo(artifactoryUrl) {
-
-            //noinspection GroovyAssignabilityCheck
-            auth([
-                    username: config.artifactory.username,
-                    password: config.artifactory.password
-            ])
-
+        mavenRepo("http://54.234.21.193:8080/artifactory/central") {
             updatePolicy "always"
         }
 
@@ -73,7 +61,7 @@ grails.project.dependency.resolution = {
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
         test 'nl.flotsam:xeger:1.0'
 
-        runtime 'mysql:mysql-connector-java:5.1.29'
+        runtime 'mysql:mysql-connector-java:5.1.38'
         runtime 'com.ctacorp.commons:multi-read-servlet-filter:1.0.0'
 
         compile 'org.springframework:spring-web:4.2.1.RELEASE'
@@ -98,7 +86,7 @@ grails.project.dependency.resolution = {
 
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
-        compile ":spring-security-core:2.0-RC5"
+        compile ":spring-security-core:2.0.0"
         compile ":quartz:1.0.2"
         compile ":mail:1.0.7"
         compile ":rest-client-builder:2.1.1"
@@ -115,19 +103,3 @@ grails.project.dependency.resolution = {
         test ":build-test-data:2.4.0"
     }
 }
-
-//_____________________
-// Release War info    \_________________________________________________________________
-// |
-// | to push a snapshot, run 'grails prod maven-deploy'
-// | to release, run 'grails prod maven-deploy --repository=plugin_rel'
-// | to install locally, run 'grails maven-install'
-//_______________________________________________________________________________________
-grails.project.repos.default = "app_snap"
-grails.project.repos.app_snap.url = config.artifactory.app_snap.url
-grails.project.repos.app_snap.username = config.artifactory.username
-grails.project.repos.app_snap.password = config.artifactory.password
-
-grails.project.repos.app_rel.url = config.artifactory.app_rel.url
-grails.project.repos.app_rel.username = config.artifactory.username
-grails.project.repos.app_rel.password = config.artifactory.password

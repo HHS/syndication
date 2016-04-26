@@ -34,7 +34,7 @@ class PDFController {
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         def indexResponse = mediaItemsService.getIndexResponse(params, PDF)
-        respond indexResponse.mediaItemList, model: [pdfInstanceCount: indexResponse.mediaItemInstanceCount]
+        respond indexResponse.mediaItemList, model: [pdfInstanceCount: indexResponse.mediaItemInstanceCount, mediaType:"PDF"]
     }
 
     def show(PDF pdfInstance) {
@@ -153,10 +153,13 @@ class PDFController {
     @Secured(['ROLE_ADMIN', 'ROLE_PUBLISHER'])
     @Transactional
     def delete(PDF pdfInstance) {
+        println "pdf: " + pdfInstance
         if (pdfInstance == null) {
+            println "is null"
             notFound()
             return
         }
+        println "after"
 
         def featuredItem = FeaturedMedia.findByMediaItem(pdfInstance)
         if(featuredItem){

@@ -76,7 +76,9 @@ class MediaService {
         }
 
         params.offset = params.offset ?: 0
-        MediaItem.facetedSearch(restrictToSet: ids.join(','), active: true, visibleInStorefront: true, syndicationVisibleBeforeDate: new Date().toString()).list(max: params.max, offset: params.offset)
+        def mediaItems = MediaItem.facetedSearch(restrictToSet: ids.join(','), active: true, visibleInStorefront: true, syndicationVisibleBeforeDate: new Date().toString()).list(max: params.max, offset: params.offset)
+        mediaItems = bubbleExactFieldMatcheToTheTop(mediaItems, searchQuery, params.offset ?: 0)
+        mediaItems
     }
 
     def getMediaTypes() {
@@ -93,5 +95,19 @@ class MediaService {
         }
 
         mediaTypes.sort{ it.name }
+    }
+
+    def bubbleExactFieldMatcheToTheTop(def mediaItems, String searchQuery, def offset) {
+        def item = MediaItem.findBySourceUrlOrName(searchQuery,searchQuery)
+        if(item){
+            if(mediaItems.id.contains(item.id) && offset) {
+                def index = mediaItems.findIndexOf{it.id==item.id}
+                mediaItems.removeAt(index)
+            }
+            if(offset == "0" || offset == 0){
+                mediaItems.add(0, item)
+            }
+        }
+        mediaItems
     }
 }

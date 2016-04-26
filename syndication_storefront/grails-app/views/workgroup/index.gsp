@@ -80,7 +80,7 @@
             <ul>
                 <li>
                     HHS Office of the Assistant Secretary for Public Affairs<br/>
-                    Yvette Alonso, <a href="mailto:Yvette.Alonso@hhs.gov">Yvette.Alonso@hhs.gov</a>
+                    Olexiy (Alex) Karakcheyev, <a href="mailto:olexiy.karakcheyev@hhs.gov">Olexiy.Karakcheyev@hhs.gov</a>
                 </li>
                 <li>
                     CDC Office of the Associate Director for Communications<br/>

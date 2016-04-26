@@ -204,8 +204,10 @@
         }
     });
 
-    $('#footerText').on('input propertychange', function(){
-        if(document.getElementById('footerText').value != ""){
+    $('#footerText,#footerLink1,#footerLink2,#footerLink3,#footerLink4').on('input propertychange', function(){
+        if(document.getElementById('footerText').value != "" || document.getElementById('footerLink1').value != ""
+                || document.getElementById('footerLink2').value != "" || document.getElementById('footerLink3').value != ""
+                || document.getElementById('footerLink4').value != ""){
             document.getElementById('check-footer').innerHTML = '<img src="${assetPath(src: '/microsite/check.png')}" class="check-image" alt="Section complete, check mark" />';
 
         } else {
@@ -220,20 +222,11 @@
 
     $('#carousel-example-generic').on('slid.bs.carousel', function (e) {
         if($('.carousel-inner .item:last').hasClass('active')) {
-            $("#left-carousel-button").show();
-            $("#right-carousel-button").hide();
-            document.getElementById("modal-done-button").className = "pull-right btn btn-submit";
             document.getElementById("step-five").focus();
         } else if($('.carousel-inner .item:first').hasClass('active')){
-            $("#left-carousel-button").hide();
-            $("#right-carousel-button").show();
-            document.getElementById("modal-done-button").className = "pull-right btn btn-submit hide";
             document.getElementById("step-one").focus();
         }
         else {
-            $("#left-carousel-button").show();
-            $("#right-carousel-button").show();
-            document.getElementById("modal-done-button").className = "pull-right btn btn-submit hide";
             var carouselData = $(this).data('bs.carousel');
             var currentIndex = carouselData.getActiveIndex();
             switch(currentIndex) {
@@ -244,27 +237,17 @@
         }
     });
     $('.header').on('click', function(){
-        $("#left-carousel-button").hide();
-        $("#right-carousel-button").show();
-        document.getElementById("modal-done-button").className = "pull-right btn btn-submit hide";
         modalFocusTitle = "step-one"
 
     });
     $('.content').on('click', function(){
-        $("#left-carousel-button").show();
-        $("#right-carousel-button").show();
-        document.getElementById("modal-done-button").className = "pull-right btn btn-submit hide";
         switch(document.activeElement.getAttribute("data-slide-to")) {
             case '1':modalFocusTitle = "step-two";break;
             case '2':modalFocusTitle = "step-three";break;
             case '3':modalFocusTitle = "step-four";break;
         }
-
     });
     $('.footer').on('click', function(){
-        $("#left-carousel-button").show();
-        $("#right-carousel-button").hide();
-        document.getElementById("modal-done-button").className = "pull-right btn btn-submit";
         modalFocusTitle = "step-five"
     });
 

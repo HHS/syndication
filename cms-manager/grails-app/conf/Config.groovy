@@ -87,7 +87,16 @@ grails {
     }
 }
 
-grails.serverURL = "http://localhost:8080/${appName}"
+environments {
+    development {
+        grails.logging.jul.usebridge = true
+    }
+    production {
+        grails.logging.jul.usebridge = false
+    }
+}
+
+grails.serverURL = System.getenv("CMS_PUBLIC_URL")
 
 //________________________________________
 // SPRING SECURITY                        \______________________________________________
@@ -170,7 +179,11 @@ test {
     ]
 }
 
-cmsManager.createTestDataInProductionMode = false
+if(System.getenv("USING_DOCKER") == "true"){
+    cmsManager.createTestDataInProductionMode = true
+} else{
+    cmsManager.createTestDataInProductionMode = false
+}
 
 //________________________________________
 // LOGGING                                \______________________________________________
@@ -211,47 +224,50 @@ environments {
 // Rabbit MQ Settings        \____________________________________________________________
 //________________________________________________________________________________________
 
-rabbitmq {
+ rabbitmq {
+     connection = {
+         connection  host: "${System.getenv('RABBIT_PORT_5672_TCP_ADDR')}",
+                 username: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_USER')}",
+                 password: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_PASS')}",
+                 virtualHost: "${System.getenv('RABBITMQ_VIRTUAL_HOST') ?: '/'}",
+                 requestedHeartbeat: 10
+     }
 
-    connection = {
-        connection host: 'localhost', username: 'syndication', password: 'syndication', virtualHost: '/syndication', requestedHeartbeat: 10
-    }
+     queues = {
+         exchange name: "updateExchange", type: "fanout", {
+             queue name: "emailUpdateQueue", durable: true
+             queue name: "restUpdateQueue", durable: true
+             queue name: "rhythmyxUpdateQueue", durable: true
+         }
 
-    queues = {
+         exchange name: "errorExchange", type: "direct", {
+             queue name: "emailErrorQueue", durable: true, binding: "emailError"
+             queue name: "restErrorQueue", durable: true, binding: "restError"
+             queue name: "rhythmyxErrorQueue", durable: true, binding: "rhythmyxError"
+         }
 
-        exchange name: "updateExchange", type: "fanout", {
-            queue name: "emailUpdateQueue", durable: true
-            queue name: "restUpdateQueue", durable: true
-            queue name: "rhythmyxUpdateQueue", durable: true
-        }
+         queue name: "emailErrorDelayQueue", durable: true, arguments: [
+                 'x-message-ttl'            : 60 * 60 * 1000,
+                 'x-dead-letter-exchange'   : 'errorExchange',
+                 'x-dead-letter-routing-key': 'emailError'
+         ]
 
-        exchange name: "errorExchange", type: "direct", {
-            queue name: "emailErrorQueue", durable: true, binding: "emailError"
-            queue name: "restErrorQueue", durable: true, binding: "restError"
-            queue name: "rhythmyxErrorQueue", durable: true, binding: "rhythmyxError"
-        }
+         queue name: "restErrorDelayQueue", durable: true, arguments: [
+                 'x-message-ttl'            : 60 * 60 * 1000,
+                 'x-dead-letter-exchange'   : 'errorExchange',
+                 'x-dead-letter-routing-key': 'restError'
+         ]
 
-        queue name: "emailErrorDelayQueue", durable: true, arguments: [
-            'x-message-ttl' : 1*60*1000,
-            'x-dead-letter-exchange' : 'errorExchange',
-            'x-dead-letter-routing-key' : 'emailError'
-        ]
+         queue name: "rhythmyxErrorDelayQueue", durable: true, arguments: [
+                 'x-message-ttl'            : 60 * 60 * 1000,
+                 'x-dead-letter-exchange'   : 'errorExchange',
+                 'x-dead-letter-routing-key': 'rhythmyxError'
+         ]
+     }
+ }
 
-        queue name: "restErrorDelayQueue", durable: true, arguments: [
-            'x-message-ttl' : 1*60*1000,
-            'x-dead-letter-exchange' : 'errorExchange',
-            'x-dead-letter-routing-key' : 'restError'
-        ]
-
-        queue name: "rhythmyxErrorDelayQueue", durable: true, arguments: [
-            'x-message-ttl' : 1*60*1000,
-            'x-dead-letter-exchange' : 'errorExchange',
-            'x-dead-letter-routing-key' : 'rhythmyxError'
-        ]
-    }
-}
-
-errorQueueRetryPolicy.maxAttempts = 6
+ syndication.mq.updateExchangeName = "updateExchange"
+ errorQueueRetryPolicy.maxAttempts = 5
 
 //___________________________
 // API Key Settings          \____________________________________________________________
@@ -282,3 +298,25 @@ grails.mail.port = ServerSetupTest.SMTP.port
 
 syndication.thumbnailPath = "/resources/media/{id}/thumbnail.jpg"
 syndication.mediaPath = "/resources/media/{id}.json"
+
+cmsManager.selfAuthPath = "/api/v1/authorizations.json"
+cmsManager.verifyAuthPath = "/api/v1/authorizations.json"
+cmsManager.headerContentLength = true
+
+springsecurity{
+    cmsManager{
+        passwordLength = 8
+        adminUsername = System.getenv("ADMIN_USERNAME")
+        defaultPassword = System.getenv("ADMIN_PASSWORD")
+    }
+}
+
+if(System.getenv("USING_DOCKER") == "true") {
+    syndication.serverUrl = System.getenv("API_PUBLIC_URL")
+}
+
+cmsManager{
+    privateKey = System.getenv("CMS_PRIVATE_KEY")
+    publicKey = System.getenv("CMS_PUBLIC_KEY")
+    secret = System.getenv("CMS_SECRET")
+}

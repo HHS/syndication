@@ -68,7 +68,7 @@ class MediaPreviewThumbnailService {
 
     @NotTransactional
     String getThumbnailUrl(Long id){
-        grailsApplication.config.syndication.contentExtraction.urlBase + "/${id}/thumbnail.jpg"
+        "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${id}/thumbnail.jpg"
     }
 
     @Transactional(readOnly = true)

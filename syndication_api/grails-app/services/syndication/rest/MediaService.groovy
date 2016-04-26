@@ -226,19 +226,19 @@ class MediaService {
         String url
         switch(mediaSource){
             case UserMediaList:
-                url = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath +"/resources/userMediaLists/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                url = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/userMediaLists/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
                 break
             case TagHolder:
-                url = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath +"/resources/tags/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                url = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/tags/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
                 break;
             case SourceHolder:
-                url = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath +"/resources/sources/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                url = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/sources/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
                 break;
             case CampaignHolder:
-                url = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath +"/resources/campaigns/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                url = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/campaigns/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
                 break;
             default:
-                url = grailsApplication.config.syndication.contentExtraction.urlBase + "/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                url = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/media/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
         }
         String width = params.width ?: "775"
         String height = params.height ?: "650"
@@ -467,19 +467,7 @@ class MediaService {
         //Extract the content (or try to)
         params.disableFailFast = true
 
-        //Special treatment for HHS until app-wide cache busting feature is added
-        def cacheBuster = ""
-        def uri = new URI(htmlInstance.sourceUrl)
-        if(uri.authority.toLowerCase().contains("hhs.gov")){
-            cacheBuster = "syndicationCacheBuster=${System.nanoTime()}"
-            if(uri.query){
-                cacheBuster = "&${cacheBuster}"
-            } else{
-                if(!htmlInstance.sourceUrl.endsWith("?")){
-                    cacheBuster = "?${cacheBuster}"
-                }
-            }
-        }
+        def cacheBuster = contentCacheService.getCacheBuster(htmlInstance.sourceUrl)
 
         def contentAndHash = contentRetrievalService.getContentAndMd5Hashcode(htmlInstance.sourceUrl + cacheBuster, params)
         if (!contentAndHash.content) { //Extraction failed
@@ -802,6 +790,14 @@ class MediaService {
             campaigns << [id: c.id, name: c.name]
         }
         campaigns
+    }
+
+    Long getMaxId() {
+        MediaItem.createCriteria().get {
+            projections {
+                max "id"
+            }
+        } as Long
     }
 
     private static int getMax(params) {

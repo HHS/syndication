@@ -19,12 +19,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         });
         
         $("#urlModal").on("click", function(){
+            $("#spinnerDiv").show();
             $sourceUrl=$("#sourceUrl").val();
             $.ajax({
                 data: {sourceUrl:$sourceUrl},
                 type: 'GET',
                 url: '${g.createLink(controller: 'mediaTestPreview', action: 'urlTestModal')}',
                 success: function(response){
+                    $("#spinnerDiv").fadeOut("fast");
                     $("#myModal").html(response);
                 }
             });
@@ -84,7 +86,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <div class="modal-body">
 
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-11">
                     <h1 class="page-header">Syndicated Media Preview & Extraction Testing</h1>
                 </div>
             </div>
@@ -103,14 +105,21 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 </div>
             </g:if>
 
+            <p>* If the remote server is unreachable the system will retry five times. This can take up to thirty seconds.</p>
+
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2">
                     <fieldset>
                         <!-- Text input-->
                         <div class="form-group">
-                            <label class="col-md-2 control-label" for="sourceUrl">Source URL:</label>
-                            <div class="col-md-10">
-                                <input id="sourceUrl" disabled="disabled" name="sourceUrl" type="text" placeholder="Enter the URL of the media to test" class="form-control input-md" value=${sourceUrl}>
+                            <div class="row">
+                                <label class="col-md-2 control-label" for="sourceUrl">Source URL:</label>
+                                <div class="col-md-9">
+                                    <input id="sourceUrl" disabled="disabled" name="sourceUrl" type="text" placeholder="Enter the URL of the media to test" class="form-control input-md" value=${sourceUrl}>
+                                </div>
+                                <div id="spinnerDiv" style="width:50px;display: none;" class="col-md-1">
+                                    <i class="fa fa-refresh fa-spin fa-lg"></i>
+                                </div>
                             </div>
                         </div>
                     </fieldset>

@@ -14,6 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.contentextraction
 
+import com.ctacorp.syndication.cache.CacheBuster
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.cache.CachedContent
 import grails.transaction.Transactional
@@ -102,5 +103,32 @@ class ContentCacheService {
         CachedContent.where{
             id > 0L
         }.deleteAll()
+    }
+
+    def getCacheBuster(String url) {
+        def cacheBuster = ""
+        def uri = new URI(url)
+        if(useCacheBuster(uri)){
+            log.info "cache busting ${url}"
+            cacheBuster = "syndicationCacheBuster=${System.nanoTime()}"
+            if(uri.query){
+                cacheBuster = "&${cacheBuster}"
+            } else{
+                if(!url.endsWith("?")){
+                    cacheBuster = "?${cacheBuster}"
+                }
+            }
+        }
+        return cacheBuster
+    }
+
+    private boolean useCacheBuster(URI uri) {
+        boolean useBuster = false
+        CacheBuster.list().domainName.each { domainName ->
+            if(uri.authority.toLowerCase().contains(domainName)){
+                useBuster = true
+            }
+        }
+        return useBuster
     }
 }

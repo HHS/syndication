@@ -50,7 +50,7 @@ class TweetController {
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         def indexResponse = mediaItemsService.getIndexResponse(params, Tweet)
-        respond indexResponse.mediaItemList, model: [tweetInstanceCount: indexResponse.mediaItemInstanceCount]
+        respond indexResponse.mediaItemList, model: [tweetInstanceCount: indexResponse.mediaItemInstanceCount, mediaType:"Tweet"]
     }
 
     @NotTransactional
@@ -125,11 +125,7 @@ class TweetController {
         }
 
         if(flash.errors) {
-            redirect action:"importTweets", params:[
-                    count:params.int('count'),
-                    restrictToMedia:params.boolean('restrictToMedia'),
-                    accountName:params.accountName
-            ]
+            redirect action:"importTweets", params:params
             return
         }
 

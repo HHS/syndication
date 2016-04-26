@@ -21,6 +21,11 @@
   padding: 15px;
 }
 
+/* removes outline from carousel buttons */
+
+[data-carousel-3d] [data-next-button]:focus,
+[data-carousel-3d] [data-prev-button]:focus {outline: none;}
+
  /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) { ... }
 

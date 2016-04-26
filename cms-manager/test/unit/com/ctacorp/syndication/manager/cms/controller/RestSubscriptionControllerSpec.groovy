@@ -101,8 +101,7 @@ class RestSubscriptionControllerSpec extends Specification {
 
         then: "redirect to the index view with a not found message"
 
-        response.redirectUrl == "/restSubscription/index"
-        flash.errors == ["default.not.found.message"]
+        view == "create"
     }
 
     void "save action correctly handles a null source url"() {
@@ -153,6 +152,8 @@ class RestSubscriptionControllerSpec extends Specification {
     }
 
     void "save action correctly handles when content extraction service returns a null mediaId"() {
+        setup:
+        MediaItem mediaItem = null
 
         when: "calling the action with the instance"
 
@@ -161,7 +162,7 @@ class RestSubscriptionControllerSpec extends Specification {
 
         then: "return a null mediaId from the content extraction service"
 
-        contentExtractionService.getMediaItemBySourceUrl(restSubscription.sourceUrl) >> null
+        contentExtractionService.getMediaItemBySourceUrl(restSubscription.sourceUrl) >> mediaItem
 
         and: "redirect to the index view with a nice error message"
 

@@ -28,6 +28,44 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <synd:message/>
     <synd:errors/>
     <synd:error/>
+
+    <div class="row">
+        <div class="col-md-10">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <g:form action="index" class="form-horizontal">
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-6" for="search">Search By Name</label>
+                                    <div class="col-sm-6">
+                                        <input id="name" name="name" type="search" placeholder="Name" class="form-control input-md" value="${params?.name}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <label class="control-label col-sm-6" for="max">Sources Per Page</label>
+                                    <div class="col-sm-6">
+                                        <g:select name="max" from="[5, 10, 15, 20, 50]" class="form-control" value="${params.max}"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="">
+                                    <g:submitButton id="search" name="search" class="btn btn-primary" value="Search"/>
+                                </div>
+                            </div>
+                        </div>
+                    </g:form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-lg-12">
             <!-- /.panel-heading -->
@@ -36,17 +74,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <table class="table table-striped table-bordered table-hover">
                         <thead>
                         <tr>
-                            <g:sortableColumn class="idTables" property="id" title="${message(code: 'source.id.label', default: 'ID')}"/>
+                            <g:sortableColumn class="idTables" property="id" title="${message(code: 'source.id.label', default: 'ID')}" params="[name:params.name,max:params.max]"/>
 
-                            <g:sortableColumn property="name" title="${message(code: 'source.name.label', default: 'Name')}"/>
+                            <g:sortableColumn property="name" title="${message(code: 'source.name.label', default: 'Name')}" params="[name:params.name,max:params.max]"/>
 
-                            <g:sortableColumn property="acronym" title="${message(code: 'source.acronym.label', default: 'Acronym')}"/>
+                            <g:sortableColumn property="acronym" title="${message(code: 'source.acronym.label', default: 'Acronym')}" params="[name:params.name,max:params.max]"/>
 
-                            <g:sortableColumn property="websiteUrl" title="${message(code: 'source.websiteUrl.label', default: 'Website Url')}"/>
+                            <g:sortableColumn property="websiteUrl" title="${message(code: 'source.websiteUrl.label', default: 'Website Url')}" params="[name:params.name,max:params.max]"/>
 
-                            <g:sortableColumn property="contactEmail" title="${message(code: 'source.contactEmail.label', default: 'Contact Email')}"/>
+                            <g:sortableColumn property="contactEmail" title="${message(code: 'source.contactEmail.label', default: 'Contact Email')}" params="[name:params.name,max:params.max]"/>
 
-                            <g:sortableColumn property="description" title="${message(code: 'source.description.label', default: 'Description')}"/>
+                            <g:sortableColumn property="description" title="${message(code: 'source.description.label', default: 'Description')}" params="[name:params.name,max:params.max]"/>
 
                         </tr>
                         </thead>
@@ -74,7 +112,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             </div>
 
             <div class="pagination">
-                <g:paginate total="${sourceInstanceCount ?: 0}"/>
+                <g:paginate total="${sourceInstanceCount ?: 0}" params="[max:params.max, name:params.name]"/>
             </div>
             
         </div>

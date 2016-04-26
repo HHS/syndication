@@ -44,7 +44,7 @@ class InfographicController {
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         def indexResponse = mediaItemsService.getIndexResponse(params, Infographic)
-        respond indexResponse.mediaItemList, model: [infographicInstanceCount: indexResponse.mediaItemInstanceCount]
+        respond indexResponse.mediaItemList, model: [infographicInstanceCount: indexResponse.mediaItemInstanceCount, mediaType:"Infographic"]
     }
 
     def show(Infographic infographicInstance) {

@@ -27,7 +27,7 @@
 
         <div class="slick-navigation">
             <g:each in="${mediaItemContent}" var="mediaItem">
-                <div><img src="${grailsApplication.config.syndication.contentExtraction.urlBase}/${mediaItem.meta.id}/thumbnail.jpg" alt="Thumbnail for media item ${mediaItem.meta.name}"></div>
+                <div><img src="${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${mediaItem.meta.id}/thumbnail.jpg" alt="Thumbnail for media item ${mediaItem.meta.name}"></div>
             </g:each>
         </div>
 

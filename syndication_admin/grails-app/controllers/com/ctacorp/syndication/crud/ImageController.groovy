@@ -45,7 +45,7 @@ class ImageController {
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         def indexResponse = mediaItemsService.getIndexResponse(params, Image)
-        respond indexResponse.mediaItemList, model: [imageInstanceCount: indexResponse.mediaItemInstanceCount]
+        respond indexResponse.mediaItemList, model: [imageInstanceCount: indexResponse.mediaItemInstanceCount, mediaType:"Image"]
     }
 
     def show(Image imageInstance) {

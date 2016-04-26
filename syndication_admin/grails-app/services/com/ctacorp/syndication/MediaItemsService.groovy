@@ -3,6 +3,7 @@ package com.ctacorp.syndication
 import com.ctacorp.syndication.authentication.Role
 import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.authentication.UserRole
+import com.ctacorp.syndication.jobs.DelayedTinyUrlJob
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.FAQ
 import com.ctacorp.syndication.media.Html
@@ -342,6 +343,9 @@ class MediaItemsService {
 
         mediaItem.save(flush: true)
         mediaItemSubscriber?.save(flush: true)
+
+        //Add URL Mapping
+        DelayedTinyUrlJob.schedule(new Date(System.currentTimeMillis() + 5000), [mediaId:mediaItem.id, sourceUrl: mediaItem.sourceUrl, externalGuid:mediaItem.externalGuid])
 
         return mediaItem
     }

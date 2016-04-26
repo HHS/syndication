@@ -45,7 +45,7 @@ environments {
         dataSource {
             dbCreate = "update"
             driverClassName = "com.mysql.jdbc.Driver"
-            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('TAGCLOUD_DB')}"
+            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('TAGCLOUD_DB')}?useSSL=false"
             username = 'root'
             password = "${System.getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD')}"
             properties {

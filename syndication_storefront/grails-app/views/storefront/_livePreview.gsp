@@ -12,5 +12,5 @@
     </div>
 </sec:ifLoggedIn>
 <sec:ifNotLoggedIn>
-    <span>To get the embed code snippet please <g:link controller="login" action="index">Login.</g:link></span>
+    <span>To get the embed code snippet please <g:link controller="login" action="index" params="['spring-security-redirect':request.forwardURI - request.contextPath]">Login.</g:link></span>
 </sec:ifNotLoggedIn>

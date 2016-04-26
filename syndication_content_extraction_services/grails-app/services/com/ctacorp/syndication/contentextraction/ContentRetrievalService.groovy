@@ -38,17 +38,26 @@ class ContentRetrievalService {
         params.newUrlBase = removeSuffix(url)
 
         String content = null
-        try{
-            content = webUtilService.getPage(url, params.disableFailFast)
-            String extractedContent = jsoupWrapperService.extract(content, params)
-            def jsonLD = jsoupWrapperService.getJsonLDMetaDataAsJSON(content)
-            return [
-                extractedContent:extractedContent,
-                jsonLD:jsonLD
-            ]
-        } catch(ContentUnretrievableException e){
-            log.error("Tried to extract content from a bad URL: ${url}\nError: ${e}")
-            throw e
+        int failedRequestAttempts = 4
+        while(failedRequestAttempts >= 0){
+            try {
+                content = webUtilService.getPage(url, params.disableFailFast)
+                String extractedContent = jsoupWrapperService.extract(content, params)
+                def jsonLD = jsoupWrapperService.getJsonLDMetaDataAsJSON(content)
+                return [
+                        extractedContent: extractedContent,
+                        jsonLD          : jsonLD
+                ]
+            } catch (ContentUnretrievableException e) {
+                log.error("Tried to extract content from a bad URL: ${url}\nError: ${e}")
+                if(failedRequestAttempts < 1){
+                    log.error("Exhausted content extraction attempts for bad URL: ${url}\nError: ${e}")
+                    throw e
+                }
+                failedRequestAttempts--
+                log.info("waiting 5 seconds retry content extraction from the URL: ${url}")
+                sleep(5000)
+            }
         }
     }
 
@@ -92,7 +101,6 @@ class ContentRetrievalService {
         String audienceField = ""
 
         def tags = tagsService.getTagsForMediaId(mi.id)
-        println tags
         def generalTags = tags.findAll{ it.type.name == "General" && it.language.isoCode == "eng" }.collect{ it.name }
         def audienceTags = tags.findAll{ it.type.name == "Audience" && it.language.isoCode == "eng" }.collect{ it.name }
 

@@ -270,7 +270,14 @@ class MediaController {
         ])
     ])
     def preview(Long id){
+        log.debug "preview request for media id: ${id}"
         MediaItem mi = mediaService.getMediaItem(id)
+        if(!mi && id <= mediaService.getMaxId()) {
+            log.debug "can't find that media item"
+            InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/missingFile.jpg").inputStream
+            renderBytes(f.bytes)
+            return
+        }
         if(!mi || !mi.active){
             response.status = 400
             render ApiResponse.get400NotFoundResponse().autoFill(params) as JSON
@@ -332,6 +339,11 @@ class MediaController {
     ])
     def thumbnail(Long id){
         MediaItem mi = mediaService.getMediaItem(id)
+        if(!mi && id <= mediaService.getMaxId()) {
+            InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/missingFile.jpg").inputStream
+            renderBytes(f.bytes)
+            return
+        }
         if(!mi || !mi.active){
             response.status = 400
             render ApiResponse.get400NotFoundResponse().autoFill(params) as JSON
@@ -392,7 +404,10 @@ class MediaController {
     ])
     def content(Long id){
         MediaItem mi = mediaService.getMediaItem(id)
-
+        if(!mi && id <= mediaService.getMaxId()) {
+            render template: "retractedItem", model:[storefrontUrl:grailsApplication.config.syndication.storefront]
+            return
+        }
         if(!mi || mi.active == false){
             response.status = 400
             response.contentType = "application/json"
@@ -455,6 +470,20 @@ class MediaController {
     ])
     def syndicate(Long id){
         MediaItem mi = mediaService.getMediaItem(id)
+        def resp = new Embedded()
+        if(!mi && id <= mediaService.getMaxId()) {
+            response.withFormat {
+                html{
+                    render text:g.render(template:  "retractedItem", model:[storefrontUrl:grailsApplication.config.syndication.storefront])
+                }
+                json{
+                    resp.content = g.render(template:  "retractedItem", model:[storefrontUrl:grailsApplication.config.syndication.storefront])
+                    respond ApiResponse.get200Response([resp]).autoFill(params)
+                }
+            }
+
+            return
+        }
         if(!mi || mi.active == false){
             response.status = 400
             response.contentType = "application/json"
@@ -464,7 +493,7 @@ class MediaController {
 
         DelayedMetricAddJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId: mi.id])
 
-        def resp = new Embedded( id: mi.id, name: mi.name, description: mi.description, sourceUrl: mi.sourceUrl)
+        resp = new Embedded( id: mi.id, name: mi.name, description: mi.description, sourceUrl: mi.sourceUrl)
 
         switch(mi){
             case com.ctacorp.syndication.media.Collection:

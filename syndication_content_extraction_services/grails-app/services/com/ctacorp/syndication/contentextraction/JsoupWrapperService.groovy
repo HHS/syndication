@@ -67,6 +67,8 @@ class JsoupWrapperService {
             removeInlineIdsFormDocument(doc)
         }
 
+        removeBadTagsFromDocument(doc)
+
         customizeStyles(doc, params)
 
         patchRelativeUrlsFromDocument(doc, newUrlBase)
@@ -296,6 +298,19 @@ class JsoupWrapperService {
         Elements brs = doc.select("br")
         brs.each{ br ->
             br.remove()
+        }
+        doc
+    }
+
+    private Document removeBadTagsFromDocument(Document doc){
+        Elements styleBlock = doc.select("style")
+        styleBlock.each{ style ->
+            style.remove()
+        }
+
+        Elements links = doc.select("link")
+        links.each{ link ->
+            link.remove()
         }
         doc
     }

@@ -1,12 +1,4 @@
-// locations to search for config files that get merged into the main config;
-// config files can be ConfigSlurper scripts, Java properties files, or classes
-// in the classpath in ConfigSlurper format
-
 grails.config.locations = [ "file:${userHome}/syndicationSharedConfig.groovy", "file:${userHome}/syndicationStorefrontConfig.groovy"]
-
-// if (System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
 
 grails.project.groupId = "com.ctacorp.syndication.storefront" // change this to alter the default package name and Maven publishing destination
 
@@ -17,16 +9,13 @@ grails.war.resources = { stagingDir, args ->
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://localhost:8082/SyndicationStorefront"
     }
     production {
         grails.logging.jul.usebridge = false
-        if(System.getenv("USING_DOCKER") == "true"){
-            grails.serverURL = "http://docker.local/store"
-        }
     }
 }
 
+grails.serverURL = System.getenv("STORE_PUBLIC_URL")
 
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
@@ -146,11 +135,8 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
         '/**/favicon.ico':                ['permitAll']
 ]
 
-syndication.swaggerAddress = System.getenv("API_URL")
-
-
-//TagCloud
-tagCloud.serverAddress = System.getenv("TAGCLOUD_URL")
+syndication.swaggerAddress = System.getenv("API_SERVER_URL")
+tagCloud.serverAddress = System.getenv("TAG_SERVER_URL")
 
 // Mail plugin defaults:
 grails {

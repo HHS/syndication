@@ -92,6 +92,13 @@
                   </div>
                 </div>
 
+                <div class="form-group">
+                  <label class="col-md-4 control-label" for="source">Items Per Page</label>
+                  <div class="col-md-8">
+                    <g:select class="form-control" from="[5, 10, 15, 20, 50]" name="max" value="${max}" noSelection="['':'-Items Per Page-']"/>
+                  </div>
+                </div>
+
               </div>
 
               <div class="row">
@@ -121,17 +128,17 @@
             <table class="table table-striped table-bordered table-hover">
               <thead>
               <tr>
-                <g:sortableColumn class="idTables" property="id" title="${message(code: 'html.id.label', default: 'Id')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType]"/>
+                <g:sortableColumn class="idTables" property="id" title="${message(code: 'html.id.label', default: 'Id')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType,subscriberId:params.subscriberId,sourceId:params.sourceId,createdBy:params.createdBy,max: params.max]"/>
 
-                <g:sortableColumn property="name" title="${message(code: 'html.name.label', default: 'Name')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType]"/>
+                <g:sortableColumn property="name" title="${message(code: 'html.name.label', default: 'Name')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType,subscriberId:params.subscriberId,sourceId:params.sourceId,createdBy:params.createdBy,max: params.max]"/>
 
-                <g:sortableColumn property="description" title="${message(code: 'html.description.label', default: 'Description')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType]"/>
+                <g:sortableColumn property="description" title="${message(code: 'html.description.label', default: 'Description')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType,subscriberId:params.subscriberId,sourceId:params.sourceId,createdBy:params.createdBy,max: params.max]"/>
 
-                <g:sortableColumn property="sourceUrl" title="${message(code: 'html.sourceUrl.label', default: 'Source Url')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType]"/>
+                <g:sortableColumn property="sourceUrl" title="${message(code: 'html.sourceUrl.label', default: 'Source Url')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType,subscriberId:params.subscriberId,sourceId:params.sourceId,createdBy:params.createdBy,max: params.max]"/>
 
-                <g:sortableColumn class="col-md-2" property="dateSyndicationCaptured" title="${message(code: 'html.dateSyndicationCaptured.label', default: 'Date Syndication Captured')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType]"/>
+                <g:sortableColumn class="col-md-2" property="dateSyndicationCaptured" title="${message(code: 'html.dateSyndicationCaptured.label', default: 'Date Syndication Captured')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType,subscriberId:params.subscriberId,sourceId:params.sourceId,createdBy:params.createdBy,max: params.max]"/>
 
-                <g:sortableColumn property="dateSyndicationUpdated" title="${message(code: 'html.dateSyndicationUpdated.label', default: 'Date Syndication Updated')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType]"/>
+                <g:sortableColumn property="dateSyndicationUpdated" title="${message(code: 'html.dateSyndicationUpdated.label', default: 'Date Syndication Updated')}" params="[url:params.url, title:params.title, id:params.id, language:params.language, mediaType:params.mediaType,subscriberId:params.subscriberId,sourceId:params.sourceId,createdBy:params.createdBy,max: params.max]"/>
 
               </tr>
               </thead>
@@ -161,7 +168,11 @@
                                                                           title:params.title,
                                                                           id:params.id,
                                                                           language:params.language,
-                                                                          mediaType:params.mediaType]"/>
+                                                                          mediaType:params.mediaType,
+                                                                          subscriberId:params.subscriberId,
+                                                                          sourceId:params.sourceId,
+                                                                          createdBy:params.createdBy,
+                                                                          max: params.max]"/>
             </div>
           </div>
         </div>
