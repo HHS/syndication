@@ -9,7 +9,9 @@ import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.jobs.DelayedMetricAddJob
 import com.ctacorp.syndication.jobs.DelayedQueryLogJob
 import grails.plugin.springsecurity.annotation.Secured
+import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
+import grails.util.Holders
 
 @Secured(['permitAll'])
 class StorefrontController {
@@ -19,6 +21,7 @@ class StorefrontController {
     def springSecurityService
     def likeService
     def mediaListService
+    RestBuilder rest = new RestBuilder()
 
     def index() {
         def model = mediaTagHelper()
@@ -175,6 +178,10 @@ class StorefrontController {
         } else {
             DelayedMetricAddJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId: mediaItemInstance.id])
         }
+        rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
+        def stripScripts = (!params.submitChangesButton || params.stripScripts == "on")
+        def stripStyles = (!params.submitChangesButton || params.stripStyles == "on")
+        def stripImages = !params.stripImages || params.stripStyles != "on"  ? false : true
 
         [
                 tags             : getTagsForMediaItem(mediaItemInstance),
@@ -183,7 +190,11 @@ class StorefrontController {
                 likeCount        : likeCount,
                 mediaItemInstance: mediaItemInstance,
                 apiBaseUrl       : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
-                userId           : springSecurityService?.currentUser?.id ?: -1
+                userId           : springSecurityService?.currentUser?.id ?: -1,
+                stripScripts     : stripScripts,
+                stripStyles      : stripStyles,
+                stripImages      : stripImages,
+                outsidePreview   : mediaItemInstance.foreignSyndicationAPIUrl ? rest.get("${Holders.config.syndication.swaggerAddress}/api/v2/resources/media/${mediaItemInstance.id}/embed.json?autoplay=0&userId=${springSecurityService?.currentUser?.id ?: -1}&stripImages=${stripImages ? 1 : 0}&stripStyles=${stripStyles ? 1 : 0}&stripScripts=${stripScripts ? 1 : 0}").json.results[0].snippet.decodeHTML() : null
         ]
     }
 

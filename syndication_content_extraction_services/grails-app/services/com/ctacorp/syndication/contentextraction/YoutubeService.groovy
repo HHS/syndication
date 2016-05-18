@@ -172,7 +172,7 @@ class YoutubeService {
             if(url?.query?.v){
                 return url.query.v
             }
-            def matcher = sourceUrl =~ /embed\/([\w\W&&[^\/]]+)/
+            def matcher = sourceUrl =~ /embed\/([\w\W&&[^?\/]]+)/
             if(matcher.count) {
                 return matcher[0][1]
             }

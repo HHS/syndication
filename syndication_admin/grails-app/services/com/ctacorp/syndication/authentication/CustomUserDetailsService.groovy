@@ -13,7 +13,6 @@ import org.springframework.web.context.request.RequestContextHolder
  * Created by nburk on 12/22/14.
  */
 class CustomUserDetailsService implements GrailsUserDetailsService {
-
     def cmsManagerKeyService
     def grailsApplication
 
@@ -30,8 +29,10 @@ class CustomUserDetailsService implements GrailsUserDetailsService {
 
         User.withTransaction { status ->
             User user = User.findByUsername(username)
+            if(!user){
+                throw new CustomAuthenticationException(UNAUTHORIZED_MESSAGE)
+            }
             if (user.authorities.contains(Role.findByAuthority("ROLE_PUBLISHER"))){
-
                 if(!cmsManagerKeyService.getSubscriberById(user.subscriberId)){
                     RequestContextHolder.currentRequestAttributes().setAttribute("publisherFailure", UNAUTHORIZED_MESSAGE, 1)
                     throw new CustomAuthenticationException(UNAUTHORIZED_MESSAGE)

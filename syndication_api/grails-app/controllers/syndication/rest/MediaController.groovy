@@ -22,6 +22,7 @@ import com.ctacorp.syndication.api.Meta
 import com.ctacorp.syndication.api.Pagination
 import com.ctacorp.syndication.jobs.DelayedTaggingJob
 import com.ctacorp.syndication.jobs.DelayedTinyUrlJob
+import com.ctacorp.syndication.jobs.DelayedAlternateImageJob
 import com.ctacorp.syndication.media.*
 import com.ctacorp.syndication.commons.util.*
 import com.ctacorp.syndication.jobs.DelayedMetricAddJob
@@ -36,6 +37,7 @@ import com.ctacorp.syndication.exception.*
 import com.ctacorp.syndication.exception.UnauthorizedException
 import com.ctacorp.syndication.render.ApiResponseRenderer
 import java.util.concurrent.Callable
+import groovy.json.StringEscapeUtils
 
 @API(swaggerDataPath = "/media", description = "Information about media", modelExtensions = [
     @ModelExtension(id="MediaItems", model = "ApiResponse", addProperties = [
@@ -207,22 +209,37 @@ class MediaController {
             return
         }
 
-        String renderedResponse
-        String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/media/$mi.id"
+        Closure getEmbedCode = {
+            if (!mi.foreignSyndicationAPIUrl) {
+                String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/media/$mi.id"
 
-        switch(params.displayMethod ? params.displayMethod.toLowerCase() : "feed"){
-            case "mv":
-                renderedResponse = mediaService.renderMediaViewerSnippet(mi, params)
-                break
-            case "feed":
-            case "list":
-            default:
-                if(params.flavor && params.flavor.toLowerCase() == "iframe") {
-                    renderedResponse = mediaService.renderIframeSnippet(url, params)
-                } else{
-                    renderedResponse = mediaService.renderJSSnippet(url, mi, params)
+                switch (params.displayMethod ? params.displayMethod.toLowerCase() : "feed") {
+                    case "mv":
+                        return mediaService.renderMediaViewerSnippet(mi, params)
+                        break
+                    case "feed":
+                    case "list":
+                    default:
+                        if (params.flavor && params.flavor.toLowerCase() == "iframe") {
+                            return mediaService.renderIframeSnippet(url, params)
+                        } else {
+                            return mediaService.renderJSSnippet(url, mi, params)
+                        }
                 }
+            } else {
+                def stripScripts = (params.int("stripScripts") == null || params.int("stripScripts") == 1)
+                def stripStyles = (params.int("stripStyles") == null || params.int("stripStyles") == 1)
+                def stripImages = (params.int("stripImages") == null || params.int("stripImages") == 0) ? false : true
+
+                return rest.get(mi.foreignSyndicationAPIUrl + "/api/v2/resources/media/${mi.externalGuid}/embed.json?stripscripts=${stripScripts}&stripstyles=${stripStyles}&stripImages=${stripImages}").json.results.encodeAsHTML()
+            }
         }
+
+        def keyParts = params.clone()
+        keyParts.remove("_")
+        keyParts.remove("callback")
+        keyParts.remove("controllerContext")
+        String renderedResponse = guavaCacheService.getEmbedCachesForId(id,"embed/${id}?" + keyParts.sort().toString(), getEmbedCode)
 
         withFormat {
             html {
@@ -1054,6 +1071,10 @@ class MediaController {
             def metaTags = jsoupWrapperService.getMetaTags(instance.sourceUrl)
             if(metaTags){
                 DelayedTaggingJob.schedule(new Date(System.currentTimeMillis() + 5000), [mediaId:instance.id, requestJson:metaTags, methodName:"tagMediaItemByNames"])
+            }
+
+            if(requestJson.addAlternateImages) {
+                DelayedAlternateImageJob.schedule(new Date(System.currentTimeMillis() + 5000), [mediaId:instance.id, alternateImages:requestJson.addAlternateImages])
             }
 
             //Add URL Mapping

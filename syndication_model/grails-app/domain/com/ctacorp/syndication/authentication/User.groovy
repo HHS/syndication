@@ -31,16 +31,18 @@ class User {
     String unlockCode
     Long subscriberId
     Date codeExpirationDate
+    Date lastLogin
 
     static hasMany = [likes:MediaItem, userLists:UserMediaList]
 
     static constraints = {
-        name     blank: false, nullable: true
-        username email:true, blank: false, unique: true
-        unlockCode blank: true, nullable: true
-        codeExpirationDate blank: true, nullable: true
-        password blank: false, minSize: 8
-        subscriberId nullable: true, blank: true
+        name                nullable: true, blank: false
+        username            email: true,    blank: false, unique: true
+        unlockCode          nullable: true, blank: true
+        codeExpirationDate  nullable: true, blank: true
+        password            blank: false,   minSize: 8
+        subscriberId        nullable: true, blank: true
+        lastLogin           nullable: true
     }
 
     static mapping = {

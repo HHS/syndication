@@ -6,9 +6,8 @@
     <br/>
     <h3>Live Snippet Preview</h3>
     <p>When you embed the above snippet code on your website, the injected content will look something like the preview below. Use the supplied checkboxes to alter the delivered content. It's important to note that the final look and feel of the content is subject to your local stylesheets.</p>
-
     <div id="snippetPreview">
-
+        ${outsidePreview?.encodeAsRaw()}
     </div>
 </sec:ifLoggedIn>
 <sec:ifNotLoggedIn>

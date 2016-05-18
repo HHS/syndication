@@ -37,13 +37,29 @@ class TagService {
 
     def listAllTags(params = [:]) {
         def offset = params.offset ?: 0
-        def max = params.max ?: 10
+        def max = 1000
         def sort = params.sort ?: "id"
         params.name = params.name ?: ""
         if (params.order?.toLowerCase() == "desc") {
             sort = "-${sort}"
         }
-        get("/tags.json?includePaginationFields=1&offset=${offset}&max=${max}&sort=${sort}&nameContains=${params.name}")
+
+        def allTags = get("/tags.json?includePaginationFields=1&offset=${offset}&max=${max}&sort=${sort}&nameContains=${params.name}")
+        if(allTags.total > max){
+            boolean keepParsing = true
+            while(keepParsing) {
+                offset += max
+                def restResp = get("/tags.json?includePaginationFields=1&offset=${offset}&max=${max}&sort=${sort}&nameContains=${params.name}")
+                allTags.tags.addAll(restResp.tags)
+                if(offset + max >= restResp.total){
+                    keepParsing = false
+                }
+            }
+            allTags.total = allTags.tags.size()
+            allTags.dataSize = allTags.total
+        }
+
+        allTags
     }
 
     def findTagsByTagName(String name, params = [:]) {

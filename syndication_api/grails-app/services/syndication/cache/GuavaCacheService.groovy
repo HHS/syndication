@@ -34,19 +34,26 @@ class GuavaCacheService {
     private final int imageCacheSize = Holders.config.disableGuavaCache ? 0 : 500
     private final int imageCacheTimeout = 24 // hours
 
+    private final int embedCacheSize = Holders.config.disableGuavaCache ? 0 : 500
+    private final int embedCacheTimeout = 1 // hours
+
     def caches = [
             apiResponseCache: CacheBuilder.newBuilder().
                     expireAfterWrite(apiResponseCacheTimeout, TimeUnit.MINUTES).
                     maximumSize(apiResponseCacheSize).
                     build(),
-            extractedContentCache:CacheBuilder.newBuilder().
+            extractedContentCache: CacheBuilder.newBuilder().
                     expireAfterWrite(extractedContentCacheTimeout, TimeUnit.HOURS).
                     maximumSize(extractedContentCacheSize).
                     build(),
-            imageCache:CacheBuilder.newBuilder().
+            imageCache: CacheBuilder.newBuilder().
                     expireAfterWrite(imageCacheTimeout, TimeUnit.HOURS).
                     maximumSize(imageCacheSize).
-                    build()
+                    build(),
+            embedCache: CacheBuilder.newBuilder().
+                    expireAfterWrite(embedCacheTimeout, TimeUnit.HOURS).
+                    maximumSize(embedCacheSize).
+                    build(),
     ]
 
     Cache getApiResponseCache(){//all
@@ -59,6 +66,10 @@ class GuavaCacheService {
     //new mediaitemupdateflushmethod
     Cache getImageCache(){//by name
         caches.imageCache
+    }
+
+    Cache getEmbedCache(){//by name
+        caches.embedCache
     }
 
     def getExtractedContentCachesForId(def id, String url, Closure c) {
@@ -87,6 +98,19 @@ class GuavaCacheService {
         return getIndividualCacheForId(id, url, map, c, "image")
     }
 
+    def getEmbedCachesForId(long id, String url, Closure c) {
+        def key = Hash.md5("${id}")
+
+        Map map = embedCache.get(key, new Callable<Map>() {
+            @Override
+            public Map call(){
+                // "regenerating full map cache"
+                return [:]
+            }
+        });
+        return getIndividualCacheForId(id, url, map, c, "embed")
+    }
+
     def getIndividualCacheForId(def id, String url, def map, Closure c, String cacheName) {
         def individualKey = Hash.md5(url)
         if(map."$individualKey" == null) {
@@ -105,6 +129,8 @@ class GuavaCacheService {
             case "content" : extractedContentCache.put(key,map)
                 break;
             case "image" : imageCache.put(key,map)
+                break;
+            case "embed" : embedCache.put(key,map)
                 break;
             default: log.error("cache for ${cacheName} did not perform a put() correctly")
                 break;

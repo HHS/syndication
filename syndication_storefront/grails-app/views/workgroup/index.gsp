@@ -51,7 +51,7 @@
                     <a href="https://digitalmedia.hhs.gov/tobacco">Food and Drug Administration - Center for Tobacco Products - Exchange Lab</a>
                 </li>
                 <li>
-                    <a href="https://tools.NIAID.NIH.gov">National Institutes of Health</a>
+                    <a href="https://www.nih.gov/health-information/free-web-content-nih">National Institutes of Health</a>
                 </li>
             </ul>
             <p><strong>Open Source</strong></p>

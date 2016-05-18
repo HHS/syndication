@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils
 class MediaPreviewThumbnailController {
     def mediaPreviewThumbnailService
     def remoteCacheService
+    def mediaPreviewThumbnailJobService
 
     def index() {
         redirect action: 'allThumbnails'
@@ -33,6 +34,30 @@ class MediaPreviewThumbnailController {
     def allThumbnails(){
         params.max = params.max?:100
         [mediaItems:MediaItem.list(params)]
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def regenerateThumbnailsForCollection(Long collectionId, Long manualCollectionId){
+        if(manualCollectionId){
+            if(!com.ctacorp.syndication.media.Collection.exists(manualCollectionId)){
+                flash.error = "No campaign found with ID: ${manualCollectionId}"
+                redirect action: "index"
+                return
+            }
+            mediaPreviewThumbnailJobService.regenerateCollection(manualCollectionId)
+            flash.message = "Preview and Thumbnail regeneration in progress for Collection: ${manualCollectionId}"
+        } else{
+            mediaPreviewThumbnailJobService.regenerateCollection(collectionId)
+            flash.message = "Preview and Thumbnail regeneration in progress for Collection: ${collectionId}"
+        }
+        redirect action: 'allThumbnails', params: [max:params.max, offset:params.offset]
+    }
+
+    @Secured(['ROLE_ADMIN'])
+    def regenerateThumbnailsForRange(Long start, Long end){
+        mediaPreviewThumbnailJobService.regenerateRange(start, end)
+        flash.message = "Preview and Thumbnail regeneration in progress for media IDs ${start} to ${end} (inclusive)"
+        redirect action: 'allThumbnails', params: [max:params.max, offset:params.offset]
     }
 
     @Secured(['ROLE_ADMIN'])
@@ -58,15 +83,14 @@ class MediaPreviewThumbnailController {
 
     @Secured(['ROLE_ADMIN'])
     def generateMissing() {
-        DelayedMediaPreviewThumbnailJob.schedule(new Date(System.currentTimeMillis() + (1000)), ["scope":"missing"])
+        mediaPreviewThumbnailJobService.regenerateMissing()
         flash.message = "${new Date()} Preview and Thumbnail generation in progress"
         redirect action: 'allThumbnails', params: [max:params.max, offset:params.offset]
     }
 
     @Secured(['ROLE_ADMIN'])
     def regenerateThumbnailPreviewForAllMedia(){
-        DelayedMediaPreviewThumbnailJob.schedule(new Date(System.currentTimeMillis() + (1000)), ["scope":"all"])
-        remoteCacheService.flushRemoteCacheByName("imageCache")
+        mediaPreviewThumbnailJobService.regenerateAll()
         flash.message = "${new Date()} Preview and Thumbnail regeneration in progress"
         redirect action: 'allThumbnails', params: [max:params.max, offset:params.offset]
     }

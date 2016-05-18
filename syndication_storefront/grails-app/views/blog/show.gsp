@@ -91,7 +91,6 @@
         <g:render template="/microsite/mediaItemModals"/>
 
         </div><!-- end microsite-content row  -->
-
     <g:render template="/microsite/templateFooter"/>
 
     </div><!-- end microsite blog -->

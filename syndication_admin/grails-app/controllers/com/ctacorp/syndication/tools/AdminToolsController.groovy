@@ -123,14 +123,22 @@ class AdminToolsController {
     }
 
     def duplicateFinder(){
-        params.max = Math.min(params.int('max') ?: 100, 1000)
+//        params.max = Math.min(params.int('max') ?: 100, 20000)
         params.sort = "id"
+        params.order = params.order ?: "DESC"
+        println "params: " + params
         def mediaList = MediaItem.list(params)
+
         def alreadyChecked = []
+        def urlMap = [:]
         def dupes = []
         mediaList.each{ mi ->
             log.info("Checking ${mi.id} for duplicates")
-            if(!(mi.id in alreadyChecked)) {
+            println "urlMapping: " + urlMap[mi.sourceUrl]
+            if(!urlMap[mi.sourceUrl.toLowerCase()]){
+                urlMap[mi.sourceUrl.toLowerCase()] = mi.id
+            }else {
+                //handle duplicate
                 def found = MediaItem.findAllBySourceUrl(mi.sourceUrl, [sort: 'id', order: 'ASC'])
                 if (found.size() > 1) {
                     log.info("Duplicate Found!! ${found}")
@@ -139,12 +147,24 @@ class AdminToolsController {
                             dupes: found[1..-1]
                     ]
                 }
-                found.each{
-                    alreadyChecked << it.id
-                }
             }
         }
         render view:'duplicateFinder', model:[duplicates:dupes, total:MediaItem.count()]
+    }
+
+    def addLoginDateToAllUsers(){
+        User.list().each{ user ->
+            User.withTransaction {
+                if(!user.lastLogin) {
+                    user.lastLogin = new Date()
+                    if (!user.save()) {
+                        log.error "Couldn't save user: ${user.id} ${user.username}"
+                    }
+                }
+            }
+        }
+        flash.message = "Dates added to all users without an existing date. Check logs for errors."
+        redirect action: "index"
     }
 
     def resetAllHashes(Boolean restrictToDomain, String domain) {

@@ -33,6 +33,7 @@ class UserService {
 
     def createUser(params){
         User userInstance = new User(params)
+        userInstance.lastLogin = new Date()
         boolean validInstance = userInstance.validate()
         def passwordValidation = passwordService.validatePassword(params.password, params.passwordRepeat)
         if(userInstance.hasErrors() || !passwordValidation.valid) {

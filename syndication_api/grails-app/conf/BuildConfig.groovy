@@ -21,9 +21,6 @@ grails.project.target.level = 1.6
 grails.project.source.level = 1.6
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
-def home = System.getProperty('user.home')
-def config = new ConfigSlurper(grailsSettings.grailsEnv).parse(new File("$home/syndicationSharedBuildConfig.groovy").toURI().toURL())
-
 //grails.project.fork = false
 grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
@@ -55,8 +52,7 @@ grails.project.dependency.resolution = {
     repositories {
         inherits("global") {}
 
-        mavenRepo(config.artifactory.repo){
-            auth username: config.artifactory.username, password: config.artifactory.password
+        mavenRepo("http://54.234.21.193:8080/artifactory/central"){
             updatePolicy 'always'
         }
 
@@ -107,8 +103,8 @@ grails.project.dependency.resolution = {
         }
 
         // plugins for the compile step --------------------------------------------------------------------------------
-        compile ":syndication-model:2.8.0"   //syndication domain models
-        compile ":content-extraction-services:1.13.0"   //syndication content extraction tools
+        compile ":syndication-model:2.9.0"   //syndication domain models
+        compile ":content-extraction-services:1.14.0"   //syndication content extraction tools
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
         compile ":asset-pipeline:2.6.5"

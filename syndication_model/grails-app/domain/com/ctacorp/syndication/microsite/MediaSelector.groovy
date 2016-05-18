@@ -20,7 +20,13 @@ class MediaSelector {
     }
 
     enum SelectorType{
-        TAG("Tag"), COLLECTION("Collection"), SOURCE("Source"), USER_MEDIA_LIST("My List"), CAMPAIGN("Campaign"), MOST_POPULAR("Most Popular"), MOST_RECENT("Most Recent")
+        TAG("Tag"),
+        COLLECTION("Collection"),
+        SOURCE("Source"),
+        USER_MEDIA_LIST("My List"),
+        CAMPAIGN("Campaign"),
+        MOST_POPULAR("Most Popular"),
+        MOST_RECENT("Most Recent")
 
         String name
 

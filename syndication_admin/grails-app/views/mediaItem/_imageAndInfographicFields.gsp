@@ -2,7 +2,7 @@
 <div class="form-group">
     <label class="col-md-4 control-label" for="width">Width<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <input id="width" name="width" type="number" min="0" max="2147483646" value="${mediaItemInstance.width}" required="" placeholder="Image Height" class="form-control input-md">
+        <input id="width" name="width" type="number" min="0" max="2147483646" value="${mediaItemInstance.width}" required="" placeholder="Image Width" class="form-control input-md">
     </div>
 </div>
 

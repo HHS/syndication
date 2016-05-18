@@ -45,8 +45,9 @@
 
                     $('#snippetCode').val(htmlDecode(data.results[0].snippet));
                 });
-
-                updatePreview();
+                if(${!mediaItemInstance?.foreignSyndicationAPIUrl}){
+                    updatePreview();
+                }
             }
 
             // Data Getters --------------------------------------------------------------------------------------------
@@ -80,16 +81,21 @@
                 var flavor = getFlavor();
                 var displayMethod = getDisplayMethod();
 
-                var queryParams = "excludeJquery=" + excludeJquery;
+                var queryParams = "";
+                if(${!mediaItemInstance?.foreignSyndicationAPIUrl}) {
+                    queryParams = "excludeJquery=" + excludeJquery;
+                    queryParams += "&stripBreaks=" + stripBreaks;
+                    queryParams += "&stripClasses=" + stripClasses;
+                    queryParams += "&stripIds=" + stripIds;
+                    queryParams += "&width=" + width;
+                    queryParams += "&height=" + height;
+                    queryParams += "&flavor=" + flavor;
+                }
+
                 queryParams += "&stripImages=" + stripImages;
                 queryParams += "&stripStyles=" + stripStyles;
                 queryParams += "&stripScripts=" + stripScripts;
-                queryParams += "&stripBreaks=" + stripBreaks;
-                queryParams += "&stripClasses=" + stripClasses;
-                queryParams += "&stripIds=" + stripIds;
-                queryParams += "&width=" + width;
-                queryParams += "&height=" + height;
-                queryParams += "&flavor=" + flavor;
+
                 queryParams += "&displayMethod=" + displayMethod;
                 queryParams += "&userId=" + ${userId};
                 queryParams += "&callback=?";

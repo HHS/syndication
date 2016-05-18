@@ -226,10 +226,10 @@ environments {
 
  rabbitmq {
      connection = {
-         connection  host: "${System.getenv('RABBIT_PORT_5672_TCP_ADDR')}",
-                 username: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_USER')}",
-                 password: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_PASS')}",
-                 virtualHost: "${System.getenv('RABBITMQ_VIRTUAL_HOST') ?: '/'}",
+         connection  host: "${System.getenv('RABBITMQ_URL')}",
+                 username: "${System.getenv('RABBITMQ_USER')}",
+                 password: "${System.getenv('RABBITMQ_PASSWORD')}",
+                 virtualHost: "/",
                  requestedHeartbeat: 10
      }
 

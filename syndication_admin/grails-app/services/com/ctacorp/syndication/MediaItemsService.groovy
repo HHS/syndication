@@ -58,110 +58,171 @@ class MediaItemsService {
         []
     }
 
-    def delete(Long mediaId) {
-        MediaItem mi = MediaItem.get(mediaId)
-        if(!mi){
+    @NotTransactional
+    def delete(Long id) {
+        if(!MediaItem.exists(id)){
             return
         }
         //Alternate Images -----------------------------------------------
-        def alternateImages = AlternateImage.where {
-            mediaItem == mi
-        }.list()
+        AlternateImage.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            if (!mi) {
+                return
+            }
+            def alternateImages = AlternateImage.where {
+                mediaItem == mi
+            }.list()
 
-        for (altImage in alternateImages) {
-            altImage.delete()
+            for (altImage in alternateImages) {
+                altImage.delete()
+            }
         }
 
-        def campaigns = []
-        campaigns.addAll(mi.campaigns ?: [])
+        //Campaigns -----------------------------------------------
+        Campaign.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            def campaigns = []
+            campaigns.addAll(mi.campaigns ?: [])
 
-        for (campaign in campaigns) {
-            campaign.removeFromMediaItems(mi)
+            for (campaign in campaigns) {
+                campaign.removeFromMediaItems(mi)
+            }
         }
 
         //Collections -----------------------------------------------
-        def collections = com.ctacorp.syndication.media.Collection.where {
-            mediaItems {
-                id == mi.id
-            }
-        }.list()
+        com.ctacorp.syndication.media.Collection.withTransaction {
+            MediaItem mi = MediaItem.get(id)
 
-        for (collection in collections) {
-            collection.removeFromMediaItems(mi)
-        }
-
-        //Extended Attributes -----------------------------------------------
-        def extendedAttributes = ExtendedAttribute.where {
-            mediaItem == mi
-        }.list()
-
-        for (extendedAttr in extendedAttributes) {
-            extendedAttr.delete()
-        }
-
-        //Media Metrics -----------------------------------------------
-        def mediaMetrics = MediaMetric.where {
-            media == mi
-        }.list()
-
-        for (metric in mediaMetrics) {
-            metric.delete()
-        }
-
-        //User Media Lists ------------------------------------------
-        def userMediaLists = UserMediaList.where {
-            mediaItems {
-                id == mi.id
-            }
-        }.list()
-
-        for (userMediaList in userMediaLists) {
-            userMediaList.removeFromMediaItems(mi)
-        }
-
-        //Q&A - FAQ --------------------------------------------------
-        if(mi instanceof QuestionAndAnswer) {
-            def faqs = FAQ.where {
-                questionAndAnswers {
+            def collections = com.ctacorp.syndication.media.Collection.where {
+                mediaItems {
                     id == mi.id
                 }
             }.list()
 
-            for (faq in faqs) {
-                faq.removeFromQuestionAndAnswers(mi)
+            for (collection in collections) {
+                collection.removeFromMediaItems(mi)
             }
         }
 
-        if(mi instanceof Collection) {
-            mi.mediaItems = []
+        //Extended Attributes -----------------------------------------------
+        ExtendedAttribute.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+
+            def extendedAttributes = ExtendedAttribute.where {
+                mediaItem == mi
+            }.list()
+
+            for (extendedAttr in extendedAttributes) {
+                extendedAttr.delete()
+            }
         }
 
-        def users = User.where {
-            likes {
-                id == mi.id
-            }
-        }.list()
+        //Media Metrics -----------------------------------------------
+        MediaMetric.withTransaction {
+            MediaItem mi = MediaItem.get(id)
 
-        users.each { col ->
-            col.removeFromLikes(mi)
+            def mediaMetrics = MediaMetric.where {
+                media == mi
+            }.list()
+
+            for (metric in mediaMetrics) {
+                metric.delete()
+            }
+        }
+
+        //User Media Lists ------------------------------------------
+        UserMediaList.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            def userMediaLists = UserMediaList.where {
+                mediaItems {
+                    id == mi.id
+                }
+            }.list()
+
+            for (userMediaList in userMediaLists) {
+                userMediaList.removeFromMediaItems(mi)
+            }
+        }
+
+        //Q&A - FAQ --------------------------------------------------
+        QuestionAndAnswer.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            if(mi instanceof QuestionAndAnswer) {
+                def faqs = FAQ.where {
+                    questionAndAnswers {
+                        id == mi.id
+                    }
+                }.list()
+
+                for (faq in faqs) {
+                    faq.removeFromQuestionAndAnswers(mi)
+                }
+            }
         }
 
         // Media Preview and thumbnails --------------------------------
-        MediaPreview.where {
-            mediaItem == mi
-        }.deleteAll()
+        MediaPreview.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            MediaPreview.where {
+                mediaItem == mi
+            }.deleteAll()
+        }
 
-        MediaThumbnail.where {
-            mediaItem == mi
-        }.deleteAll()
+        //thumbnails ---------------------------------------------------
+        MediaThumbnail.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            MediaThumbnail.where {
+                mediaItem == mi
+            }.deleteAll()
+        }
 
-        CachedContent.findByMediaItem(mi)?.delete(flush: true)
-        FlaggedMedia.findByMediaItem(mi)?.delete(flush: true)
-        MediaItemSubscriber.findByMediaItem(mi)?.delete(flush: true)
+        //Users --------------------------------------------------
+        User.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            def users = User.where {
+                likes {
+                    id == mi.id
+                }
+            }.list()
 
-        MediaItem.where{
-            id == mi.id
-        }.deleteAll()
+            users.each { col ->
+                col.removeFromLikes(mi)
+            }
+        }
+
+        //Collection Items --------------------------------------------------
+        MediaItem.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            if(mi instanceof Collection) {
+                mi.mediaItems = []
+            }
+        }
+
+        //Cached Content --------------------------------------------------
+        CachedContent.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            CachedContent.findByMediaItem(mi)?.delete(flush: true)
+        }
+
+        //Flagged Media --------------------------------------------------
+        FlaggedMedia.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            FlaggedMedia.findByMediaItem(mi)?.delete(flush: true)
+        }
+
+        //Subscribers --------------------------------------------------
+        MediaItemSubscriber.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            MediaItemSubscriber.findByMediaItem(mi)?.delete(flush: true)
+        }
+
+        //The media item itself --------------------------------------------------
+        MediaItem.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            MediaItem.where{
+                id == mi.id
+            }.deleteAll()
+        }
     }
 
     @Transactional(readOnly = true)

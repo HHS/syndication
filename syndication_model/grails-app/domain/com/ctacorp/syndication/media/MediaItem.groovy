@@ -45,7 +45,8 @@ import com.ctacorp.syndication.preview.MediaThumbnail
     @ModelProperty(propertyName = "externalGuid",            attributes = [@PropertyAttribute(type = "string")]),
     @ModelProperty(propertyName = "hash",                    attributes = [@PropertyAttribute(type = "string")]),
     @ModelProperty(propertyName = "extendedAttributes",      attributes = [@PropertyAttribute(type = "Map")]),
-    @ModelProperty(propertyName = "createdBy",                attributes = [@PropertyAttribute(type = "string",                      required = true)])
+    @ModelProperty(propertyName = "createdBy",               attributes = [@PropertyAttribute(type = "string",                      required = true)]),
+    @ModelProperty(propertyName = "foreignSyndicationAPIUrl",attributes = [@PropertyAttribute(type = "string",                      required = true)])
 ])
 class MediaItem {
     String name
@@ -72,6 +73,7 @@ class MediaItem {
     Set metrics
     StructuredContentType structuredContentType
     String createdBy
+    String foreignSyndicationAPIUrl
 
     enum StructuredContentType{
         BLOG_POSTING("BlogPosting"),                // https://schema.org/BlogPosting
@@ -95,29 +97,30 @@ class MediaItem {
     static belongsTo = Campaign
 
     static constraints = {
-        name                    nullable: false,    blank: false,               maxSize: 255
-        description             nullable: true,     blank: false,               maxSize: 2000
-        sourceUrl               nullable: false,    blank: false,   url:true,   maxSize: 2000
-        sourceUrlHash           nullable: false,    blank: false,   unique: true
-        targetUrl               nullable: true,     blank:false,    url:true,   maxSize: 2000
-        customThumbnailUrl      nullable: true,     blank:false,    url:true,   maxSize: 2000
-        customPreviewUrl        nullable: true,     blank:false,    url:true,   maxSize: 2000
-        dateContentAuthored     nullable: true
-        dateContentUpdated      nullable: true
-        dateContentPublished    nullable: true
-        dateContentReviewed     nullable: true
-        dateSyndicationCaptured nullable: false
-        dateSyndicationUpdated  nullable: false
-        dateSyndicationVisible  nullable: true
-        language                nullable: false
+        name                        nullable: false,    blank: false,               maxSize: 255
+        description                 nullable: true,     blank: false,               maxSize: 2000
+        sourceUrl                   nullable: false,    blank: false,   url:true,   maxSize: 2000
+        sourceUrlHash               nullable: false,    blank: false,   unique: true
+        targetUrl                   nullable: true,     blank:false,    url:true,   maxSize: 2000
+        customThumbnailUrl          nullable: true,     blank:false,    url:true,   maxSize: 2000
+        customPreviewUrl            nullable: true,     blank:false,    url:true,   maxSize: 2000
+        dateContentAuthored         nullable: true
+        dateContentUpdated          nullable: true
+        dateContentPublished        nullable: true
+        dateContentReviewed         nullable: true
+        dateSyndicationCaptured     nullable: false
+        dateSyndicationUpdated      nullable: false
+        dateSyndicationVisible      nullable: true
+        language                    nullable: false
         active()
         visibleInStorefront()
         manuallyManaged()
-        externalGuid            nullable: true,                                 maxSize: 255
-        hash                    nullable: true,     blank: false,               maxSize: 255
-        source                  nullable: false
-        structuredContentType   nullable: true
-        createdBy               nullable: true,     blank: false,               maxSize: 255
+        externalGuid                nullable: true,                                 maxSize: 255
+        hash                        nullable: true,     blank: false,               maxSize: 255
+        source                      nullable: false
+        structuredContentType       nullable: true
+        createdBy                   nullable: true,     blank: false,               maxSize: 255
+        foreignSyndicationAPIUrl    nullable: true,     url:true,                   maxSize: 255
     }
 
 

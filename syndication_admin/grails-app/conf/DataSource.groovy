@@ -28,8 +28,8 @@ hibernate {
 environments {
     development {
         dataSource {
-            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('SYNDICATION_DB')}?useSSL=false"
-            password = "${System.getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD')}"
+            url = "jdbc:mysql://${System.getenv('MYSQL_SERVER_URL')}:3306/${System.getenv('SYNDICATION_DB')}?useSSL=false"
+            password = "${System.getenv('MYSQL_ROOT_PASSWORD')}"
             dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
         }
     }
@@ -46,18 +46,26 @@ environments {
         dataSource {
             dbCreate = "update"
             driverClassName = "com.mysql.jdbc.Driver"
-            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('SYNDICATION_DB')}?useSSL=false"
-            password = "${System.getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD')}"
+            url = "jdbc:mysql://${System.getenv('MYSQL_SERVER_URL')}:3306/${System.getenv('SYNDICATION_DB')}?useSSL=false"
+            password = "${System.getenv('MYSQL_ROOT_PASSWORD')}"
             properties {
-                maxActive = -1
-                minEvictableIdleTimeMillis = 1800000
-                timeBetweenEvictionRunsMillis = 1800000
-                numTestsPerEvictionRun = 3
+                jmxEnabled = true
+                initialSize = 5
+                maxActive = 50
+                minIdle = 5
+                maxIdle = 25
+                maxWait = 10000
+                maxAge = 10 * 60000
+                timeBetweenEvictionRunsMillis = 5000
+                minEvictableIdleTimeMillis = 60000
+                validationQuery = "SELECT 1"
+                validationQueryTimeout = 3
+                validationInterval = 15000
                 testOnBorrow = true
                 testWhileIdle = true
                 testOnReturn = false
-                validationQuery = "SELECT 1"
-                jdbcInterceptors = "ConnectionState"
+                jdbcInterceptors = "ConnectionState;StatementCache(max=200)"
+                defaultTransactionIsolation = java.sql.Connection.TRANSACTION_READ_COMMITTED
             }
         }
     }

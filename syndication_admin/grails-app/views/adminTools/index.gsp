@@ -183,6 +183,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     </g:form>
                 </div>
             </div>
+            %{--Add initial last login ------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Add last-login date to users without one</h3>
+                    <g:form action="addLoginDateToAllUsers">
+                        <g:submitButton class="btn btn-primary" name="addLastLogin" value="Add Date"/>
+                    </g:form>
+                </div>
+            </div>
             %{--Mass Message users ------------------------------------------------------------------------------------}%
             <div class="row">
                 <div class="col-lg-12">

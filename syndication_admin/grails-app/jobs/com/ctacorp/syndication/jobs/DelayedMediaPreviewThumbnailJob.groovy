@@ -5,34 +5,56 @@ import com.ctacorp.syndication.preview.MediaThumbnail
 
 class DelayedMediaPreviewThumbnailJob {
     def mediaPreviewThumbnailService
+    def remoteCacheService
 
     def execute(context) {
-        if(context.mergedJobDataMap.mediaId){
-            log.info "regen thumbnail for ${context.mergedJobDataMap.mediaId}"
-            Long mediaId = context.mergedJobDataMap.mediaId as Long
-            mediaPreviewThumbnailService.generate(mediaId)
-        } else{
-            def mediaItems = MediaItem.list(sort:"id", order:"DESC")
-
-            mediaItems.each{ mediaItem ->
-                try {
-                    def className = mediaItem.getClass().simpleName.toLowerCase()
-                    if (className in ["html", "image", "infographic", "video"]) {
-                        if (context.mergedJobDataMap.get('scope') == "all") {
-                            mediaPreviewThumbnailService.generate(mediaItem.id)
-                            log.info "regen thumbnail for ${mediaItem.id}"
-                        } else {
-                            MediaThumbnail existingThumb = MediaThumbnail.findByMediaItem(mediaItem)
-                            if (!existingThumb) {
-                                log.info "regen thumbnail for ${mediaItem.id}"
-                                mediaPreviewThumbnailService.generate(mediaItem.id)
-                            }
-                        }
+        switch (context.mergedJobDataMap.scope) {
+            case "single":
+                log.info "regen thumbnail for ${context.mergedJobDataMap.mediaId}"
+                Long mediaId = context.mergedJobDataMap.mediaId as Long
+                mediaPreviewThumbnailService.generate(mediaId)
+                break
+            case "range":
+                def mediaItems = MediaItem.findAllByIdGreaterThanEqualsandIdLessThanEquals(context.mergedJobDataMap.start, context.mergedJobDataMap.end)
+                generateThumbnails(mediaItems)
+                break
+            case "missing":
+                def allMediaItems = MediaItem.list(sort: "id", order: "ASC")
+                def mediaWithoutThumbnail = []
+                allMediaItems.each { mediaItem ->
+                    MediaThumbnail existingThumb = MediaThumbnail.findByMediaItem(mediaItem)
+                    if (!existingThumb) {
+                        log.info "regen thumbnail for ${mediaItem.id}"
+                        mediaWithoutThumbnail << mediaItem
                     }
-                } catch(e){
-                    log.error "Problem generating thumbnail for ${mediaItem.id}: ${mediaItem.sourceUrl}"
+                    generateThumbnails(mediaWithoutThumbnail)
                 }
+
+                break
+            case "collection":
+                def collectionMediaItems = com.ctacorp.syndication.media.Collection.get(context.mergedJobDataMap.collectionId)?.mediaItems
+                generateThumbnails(collectionMediaItems)
+                break
+            case "all":
+                def mediaItems = MediaItem.list(sort: "id", order: "ASC")
+                generateThumbnails(mediaItems)
+                break
+            default:
+                log.error "Tried to regenerate thumbnails with an unknown scope: ${context.mergedJobDataMap.scope}"
+        }
+    }
+
+    def generateThumbnails(mediaItems) {
+        mediaItems.each { mediaItem ->
+            try {
+                mediaPreviewThumbnailService.generate(mediaItem.id)
+                log.info "regen thumbnail for ${mediaItem.id}"
+            } catch (e){
+                e.printStackTrace()
+                log.error "Problem generating thumbnail for ${mediaItem.id}: ${mediaItem.sourceUrl}"
             }
         }
+
+        remoteCacheService.flushRemoteCacheByName("imageCache")
     }
 }

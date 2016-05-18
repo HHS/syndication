@@ -6,6 +6,8 @@ class UrlMappings {
             }
         }
 
+        "/robots.txt" (view: "robots/robots")
+
         "/$token"(controller:"redir", action:"resolveTinyToken"){
             constraints{
                 //dev consoles

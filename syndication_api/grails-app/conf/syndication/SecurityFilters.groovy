@@ -31,8 +31,8 @@ class SecurityFilters {
 //                log.debug headers
 //            }
 //        }
-        addHeader(controller:'*', action:'*') {
-            before={
+        addHeader(controller: '*', action: '*') {
+            before = {
                 response.addHeader("Access-Control-Allow-Origin", "*")
             }
         }
@@ -47,7 +47,15 @@ class SecurityFilters {
                 afterView = { Exception e -> }
             }
 
-            cache(controller:'cacheAccess', action:'*'){
+            adminControls(controller: 'admin', action: '*') {
+                before = {
+                    handleAuthRequest(owner, request)
+                }
+                after = { Map model -> }
+                afterView = { Exception e -> }
+            }
+
+            cache(controller: 'cacheAccess', action: '*') {
                 before = {
                     handleAuthRequest(owner, request)
                 }
@@ -58,33 +66,45 @@ class SecurityFilters {
         }
     }
 
-    private boolean handleAuthRequest(filter, request){
+    private boolean handleAuthRequest(filter, request) {
+
         boolean authorized = checkAuthorization(request)
+
         if (!authorized) {
+
             def url = "Requested URL ------------------\n${grailsApplication.config.grails.serverURL}${request.forwardURI[request.contextPath.size()..-1]}"
+
             String requestHeaders = "Headers --------------------\n"
+
             request.getHeaderNames().each { name ->
                 requestHeaders += " -> ${name}:${request.getHeader(name)}\n"
             }
-            def body = "Body ---------------------\n${request.reader.text}"
+            def body = "No Body"
+            try {
+                body = "Body ---------------------\n${request.reader.text}"
+            } catch (e) {
+                // body could not be read
+            }
             log.info("Not Authorized: Request: \n${requestHeaders}\n${url}\n${body}")
             filter.redirect(controller: "error", action: "unauthorized")
-            return false
-        }
 
+            return false
+
+        }
         success(request)
         true
+
     }
 
-    private boolean success(request){
+    private boolean success(request) {
         try {
             log.info("Authentication succeeded for request: ${request.reader.text}")
-        } catch(ignore){
+        } catch (ignore) {
             log.info("Authentication succeeded for request: ${request.forwardURI}")
         }
     }
 
-    private boolean checkAuthorization(request){
+    private boolean checkAuthorization(request) {
         //Get the requested URL
         def url = grailsApplication.config.grails.serverURL + request.forwardURI[request.contextPath.size()..-1]
         log.debug "API: RequestURL: ${url}"
@@ -103,7 +123,7 @@ class SecurityFilters {
 
         def authorized = authorizationService.checkAuthorization(authHeaders)
         log.debug "API: Authorized?: ${authorized}"
-        if(!authorized){
+        if (!authorized) {
             log.error("Request was not not authorized")
             log.error("Computed authHeaders were: \n${(authHeaders as JSON).toString(true)}")
         }

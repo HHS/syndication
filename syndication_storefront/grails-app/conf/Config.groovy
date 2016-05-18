@@ -135,8 +135,8 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
         '/**/favicon.ico':                ['permitAll']
 ]
 
-syndication.swaggerAddress = System.getenv("API_SERVER_URL")
-tagCloud.serverAddress = System.getenv("TAG_SERVER_URL")
+syndication.swaggerAddress = System.getenv("API_PUBLIC_URL")
+tagCloud.serverAddress = System.getenv("TAG_PUBLIC_URL")
 
 // Mail plugin defaults:
 grails {

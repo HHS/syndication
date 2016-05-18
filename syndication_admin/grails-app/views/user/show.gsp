@@ -43,15 +43,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <dt id="authority-label" class="word_wrap"><g:message code="role.authority.label" default="Authority"/></dt>
                 <dd class="word_wrap"><g:fieldValue bean="${UserRole.findAllByUser(User.get(userInstance.id))?.role?.first()}" field="authority"/></dd>
 
-            <g:if test="${userInstance?.name}">
-                <dt id="name-label" class="word_wrap"><g:message code="user.name.label" default="Name"/></dt>
-                <dd class="word_wrap"><g:fieldValue bean="${userInstance}" field="name"/></dd>
-            </g:if>
+                <g:if test="${userInstance?.name}">
+                    <dt id="name-label" class="word_wrap"><g:message code="user.name.label" default="Name"/></dt>
+                    <dd class="word_wrap"><g:fieldValue bean="${userInstance}" field="name"/></dd>
+                </g:if>
 
-            <g:if test="${userInstance?.username}">
-                <dt id="username-label" class="word_wrap"><g:message code="user.username.label" default="Username"/></dt>
-                <dd class="word_wrap"><g:fieldValue bean="${userInstance}" field="username"/></dd>
-            </g:if>
+                <g:if test="${userInstance?.username}">
+                    <dt id="username-label" class="word_wrap"><g:message code="user.username.label" default="Username"/></dt>
+                    <dd class="word_wrap"><g:fieldValue bean="${userInstance}" field="username"/></dd>
+                </g:if>
 
                 <dt id="enabled-label" class="word_wrap"><g:message code="user.enabled.label" default="Enabled"/></dt>
                 <dd class="word_wrap"><g:formatBoolean boolean="${userInstance?.enabled}"/></dd>
@@ -65,12 +65,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <dt id="passwordExpired-label" class="word_wrap"><g:message code="user.passwordExpired.label" default="Password Expired"/></dt>
                 <dd class="word_wrap"><g:formatBoolean boolean="${userInstance?.passwordExpired}"/></dd>
 
-            <g:if test="${userInstance?.likes}">
-                <dt id="likes-label" class="word_wrap"><g:message code="user.likes.label" default="Likes"/></dt>
-                <g:each in="${userInstance.likes}" var="l">
-                    <dd class="word_wrap"><g:link controller="mediaItem" action="show" id="${l.id}">${l?.encodeAsHTML()}</g:link></dd>
-                </g:each>
-            </g:if>
+                <g:if test="${userInstance?.lastLogin}">
+                    <dt id="lastLogin-label" class="word_wrap"><g:message code="user.lastLogin.label" default="Last Login Date"/></dt>
+                    <dd class="word_wrap"><g:formatDate date="${userInstance?.lastLogin}" format="MMM dd, yyyy"/>
+                </g:if>
+
+                <g:if test="${userInstance?.likes}">
+                    <dt id="likes-label" class="word_wrap"><g:message code="user.likes.label" default="Likes"/></dt>
+                    <g:each in="${userInstance.likes}" var="l">
+                        <dd class="word_wrap"><g:link controller="mediaItem" action="show" id="${l.id}">${l?.encodeAsHTML()}</g:link></dd>
+                    </g:each>
+                </g:if>
             </dl>
         </div>
 </div>

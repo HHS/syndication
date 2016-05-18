@@ -45,6 +45,11 @@
     <dd class="word_wrap"><a target="_blank" href="${mediaItemInstance?.targetUrl}"><g:fieldValue bean="${mediaItemInstance}" field="targetUrl"/></a></dd>
 </g:if>
 
+<g:if test="${mediaItemInstance?.foreignSyndicationAPIUrl}">
+    <dt id="foreignSyndicationAPIUrl-label" class="word_wrap"><g:message code="${mediaType}.foreignSyndicationAPIUrl.label" default="Foreign Synd. API Url"/></dt>
+    <dd class="word_wrap"><a target="_blank" href="${mediaItemInstance?.foreignSyndicationAPIUrl}"><g:fieldValue bean="${mediaItemInstance}" field="foreignSyndicationAPIUrl"/></a></dd>
+</g:if>
+
 <g:if test="${mediaItemInstance?.active && mediaItemInstance?.visibleInStorefront}">
     <dt id="storefrontLink-label" class="word_wrap"><g:message code="${mediaType}.storefrontLink.label" default="Storefront Link"/></dt>
     <dd class="word_wrap"><a target="_blank" href="${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${mediaItemInstance?.id}">${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${mediaItemInstance?.id}</a></dd>

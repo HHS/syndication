@@ -15,12 +15,31 @@ package com.ctacorp.syndication
 
 import com.ctacorp.syndication.jobs.DelayedMediaPreviewThumbnailJob
 
+//This service is needed because plugins make use of it by name, and it is injected into plugins
+//at runtime. Without it, the MediaItemChangeListener in SyndicationModel would fail to create
+//updated thumbnails
 class MediaPreviewThumbnailJobService {
     static transactional = false
 
     void delayedPreviewAndThumbnailGeneration(Long mediaId) {
         if(mediaId){
-            DelayedMediaPreviewThumbnailJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId: mediaId])
+            DelayedMediaPreviewThumbnailJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId: mediaId, scope:"single"])
         }
+    }
+
+    void regenerateRange(start, end){
+        DelayedMediaPreviewThumbnailJob.triggerNow(["scope":"range", "start":start, "end":end])
+    }
+
+    void regenerateAll(){
+        DelayedMediaPreviewThumbnailJob.triggerNow(["scope":"all"])
+    }
+
+    void regenerateMissing(){
+        DelayedMediaPreviewThumbnailJob.triggerNow(["scope":"missing"])
+    }
+
+    void regenerateCollection(long collectionId){
+        DelayedMediaPreviewThumbnailJob.triggerNow(["scope":"collection", "collectionId":collectionId])
     }
 }

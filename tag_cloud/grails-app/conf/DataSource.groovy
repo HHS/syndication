@@ -45,9 +45,9 @@ environments {
         dataSource {
             dbCreate = "update"
             driverClassName = "com.mysql.jdbc.Driver"
-            url = "jdbc:mysql://${System.getenv('MYSQL_PORT_3306_TCP_ADDR')}:3306/${System.getenv('TAGCLOUD_DB')}?useSSL=false"
+            url = "jdbc:mysql://${System.getenv('MYSQL_SERVER_URL')}:3306/${System.getenv('TAGCLOUD_DB')}?useSSL=false"
             username = 'root'
-            password = "${System.getenv('MYSQL_ENV_MYSQL_ROOT_PASSWORD')}"
+            password = "${System.getenv('MYSQL_ROOT_PASSWORD')}"
             properties {
                 maxActive = -1
                 minEvictableIdleTimeMillis = 1800000

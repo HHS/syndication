@@ -9,6 +9,7 @@ import com.ctacorp.syndication.contentextraction.ContentRetrievalService
 import com.ctacorp.syndication.health.FlaggedMedia
 import com.ctacorp.syndication.jobs.DelayedTinyUrlJob
 import com.ctacorp.syndication.media.Collection
+import com.ctacorp.syndication.media.QuestionAndAnswer
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
@@ -28,7 +29,7 @@ import spock.lang.Specification
  * Created by nburk on 6/16/15.
  */
 @TestFor(MediaItemsService)
-@Mock([User, UserRole, Role, MediaItem, SystemEvent, Html, Video, Image, Infographic, Collection, Tweet, PDF, MediaItemSubscriber, Campaign, MediaPreview, MediaThumbnail, CachedContent, FlaggedMedia, ExtendedAttribute])
+@Mock([User, UserRole, Role, MediaItem, SystemEvent, Html, Video, Image, Infographic, QuestionAndAnswer,Collection, Tweet, PDF, MediaItemSubscriber, Campaign, MediaPreview, MediaThumbnail, CachedContent, FlaggedMedia, ExtendedAttribute])
 class MediaItemServiceSpec extends Specification {
 
     def contentRetrievalService = Mock(ContentRetrievalService)

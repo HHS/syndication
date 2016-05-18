@@ -2,10 +2,8 @@ package com.ctacorp.syndication.tools
 
 import com.ctacorp.syndication.commons.mq.Message
 import com.ctacorp.syndication.commons.mq.MessageType
-import com.ctacorp.syndication.jobs.DelayedMediaPreviewThumbnailJob
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.MediaItem
-import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.health.FlaggedMedia
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Holders

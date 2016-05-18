@@ -44,7 +44,7 @@ class BootStrap {
         def words = grailsApplication.mainContext.getResource("/words.txt").getFile().readLines()
         Random ran = new Random()
 
-        1000.times{
+        2000.times{
             def tag = new Tag(name: words[ran.nextInt(words.size())], type: TagType.load(ran.nextInt(3)+1), language: Language.load(ran.nextBoolean()?1:400))
             if(!tag.save()){
                 println tag.errors

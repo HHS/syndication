@@ -24,12 +24,20 @@ class AlternateImagesService {
 
     def save(AlternateImage imageInstance, Long mediaId) {
         MediaItem mi = MediaItem.load(mediaId)
-        imageInstance.mediaItem = mi
-        imageInstance.save(flush: true)
-        if (imageInstance.id) {
-            mi.addToAlternateImages(imageInstance)
-        } else {
-           return null
+        def existingImageInstance = AlternateImage.findByNameAndMediaItem(imageInstance.name,mi)
+        if(existingImageInstance) {
+            existingImageInstance.width = imageInstance.width
+            existingImageInstance.height = imageInstance.height
+            existingImageInstance.url = imageInstance.url
+            existingImageInstance.save(flush: true)
+        }else {
+            imageInstance.mediaItem = mi
+            imageInstance.save(flush: true)
+            if (imageInstance.id) {
+                mi.addToAlternateImages(imageInstance)
+            } else {
+                return null
+            }
         }
         imageInstance
     }

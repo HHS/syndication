@@ -55,6 +55,7 @@ class ContentIndexController {
     }
 
     def reindexMedia(String mediaIds) {
+        log.info "Request made to reindex all media"
         def mediaIdList = mediaIds?.tokenize(",")?.collect() { it as Long }
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
             mediaIdList = MediaItemSubscriber.findAllByMediaItemInListAndSubscriberId(MediaItem.findAllByIdInList(mediaIdList),springSecurityService.currentUser.subscriberId).mediaItem.id
@@ -185,6 +186,7 @@ class ContentIndexController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
     def reindexAllTags() {
+        log.info "Starting re-index job on all tags"
         ReindexMediaJob.triggerNow([type: "tags", params: params])
         flash.message = "Re-indexing started on all tag content"
         redirect action: 'index'

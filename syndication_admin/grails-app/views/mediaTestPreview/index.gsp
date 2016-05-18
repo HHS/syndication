@@ -10,9 +10,8 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --%>
-
-<!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
+<!DOCTYPE html>
 <html>
 <head>
     <title>Syndicated Media Preview & Extraction Testing</title>
@@ -20,9 +19,65 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <asset:stylesheet src="prettify/prettify.css"/>
     <asset:javascript src="prettify/prettify.js"/>
     <script type="text/javascript">
+
+        function startProgressBar(){
+            var $progress = $('.progress');
+            var $progressBar = $('.progress-bar');
+
+            setTimeout(function() {
+                $progressBar.css('width', '15%');
+                setTimeout(function() {
+                    $progressBar.css('width', '30%');
+                    setTimeout(function() {
+                        $progressBar.css('width', '45%');
+                        setTimeout(function() {
+                            $progressBar.css('width', '60%');
+                            setTimeout(function() {
+                                $progressBar.css('width', '75%');
+                                setTimeout(function() {
+                                    $progressBar.css('width', '90%');
+                                }, 4000); // WAIT 5 milliseconds
+                            }, 4000); // WAIT 5 milliseconds
+                        }, 5000); // WAIT 5 milliseconds
+                    }, 4000); // WAIT 3 seconds
+                }, 4000); // WAIT 3 seconds
+            }, 4000); // WAIT 3 second
+        }
+
         $(document).ready(function(){
-            prettyPrint()
-        })
+            prettyPrint();
+
+            $("#testUrl").on("click", function(){
+                document.getElementById("testUrl").disabled = true;
+                var $progress = $('.progress');
+                var $progressBar = $('.progress-bar');
+                $progressBar.css('width', '5%');
+                $progress.css('display', 'block');
+                startProgressBar();
+
+                $("#spinnerDiv").show();
+                $sourceUrl=$("#sourceUrl").val();
+                $.ajax({
+                    data: {sourceUrl:$sourceUrl},
+                    type: 'GET',
+                    url: '${g.createLink(controller: 'mediaTestPreview', action: 'urlTest')}',
+                    success: function(response){
+                        setTimeout(function() {
+                            $progressBar.css('width', '100%');
+                        }, 300); // WAIT 5 milliseconds
+                        $("#spinnerDiv").fadeOut("fast");
+
+                        setTimeout(function() {
+                            $progress.css('display', 'none');
+                            document.getElementById("testUrl").disabled = false;
+                            $("#testResults").html(response);
+                        }, 800); // WAIT 5 milliseconds
+
+                    }
+                });
+            });
+        });
+
     </script>
     <style>
         .mobile-preview{
@@ -91,6 +146,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         </div>
     </g:if>
 
+    <p>* If the remote server is unreachable the system will retry five times. This can take up to thirty seconds.</p>
+    <div class="progress" hidden>
+        <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 5%;"></div>
+    </div>
+    <div id="spinnerDiv" style="width:50px;display: none;" class="col-md-1">
+        <i class="fa fa-refresh fa-spin fa-lg"></i>
+    </div>
+
     <div class="row">
         <div class="col-lg-8 col-lg-offset-2">
             <form class="form-horizontal" action="index">
@@ -104,60 +167,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     </div>
                     <div class="form-group">
                         <div class="col-md-2 col-md-offset-10">
-                            <g:submitButton name="checkButton" value="Try it out!" class="btn btn-success pull-right"/>
+                            <input type="button" id="testUrl" value="Try it out!" class="btn btn-success pull-right"/>
                         </div>
                     </div>
                 </fieldset>
             </form>
 
-            <g:if test="${extractedContent}">
-                <ul class="nav nav-pills" role="tablist">
-                    <li role="presentation" class="active"><a href="#previewTab" role="tab" data-toggle="tab">Browser Preview</a></li>
-                    <li role="presentation"><a href="#previewMobileTab" role="tab" data-toggle="tab">Mobile Preview</a></li>
-                    <li role="presentation"><a href="#sourceTab" role="tab" data-toggle="tab">Raw Source</a></li>
-                </ul>
-                <br/>
-                <div class="tab-content">
-                    <div class="row tab-pane active" id="previewTab">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h1 class="panel-title">Extracted Content</h1>
-                            </div>
-                            <div class="panel-body">
-                                ${extractedContent.encodeAsRaw()}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row tab-pane" id="previewMobileTab">
-                        <div class="alert alert-info">Previews are constrained to mobile phone resolution in order of popularity.
-                         5 pixel padding has been added to all previews, and images are constrained to 100% maximum to prevent cropping.
-                         Exact look & feel will depend on your style sheets.</div>
-                        <h3>320x568</h3>
-                        <div class="mobile-preview mobile-size-320x568">${extractedContent.encodeAsRaw()}</div>
-                        <h3>768x1024</h3>
-                        <div class="mobile-preview mobile-size-768x1024">${extractedContent.encodeAsRaw()}</div>
-                        <h3>320x480</h3>
-                        <div class="mobile-preview mobile-size-320x480">${extractedContent.encodeAsRaw()}</div>
-                        <h3>360x640</h3>
-                        <div class="mobile-preview mobile-size-360x640">${extractedContent.encodeAsRaw()}</div>
-                    </div>
-                    <div class="row tab-pane" id="sourceTab">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h1 class="panel-title">Extracted Content</h1>
-                            </div>
-                            <div class="panel-body">
-                                <pre class="prettyprint linenums">
-                                    <code class="lang-html">
-                                        ${extractedContent}
-                                    </code>
-                                </pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </g:if>
         </div>
+    </div>
+    <div id="testResults">
+
     </div>
 </div>
 </body>

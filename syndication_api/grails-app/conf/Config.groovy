@@ -235,10 +235,10 @@ grails {
 rabbitmq {
 
     connection = {
-        connection  host: "${System.getenv('RABBIT_PORT_5672_TCP_ADDR')}",
-                username: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_USER')}",
-                password: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_PASS')}",
-                virtualHost: "${System.getenv('RABBITMQ_VIRTUAL_HOST') ?: '/'}",
+        connection  host: "${System.getenv('RABBITMQ_URL')}",
+                username: "${System.getenv('RABBITMQ_USER')}",
+                password: "${System.getenv('RABBITMQ_PASSWORD')}",
+                virtualHost: "/",
                 requestedHeartbeat: 10
     }
 
@@ -291,11 +291,11 @@ springsecurity {
 google.youtube.apiKey = System.getenv("YOUTUBE_API_KEY")
 
 if(System.getenv("USING_DOCKER") == "true") {
-    syndication.solrService.serverAddress = "http" + (System.getenv("SOLR_PORT_8983_TCP") - "tcp") + "/solr/syndication"
+    syndication.solrService.serverAddress = System.getenv("SOLR_ADDRESS")
 }
 
 manet{
-    server.url = System.getenv("MANET_PORT_8891_TCP")?.replace("tcp://", "http://")
+    server.url = System.getenv("MANET_ADDRESS")
 }
 
 //CMS Manager

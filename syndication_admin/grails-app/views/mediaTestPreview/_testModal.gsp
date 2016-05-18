@@ -15,10 +15,40 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <%@ page contentType="text/html;charset=UTF-8" %>
     <script type="text/javascript">
         $(document).ready(function(){
-            prettyPrint()
+            prettyPrint();
         });
-        
+
+
+        function startProgressBar(){
+            var $progress = $('.progress');
+            var $progressBar = $('.progress-bar');
+
+            setTimeout(function() {
+                $progressBar.css('width', '15%');
+                setTimeout(function() {
+                    $progressBar.css('width', '30%');
+                    setTimeout(function() {
+                        $progressBar.css('width', '45%');
+                        setTimeout(function() {
+                            $progressBar.css('width', '60%');
+                            setTimeout(function() {
+                                $progressBar.css('width', '75%');
+                                setTimeout(function() {
+                                    $progressBar.css('width', '90%');
+                                }, 4000); // WAIT 5 milliseconds
+                            }, 4000); // WAIT 5 milliseconds
+                        }, 5000); // WAIT 5 milliseconds
+                    }, 4000); // WAIT 3 seconds
+                }, 4000); // WAIT 3 seconds
+            }, 4000); // WAIT 3 second
+        }
+
         $("#urlModal").on("click", function(){
+            var $progress = $('.progress');
+            var $progressBar = $('.progress-bar');
+            $progress.css('display', 'block');
+            startProgressBar();
+
             $("#spinnerDiv").show();
             $sourceUrl=$("#sourceUrl").val();
             $.ajax({
@@ -26,8 +56,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 type: 'GET',
                 url: '${g.createLink(controller: 'mediaTestPreview', action: 'urlTestModal')}',
                 success: function(response){
+                    setTimeout(function() {
+                        $progressBar.css('width', '100%');
+                    }, 300); // WAIT 5 milliseconds
                     $("#spinnerDiv").fadeOut("fast");
-                    $("#myModal").html(response);
+
+                    setTimeout(function() {
+                        $("#myModal").html(response);
+                    }, 800); // WAIT 5 milliseconds
+
                 }
             });
         });
@@ -106,15 +143,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             </g:if>
 
             <p>* If the remote server is unreachable the system will retry five times. This can take up to thirty seconds.</p>
-
+            <div class="progress" hidden>
+                <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 5%;"></div>
+            </div>
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2">
                     <fieldset>
                         <!-- Text input-->
                         <div class="form-group">
                             <div class="row">
-                                <label class="col-md-2 control-label" for="sourceUrl">Source URL:</label>
-                                <div class="col-md-9">
+                                <label class="col-md-3 control-label" for="sourceUrl">Source URL:</label>
+                                <div class="col-md-8">
                                     <input id="sourceUrl" disabled="disabled" name="sourceUrl" type="text" placeholder="Enter the URL of the media to test" class="form-control input-md" value=${sourceUrl}>
                                 </div>
                                 <div id="spinnerDiv" style="width:50px;display: none;" class="col-md-1">

@@ -44,22 +44,23 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <div class="col-md-12">
             <div class="row">
                 <div class="col-lg-6">
-                    <g:form action="duplicateFinder">
-                        <fieldset class="form-group">
-                            <label>Check how many?</label>
-                            <g:select name="max" from="[100,200,500,1000]" class="form-control" value="${params.max?:100}"/>
-                        </fieldset>
-                        <fieldset class="form-group">
-                            <g:radioGroup name="order" values="['ASC', 'DESC']" labels="['Search Oldest First', 'Search Newest First']" value="${params.order ?: 'DESC'}" >
-                                <p>${it.radio} ${it.label}</p>
-                            </g:radioGroup>
-                        </fieldset>
-                        <fieldset class="form-group">
-                            <g:submitButton name="search" value="Search" class="btn btn-primary form-control" />
-                        </fieldset>
-                    </g:form>
+                    %{--<g:form action="duplicateFinder">--}%
+                        %{--<fieldset class="form-group">--}%
+                            %{--<label>Check how many?</label>--}%
+                            %{--<g:select name="max" from="[100,200,500,1000,5000,10000,15000]" class="form-control" value="${params.max?:100}"/>--}%
+                        %{--</fieldset>--}%
+                        %{--<fieldset class="form-group">--}%
+                            %{--<g:radioGroup name="order" values="['ASC', 'DESC']" labels="['Search Oldest First', 'Search Newest First']" value="${params.order ?: 'DESC'}" >--}%
+                                %{--<p>${it.radio} ${it.label}</p>--}%
+                            %{--</g:radioGroup>--}%
+                        %{--</fieldset>--}%
+                        %{--<fieldset class="form-group">--}%
+                            %{--<g:submitButton name="search" value="Search" class="btn btn-primary form-control" />--}%
+                        %{--</fieldset>--}%
+                    %{--</g:form>--}%
                 </div>
             </div>
+            total duplicates: ${duplicates.size()}
             <g:if test="${duplicates}">
                 <div class="row">
                     <div class="col-lg-12">
@@ -79,9 +80,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <g:else>
                 <div class="info">No duplicates found in this range</div>
             </g:else>
-            <div class="pagination">
-                <g:paginate total="${total}" max="${params.max ?: 100}"/>
-            </div>
+            %{--<div class="pagination">--}%
+                %{--<g:paginate total="${total}" max="${params.max ?: 100}"/>--}%
+            %{--</div>--}%
         </div>
     </div>
 </div>

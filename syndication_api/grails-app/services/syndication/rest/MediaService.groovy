@@ -15,13 +15,19 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.rest
 
+import com.ctacorp.syndication.authentication.User
+import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.commons.util.Hash
 import com.ctacorp.syndication.commons.util.Util
 import com.ctacorp.syndication.data.CampaignHolder
 import com.ctacorp.syndication.data.SourceHolder
 import com.ctacorp.syndication.data.TagHolder
+import com.ctacorp.syndication.health.FlaggedMedia
 import com.ctacorp.syndication.jobs.DelayedTaggingJob
 import com.ctacorp.syndication.media.*
+import com.ctacorp.syndication.metric.MediaMetric
+import com.ctacorp.syndication.preview.MediaPreview
+import com.ctacorp.syndication.preview.MediaThumbnail
 import com.ctacorp.syndication.storefront.UserMediaList
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
@@ -57,6 +63,200 @@ class MediaService {
     String renderHtml(Html html, params){
         String extractedContent = getExtractedContent(html, params)
         groovyPageRenderer.render(template: "/media/htmlView", model: [extractedContent:extractedContent])
+    }
+
+    @NotTransactional
+    void deleteMediaItem(long id){
+        if(!MediaItem.exists(id)){
+            return
+        }
+
+        createAndFindMediaItemSubscriber(MediaItem.get(id))
+
+        //Alternate Images -----------------------------------------------
+        AlternateImage.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            if (!mi) {
+                return
+            }
+            def alternateImages = AlternateImage.where {
+                mediaItem == mi
+            }.list()
+
+            for (altImage in alternateImages) {
+                altImage.delete()
+            }
+        }
+
+        //Campaigns -----------------------------------------------
+        Campaign.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            def campaigns = []
+            campaigns.addAll(mi.campaigns ?: [])
+
+            for (campaign in campaigns) {
+                campaign.removeFromMediaItems(mi)
+            }
+        }
+
+        //Collections -----------------------------------------------
+        com.ctacorp.syndication.media.Collection.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+
+            def collections = com.ctacorp.syndication.media.Collection.where {
+                mediaItems {
+                    id == mi.id
+                }
+            }.list()
+
+            for (collection in collections) {
+                collection.removeFromMediaItems(mi)
+            }
+        }
+
+        //Extended Attributes -----------------------------------------------
+        ExtendedAttribute.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+
+            def extendedAttributes = ExtendedAttribute.where {
+                mediaItem == mi
+            }.list()
+
+            for (extendedAttr in extendedAttributes) {
+                extendedAttr.delete()
+            }
+        }
+
+        //Media Metrics -----------------------------------------------
+        MediaMetric.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+
+            def mediaMetrics = MediaMetric.where {
+                media == mi
+            }.list()
+
+            for (metric in mediaMetrics) {
+                metric.delete()
+            }
+        }
+
+        //User Media Lists ------------------------------------------
+        UserMediaList.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            def userMediaLists = UserMediaList.where {
+                mediaItems {
+                    id == mi.id
+                }
+            }.list()
+
+            for (userMediaList in userMediaLists) {
+                userMediaList.removeFromMediaItems(mi)
+            }
+        }
+
+        //Q&A - FAQ --------------------------------------------------
+        QuestionAndAnswer.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            if(mi instanceof QuestionAndAnswer) {
+                def faqs = FAQ.where {
+                    questionAndAnswers {
+                        id == mi.id
+                    }
+                }.list()
+
+                for (faq in faqs) {
+                    faq.removeFromQuestionAndAnswers(mi)
+                }
+            }
+        }
+
+        // Media Preview and thumbnails --------------------------------
+        MediaPreview.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            MediaPreview.where {
+                mediaItem == mi
+            }.deleteAll()
+        }
+
+        //thumbnails ---------------------------------------------------
+        MediaThumbnail.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            MediaThumbnail.where {
+                mediaItem == mi
+            }.deleteAll()
+        }
+
+        //Users --------------------------------------------------
+        User.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            def users = User.where {
+                likes {
+                    id == mi.id
+                }
+            }.list()
+
+            users.each { col ->
+                col.removeFromLikes(mi)
+            }
+        }
+
+        //Collection Items --------------------------------------------------
+        MediaItem.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            if(mi instanceof Collection) {
+                mi.mediaItems = []
+            }
+        }
+
+        //Cached Content --------------------------------------------------
+        CachedContent.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            CachedContent.findByMediaItem(mi)?.delete(flush: true)
+        }
+
+        //Flagged Media --------------------------------------------------
+        FlaggedMedia.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            FlaggedMedia.findByMediaItem(mi)?.delete(flush: true)
+        }
+
+        //Subscribers --------------------------------------------------
+        MediaItemSubscriber.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            MediaItemSubscriber.findByMediaItem(mi)?.delete(flush: true)
+        }
+
+        //The media item itself --------------------------------------------------
+        MediaItem.withTransaction {
+            MediaItem mi = MediaItem.get(id)
+            MediaItem.where{
+                id == mi.id
+            }.deleteAll()
+        }
+    }
+
+    MediaItem archiveMedia(long id){
+        MediaItem mi = MediaItem.get(id)
+        if(!mi){
+            return
+        }
+
+        createAndFindMediaItemSubscriber(mi)
+
+        mi.active = false
+        mi.save()
+    }
+
+    MediaItem unarchiveMedia(long id){
+        MediaItem mi = MediaItem.get(id)
+        if(!mi){
+            return null
+        }
+
+        createAndFindMediaItemSubscriber(mi)
+
+        mi.active = true
+        mi.save()
     }
 
     String renderImage(Image img, params){
@@ -663,7 +863,12 @@ class MediaService {
     MediaItemSubscriber createAndFindMediaItemSubscriber(MediaItem mediaItem){
         GrailsWebRequest webUtils = WebUtils.retrieveGrailsWebRequest()
         def request = webUtils.getCurrentRequest()
-        String[] apiKey = request.getHeader("Authorization").substring("syndication_api_key ".length()).split(':')
+        def authorizationHeader = request.getHeader("Authorization")
+        if(!authorizationHeader){
+            throw new UnauthorizedException("You do not have permission to access this mediaSource.")
+            return null
+        }
+        String[] apiKey = authorizationHeader.substring("syndication_api_key ".length()).split(':')
         def apiKeyLength = apiKey.length
 
         if (apiKeyLength != 2) {

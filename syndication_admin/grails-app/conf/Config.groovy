@@ -135,13 +135,13 @@ log4j.main = {
     fatal  'org.hibernate.tool.hbm2ddl.SchemaExport'
 }
 
-//-----------------------------------------------------------------
-
-// Added by the Spring Security Core plugin:
+//___________________________
+// Spring Security           \____________________________________________________________
+//________________________________________________________________________________________
+grails.plugin.springsecurity.useSecurityEventListener = true
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'com.ctacorp.syndication.authentication.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'com.ctacorp.syndication.authentication.UserRole'
 grails.plugin.springsecurity.authority.className = 'com.ctacorp.syndication.authentication.Role'
-
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
         '/dbconsole/**':                  ['permitAll'],
         '/':                              ['permitAll'],
@@ -153,7 +153,11 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
         '/**/favicon.ico':                ['permitAll']
 ]
 
-grails.plugin.springsecurity.useSecurityEventListener = true
+grails.plugin.springsecurity.onInteractiveAuthenticationSuccessEvent = { e, appCtx ->
+    def adminUserService = appCtx.getBean('adminUserService')
+    adminUserService.updateUserLastLogin()
+}
+
 bruteforcedefender {
     time = 15
     allowedNumberOfAttempts = 5
@@ -212,10 +216,10 @@ syndication{
 rabbitmq {
 
     connection = {
-        connection  host: "${System.getenv('RABBIT_PORT_5672_TCP_ADDR')}",
-                    username: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_USER')}",
-                    password: "${System.getenv('RABBIT_ENV_RABBITMQ_DEFAULT_PASS')}",
-                    virtualHost: "${System.getenv('RABBITMQ_VIRTUAL_HOST') ?: '/'}",
+        connection  host: "${System.getenv('RABBITMQ_URL')}",
+                    username: "${System.getenv('RABBITMQ_USER')}",
+                    password: "${System.getenv('RABBITMQ_PASSWORD')}",
+                    virtualHost: "/",
                     requestedHeartbeat: 10
     }
 
@@ -263,8 +267,12 @@ springsecurity {
 }
 
 tagCloud.serverAddress = System.getenv("TAG_PUBLIC_URL")
+syndication.solrService.serverAddress = System.getenv("SOLR_ADDRESS")
+storefront.serverAddress = System.getenv("STORE_PUBLIC_URL")
+syndication.solrService.useSolr = true
+
 manet{
-    server.url = System.getenv("MANET_PORT_8891_TCP")?.replace("tcp://", "http://")
+    server.url = System.getenv("MANET_ADDRESS")
 }
 
 syndication{
@@ -279,6 +287,5 @@ cmsManager{
     secret = System.getenv("CMS_SECRET")
 }
 
-if(System.getenv("USING_DOCKER") == "true") {
-    syndication.solrService.serverAddress = System.getenv("SOLR_ADDRESS")
-}
+google.youtube.apiKey = System.getenv("YOUTUBE_API_KEY")
+
