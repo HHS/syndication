@@ -23,7 +23,7 @@ function syndicated_content_menu()
     'title'            => 'Syndicated Content Settings',
     'description'      => 'Configuration for Syndicated Content module',
     'page callback'    => 'syndicated_content_settings_page',
-    'access arguments' => array('access administration pages'),
+    'access arguments' => array('syndication configuration rights'),
     'type'             => MENU_NORMAL_ITEM
   );
 
@@ -32,7 +32,7 @@ function syndicated_content_menu()
     'description'      => 'Sources of Syndicated Content',
     'page callback'    => 'drupal_get_form',
     'page arguments'   => array('syndicated_content_admin_sources_form'),
-    'access arguments' => array('access administration pages'),
+    'access arguments' => array('syndication configuration rights'),
     'type'             => MENU_NORMAL_ITEM
   );
 /*
@@ -178,4 +178,18 @@ function syndicated_content_node_validate( $node, $form, &$form_state )
 function syndicated_content_node_view($node, $view_mode, $langcode) {
     module_load_include('php','syndicated_content','includes/syndicated_content.data');
     return _syndicated_content_node_view( $node, $view_mode, $langcode );
+}
+
+// create custom permission
+function syndicated_content_permission() {
+  return array(
+    'syndication publish rights' => array(
+      'title' => t('Syndication publish rights'),
+      'description' => t('Syndication publishing rights.'),
+    ),
+    'syndication configuration rights' => array(
+      'title' => t('Syndication configuration rights'),
+      'description' => t('Syndication configuration rights.'),
+    ),
+  );
 }

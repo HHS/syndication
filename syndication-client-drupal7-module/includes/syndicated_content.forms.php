@@ -648,7 +648,7 @@ function _syndicated_content_alter_edit_form_unpublished( $type_map, &$form, &$f
             'class' => array('node-form-syndication-information'),
         ),
         '#weight' => -10, /// 100 10,
-        '#access' => user_access('administer nodes'),
+        '#access' => user_access('syndication publish rights'),
     );
 
     /*
@@ -737,7 +737,7 @@ function _syndicated_content_alter_edit_form_published( $drupal_metadata, &$form
             'class' => array('node-form-syndication-information'),
         ),
         '#weight' => -10, /// 100 -10,
-        '#access' => user_access('administer nodes'),
+        '#access' => user_access('syndication publish rights'),
     );
 
     $synd_metadata = @json_decode($drupal_metadata['metadata'],true);

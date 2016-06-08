@@ -20,7 +20,10 @@ jQuery( document ).ready(function( $ ) {
 	}
     $("textarea[id^='edit-key']").parent().parent().hide();
     
+    if($("fieldset#edit-api-identiy legend span").length)
     $("fieldset#edit-api-identiy legend span").append($("<span> - </span><a href='#' id='quickAdd'>Quick Add</a>"));
+    if($("fieldset#edit-api-identiy legend div").length)
+        $("fieldset#edit-api-identiy legend div").append($("<span> - </span><a href='#' id='quickAdd'>Quick Add</a>"));
     $("#quickAdd").click(function() {
         if($(this).html() == "Quick Add") {
             $("input[id^='edit-key']").parent().hide();

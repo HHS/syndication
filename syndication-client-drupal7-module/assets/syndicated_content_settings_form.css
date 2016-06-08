@@ -22,7 +22,10 @@ fieldset#edit-type-mapping .fieldset-wrapper .field_layer {
     background: #fff;
     color: #333;
 }
-
+div.synd_couple div.form-item.form-type-select.form-group select.form-control.form-select {
+    width: auto;
+    display: inline-block;
+}
 .synd_error {
     border: 1px solid red;
 }

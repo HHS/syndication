@@ -67,7 +67,10 @@ Pressing the *Subscribe* button will send you to an auto-populated local content
 
 **Publishing**
 
-Local Content Types chosen as *syndicatable* get a new section in their edit screen for managing the publishing process. It provides a publish form for available content. It displays metadata for content already published. It provides an *update* button to manually send a new copy of your content to inform your source of any content changes.
+Local Content Types chosen as *syndicatable* get a new section in their edit screen for managing the publishing process. It provides a publish form for available content. It displays metadata for content already published. It provides an *update* button to manually send a new copy of your content to inform your source of any content changes. You can add more roles to publish to Syndication by giving them the Syndication Publish Right under permissions.
+
+**Configuration**
+Admin has configuration rights by default. You can give other users Syndiction configuration rights. This can be done by going to Drupal permissions and assign the Syndication Configuration Rights to the role you want to access the configuration page.
 
 Download Link
 ----------------------
@@ -75,6 +78,14 @@ Download Link
 
 CHANGE LOG
 ------------
+**1.16.6.8**
+
+Added permission for Syndicaiton configuration page.
+
+**1.16.5.18**
+
+Added Drupal hook_permission for Syndication publishing rights.
+
 **1.16.3.11**
 
 Custom Patching Level to fix updates

@@ -1,8 +1,12 @@
 package com.ctacorp.syndication.contentextraction
 
+import com.ctacorp.syndication.media.Collection
+import com.ctacorp.syndication.media.FAQ
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
+import com.ctacorp.syndication.media.PDF
+import com.ctacorp.syndication.media.QuestionAndAnswer
 import com.ctacorp.syndication.media.Video
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Tweet
@@ -17,6 +21,7 @@ import org.apache.commons.io.IOUtils
 @Transactional
 class MediaPreviewThumbnailService {
     def grailsApplication
+    def assetResourceLocator
 
     def config = Holders.config
 
@@ -33,6 +38,22 @@ class MediaPreviewThumbnailService {
             case Html:
                 savePreview(mi, generatePreview(htmlUrl))
                 saveThumbnail(mi, generateThumbnail(htmlUrl, ".5"))
+                break
+            case Collection:
+                savePreview(mi, assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream)
+                saveThumbnail(mi, assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream)
+                break
+            case PDF:
+                savePreview(mi, assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/pdf.jpg").inputStream)
+                saveThumbnail(mi, assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/pdf.jpg").inputStream)
+                break
+            case FAQ:
+                savePreview(mi, assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/faq.jpg").inputStream)
+                saveThumbnail(mi, assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/faq.jpg").inputStream)
+                break
+            case QuestionAndAnswer:
+                savePreview(mi, assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/questionAndAnswer.jpg").inputStream)
+                saveThumbnail(mi, assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/questionAndAnswer.jpg").inputStream)
                 break
             case Image:
             case Infographic:
