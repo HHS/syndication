@@ -80,7 +80,8 @@ CHANGE LOG
 ------------
 
 **1.16.7.27**
-Added delete opiton on the Drupal side so the content will be removed on the Syndication system. We have 
+
+Added delete option on the Drupal side so the content will be removed on the Syndication system. We have
 also added archive/unarchive option for the Syndicated content.
 
 **1.16.6.8**
