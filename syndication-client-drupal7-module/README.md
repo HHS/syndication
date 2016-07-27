@@ -74,7 +74,7 @@ Admin has configuration rights by default. You can give other users Syndiction c
 
 Download Link
 ----------------------
-[Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication-client-drupal7-module.1.16.3.2.zip?raw=true)
+[Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication-client-drupal7-module.1.16.7.27.zip?raw=true)
 
 CHANGE LOG
 ------------
