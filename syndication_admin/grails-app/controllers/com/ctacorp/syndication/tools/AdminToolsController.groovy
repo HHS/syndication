@@ -104,7 +104,7 @@ class AdminToolsController {
 
     def updateMissingTinyUrls() {
         def updatedMappings = tinyUrlService.updateItemsWithoutMappings()
-        String statusMessage = ""
+        String statusMessalge = ""
         updatedMappings.each {
             statusMessage += "${it.id} - ${it.targetUrl}<br/>"
         }

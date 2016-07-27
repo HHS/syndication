@@ -39,17 +39,19 @@ class TinyUrlService {
         def mediaItems = MediaItem.list().collect{
             [id:it.id, url:it.sourceUrl]
         }
+        log.info("mediaitems listing: " + mediaItems)
 
         def itemIds = rest.post("${apiUrl}/missingTinyUrls.json"){
             accept "application/json;charset=UTF-8"
             body mediaItems as JSON
         }.json.collect{ it as Long }
+        log.info("items Ids to generate a tinyurl for: " + itemIds)
 
         if(itemIds){
             def mediaItemsWithoutTinyUrls = MediaItem.withCriteria {
                 'in'('id', itemIds)
             }
-
+            log.info("mediaItemsWithoutTinyUrls: " + itemIds)
             def bulkData = mediaItemsWithoutTinyUrls.collect{
                 [url:it.sourceUrl, id:it.id, guid:it.externalGuid]
             }
@@ -101,6 +103,7 @@ class TinyUrlService {
 
     @NotTransactional
     def createMapping(String targetUrl, Long syndicationId, String guid){
+        log.info("creating mapping for syndid: " + syndicationId)
         def resp = rest.post(apiUrl) {
             header 'Date', new Date().toString()
             header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""

@@ -81,7 +81,7 @@ grails.project.dependency.resolution = {
     plugins {
         // plugins for the compile step ----------------------------------------------------
         compile ":syndication-model:2.9.0"       //Syndication domain classes
-        compile ":content-extraction-services:1.14.0"  //syndication content extraction tools
+        compile ":content-extraction-services:1.15.0"  //syndication content extraction tools
         compile ":solr-operations:1.5.0"                  //syndication solr stuff
 
         //plugins for the compile step

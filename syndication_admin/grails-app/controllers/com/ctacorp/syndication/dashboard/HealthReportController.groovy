@@ -14,6 +14,7 @@ import grails.transaction.Transactional
 class HealthReportController {
     def mediaValidationService
     def springSecurityService
+    def mediaItemsService
 
     def index(Integer max) {
         setDefaultParams(max)
@@ -112,7 +113,12 @@ class HealthReportController {
     private Map getStabilityStats(){
         def flaggedMediaItems = getFlaggedItems(false)
         def ignoredItems = getFlaggedItems(true)
-        def totalItems = MediaItem.count()
+        def totalItems
+        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
+            totalItems = MediaItem.facetedSearch([restrictToSet:mediaItemsService.publisherItems().join(",")]).count()
+        } else {
+            totalItems = MediaItem.count()
+        }
         if(totalItems > 0){
             def stableItems = totalItems - flaggedMediaItems.totalCount - ignoredItems.totalCount
             def percentStable = 100 * (1 - (flaggedMediaItems.totalCount + ignoredItems.totalCount) / totalItems)

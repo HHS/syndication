@@ -2,12 +2,17 @@ package com.ctacorp.syndication.authentication
 
 import com.ctacorp.syndication.microsite.MicroSite
 import com.ctacorp.syndication.storefront.UserMediaList
+import com.ctacorp.syndication.util.PasswordGenerator
 import grails.transaction.Transactional
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 @Transactional
 class AdminUserService {
     def springSecurityService
     def micrositeService
+    def mailService
+    def grailsApplication
+    def groovyPageRenderer
 
     def updateUserLastLogin(){
         User currentUser = springSecurityService.getCurrentUser()
@@ -71,4 +76,29 @@ class AdminUserService {
         }
         [userInstanceCount: userRoles.getTotalCount(), userRoles:userRoles, currentRole: params.role]
     }
+
+    def resetPassword(User user) {
+        if (user.getAuthorities().contains(Role.findByAuthority("ROLE_ADMIN"))) {
+            log.error "A password reset was attempted for an admin account ID: ${user.id}"
+            return false
+        }
+
+        //Generate a new random password
+        def randomPassword = PasswordGenerator.randomPassword
+        user.password = randomPassword
+        //Update user account with new rand password
+
+        if (user.save(flush: true, failOnError: true)) {
+            //if the save worked, send an email
+            mailService.sendMail {
+                async true
+                to user.username
+                subject "Your password has been reset"
+                html groovyPageRenderer.render(template: "/login/passwordResetEmail", model:[randomPassword:randomPassword, user:user])
+            }
+            return true
+        }
+        false
+    }
+
 }

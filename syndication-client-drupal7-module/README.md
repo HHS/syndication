@@ -74,10 +74,15 @@ Admin has configuration rights by default. You can give other users Syndiction c
 
 Download Link
 ----------------------
-[Download Latest Release](https://github.com/HHS/syndication/raw/master/binaries/syndication-client-drupal7-module.1.16.6.8.zip?raw=true)
+[Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication-client-drupal7-module.1.16.3.2.zip?raw=true)
 
 CHANGE LOG
 ------------
+
+**1.16.7.27**
+Added delete opiton on the Drupal side so the content will be removed on the Syndication system. We have 
+also added archive/unarchive option for the Syndicated content.
+
 **1.16.6.8**
 
 Added permission for Syndicaiton configuration page.

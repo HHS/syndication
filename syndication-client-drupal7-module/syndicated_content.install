@@ -83,6 +83,20 @@ function syndicated_content_update_7003() {
     );
     db_add_field('syndicated_content_sources', 'cms_url', $spec);
 }
+
+/**
+ * Adds archive field
+ */
+function syndicated_content_update_7004() {
+    $spec = array(
+      'description'   => t('Archive Syndication'),
+      'type'          => 'int',
+      'length'        => 1,
+      'default'       => 0
+    );
+    db_add_field('syndicated_content', 'archive', $spec);
+}
+
 function syndicated_content_schema()
 {
     $schema['syndicated_content_sources'] = array(
@@ -143,6 +157,11 @@ function syndicated_content_schema()
                 'type'        => 'int',
                 'length'      => 1,
                 'default'     => 0),
+              'cms_url' => array(
+                'description' => 'CMS Real URL',
+                'type'        => 'varchar',
+                'length'      => 128,
+                'default'     => ''),
         ),
         'primary key' => array('id'),
     );
@@ -244,6 +263,11 @@ function syndicated_content_schema()
                 'description' => 'JSON MetaData From Source',
                 'type' => 'text',
                 'not null' => TRUE),
+              'archive' => array(
+                'description' => 'Archive Syndication',
+                'type' => 'int',
+                'not null' => TRUE,
+                'default' => '0'),
             /* /// we may have to go around taxonomy
             'campaign_ids' => array(
                 'description' => 'Campaign IDs',

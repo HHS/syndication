@@ -28,6 +28,7 @@ function _syndicated_content_node_validate( $node, $form, &$form_state )
         switch( $syndication_action )
         {
             case '': break;
+
             case 'publish':
                 $language_id = _syndicated_content_find_language_id( $form_state['values']['syndication_publish_language'] );
                 
@@ -42,6 +43,7 @@ function _syndicated_content_node_validate( $node, $form, &$form_state )
                 
                 _syndicated_content_update($node, $params, true);
                 break;
+
             case 'unpublish':
                 /// need syndication_media_id of current node
                 $drupaldata = db_query("SELECT * FROM {syndicated_content} WHERE node_id=:node",array(
@@ -55,30 +57,103 @@ function _syndicated_content_node_validate( $node, $form, &$form_state )
                 } else {
                     if ( empty($drupaldata->locally_owned) )
                     {
-                        form_set_error('syndication_action', t('You cannot unpublish content you do not own.'));
+                        form_set_error('syndication_action', t('You cannot delete content you do not own.'));
                         return;
                     }
-                    //// syndication doesn't actually unpublish anything atm
-                    $num_deleted = db_delete('syndicated_content')
-                        ->condition('node_id', $node->nid, '=')
-                        ->execute();
-                    drupal_set_message('UnPublished From Syndication Source.');
-                    /*
+
                     $syndication = _syndicated_content_api_factory();
                     $response = $syndication->unPublishMediaById($drupaldata->media_id);
-                    if ( $response->success )
+
+                    if ( $response->status == 200 )
                     {
                         $num_deleted = db_delete('syndicated_content')
                                      ->condition('node_id', $node->nid, '=')
                                      ->execute();
-                        drupal_set_message('UnPublished From Syndication Source.');
+                        drupal_set_message('Deleted From Syndication Source.');
                     } else {
-                        drupal_set_message('Failed to UnPublish.');
+                        drupal_set_message('Failed to delete source.');
                     }
-                    */
+
                 }
                 _syndicated_content_stop_destination($node);
                 break;
+
+            case 'archive':
+                /// need syndication_media_id of current node
+                $drupaldata = db_query("SELECT * FROM {syndicated_content} WHERE node_id=:node",array(
+                  'node'   => $node->nid
+                ))->fetchObject();
+                /// this node is not subscribed to anything
+                if ( empty($drupaldata) )
+                {
+                    form_set_error('syndication_action', t('This node is not subscribed to any syndicated content.'));
+                    return;
+                } else {
+                    if ( empty($drupaldata->locally_owned) )
+                    {
+                        form_set_error('syndication_action', t('You cannot archive content you do not own.'));
+                        return;
+                    }
+
+                    $syndication = _syndicated_content_api_factory();
+                    $response = $syndication->archiveMediaById($drupaldata->media_id);
+
+                    if ( $response->status == 200 )
+                    {
+                        // update content to be archived
+                        db_update('syndicated_content')
+                          ->fields(array('archive' => 1))
+                          ->condition('media_id', $drupaldata->media_id)
+                          ->execute();
+
+                        drupal_set_message('Archived to Syndication Source.');
+                    } else {
+                        drupal_set_message('Failed to archive.');
+                    }
+
+                }
+                _syndicated_content_stop_destination($node);
+
+            break;
+
+            case 'unarchive':
+                /// need syndication_media_id of current node
+                $drupaldata = db_query("SELECT * FROM {syndicated_content} WHERE node_id=:node",array(
+                  'node'   => $node->nid
+                ))->fetchObject();
+                /// this node is not subscribed to anything
+                if ( empty($drupaldata) )
+                {
+                    form_set_error('syndication_action', t('This node is not subscribed to any syndicated content.'));
+                    return;
+                } else {
+                    if ( empty($drupaldata->locally_owned) )
+                    {
+                        form_set_error('syndication_action', t('You cannot unarchive content you do not own.'));
+                        return;
+                    }
+
+                    $syndication = _syndicated_content_api_factory();
+                    $response = $syndication->unArchiveMediaById($drupaldata->media_id);
+
+                    if ( $response->status == 200 )
+                    {
+                        // update content to be archived
+                        db_update('syndicated_content')
+                          ->fields(array('archive' => 0))
+                          ->condition('media_id', $drupaldata->media_id)
+                          ->execute();
+
+                        drupal_set_message('Unarchived from Syndication Source.');
+                    } else {
+                        drupal_set_message('Failed to unarchive.');
+                    }
+
+                }
+                _syndicated_content_stop_destination($node);
+
+                break;
+
             case 'update':
                 /// is this node subscribed to anything?
                 $drupaldata = db_query("SELECT * FROM {syndicated_content} WHERE node_id=:node",array(
@@ -122,6 +197,7 @@ function _syndicated_content_node_validate( $node, $form, &$form_state )
                     drupal_set_message(t('Failed to updated content from syndication.'));
                 }
                 break;
+
             case 'unsubscribe':
                 $num_deleted = db_delete('syndicated_content')
                                  ->condition('node_id', $node->nid, '=')
@@ -132,6 +208,7 @@ function _syndicated_content_node_validate( $node, $form, &$form_state )
                 }
                 _syndicated_content_stop_destination($node);
                 break;
+
             default:
                 drupal_set_message('Unsupported syndication action requested: '.$syndication_action);
                 _syndicated_content_stop_destination($node);

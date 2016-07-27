@@ -1,3 +1,4 @@
+import com.ctacorp.syndication.authentication.User
 import grails.converters.JSON
 
 import javax.servlet.http.HttpServletResponse
@@ -14,6 +15,8 @@ import grails.plugin.springsecurity.annotation.Secured
 
 @Secured(['permitAll'])
 class LoginController {
+
+    def adminUserService
 
     /**
      * Dependency injection for the authenticationTrustResolver.
@@ -40,7 +43,6 @@ class LoginController {
      * Show the login page.
      */
     def auth = {
-        session.nathan="burk"
 
         def config = SpringSecurityUtils.securityConfig
 
@@ -52,6 +54,28 @@ class LoginController {
         String view = 'auth'
         String postUrl = "${request.contextPath}${config.apf.filterProcessesUrl}"
         render view: view, model: [postUrl: postUrl, rememberMeParameter: config.rememberMe.parameter]
+    }
+
+    def forgotPassword() {
+        render view:"forgotPassword"
+    }
+
+    def resetPassword(String username) {
+        User user = User.findByUsername(username)
+        if(!user) {
+            flash.error = "The provided email is not in our records"
+            redirect action: "forgotPassword"
+            return
+        }
+
+        def success = adminUserService.resetPassword(user)
+        if(!success) {
+            flash.error = "Unable to reset your password. Please contact an admin at syndicationadmin@hhs.gov"
+            redirect action: "forgotPassword"
+            return
+        }
+        flash.message = "Your password has been reset, please follow the instructions in your email"
+        redirect action: "auth"
     }
 
     /**
@@ -111,7 +135,7 @@ class LoginController {
         if (springSecurityService.isAjax(request)) {
             render([error: msg] as JSON)
         } else {
-            flash.message = msg
+            flash.error = msg
             redirect action: 'auth', params: params
         }
     }

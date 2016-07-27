@@ -34,8 +34,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 </div>
 
                 <div class="panel-body">
+                    <g:if test='${flash.error}'>
+                        <div class='panel-body'><span class="text-danger"><i class="fa fa-warning"></i> ${flash.error}</span></div>
+                    </g:if>
                     <g:if test='${flash.message}'>
-                        <div class='panel-body'><span class="text-danger"><i class="fa fa-warning"></i> ${flash.message}</span></div>
+                        <div class='panel-body'><span class="text-info"><i class="fa fa-info"></i> ${flash.message}</span></div>
                     </g:if>
                     <form action='${postUrl}' method='POST' id='loginForm' class='cssform' autocomplete='off'>
                         <fieldset>
@@ -47,9 +50,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                                 <input class="form-control" autocomplete="off" id="password" placeholder="Password" name="j_password" type="password" value="">
                             </div>
 
-                            <g:submitButton name="submit" autocomplete="off" class="btn btn-lg btn-success btn-block" value="Login"/>
+                            <div class="form-group">
+                                <g:submitButton name="submit" autocomplete="off" class="btn btn-lg btn-success btn-block" value="Login"/>
+                            </div>
+
+                            <g:link controller="login" action="forgotPassword" class="pull-right">Forgot Password?</g:link>
                         </fieldset>
                     </form>
+
+
                 </div>
             </div>
             <p>

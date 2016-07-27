@@ -53,7 +53,8 @@ class TagsService {
     @NotTransactional
     def getMediaForTagIds(String tagIdCSV, params = [:]) {
         params['ids'] = tagIdCSV
-        def response = restGet("${serverAddress}/resources/relatedMediaFromTagIds/${params.ids}.json", params) ?: []
+        params.max = params.max ?: 1000000
+        def response = restGet("${serverAddress}/content/getContentForTagIds/${params.ids}.json", params) ?: []
         if (!response) {
             return []
         }

@@ -832,14 +832,43 @@ function _syndicated_content_alter_edit_form_published( $drupal_metadata, &$form
                 'onclick' => "syndicationAction('republish');return false;",
             ),
         );*/
-        /// button: un-publish
+
+        // button to delete from Syndication
         $form['syndication_information']['syndication_unpublish_button'] = array(
             '#type'        => 'button',
-            '#value'       => 'UnPublish From Syndication',
+            '#value'       => 'Delete From Syndication',
             '#attributes'  => array(
                 'onclick' => "syndicationAction('unpublish');return false;",
             ),
         );
+
+
+        $query = db_select('syndicated_content', 'c')
+          ->fields('c')
+          ->condition('node_id', $drupal_metadata['node_id'])
+          ->range(0, 1);
+        $exec = $query->execute();
+        $sc_archived = $exec->fetchAssoc();
+
+        if($sc_archived['archive'] == 0) {
+            // button to delete from Syndication
+            $form['syndication_information']['syndication_archive_button'] = array(
+              '#type'        => 'button',
+              '#value'       => 'Archive to Syndication',
+              '#attributes'  => array(
+                'onclick' => "syndicationAction('archive');return false;",
+              ),
+            );
+        } else {
+            // button to delete from Syndication
+            $form['syndication_information']['syndication_unarchive_button'] = array(
+              '#type'        => 'button',
+              '#value'       => 'Unarchive from Syndication',
+              '#attributes'  => array(
+                'onclick' => "syndicationAction('unarchive');return false;",
+              ),
+            );
+        }
 
     /// We are subscribed to this piece of content from synd-server
     } else {

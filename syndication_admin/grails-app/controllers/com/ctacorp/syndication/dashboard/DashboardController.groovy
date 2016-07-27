@@ -74,15 +74,32 @@ class DashboardController {
     }
 
     def contentTypeDistributionDonut(){
-        def data = [
-            [label:"Html", value:Html.count()],
-            [label:"Video", value:Video.count()],
-            [label:"Image", value:Image.count()],
-            [label:"Infographic", value:Infographic.count()],
-            [label:"Collection", value:com.ctacorp.syndication.media.Collection.count()],
-            [label:"Tweet", value:Tweet.count()],
-            [label:"pdf", value:PDF.count()]
-        ]
+        def data
+        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
+            data = [
+                    [label:"Article", value:MediaItem.facetedSearch([mediaTypes:"ARTICLE",restrictToSet:publisherItems().join(","),sort:"-id"]).count()],
+                    [label:"BlogPosting", value:MediaItem.facetedSearch([mediaTypes:"BLOG_POSTING",restrictToSet:publisherItems().join(","),sort:"-id"]).count()],
+                    [label:"NewsArticle", value:MediaItem.facetedSearch([mediaTypes:"NEWS_ARTICLE",restrictToSet:publisherItems().join(","),sort:"-id"]).count()],
+                    [label:"Html", value:MediaItem.facetedSearch([mediaTypes:"html",restrictToSet:publisherItems().join(","),sort:"-id"]).count()],
+                    [label:"Video", value:MediaItem.facetedSearch([mediaTypes:"video",restrictToSet:publisherItems().join(","),sort:"-id"]).count()],
+                    [label:"Image", value:MediaItem.facetedSearch([mediaTypes:"image",restrictToSet:publisherItems().join(","),sort:"-id"]).count()],
+                    [label:"Infographic", value:MediaItem.facetedSearch([mediaTypes:"infographic",restrictToSet:publisherItems().join(","),sort:"-id"]).count()],
+                    [label:"Collection", value:MediaItem.facetedSearch([mediaTypes:"collection",restrictToSet:publisherItems().join(","),sort:"-id"]).count()],
+                    [label:"Tweet", value:MediaItem.facetedSearch([mediaTypes:"tweet",restrictToSet:publisherItems().join(","),sort:"-id"]).count()],
+                    [label:"pdf", value:MediaItem.facetedSearch([mediaTypes:"pdf",restrictToSet:publisherItems().join(","),sort:"-id"]).count()]
+            ]
+        } else {
+            data = [
+                    [label:"Html", value:Html.count()],
+                    [label:"Video", value:Video.count()],
+                    [label:"Image", value:Image.count()],
+                    [label:"Infographic", value:Infographic.count()],
+                    [label:"Collection", value:com.ctacorp.syndication.media.Collection.count()],
+                    [label:"Tweet", value:Tweet.count()],
+                    [label:"pdf", value:PDF.count()]
+            ]
+        }
+
 
         render data as JSON
     }
@@ -133,7 +150,37 @@ class DashboardController {
 
         render data as JSON
     }
-    
+
+    def ContentByPublisherAreaChart(String whichDate) {
+        def data = [
+                data:[],
+                xkey:"month",
+                ykeys:["Count"],
+                labels:["Count"]
+        ]
+
+        def dates = getDateRangesForLast12Months()
+        def sources = Source.list()
+        //68
+
+        dates.eachWithIndex{ date, index ->
+            def monthData = [month:"${date.date}"]
+            data.data << monthData
+            def items = null
+            switch(whichDate) {
+                case "areaDateSelectorSyndicationCaptured": items   = MediaItem.countByDateSyndicationCapturedBetweenAndIdInList(date.firstDay, date.lastDay, publisherItems()); break;
+                case "areaDateSelectorSyndicationUpdated": items    = MediaItem.countByDateSyndicationUpdatedBetweenAndIdInList(date.firstDay, date.lastDay, publisherItems()); break;
+                case "areaDateSelectorTotal":           items       = MediaItem.countByDateSyndicationCapturedLessThanAndIdInList(date.firstDay, publisherItems()); break;
+                default: items                                      = MediaItem.countByDateSyndicationCapturedBetweenAndIdInList(date.firstDay, date.lastDay, publisherItems());
+            }
+            monthData << [
+                    "Count":items
+            ]
+        }
+
+        render data as JSON
+    }
+
     def error500(){
         def errorCode = RandomStringUtils.randomAlphabetic(10).toUpperCase()
         log.error(errorCode)
@@ -148,6 +195,7 @@ class DashboardController {
             cal.set(Calendar.DATE, 1)
             Date firstDay = cal.getTime().clearTime()
             cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE))
+            cal.add(Calendar.DATE, 1) //add one then clear time to get the full last day of the month
             Date lastDay = cal.getTime().clearTime()
             String date = lastDay.format("yyyy-MM-dd")
 

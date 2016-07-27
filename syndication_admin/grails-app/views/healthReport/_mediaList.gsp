@@ -2,12 +2,8 @@
     <g:hiddenField name="whereToController" value="healthReport"/>
 <table class="table table-header">
     <thead>
+        <th></th> <!-- select box -->
         <th></th> <!-- Icon -->
-        <sec:ifAllGranted roles="ROLE_ADMIN">
-            <th>
-                <strong>DELETE</strong>
-            </th>
-        </sec:ifAllGranted>
         <g:sortableColumn action="${params.action}" defaultOrder="DESC" title="Date Flagged" property="dateFlagged"/>
         <g:sortableColumn action="${params.action}" title="Media ID" property="mediaItem.id"/>
         <g:sortableColumn action="${params.action}" title="Name" property="mediaItem.name"/>
@@ -37,10 +33,10 @@
                 <td>${flaggedMediaItem.message}</td>
                 <td>
                     <g:if test="${params.action == 'ignored'}">
-                        <g:link action="unignoreFlaggedMedia" id="${flaggedMediaItem.id}"><button type="button" class="btn btn-default btn-circle" title="Ignore"><i class="fa fa-times fa-fw"></i></button></g:link>
+                        <g:link action="unignoreFlaggedMedia" id="${flaggedMediaItem.id}"><button type="button" class="btn btn-default btn-circle" title="Ignore"><i class="fa fa-check fa-fw"></i></button></g:link>
                     </g:if>
                     <g:else>
-                        <g:link action="ignoreFlaggedMedia" id="${flaggedMediaItem.id}"><button type="button" class="btn btn-default btn-circle" title="Unignore"><i class="fa fa-check fa-fw"></i></button></g:link>
+                        <g:link action="ignoreFlaggedMedia" id="${flaggedMediaItem.id}"><button type="button" class="btn btn-default btn-circle" title="Unignore"><i class="fa fa-times fa-fw"></i></button></g:link>
                     </g:else>
                 </td>
                 <td>
@@ -62,13 +58,12 @@
     <script>
         $(document).ready(function(){
             $("#selectAllButton").click(function(){
-                $('.deleteCheckbox').attr('checked', 'checked')
+                $('.deleteCheckbox').prop('checked', true)
             });
             $("#deselectAllButton").click(function(){
-                $('.deleteCheckbox').removeAttr('checked')
+                $('.deleteCheckbox').prop('checked', false)
             });
             $("#deleteAllButton").click(function(){
-                console.log("submitting!");
                 $('.deleteAllForm').submit();
             });
         });

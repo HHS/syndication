@@ -42,62 +42,91 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <!-- /.row -->
 <div class="row">
 <div class="col-lg-8">
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <i class="fa fa-bar-chart-o fa-fw"></i> <span id="areaChartLabel">Showing content by 'Date Syndication Captured'</span>
-        <div class="pull-right">
-            <div class="btn-group">
-                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                    Date Selector
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu pull-right" role="menu">
-                    <li><a href="#" id="areaDateSelectorSyndicationCaptured"    class="areaDateSelector">Syndication Captured</a></li>
-                    <li><a href="#" id="areaDateSelectorSyndicationUpdated"     class="areaDateSelector">Syndication Updated</a></li>
-                    <li><a href="#" id="areaDateSelectorContentAuthored"        class="areaDateSelector">Content Authored</a></li>
-                    <li><a href="#" id="areaDateSelectorContentUpdated"         class="areaDateSelector">Content Updated</a></li>
-                    <li><a href="#" id="areaDateSelectorContentPublished"       class="areaDateSelector">Content Published</a></li>
-                    <li><a href="#" id="areaDateSelectorContentReviewed"        class="areaDateSelector">Content Reviewed</a></li>
-                </ul>
+    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bar-chart-o fa-fw"></i> <span id="areaChartLabel">Showing content by 'Date Syndication Captured'</span>
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                            Date Selector
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu pull-right" role="menu">
+                            <li><a href="#" id="areaDateSelectorSyndicationCaptured"    class="areaDateSelector">Syndication Captured</a></li>
+                            <li><a href="#" id="areaDateSelectorSyndicationUpdated"     class="areaDateSelector">Syndication Updated</a></li>
+                            <li><a href="#" id="areaDateSelectorContentAuthored"        class="areaDateSelector">Content Authored</a></li>
+                            <li><a href="#" id="areaDateSelectorContentUpdated"         class="areaDateSelector">Content Updated</a></li>
+                            <li><a href="#" id="areaDateSelectorContentPublished"       class="areaDateSelector">Content Published</a></li>
+                            <li><a href="#" id="areaDateSelectorContentReviewed"        class="areaDateSelector">Content Reviewed</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div id="contentByAgencyArea"></div>
+            </div>
+            <!-- /.panel-body -->
         </div>
+    </sec:ifAnyGranted>
+    <sec:ifAnyGranted roles="ROLE_PUBLISHER">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bar-chart-o fa-fw"></i> <span id="areaPublisherChartLabel">Showing content by 'Date Syndication Captured'</span>
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                            Date Selector
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu pull-right" role="menu">
+                            <li><a href="#" id="areaDateSelectorSyndicationCaptured"    class="areaPublisherDateSelector">Syndication Captured</a></li>
+                            <li><a href="#" id="areaDateSelectorSyndicationUpdated"     class="areaPublisherDateSelector">Syndication Updated</a></li>
+                            <li><a href="#" id="areaDateSelectorTotal"        class="areaPublisherDateSelector">Total Items</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div id="publisherContentArea"></div>
+            </div>
+            <!-- /.panel-body -->
+        </div>
+    </sec:ifAnyGranted>
+    <!-- /.panel -->
+    <div class="panel panel-default visible-lg">
+        <g:render template="timeline"/>
     </div>
-    <!-- /.panel-heading -->
-    <div class="panel-body">
-        <div id="contentByAgencyArea"></div>
-    </div>
-    <!-- /.panel-body -->
-</div>
-<!-- /.panel -->
-<div class="panel panel-default visible-lg">
-    <g:render template="timeline"/>
-</div>
 <!-- /.panel -->
 </div>
 <!-- /.col-lg-8 -->
 <div class="col-lg-4">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <i class="fa fa-bell fa-fw"></i> Notifications Panel
+    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bell fa-fw"></i> Notifications Panel
+            </div>
+            <!-- /.panel-heading -->
+            <g:render template="recentEvents"/>
+            <!-- /.panel-body -->
         </div>
-        <!-- /.panel-heading -->
-        <g:render template="recentEvents"/>
-        <!-- /.panel-body -->
-    </div>
-    <!-- /.panel -->
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <i class="fa fa-bar-chart-o fa-fw"></i> # of Media Items by Agency
-        </div>
+        <!-- /.panel -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-bar-chart-o fa-fw"></i> # of Media Items by Agency
+            </div>
 
-        <div class="panel-body">
-            <div id="contentByAgencyDonut"></div>
-            <!--
-            <a href="#" class="btn btn-default btn-block">View Details</a>
-            -->
+            <div class="panel-body">
+                <div id="contentByAgencyDonut"></div>
+                <!--
+                <a href="#" class="btn btn-default btn-block">View Details</a>
+                -->
+            </div>
+            <!-- /.panel-body -->
         </div>
-        <!-- /.panel-body -->
-    </div>
+    </sec:ifAnyGranted>
     <!-- /.panel -->
     <div class="panel panel-default">
         <div class="panel-heading">

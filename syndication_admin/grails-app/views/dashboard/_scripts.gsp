@@ -20,7 +20,19 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             $("#areaChartLabel").html("Showing content by 'Date " + labelText + "'");
             updateAreaChart($(this).attr("id"));
         });
+        $(".areaPublisherDateSelector").click(function(){
+            var labelText = $(this).text();
+            console.log(labelText)
+            $("#areaPublisherChartLabel").html("Showing content by 'Date " + labelText + "'");
+            updatePublisherAreaChart($(this).attr("id"));
+        });
     });
+
+    function initPublisherContentArea(){
+        $.getJSON('${grailsApplication.config.grails.serverURL}/dashboard/contentByPublisherAreaChart.json?whichDate=areaDateSelectorSyndicationCaptured', function (data) {
+            area(data, "publisherContentArea");
+        });
+    }
 
     function initContentByAgencyArea(){
         $.getJSON('${grailsApplication.config.grails.serverURL}/dashboard/contentByAgencyAreaChart.json?whichDate=areaDateSelectorSyndicationCaptured', function (data) {
@@ -28,9 +40,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         });
     }
 
-    function updateAreaChart(whichData){
-        console.log('getting data for '+ whichData);
+    function updatePublisherAreaChart(whichData){
+        $.getJSON('${grailsApplication.config.grails.serverURL}/dashboard/contentByPublisherAreaChart.json?whichDate=' + whichData, function (data) {
+            areaChart.setData(data.data);
+        });
+    }
 
+    function updateAreaChart(whichData){
         $.getJSON('${grailsApplication.config.grails.serverURL}/dashboard/contentByAgencyAreaChart.json?whichDate=' + whichData, function (data) {
             areaChart.setData(data.data);
         });
@@ -72,6 +88,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
     var areaChart;
     initContentByAgencyArea();
+    initPublisherContentArea();
     initContentByAgencyDonut();
     initContentDistributionDonut();
 </g:javascript>

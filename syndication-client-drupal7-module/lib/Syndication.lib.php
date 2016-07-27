@@ -740,7 +740,7 @@ class SyndicationAPIClient
                 $request_headers[] = 'Content-Type: application/json;charset=UTF-8';
                 break;
             default:
-                $http_params = http_build_query($params,'','&');
+                @$http_params = http_build_query($params,'','&');
                 $request_headers[] = 'Content-Type: application/x-www-form-urlencoded;charset=UTF-8';
                 break;
         }
@@ -1723,8 +1723,50 @@ class Syndication extends SyndicationApiClient
         /// if publishing a collection, we get collection item, which contains list of any sub-items also generated
         try
         {
-            $result = $this->apiCall('delete',"{$this->api['syndication_url']}/resources/media/{$id}");
-            return $this->createResponse($result,'Un-Publish','Id');
+            $result = $this->apiCall('delete',"{$this->api['syndication_url']}/adminControls/media/delete/{$id}", 'json', 'json');
+            return $this->createResponse($result,'Delete','Id');
+        } catch ( Exception $e ) {
+            return $this->createResponse($e,'API Call');
+        }
+    }
+
+    /**
+     * Archive a piece of Media content by Id
+     *
+     * @param mixed $id id Numeric Id of a Media item
+     * @access public
+     *
+     * @return SyndicationResponse ->results[]
+     *      media metatdata ?
+     */
+    function archiveMediaById ( $id )
+    {
+        try
+        {
+            $result = $this->apiCall('post',"{$this->api['syndication_url']}/adminControls/media/archive/{$id}", 'json', 'json');
+            return $this->createResponse($result,'Archive','Id');
+
+        } catch ( Exception $e ) {
+            return $this->createResponse($e,'API Call');
+        }
+    }
+
+    /**
+     * Archive a piece of Media content by Id
+     *
+     * @param mixed $id id Numeric Id of a Media item
+     * @access public
+     *
+     * @return SyndicationResponse ->results[]
+     *      media metatdata ?
+     */
+    function unArchiveMediaById ( $id )
+    {
+        try
+        {
+            $result = $this->apiCall('post',"{$this->api['syndication_url']}/adminControls/media/unarchive/{$id}", 'json', 'json');
+            return $this->createResponse($result,'Archive','Id');
+
         } catch ( Exception $e ) {
             return $this->createResponse($e,'API Call');
         }

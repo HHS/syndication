@@ -89,7 +89,7 @@ class ContentItemService {
 
     def getContentForTagIds(String tagIds, params = [:]) {
         params.max = Util.getMax(params)
-        def ids = tagIds.split(",").collect { it as Long }.unique()
+        def ids = (tagIds ?: "-1").split(",").collect { it as Long }.unique()
 
         ContentItem.createCriteria().list(params) {
             tags {

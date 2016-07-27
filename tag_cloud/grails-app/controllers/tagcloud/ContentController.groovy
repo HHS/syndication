@@ -77,4 +77,15 @@ class ContentController {
             respond contentItemService.getContentForTagId(tagId, params)
         }
     }
+
+    /**
+     * Get content tagged by all tag Ids
+     * @param id  the list of all tag ids
+     * @return
+     */
+    def getContentForTagIds(String id){
+        JSON.use("contentList"){
+            respond contentItemService.getContentForTagIds(id, params)
+        }
+    }
 }

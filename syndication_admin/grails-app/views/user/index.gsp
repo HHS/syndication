@@ -27,6 +27,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <div id="list-user" class="content scaffold-list" role="main">
     <h1><g:message code="default.list.label" args="[entityName]"/></h1>
+    <div id="messages">
+
+    </div>
     <synd:message/>
     <synd:errors/>
     <synd:error/>
@@ -45,11 +48,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                 <g:sortableColumn property="user.accountExpired" title="${message(code: 'user.accountExpired.label', default: 'Account Expired')}" params="[role:params.role]"/>
 
-                <g:sortableColumn property="user.accountLocked" title="${message(code: 'user.accountLocked.label', default: 'Account Locked')}" params="[role:params.role]"/>
+                %{--<g:sortableColumn property="user.accountLocked" title="${message(code: 'user.accountLocked.label', default: 'Account Locked')}" params="[role:params.role]"/>--}%
 
                 <g:sortableColumn property="user.enabled" title="${message(code: 'user.enabled.label', default: 'Enabled')}" params="[role:params.role]"/>
 
                 <g:sortableColumn property="role" title="${message(code: 'user.role.label', default: 'Role')}" params="[role:params.role]"/>
+
+                <th>Reset Password</th>
 
             </tr>
             </thead>
@@ -65,11 +70,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                     <td><g:formatBoolean boolean="${userRoleInstance.user.accountExpired}"/></td>
 
-                    <td><g:formatBoolean boolean="${userRoleInstance.user.accountLocked}"/></td>
+                    %{--<td><g:formatBoolean boolean="${userRoleInstance.user.accountLocked}"/></td>--}%
 
                     <td><g:formatBoolean boolean="${userRoleInstance.user.enabled}"/></td>
 
                     <td>${userRoleInstance.role}</td>
+
+                    <td><input type="button" id="resetPassword" name="resetPassword" onclick="resetPassword(${userRoleInstance.user.id})" class="btn btn-primary" value="Reset Password"/></td>
 
                 </tr>
             </g:each>
@@ -81,6 +88,27 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <g:paginate total="${userInstanceCount ?: 0}" params="[role:params.role]"/>
         </div>
     </g:if>
+    <script>
+        function resetPassword( id ) {
+            $.ajax({
+                type: "POST",
+                data: {userId: id},
+                url: "${g.createLink(controller:'user',action:'resetPassword')}",
+                success: function (response ) {
+                    document.getElementById("messages").innerHTML = "<div class='row'><div class=\"alert alert-info alert-dismissable break-word\">" +
+                        "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-hidden=\"true\">&times;</button>" +
+                        response +
+                        "</div></div>"
+                },
+                error:function( response ) {
+                    document.getElementById("messages").innerHTML = "<div class='row'><div class=\"alert alert-danger alert-dismissable break-word\">" +
+                            "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-hidden=\"true\">&times;</button>" +
+                            response.responseText +
+                            "</div></div>"
+                }
+            });
+        }
+    </script>
 </div>
 </body>
 </html>

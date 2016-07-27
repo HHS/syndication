@@ -127,7 +127,7 @@ class MediaController {
             public String call(){
                 def mediaItem = mediaService.getMediaItem(id)
 
-                if(!mediaItem){
+                if(!mediaItem || !mediaItem.active){
                     response.status = 400
                     respond ApiResponse.get400NotFoundResponse().autoFill(params)
                     return
@@ -301,26 +301,6 @@ class MediaController {
             return
         }
 
-        //render special icons for collections and social media
-        switch(mi){
-            case QuestionAndAnswer:
-                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/questionAndAnswer.jpg").inputStream
-                renderBytes(f.bytes)
-                return
-            case FAQ:
-                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/faq.jpg").inputStream
-                renderBytes(f.bytes)
-                return
-            case Collection:
-                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream
-                renderBytes(f.bytes)
-                return
-            case PDF:
-                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/pdf.jpg").inputStream
-                renderBytes(f.bytes)
-                return
-        }
-
         byte[] renderedResponse
 
         Closure getImage = {
@@ -332,6 +312,18 @@ class MediaController {
                 switch (mi) {
                     case Tweet:
                         InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/twitter.jpg").inputStream
+                        return f.bytes
+                    case QuestionAndAnswer:
+                        InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/questionAndAnswer.jpg").inputStream
+                        return f.bytes
+                    case FAQ:
+                        InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/faq.jpg").inputStream
+                        return f.bytes
+                    case Collection:
+                        InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream
+                        return f.bytes
+                    case PDF:
+                        InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/pdf.jpg").inputStream
                         return f.bytes
                     default:
                         InputStream f  = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/bad.jpg").inputStream
@@ -367,26 +359,6 @@ class MediaController {
             return
         }
 
-        //render special icons for collections and social media
-        switch(mi){
-            case Collection:
-                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream
-                renderBytes(f.bytes)
-                return
-            case PDF:
-                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/pdf.jpg").inputStream
-                renderBytes(f.bytes)
-                return
-            case QuestionAndAnswer:
-                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/questionAndAnswer.jpg").inputStream
-                renderBytes(f.bytes)
-                break
-            case FAQ:
-                InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/faq.jpg").inputStream
-                renderBytes(f.bytes)
-                break
-        }
-
         byte[] renderedResponse
             Closure getImage =  {
                 MediaThumbnail thumbnail = MediaThumbnail.findByMediaItem(mi)
@@ -397,6 +369,18 @@ class MediaController {
                     switch(mi){
                         case Tweet:
                             InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/twitter.jpg").inputStream
+                            return f.bytes
+                        case Collection:
+                            InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/collection.jpg").inputStream
+                            return f.bytes
+                        case PDF:
+                            InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/pdf.jpg").inputStream
+                            return f.bytes
+                        case QuestionAndAnswer:
+                            InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/questionAndAnswer.jpg").inputStream
+                            return f.bytes
+                        case FAQ:
+                            InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/faq.jpg").inputStream
                             return f.bytes
                         default:
                             InputStream f = assetResourceLocator.findAssetForURI("defaultIcons/thumbnail/bad.jpg").inputStream

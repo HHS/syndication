@@ -46,16 +46,19 @@ class MediaMappingQueryController {
 
     def missingTinyUrls(){
         def data = request.getJSON()
+        log.info("data passed to missing TinyUrls: " + data)
 
         def missing = []
         MediaMapping.withSession {
             data.each{ entry ->
-                def mediaMapping = MediaMapping.findByTargetUrlAndSyndicationId(entry.url, entry.id)
+                def mediaMapping = MediaMapping.findByTargetUrl(entry.url)
                 if(!mediaMapping){
                     missing << entry.id
                 }
             }
         }
+
+        log.info("missing tinyurls: " + missing)
 
         render text: missing as JSON, contentType: "application/json;charset=UTF-8"
     }

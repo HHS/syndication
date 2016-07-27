@@ -29,6 +29,7 @@ class MediaMappingRestController {
     @Transactional
     def save(MediaMapping mediaMappingInstance) {
         if (mediaMappingInstance == null) {
+            log.error("mediaMappingInstance not found: ")
             notFound()
             return
         }

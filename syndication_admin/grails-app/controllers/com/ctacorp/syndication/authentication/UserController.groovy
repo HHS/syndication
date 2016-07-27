@@ -35,7 +35,7 @@ class UserController {
     def cmsManagerKeyService
     def passwordService
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE", resetPassword: "POST"]
 
     @Secured(["ROLE_ADMIN"])
     def index(Integer max) {
@@ -250,6 +250,25 @@ class UserController {
             }
             '*' { respond userInstance, [status: OK] }
         }
+    }
+
+    @Secured(["ROLE_ADMIN"])
+    @Transactional
+    def resetPassword(Long userId) {
+        User user = User.get(userId)
+        if(!user){
+            response.status = 400
+            render "Unable to resetPassword"
+            return
+        }
+        def success = adminUserService.resetPassword(user)
+        if(!success) {
+            response.status = 400
+            render "Unable to reset password"
+            return
+        }
+
+        render "Sent password reset email to ${user}"
     }
 
     @Secured(["ROLE_ADMIN"])

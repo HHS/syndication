@@ -929,7 +929,7 @@ class MediaService {
             params.sort = "-" + params.sort
         }
         if (params.tagIds) {
-            def mediaIds = tagsService.getMediaForTagIds(params.tagIds).join(",")
+            def mediaIds = tagsService.getMediaForTagIds(params.tagIds).syndicationId.join(",")
             if (!mediaIds) {
                 return []
             }

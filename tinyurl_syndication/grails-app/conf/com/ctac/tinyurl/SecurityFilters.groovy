@@ -17,6 +17,7 @@ class SecurityFilters {
                     log.error "not authorized"
                     return false
                 }
+                log.info("tinyurl post authorized")
                 true
             }
             after = { Map model ->
