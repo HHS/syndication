@@ -34,15 +34,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.create.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
+			<synd:hasError/>
 
 			<div class="row">
 				<div class="col-md-10">
-					<g:form class="form-horizontal" url="[resource:collectionInstance, action:'save']" >
+					<g:form class="form-horizontal" url="[resource:collectionInstance, action:'save']" id="updateMediaItem">
 						<fieldset class="form">
 							<g:render template="form"/>
 						</fieldset>
-						<fieldset class="buttons">
+						<fieldset class="buttons" id="mediaItemSubmitButton">
 							<g:submitButton name="create" class="btn btn-default btn-success" value="${message(code: 'default.button.create.label', default: 'Create')}" />
 							<g:link class="btn btn-default" action="index">
 								Cancel

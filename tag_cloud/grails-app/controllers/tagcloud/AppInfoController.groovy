@@ -14,6 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package tagcloud
 
+import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 

@@ -15,6 +15,7 @@ package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.media.QuestionAndAnswer
+import grails.util.Holders
 
 import static org.springframework.http.HttpStatus.*
 
@@ -32,9 +33,9 @@ import grails.transaction.Transactional
 class FAQController {
     def mediaItemsService
     def tagService
-    def solrIndexingService
     def cmsManagerKeyService
     def springSecurityService
+    def config = Holders.config
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "POST"]
 
@@ -46,7 +47,6 @@ class FAQController {
 
     def show(FAQ faqInstance) {
         def tagData = tagService.getTagInfoForMediaShowViews(faqInstance, params)
-
         respond faqInstance, model: [tags               : tagData?.tags,
                                      languages          : tagData?.languages,
                                      tagTypes           : tagData?.tagTypes,
@@ -54,7 +54,7 @@ class FAQController {
                                      selectedTagType    : tagData?.selectedTagType,
                                      languageId         : params.languageId,
                                      tagTypeId          : params.tagTypeId,
-                                     apiBaseUrl         : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                     apiBaseUrl         : config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                      subscriber         : cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(faqInstance)?.subscriberId)
         ]
     }
@@ -66,7 +66,6 @@ class FAQController {
         faqInstance.language = faqInstance.language ?: Language.findByIsoCode("eng")
 
         def subscribers = cmsManagerKeyService.listSubscribers()
-
         def questionAndAnswerList = mediaItemsService.getPublisherItemsByType(QuestionAndAnswer)
 
         respond faqInstance, model: [
@@ -93,8 +92,6 @@ class FAQController {
             return
         }
 
-        solrIndexingService.inputMediaItem(faqInstance)
-
         request.withFormat {
             form {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'faqInstance.label', default: 'FAQ'), faqInstance.name])
@@ -106,7 +103,6 @@ class FAQController {
 
     def edit(FAQ faqInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
-
         respond faqInstance, model: [
                 questionAndAnswerList        : mediaItemsService.getPublisherItemsByType(QuestionAndAnswer),
                 selectedQuestionAndAnswerList: faqInstance?.questionAndAnswers,
@@ -136,7 +132,6 @@ class FAQController {
 
         faqInstance.save flush: true
 
-        solrIndexingService.inputMediaItem(faqInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'FAQ.label', default: 'FAQ'), [faqInstance.name]])
@@ -160,7 +155,6 @@ class FAQController {
         }
 
         mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(faqInstance, true)
-        solrIndexingService.removeMediaItem(faqInstance)
         mediaItemsService.delete(faqInstance.id)
 
         request.withFormat {

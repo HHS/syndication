@@ -5,7 +5,7 @@
   Time: 3:01 PM
 --%>
 
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="grails.util.Holders" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -190,7 +190,7 @@
         var type = currentTag.getAttribute('data-totalType');
         currentTag.className = "btn totalGraphType btn-default active";
         $("#totalViews-container").html('<div id="spinnerDiv" style="width:50px;" class="center-block"><asset:image src="spinner.gif"/></div>');
-        $.get('${grailsApplication.config.grails.serverURL}' + "/consumerMetrics/getTotalViews?&mediaToGraph="+"${mediaToGraph}", function(data){
+        $.get('${grails.util.Holders.config.ADMIN_SERVER_URL}' + "/consumerMetrics/getTotalViews?&mediaToGraph="+"${mediaToGraph}", function(data){
             renderData(data, type, "totalViews-container");
         });
     }
@@ -198,7 +198,7 @@
         var type = currentTag.getAttribute('data-totalType');
         currentTag.className = "btn mobileTotalGraphType btn-default active";
         $("#mobileViews-container").html('<div id="spinnerDiv" style="width:50px;" class="center-block"><asset:image src="spinner.gif"/></div>');
-        $.get('${grailsApplication.config.grails.serverURL}' + "/consumerMetrics/getTotalMobileViews?&mediaToGraph="+"${mediaToGraph}", function(data){
+        $.get('${Holders.config.ADMIN_SERVER_URL}' + "/consumerMetrics/getTotalMobileViews?&mediaToGraph="+"${mediaToGraph}", function(data){
             renderData(data, type, "mobileViews-container");
         });
     }

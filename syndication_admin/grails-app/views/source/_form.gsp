@@ -20,7 +20,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="name">Name<span class="required-indicator">*</span></label>
     <div class="col-md-4">
-        <input name="name" type="text" placeholder="source name" class="form-control input-md" maxlength="255" required="" value="${sourceInstance?.name}">
+        <input name="name" type="text" placeholder="source name" class="form-control input-md" maxlength="255" required="" value="${source?.name}">
     </div>
 </div>
 
@@ -28,7 +28,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="acronym">Acronym<span class="required-indicator">*</span></label>
     <div class="col-md-4">
-        <input name="acronym" maxlength="255" required="" value="${sourceInstance?.acronym}" type="text" placeholder="abbreviation" class="form-control input-md">
+        <input name="acronym" maxlength="255" required="" value="${source?.acronym}" type="text" placeholder="abbreviation" class="form-control input-md">
     </div>
 </div>
 
@@ -36,7 +36,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="websiteUrl">Website Url<span class="required-indicator">*</span></label>
     <div class="col-md-4">
-        <input name="websiteUrl" maxlength="2000" required="" value="${sourceInstance?.websiteUrl}" type="url" placeholder="url" class="form-control input-md">
+        <input name="websiteUrl" maxlength="2000" required="" value="${source?.websiteUrl}" type="url" placeholder="url" class="form-control input-md">
     </div>
 </div>
 
@@ -44,7 +44,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="contactEmail">Contact Email</label>
     <div class="col-md-4">
-        <input name="contactEmail" maxlength="255"  value="${sourceInstance?.contactEmail}" type="email" placeholder="email" class="form-control input-md">
+        <input name="contactEmail" maxlength="255"  value="${source?.contactEmail}" type="email" placeholder="email" class="form-control input-md">
     </div>
 </div>
 
@@ -52,7 +52,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="largeLogoUrl">Large Logo Url</label>
     <div class="col-md-4">
-        <input name="largeLogoUrl" maxlength="2000" value="${sourceInstance?.largeLogoUrl}" type="url" placeholder="large logo" class="form-control input-md">
+        <input name="largeLogoUrl" maxlength="2000" value="${source?.largeLogoUrl}" type="url" placeholder="large logo" class="form-control input-md">
     </div>
 </div>
 
@@ -60,7 +60,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="smallLogoUrl">Small Logo Url</label>
     <div class="col-md-4">
-        <input name="smallLogoUrl" maxlength="2000" value="${sourceInstance?.smallLogoUrl}" type="url" placeholder="small logo" class="form-control input-md">
+        <input name="smallLogoUrl" maxlength="2000" value="${source?.smallLogoUrl}" type="url" placeholder="small logo" class="form-control input-md">
     </div>
 </div>
 
@@ -68,6 +68,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="description">Description</label>
     <div class="col-md-4">
-        <textarea class="form-control" name="description" maxlength="5000">${sourceInstance?.description}</textarea>
+        <textarea class="form-control" name="description" maxlength="5000">${source?.description}</textarea>
     </div>
 </div>

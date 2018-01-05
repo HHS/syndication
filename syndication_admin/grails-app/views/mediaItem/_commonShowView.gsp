@@ -35,6 +35,12 @@
     <dd class="word_wrap"><a target="_blank" href="${mediaItemInstance.sourceUrl}"><g:fieldValue bean="${mediaItemInstance}" field="sourceUrl"/></a></dd>
 </g:if>
 
+<g:if test="${mediaItemInstance?.customAttributionUrl}">
+    <dt class="word_wrap"><g:message code="${mediaType}.customAttributionUrl.label" default="Custom Attribute URL"/></dt>
+    <dd class="word_wrap"><a target="_blank" href="${mediaItemInstance.customAttributionUrl}"><g:fieldValue bean="${mediaItemInstance}" field="customAttributionUrl"/></a></dd>
+</g:if>
+
+
 <g:if test="${mediaItemInstance?.sourceUrlHash && mediaItemInstance.getClass().simpleName != 'Collection'}">
     <dt class="word_wrap"><g:message code="${mediaType}.sourceUrlHash.label" default="Source Url Hash"/></dt>
     <dd class="word_wrap"><g:fieldValue bean="${mediaItemInstance}" field="sourceUrlHash"/></dd>
@@ -52,7 +58,7 @@
 
 <g:if test="${mediaItemInstance?.active && mediaItemInstance?.visibleInStorefront}">
     <dt id="storefrontLink-label" class="word_wrap"><g:message code="${mediaType}.storefrontLink.label" default="Storefront Link"/></dt>
-    <dd class="word_wrap"><a target="_blank" href="${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${mediaItemInstance?.id}">${grails.util.Holders.config.storefront.serverAddress}/storefront/showContent/${mediaItemInstance?.id}</a></dd>
+    <dd class="word_wrap"><a target="_blank" href="${grails.util.Holders.config.STOREFRONT_SERVER_URL}/storefront/showContent/${mediaItemInstance?.id}">${grails.util.Holders.config.STOREFRONT_SERVER_URL}/storefront/showContent/${mediaItemInstance?.id}</a></dd>
 </g:if>
 
 <g:if test="${mediaItemInstance?.customThumbnailUrl}">
@@ -128,6 +134,9 @@
 
 <dt id="active-label" class="word_wrap"><g:message code="${mediaType}.manuallyManaged.label" default="Manually Managed"/></dt>
 <dd class="word_wrap"><g:formatBoolean boolean="${mediaItemInstance?.manuallyManaged}"/></dd>
+
+<dt id="active-label" class="word_wrap"><g:message code="${mediaType}.disableIframe.label" default="Disable Iframe"/></dt>
+<dd class="word_wrap"><g:formatBoolean boolean="${mediaItemInstance?.disableIframe}"/></dd>
 
 <g:if test="${mediaItemInstance?.externalGuid}">
     <dt id="externalGuid-label" class="word_wrap"><g:message code="${mediaType}.externalGuid.label" default="External GUID"/></dt>

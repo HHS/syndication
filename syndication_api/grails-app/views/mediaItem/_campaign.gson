@@ -1,0 +1,10 @@
+import com.ctacorp.syndication.Campaign
+
+model {
+    Campaign campaign
+}
+
+json {
+    id campaign.id
+    name campaign.name
+}

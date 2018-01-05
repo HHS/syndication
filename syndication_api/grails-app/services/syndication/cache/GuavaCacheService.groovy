@@ -135,7 +135,6 @@ class GuavaCacheService {
             default: log.error("cache for ${cacheName} did not perform a put() correctly")
                 break;
         }
-
     }
 
     boolean flushItem(String cacheName, String key){

@@ -9,13 +9,15 @@ import com.ctacorp.syndication.storefront.UserMediaList
 import com.ctacorp.syndication.microsite.FlaggedMicrosite
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import grails.util.Holders
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
 class ClassicController {
-    
+
     def micrositeService
     def tagService
     def micrositeFilterService
+    def config = Holders.config
 
     def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
     def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
@@ -103,7 +105,7 @@ class ClassicController {
                                         pane2MediaItems:pane2MediaItems,
                                         pane3MediaItems:pane3MediaItems,
                                         collection:params.collection,
-                                        apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                        apiBaseUrl:config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                         classicOffset:0,
                                         maxClassics:maxClassics
         ]
@@ -118,7 +120,7 @@ class ClassicController {
         if(!pane1MediaItems) {
             render [:] as JSON
         }
-        render template: "classicList", model:[pane1MediaItems:pane1MediaItems,apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath]
+        render template: "classicList", model:[pane1MediaItems:pane1MediaItems,apiBaseUrl:Holders.config.API_SERVER_URL + Holders.config.SYNDICATION_APIPATH]
     }
 
     def update(MicroSite microSite){

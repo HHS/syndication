@@ -25,7 +25,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <h1>Create Tweet Auto Importer</h1>
         <synd:message/>
         <synd:errors/>
-        <synd:error/>
+        <synd:hasError/>
         <div class="row">
             <div class="col-md-8">
                 <g:form class="form-horizontal" url="[resource:twitterStatusCollector, action:'save']" >

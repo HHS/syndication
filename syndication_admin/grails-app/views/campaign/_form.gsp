@@ -20,7 +20,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-5 control-label" for="name">Name<span class="required-indicator">*</span></label>
     <div class="col-md-7">
-        <input id="name" name="name" required="" value="${campaignInstance?.name}" type="text" placeholder="campaign name" class="form-control input-md">
+        <input id="name" name="name" required="" value="${campaign?.name}" type="text" placeholder="campaign name" class="form-control input-md">
     </div>
 </div>
 
@@ -28,7 +28,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-5 control-label" for="description">Description</label>
     <div class="col-md-7">
-        <textarea class="form-control" id="description" name="description" maxlength="2000" >${campaignInstance?.description}</textarea>
+        <textarea class="form-control" id="description" name="description" maxlength="2000" >${campaign?.description}</textarea>
     </div>
 </div>
 
@@ -36,27 +36,27 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-5 control-label" for="contactEmail">Contact Email</label>
     <div class="col-md-7">
-        <input id="contactEmail" name="contactEmail"  value="${campaignInstance?.contactEmail}" type="email" placeholder="email" class="form-control input-md">
+        <input id="contactEmail" name="contactEmail"  value="${campaign?.contactEmail}" type="email" placeholder="email" class="form-control input-md">
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: campaignInstance, field: 'startDate', 'error')} required">
+<div class="form-group ${hasErrors(bean: campaign, field: 'startDate', 'error')} required">
     <label class="col-md-5 control-label" for="startDate">
         <g:message code="campaign.startDate.label" default="Start Date" />
         <span class="required-indicator">*</span>
     </label>
     <div class="col-md-7">
-        <g:datePicker name="startDate" precision="minute" relativeYears="[-20..1]"  value="${campaignInstance?.startDate}"  />
+        <g:datePicker name="startDate" precision="minute" relativeYears="[-20..1]"  value="${campaign?.startDate}"  />
     </div>
 
 </div>
 
-<div class="form-group ${hasErrors(bean: campaignInstance, field: 'endDate', 'error')} ">
+<div class="form-group ${hasErrors(bean: campaign, field: 'endDate', 'error')} ">
     <label class="col-md-5 control-label" for="endDate">
         <g:message code="campaign.endDate.label" default="End Date" />
     </label>
     <div class="col-md-7">
-        <g:datePicker name="endDate" precision="minute" relativeYears="[-20..1]"  value="${campaignInstance?.endDate}" default="none" noSelection="['': '']" />
+        <g:datePicker name="endDate" precision="minute" relativeYears="[-20..1]"  value="${campaign?.endDate}" default="none" noSelection="['': '']" />
     </div>
 </div>
 
@@ -69,7 +69,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <div class="col-md-7">
         <select id="selectbasic" name="source.id" class="form-control">
             <g:each in="${com.ctacorp.syndication.Source.list()}" var="sourceInstance">
-                <g:if test="${sourceInstance.id == campaignInstance?.source?.id}">
+                <g:if test="${sourceInstance.id == campaign?.source?.id}">
                     <option value="${sourceInstance.id}" selected>${sourceInstance}</option>
                 </g:if>
                 <g:else>

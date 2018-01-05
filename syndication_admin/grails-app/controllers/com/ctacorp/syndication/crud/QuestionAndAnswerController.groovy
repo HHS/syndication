@@ -14,6 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
+import grails.util.Holders
 
 import static org.springframework.http.HttpStatus.*
 
@@ -30,10 +31,9 @@ import grails.transaction.Transactional
 class QuestionAndAnswerController {
     def mediaItemsService
     def tagService
-    def solrIndexingService
     def cmsManagerKeyService
     def springSecurityService
-    def jobService
+    def config = Holders.config
 
     RestBuilder rest = new RestBuilder()
 
@@ -57,7 +57,7 @@ class QuestionAndAnswerController {
                                                    selectedLanguage : tagData?.selectedLanguage,
                                                    selectedTagType  : tagData?.selectedTagType,
                                                    collections      : Collection.findAll("from Collection where ? in elements(mediaItems)", [questionAndAnswerInstance]),
-                                                   apiBaseUrl       : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                                   apiBaseUrl       : config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                                    subscriber       :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(questionAndAnswerInstance)?.subscriberId)
         ]
     }
@@ -85,8 +85,6 @@ class QuestionAndAnswerController {
             respond questionAndAnswerInstance, view:'create', model: [subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
-
-        jobService.solrUpdate10SecondDelay(questionAndAnswerInstance.id)
 
         request.withFormat {
             form multipartForm{
@@ -116,8 +114,6 @@ class QuestionAndAnswerController {
             return
         }
 
-        jobService.solrUpdate10SecondDelay(questionAndAnswerInstance.id)
-
         request.withFormat {
             form multipartForm{
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'QuestionAndAnswer.label', default: 'QuestionAndAnswer'), [questionAndAnswerInstance.name]])
@@ -141,7 +137,6 @@ class QuestionAndAnswerController {
         }
 
         mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(questionAndAnswerInstance, true)
-        solrIndexingService.removeMediaItem(questionAndAnswerInstance)
         mediaItemsService.delete(questionAndAnswerInstance.id)
 
         request.withFormat {

@@ -32,7 +32,6 @@ class CampaignController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
     def featuredMediaService
-    def solrIndexingService
     def springSecurityService
     def campaignService
     def cmsManagerKeyService
@@ -43,7 +42,7 @@ class CampaignController {
             respond Campaign.findAllByIdInList(campaignService.publisherCampaigns(), params), model: [campaignInstanceCount: Campaign.countByIdInList(campaignService.publisherCampaigns() ?: [0],params)]
             return
         }
-        
+
         respond Campaign.list(params), model: [campaignInstanceCount: Campaign.count()]
     }
 
@@ -56,7 +55,7 @@ class CampaignController {
         def subscribers = cmsManagerKeyService.listSubscribers()
         def featuredMedia = campaignInstance?.mediaItems
         String featuredMediaForTokenInput = featuredMedia.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
-        
+
         respond new Campaign(params), model:[featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput, subscribers:subscribers]
     }
 
@@ -74,7 +73,7 @@ class CampaignController {
                 campaignInstance?.addToMediaItems(MediaItem.load(mediaId))
             }
         }
-        
+
         campaignInstance =  campaignService.updateCampaignAndSubscriber(campaignInstance, params.subscriberId)
         if (campaignInstance.hasErrors()) {
             flash.errors = campaignInstance.errors.allErrors.collect { [message: g.message([error: it])] }
@@ -83,8 +82,6 @@ class CampaignController {
             respond campaignInstance, view:'create', model:[featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput, subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
-
-        solrIndexingService.inputCampaign(campaignInstance)
 
         request.withFormat {
             form {
@@ -128,7 +125,7 @@ class CampaignController {
             respond campaignInstance, view: 'edit', imodel:[featuredMedia:featuredMedia, featuredMediaForTokenInput:featuredMediaForTokenInput, subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(CampaignSubscriber.findByCampaign(campaignInstance)?.subscriberId)]
             return
         }
-        
+
         //deletes and adds the media items back in one at a time because of Gorm issue not being able to query
         // all at once on a many-to-many relationship.
         params.remove("mediaItemsToAdd")
@@ -139,7 +136,6 @@ class CampaignController {
         }
 
         campaignInstance.save flush: true
-        solrIndexingService.inputCampaign(campaignInstance)
 
         request.withFormat {
             form {
@@ -159,7 +155,6 @@ class CampaignController {
             return
         }
 
-        solrIndexingService.removeCampaign(campaignInstance)
         CampaignSubscriber.findByCampaign(campaignInstance)?.delete(flush:true)
         campaignInstance.delete flush: true
 

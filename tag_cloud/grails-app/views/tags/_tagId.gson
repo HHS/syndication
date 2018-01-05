@@ -1,0 +1,9 @@
+import tagcloud.domain.Tag
+
+model {
+    Tag tag
+}
+
+json {
+    id tag.id
+}

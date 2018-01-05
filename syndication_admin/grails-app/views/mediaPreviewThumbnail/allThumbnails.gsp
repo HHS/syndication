@@ -92,7 +92,7 @@
 
                 <div id="thumb_${mi.id}" class="thumb-holder">
                     <img class="thumbnail"
-                         src="${grails.util.Holders.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/thumbnail.jpg"/>
+                         src="${System.getenv('API_SERVER_URL')}${System.getenv('SYNDICATION_APIPATH')}/resources/media/${mi.id}/thumbnail.jpg"/>
                 </div>
 
                 <div style="padding: 5px;">

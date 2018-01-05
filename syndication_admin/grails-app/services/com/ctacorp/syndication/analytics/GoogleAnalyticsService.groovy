@@ -21,10 +21,13 @@ import grails.util.Holders;
 class GoogleAnalyticsService {
     static transactional = false
 
+    static final String GOOGLE_ANALYTICS_EMAILADDRESS = System.getenv('GOOGLE_ANALYTICS_EMAILADDRESS')
+    static final String GOOGLE_ANALYTICS_P12 = System.getenv('GOOGLE_ANALYTICS_P12')
+
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance()
     private static HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 
-    private static final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"), ".syndication/analytics/analytics_data_store");
+    private static final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"), ".syndication/analytics/analytics_data_store")
     private static FileDataStoreFactory dataStoreFactory;
 
     static executeQuery(String profileId, def start = new Date()-7, def end = new Date(), String query, params = [:]){
@@ -152,15 +155,13 @@ class GoogleAnalyticsService {
     }
 
     private static Credential authorize() {
-        String emailAddress = Holders.config.google.analytics.emailAddress
-
         GoogleCredential credential = new GoogleCredential.Builder()
                 .setTransport(httpTransport)
                 .setJsonFactory(JSON_FACTORY)
-                .setServiceAccountId(emailAddress)
-                .setServiceAccountPrivateKeyFromP12File(new File("${System.getProperty('user.home')}/.syndication/analytics/SyndicationIntegration-f5abe9084219.p12"))
+                .setServiceAccountId(GOOGLE_ANALYTICS_EMAILADDRESS)
+                .setServiceAccountPrivateKeyFromP12File(new File("${System.getProperty('user.home')}/.syndication/analytics/${GOOGLE_ANALYTICS_P12}"))
                 .setServiceAccountScopes(["https://www.googleapis.com/auth/analytics.readonly"])
-                .build();
+                .build()
         credential
     }
 
@@ -171,7 +172,7 @@ class GoogleAnalyticsService {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new File("${System.getProperty('user.home')}/.syndication/analytics/analytics_data_store/client_secrets.json").newDataInputStream()));
 
         if (clientSecrets.getDetails().getClientId().startsWith("Enter") || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
-            System.out.println("Enter Client ID and Secret from https://code.google.com/apis/console/?api=analytics "
+            println("Enter Client ID and Secret from https://code.google.com/apis/console/?api=analytics "
                             + "into analytics-cmdline-sample/src/main/resources/client_secrets.json");
             System.exit(1);
         }

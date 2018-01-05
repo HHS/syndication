@@ -7,11 +7,11 @@ import grails.transaction.Transactional
 class MediaMappingService {
 
     MediaMapping saveMediaMapping(MediaMapping mediaMappingInstance) {
+
         if (mediaMappingInstance.hasErrors()) {
-            log.error mediaMappingInstance.errors
+            log.error mediaMappingInstance.errors.toString()
             return null
         }
-
         //Find existing entries by syndication ID
         def existing = MediaMapping.findBySyndicationId(
                 mediaMappingInstance.syndicationId
@@ -22,14 +22,16 @@ class MediaMappingService {
             existing.properties = mediaMappingInstance.properties
             mediaMappingInstance = existing
         }
-
         mediaMappingInstance.save(flush: true)
+
+        mediaMappingInstance
+
     }
 
     def bulkMapping(mappingList){
         def saved = []
         mappingList.each{
-            def mapping = new MediaMapping(syndicationId: it.id, guid: it.guid, targetUrl: it.url)
+            def mapping = new MediaMapping(syndicationId: it.syndicationId, guid: it.guid, targetUrl: it.targetUrl)
             def existing = MediaMapping.findBySyndicationId(
                     mapping.syndicationId
             )

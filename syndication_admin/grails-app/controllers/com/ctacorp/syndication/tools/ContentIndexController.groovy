@@ -21,21 +21,27 @@ import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.authentication.UserRole
+import com.ctacorp.syndication_elasticsearch_plugin.ElasticsearchJob
+import com.ctacorp.syndication_elasticsearch_plugin.ReindexJob
 import grails.converters.JSON
-import com.ctacorp.syndication.jobs.ReindexMediaJob
 import grails.plugin.springsecurity.annotation.Secured
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 class ContentIndexController {
-    def solrIndexingService
+
+    def elasticsearchService
     def tagService
+    def contentCacheService
     def springSecurityService
 
     def index() {
-        def languages = tagService.getAllActiveTagLanguages()
-        def tagTypes = tagService.getTagTypes()
-
-        [languages:languages, tagTypes:tagTypes]
+        [
+                languages: tagService.getAllActiveTagLanguages(),
+                tagTypes: tagService.getTagTypes(),
+                lastJobExecutionTime: (ReindexJob.last()?.dateCreated ?: new Date(0)).toLocaleString(),
+                fullReindexRunning: fullReindexRunning(),
+                itemCount: elasticsearchService.getItemCount()
+        ]
     }
 
     def mediaSearch(String q) {
@@ -55,38 +61,77 @@ class ContentIndexController {
     }
 
     def reindexMedia(String mediaIds) {
-        log.info "Request made to reindex all media"
+
+        log.info "Request made to reindex ${mediaIds}"
+
         def mediaIdList = mediaIds?.tokenize(",")?.collect() { it as Long }
+
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
             mediaIdList = MediaItemSubscriber.findAllByMediaItemInListAndSubscriberId(MediaItem.findAllByIdInList(mediaIdList),springSecurityService.currentUser.subscriberId).mediaItem.id
         }
-        if (!mediaIds.isEmpty()) {
-            def urlContent
+
+        if(!mediaIds.isEmpty()) {
+
+            def urlContent = ""
+            def cachedContent
+
             try {
                 mediaIdList?.each { mediaId ->
+
                     def mi = MediaItem.get(mediaId)
                     def className = mi.getClass().simpleName
+
                     if (className.equalsIgnoreCase("html")) {
-                        urlContent = solrIndexingService.rest.get(solrIndexingService.serverAddress + "/${mi.id}/content/").text
+
+                        cachedContent = contentCacheService.cache(mediaId)
+                        urlContent = cachedContent?.content
+
                     } else {
                         urlContent = ""
                     }
-                    solrIndexingService.inputMediaItem(mi, urlContent)
+
+                    elasticsearchService.indexMediaItem(mi, urlContent)
                 }
+
                 flash.message = "Re-indexing started for media id[s]: ${mediaIds}"
 
-
             } catch (e) {
-                flash.message = "Error in indexing media id[s]: ${mediaIds}"
+
+                def message = "Error in indexing media id[s]: ${mediaIds}"
+                flash.message = message
+                log.error(message, e)
             }
         }
+
         redirect action: 'index'
     }
-    
-    def reindexAllMedia() {
-        ReindexMediaJob.triggerNow([type: "mediaItems", subscriberId:springSecurityService.currentUser?.subscriberId])
-        flash.message = "Re-indexing started on all media content"
-        redirect action: 'index'
+
+    def bulkReindex() {
+
+        Integer itemCount = null
+        String lastJobExecutionTime = null
+
+        if(!fullReindexRunning()) {
+
+            ElasticsearchJob.triggerNow(command: ElasticsearchJob.FULL_REINDEX)
+            flash.message = 'Full re-index started'
+            itemCount = 0
+            lastJobExecutionTime = new Date().toLocaleString()
+
+        } else {
+
+            flash.message = 'Full re-index already running'
+            itemCount = elasticsearchService.getItemCount()
+            lastJobExecutionTime = (ReindexJob.last()?.dateCreated ?: new Date(0)).toLocaleString()
+        }
+
+        redirect view: 'index', model:         [
+                languages: tagService.getAllActiveTagLanguages(),
+                tagTypes: tagService.getTagTypes(),
+                lastJobExecutionTime: lastJobExecutionTime,
+                fullReindexRunning: true,
+                itemCount: itemCount
+        ]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
@@ -107,10 +152,6 @@ class ContentIndexController {
             sourceIds = (parts as Set).join(',')
         }
         try {
-            sourceIds?.tokenize(',').collect { it as Long }.each { sourceId ->
-                Source source = Source.get(sourceId)
-                solrIndexingService.inputSource(source)
-            }
             flash.message = "Re-indexing started for source id[s]: ${sourceIds}"
         } catch (e) {
             flash.message  = "Error in indexing source id[s]: ${sourceIds}"
@@ -120,7 +161,7 @@ class ContentIndexController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
     def reindexAllSource() {
-        ReindexMediaJob.triggerNow([type:"sources"])
+
         flash.message = "Re-indexing started on all source content"
         redirect action: 'index'
     }
@@ -150,7 +191,6 @@ class ContentIndexController {
         try {
             campaignIdList?.each { campaignId ->
                 Campaign campaign = Campaign.get(campaignId)
-                solrIndexingService.inputCampaign(campaign)
             }
             flash.message = "Re-indexing started for campaign id[s]: ${campaignIds}"
         } catch (e) {
@@ -160,7 +200,6 @@ class ContentIndexController {
     }
 
     def reindexAllCampaign() {
-        ReindexMediaJob.triggerNow([type: "campaigns", subscriberId:springSecurityService.currentUser?.subscriberId])
         flash.message = "Re-indexing started on all campaign content"
         redirect action: 'index'
     }
@@ -173,10 +212,6 @@ class ContentIndexController {
         }
 
         try {
-            tagIds?.tokenize(',').collect { it as Long }.each { tagId ->
-                def tag = tagService.getTag(tagId)
-                solrIndexingService.inputTag(String.valueOf(tag.id), tag.name)
-            }
             flash.message = "Re-indexing started for tag id[s]: ${tagIds}"
         } catch (e) {
             flash.message = "Error in indexing tag id[s]: ${tagIds}"
@@ -187,8 +222,23 @@ class ContentIndexController {
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
     def reindexAllTags() {
         log.info "Starting re-index job on all tags"
-        ReindexMediaJob.triggerNow([type: "tags", params: params])
         flash.message = "Re-indexing started on all tag content"
         redirect action: 'index'
+    }
+
+    protected static fullReindexRunning() {
+        ElasticsearchJob.grails_plugins_quartz_QuartzJob__internalScheduler$get().currentlyExecutingJobs.size() > 0
+    }
+
+    protected String getTextContentForMediaItem(MediaItem mediaItem) {
+
+        if (mediaItem.getClass().simpleName.equalsIgnoreCase("html")) {
+
+            def cachedContent = contentCacheService.cache(mediaItem.id)
+            return cachedContent?.content
+
+        }
+
+        ""
     }
 }

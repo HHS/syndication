@@ -16,6 +16,7 @@ package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.Source
+import grails.util.Holders
 import groovyx.net.http.URIBuilder
 
 import static org.springframework.http.HttpStatus.CREATED
@@ -37,10 +38,11 @@ class VideoController {
 
     def mediaItemsService
     def tagService
-    def solrIndexingService
     def cmsManagerKeyService
     def springSecurityService
     def youtubeService
+    def elasticsearchService
+    def config = Holders.config
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "POST", importVideo: "POST"]
 
@@ -61,7 +63,7 @@ class VideoController {
                                             selectedLanguage:tagData.selectedLanguage,
                                             selectedTagType :tagData.selectedTagType,
                                             collections     : Collection.findAll("from Collection where ? in elements(mediaItems)", [videoInstance]),
-                                            apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                            apiBaseUrl      :config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                             subscriber      :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(videoInstance)?.subscriberId)
         ]
     }
@@ -88,7 +90,6 @@ class VideoController {
             return
         }
 
-        solrIndexingService.inputMediaItem(videoInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'videoInstance.label', default: 'Video'), [videoInstance.name]])
@@ -117,7 +118,6 @@ class VideoController {
             return
         }
 
-        solrIndexingService.inputMediaItem(videoInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'Video.label', default: 'Video'), [videoInstance.name]])
@@ -141,7 +141,6 @@ class VideoController {
         }
 
         mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(videoInstance, true)
-        solrIndexingService.removeMediaItem(videoInstance)
         mediaItemsService.delete(videoInstance.id)
 
         request.withFormat {
@@ -179,6 +178,9 @@ class VideoController {
             render view: "create"
             return
         }
+
+        elasticsearchService.indexMediaItem(videoInstance)
+
         respond videoInstance, view:'create', model:[subscribers:cmsManagerKeyService.listSubscribers()]
     }
 
@@ -212,6 +214,7 @@ class VideoController {
             return
         }
 
+        elasticsearchService.indexMediaItem(collectionInstance)
         youtubeService.saveMediaItemSubscriber(collectionInstance)
 
         flash.message = "Created all videos in the playlist and placed them in the following Collection."

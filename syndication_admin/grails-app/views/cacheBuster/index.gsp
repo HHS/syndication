@@ -19,7 +19,7 @@
 
         <synd:message/>
         <synd:errors/>
-        <synd:error/>
+        <synd:hasError/>
 
         <div class="row">
             <div class="col-lg-12">
@@ -36,7 +36,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <g:each in="${cacheBusterInstanceList}" status="i" var="cacheBusterInstance">
+                            <g:each in="${cacheBusterList}" status="i" var="cacheBusterInstance">
                                 <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 
                                     <td>${cacheBusterInstance?.id}</td>

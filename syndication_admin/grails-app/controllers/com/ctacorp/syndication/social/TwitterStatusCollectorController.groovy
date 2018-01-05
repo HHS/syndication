@@ -85,7 +85,7 @@ class TwitterStatusCollectorController {
             return
         }
 
-        twitterStatusCollector.delete()
+        twitterStatusCollector.delete(flush:true)
 
         request.withFormat {
             form {

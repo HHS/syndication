@@ -10,7 +10,7 @@ import grails.util.Holders
  */
 class MediaValidationJob {
     static triggers = {
-        cron name: 'mediaValidationTrigger', cronExpression: "0 0 0 ? * *" //Every Night
+//        cron name: 'nightlyMediaValidationTrigger', cronExpression: "0 0 0 ? * *" //Every Night
     }
 
     def group = "MediaValidation"
@@ -18,7 +18,6 @@ class MediaValidationJob {
     def mediaValidationService
     def mediaItemsService
     def mailService
-    def grailsApplication
 
     def execute(context){
         if(Holders.config.syndication.disableHealthReportEmail){ //disable health report emails in staging
@@ -37,7 +36,7 @@ class MediaValidationJob {
             mailRecipiants = EmailContact.list().email ?: "syndicationAdmin@hhs.gov"
             flaggedItems = mediaValidationService.getFlaggedMedia()
         }
-        
+
         log.info "flagged media items: \n${flaggedItems}"
 
         mailService.sendMail {

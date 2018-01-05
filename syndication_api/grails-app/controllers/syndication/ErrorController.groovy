@@ -15,7 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication
 
 import grails.converters.JSON
-import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
+import org.grails.web.errors.GrailsWrappedRuntimeException
 import com.ctacorp.syndication.api.ApiResponse
 
 class ErrorController {
@@ -25,7 +25,7 @@ class ErrorController {
     def fivehundred() {
         GrailsWrappedRuntimeException exception = request.exception
 
-        if(exception.getMessage().contains("could not resolve property:")){
+        if(exception?.getMessage()?.contains("could not resolve property:")){
             redirect action: fourhundred()
             return
         }

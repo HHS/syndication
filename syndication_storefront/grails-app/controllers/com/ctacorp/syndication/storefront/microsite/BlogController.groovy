@@ -8,15 +8,18 @@ import com.ctacorp.syndication.microsite.MediaSelector
 import com.ctacorp.syndication.microsite.MicroSite
 import com.ctacorp.syndication.storefront.UserMediaList
 import com.ctacorp.syndication.microsite.FlaggedMicrosite
+import com.sun.swing.internal.plaf.synth.resources.synth_sv
 import grails.converters.JSON
+import grails.util.Holders
 import grails.plugin.springsecurity.annotation.Secured
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
 class BlogController {
-    
+
     def tagService
     def micrositeService
     def micrositeFilterService
+    def config = Holders.config
 
     def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
     def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
@@ -83,11 +86,14 @@ class BlogController {
 
     @Secured(['permitAll'])
     def show(){
+
         def microSite = MicroSite.get(params.long("id"))
+
         if(FlaggedMicrosite.findByMicrosite(microSite) && !FlaggedMicrosite.findByMicrosite(microSite).ignored) {
             flash.error = "The Microsite is temporarily blocked."
             redirect controller: "storefront", action: "index"
         }
+
         def pane3MediaItems = micrositeService.getMediaItems(microSite.mediaArea3)
         def pane2MediaItems = micrositeService.getMediaItems(microSite.mediaArea2)
         def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1, 50)
@@ -101,7 +107,7 @@ class BlogController {
                                         pane2MediaItems:pane2MediaItems,
                                         pane3MediaItems:pane3MediaItems,
                                         collection:params.collection,
-                                        apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                        apiBaseUrl: config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                         blogOffset:0,
                                         maxBlogs:maxBlogs
         ]

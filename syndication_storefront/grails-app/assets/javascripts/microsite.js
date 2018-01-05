@@ -5,7 +5,7 @@
 // You're free to add application-wide JavaScript to this file, but it's generally better
 // to create separate JavaScript files as needed.
 //
-//= require jquery
+//= require jquery-2.2.0.min
 //= require bootstrap.min.js
 //= require imagesloaded.pkgd.min.js
 //= require masonry/masonry.pkgd.min.js

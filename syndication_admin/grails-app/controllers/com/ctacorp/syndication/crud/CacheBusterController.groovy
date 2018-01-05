@@ -57,9 +57,7 @@ class CacheBusterController {
             render view: "edit", model:[cacheBusterInstance:cacheBusterInstance]
             return
         }
-
-        cacheBusterInstance.save()
-
+        cacheBusterInstance.save(flush: true)
         render view:"show", model:[cacheBusterInstance:cacheBusterInstance]
     }
 

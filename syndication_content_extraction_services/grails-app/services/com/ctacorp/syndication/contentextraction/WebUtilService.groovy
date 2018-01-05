@@ -26,10 +26,10 @@ class WebUtilService {
         try{
             content = getContentFromUrl(url, disableFailFast)
         }catch (e){
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            log.error "There was an exception when trying to download content from the url ${url}. Falling back to saved version if possible. Exception trace: ${sw.toString()}"
+            StringWriter sw = new StringWriter()
+            PrintWriter pw = new PrintWriter(sw)
+            log.error "There was an exception when trying to download content from the url ${url}. Falling back to saved version if possible"
+            log.error "Exception message was: ${e.toString()}"
             CachedContent cached = contentCacheService.get(url)
             if(!cached){
                 throw new ContentUnretrievableException("Could not load content located at ${url} from original location or cache.")
@@ -70,7 +70,7 @@ class WebUtilService {
             return getContentFromUrl(newUrl, disableFailFast, depth+1)
         }
 
-        BufferedReader buff = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        BufferedReader buff = new BufferedReader(new InputStreamReader(con.getInputStream(), 'UTF-8'))
         buff.text
     }
 }

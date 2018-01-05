@@ -18,6 +18,7 @@ package syndication.tinyurl
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
+import grails.util.Holders
 
 import javax.annotation.PostConstruct
 
@@ -41,12 +42,12 @@ class TinyUrlService {
     @PostConstruct
     void init() {
         rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
-        tServer = grailsApplication.config.tinyUrl.serverAddress + grailsApplication.config.tinyUrl.mappingBase
+        tServer = Holders.config.TINYURL_SERVER_URL + Holders.config.TINYURL_MAPPINGBASE
     }
 
     def status() {
         try {
-            def code = rest.get("${grailsApplication.config.tinyUrl.serverAddress}/statusCheck").status
+            def code = rest.get("${Holders.config.TINYURL_SERVER_URL}/statusCheck").status
             switch (code) {
                 case 200: return true;
                 default: return false;
@@ -90,7 +91,7 @@ class TinyUrlService {
             String body = ([targetUrl: targetUrl, syndicationId: syndicationId, guid: guid] as JSON).toString()
             def resp = rest.post(tServer) {
                 header 'Date', new Date().toString()
-                header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+                header 'Authorization', Holders.config.SYNDICATION_INTERNALAUTHHEADER ?: ""
                 header 'Content-Type', "application/json;charset=UTF-8"
                 accept 'application/json'
 

@@ -1,0 +1,14 @@
+import com.ctacorp.syndication.api.Embedded
+
+model {
+    Embedded embedded
+}
+
+json {
+    content embedded.content
+    description embedded.description
+    id embedded.id
+    mediaType embedded.mediaType
+    name embedded.name
+    sourceUrl embedded.sourceUrl
+}

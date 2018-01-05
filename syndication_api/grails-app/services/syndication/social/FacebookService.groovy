@@ -62,7 +62,7 @@ class FacebookService {
 //                source: Source.findByAcronym("HHS"),
 //                dateContentAuthored:dateContentAuthored,
 //                dateContentUpdated:dateContentUpdated,
-//                sourceUrl:"http://localhost:8080/Syndication/api/v2/resources/media/ID_HERE/content",
+//                sourceUrl:"http://localhost:8080/api/v2/resources/media/ID_HERE/content",
 //                name: "${item.from.name} - ${dateUpdated}",
 //                description: item.message
 //        )

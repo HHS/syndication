@@ -1,0 +1,9 @@
+import com.ctacorp.syndication.media.QuestionAndAnswer
+
+model {
+    QuestionAndAnswer questionAndAnswer
+}
+
+json {
+    answer questionAndAnswer.answer
+}

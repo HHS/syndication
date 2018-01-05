@@ -1,0 +1,14 @@
+import com.ctacorp.syndication.Campaign
+
+model {
+    Campaign campaign
+}
+
+json {
+    id campaign?.id
+    name campaign.name
+    description campaign.description
+    startDate campaign.startDate
+    endDate campaign.endDate
+    source tmpl.'/sources/source'(campaign.source)
+}

@@ -1,0 +1,9 @@
+import grails.orm.PagedResultList
+import tagcloud.domain.ContentItem
+
+model {
+    List<ContentItem> contentItemList
+}
+
+
+json tmpl.'/content/syndicationId'(contentItemList ?: [])

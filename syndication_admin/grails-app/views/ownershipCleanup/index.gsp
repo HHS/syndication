@@ -23,7 +23,7 @@
 
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <g:form>
         <div class="form-group">

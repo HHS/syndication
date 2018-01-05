@@ -19,7 +19,7 @@
             </div>
         </div>
     </div>
-    <g:render template="../storefront/rightBoxes"/>
+    <g:render template="/storefront/rightBoxes" model="[API_SERVER_URL:API_SERVER_URL]" />
 </div>
 </body>
 </html>

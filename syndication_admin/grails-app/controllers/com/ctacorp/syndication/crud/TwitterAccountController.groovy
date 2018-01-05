@@ -5,6 +5,7 @@ import com.ctacorp.syndication.social.TwitterAccount
 import com.ctacorp.syndication.media.Tweet
 import com.ctacorp.syndication.social.TwitterStatusCollector
 import grails.plugin.springsecurity.annotation.Secured
+import twitter4j.TwitterException
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -17,7 +18,7 @@ class TwitterAccountController {
     def cmsManagerKeyService
     def springSecurityService
     def mediaItemsService
-    def solrIndexingService
+    def twitterService
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -40,10 +41,14 @@ class TwitterAccountController {
     }
 
     def save(TwitterAccount twitterAccountInstance) {
+
         if (twitterAccountInstance == null) {
-            notFound()
-            return
+            return notFound()
         }
+
+        def accountName = twitterAccountInstance.accountName
+
+        if(twitterAccountHasIssue(accountName)) {return}
 
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
             twitterAccountInstance.subscriberId = springSecurityService.currentUser.subscriberId
@@ -76,6 +81,8 @@ class TwitterAccountController {
             return
         }
 
+        if(twitterAccountHasIssue(twitterAccountInstance.accountName)) {return}
+
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
             twitterAccountInstance.subscriberId = springSecurityService.currentUser.subscriberId
         }
@@ -87,7 +94,7 @@ class TwitterAccountController {
             return
         }
 
-        twitterAccountInstance.save()
+        twitterAccountInstance.save(flush:true)
 
         request.withFormat {
             form multipartForm{
@@ -115,11 +122,10 @@ class TwitterAccountController {
         def mediaItems = Tweet.findAllByAccount(twitterAccount)
         mediaItems.each{ item ->
             mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(item, true)
-            solrIndexingService.removeMediaItem(item)
             mediaItemsService.delete(item.id)
         }
 
-        twitterAccount.delete()
+        twitterAccount.delete(flush:true)
 
         request.withFormat {
             form {
@@ -130,6 +136,35 @@ class TwitterAccountController {
         }
 
 
+    }
+
+    protected boolean twitterAccountHasIssue(String accountName) {
+
+        try {
+
+            twitterService.twitter.users().lookupUsers(accountName)
+            false
+
+        } catch (TwitterException e) {
+
+            if(e.resourceNotFound()) {
+                twitterAccountError("twitter account '${accountName}' does not exist")
+            } else {
+                twitterAccountError("a problem occurred when creating twitter account '${accountName}'")
+            }
+
+            true
+        }
+    }
+
+    protected void twitterAccountError(msg) {
+        request.withFormat {
+            form {
+                flash.error = [msg]
+                redirect action: 'index'
+            }
+            '*'{ render status: 200 }
+        }
     }
 
     protected void notFound() {

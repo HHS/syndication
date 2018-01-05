@@ -1,7 +1,8 @@
 .logDisplayWindow{
     border:1px solid black;
     width: 100%;
-    overflow:scroll
+    overflow:scroll;
+    margin-bottom: 20px;
 }
 
 .logViewPanelConstrained{

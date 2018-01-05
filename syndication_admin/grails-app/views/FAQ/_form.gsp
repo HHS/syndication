@@ -14,7 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <%@ page import="com.ctacorp.syndication.media.FAQ" %>
 
-<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:FAQInstance]"/>
+<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:faq]"/>
 
 <!-- Select Multiple -->
 <div class="form-group">
@@ -22,7 +22,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <div class="col-md-8">
         <select multiple="multiple" id="questionAndAnswers" name="questionAndAnswers">
             <g:each in="${questionAndAnswerList}" var="qAndA">
-                <g:if test="${qAndA.id in FAQInstance?.questionAndAnswers*.id}">
+                <g:if test="${qAndA.id in faq?.questionAndAnswers*.id}">
                     <option value="${qAndA.id}" selected>[${qAndA.id}] ${qAndA.name}</option>
                 </g:if>
                 <g:else>

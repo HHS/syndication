@@ -15,14 +15,11 @@ package com.ctacorp.syndication.media
 
 import com.ctacorp.grails.swagger.annotations.*
 
-@ModelExtension(id = "Infographic", model = "MediaItem", addProperties = [
-    @ModelProperty(propertyName = "width",        attributes = [@PropertyAttribute(type = "integer", format = "int32",  required = true)]),
-    @ModelProperty(propertyName = "height",       attributes = [@PropertyAttribute(type = "integer", format = "int32",  required = true)]),
-    @ModelProperty(propertyName = "imageFormat",  attributes = [@PropertyAttribute(type = "string",   required = true)]),
-    @ModelProperty(propertyName = "altText",      attributes = [@PropertyAttribute(type = "string",   required = true)])
-])
+@Definition
 class Infographic extends MediaItem {
+    @DefinitionProperty(type=DefinitionPropertyType.INTEGER, format = "int32")
     Integer height
+    @DefinitionProperty(type=DefinitionPropertyType.INTEGER, format = "int32")
     Integer width
     String imageFormat
     String altText

@@ -18,7 +18,7 @@
     <h1><g:message code="default.list.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-lg-12">

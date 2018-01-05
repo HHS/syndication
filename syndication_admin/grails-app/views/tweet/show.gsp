@@ -29,41 +29,41 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1><g:message code="default.show.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-md-10 col-md-offset-2">
             <dl class="dl-horizontal">
-                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: tweetInstance, mediaType:'tweet']"/>
+                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: tweet, mediaType:'tweet']"/>
 
-                <g:if test="${tweetInstance?.tweetId}">
+                <g:if test="${tweet?.tweetId}">
                     <dt id="name-label" class="word_wrap"><g:message code="tweet.tweetId.label" default="Tweet Id"/></dt>
-                    <dd class="word_wrap">${tweetInstance.tweetId}</dd>
+                    <dd class="word_wrap">${tweet.tweetId}</dd>
                 </g:if>
 
-                <g:if test="${tweetInstance?.account}">
+                <g:if test="${tweet?.account}">
                     <dt id="name-label" class="word_wrap"><g:message code="tweet.account.label" default="Account"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${tweetInstance}" field="account"/></dd>
+                    <dd class="word_wrap"><g:fieldValue bean="${tweet}" field="account"/></dd>
                 </g:if>
 
-                <g:if test="${tweetInstance?.messageText}">
+                <g:if test="${tweet?.messageText}">
                     <dt id="name-label" class="word_wrap"><g:message code="tweet.messageText.label" default="Message Text"/></dt>
-                    <dd class="word_wrap"><synd:linkify><g:fieldValue bean="${tweetInstance}" field="messageText"/></synd:linkify></dd>
+                    <dd class="word_wrap"><synd:linkify><g:fieldValue bean="${tweet}" field="messageText"/></synd:linkify></dd>
                 </g:if>
 
-                <g:if test="${tweetInstance?.mediaUrl}">
+                <g:if test="${tweet?.mediaUrl}">
                     <dt id="name-label" class="word_wrap"><g:message code="tweet.mediaUrl.label" default="Media Url"/></dt>
-                    <dd class="word_wrap"><a href="${tweetInstance?.mediaUrl}"><g:fieldValue bean="${tweetInstance}" field="mediaUrl"/></a></dd>
+                    <dd class="word_wrap"><a href="${tweet?.mediaUrl}"><g:fieldValue bean="${tweet}" field="mediaUrl"/></a></dd>
                 </g:if>
 
-                <g:if test="${tweetInstance?.videoVariantUrl}">
+                <g:if test="${tweet?.videoVariantUrl}">
                     <dt id="name-label" class="word_wrap"><g:message code="tweet.videoVariantUrl.label" default="Video Url"/></dt>
-                    <dd class="word_wrap"><a href="${tweetInstance?.videoVariantUrl}"><g:fieldValue bean="${tweetInstance}" field="videoVariantUrl"/></a></dd>
+                    <dd class="word_wrap"><a href="${tweet?.videoVariantUrl}"><g:fieldValue bean="${tweet}" field="videoVariantUrl"/></a></dd>
                 </g:if>
 
-                <g:if test="${tweetInstance?.tweetDate}">
+                <g:if test="${tweet?.tweetDate}">
                     <dt id="name-label" class="word_wrap"><g:message code="tweet.tweetDate.label" default="Tweet Date"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${tweetInstance}" field="tweetDate"/></dd>
+                    <dd class="word_wrap"><g:fieldValue bean="${tweet}" field="tweetDate"/></dd>
                 </g:if>
 
             </dl>
@@ -71,8 +71,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 
     <fieldset class="buttons">
-        <g:form  url="[resource:tweetInstance, action:'edit']">
-            <a href="${apiBaseUrl + '/resources/media/'+ tweetInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
+        <g:form  url="[resource:tweet, action:'edit']">
+            <a href="${apiBaseUrl + '/resources/media/'+ tweet?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>
@@ -83,16 +83,21 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 Cancel
             </g:link>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${tweetInstance?.id}" action="featureItem">
+                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${tweet?.id}" action="featureItem">
                     Feature this Item
                 </g:link>
-                <g:link controller="tweet" class="btn btn-primary pull-right" style="margin-right: 5px;" id="${tweetInstance?.id}" action="refreshTwitterMeta">
+                <g:link controller="tweet" class="btn btn-primary pull-right" style="margin-right: 5px;" id="${tweet?.id}" action="refreshTwitterMeta">
                     Refresh
+                </g:link>
+            </sec:ifAnyGranted>
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+                <g:link controller="mediaPreviewThumbnail" style="margin-right: 3px;" class="btn btn-warning pull-right" id="${tweet?.id}" action="flush">
+                    Regenerate Thumbnail & Preview
                 </g:link>
             </sec:ifAnyGranted>
         </g:form>
     </fieldset>
-    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: tweetInstance]"/>
+    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: tweet]"/>
 </div>
 </body>
 </html>

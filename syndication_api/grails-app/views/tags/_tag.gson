@@ -1,0 +1,12 @@
+import org.grails.web.json.JSONObject
+
+model {
+    JSONObject tag
+}
+
+json {
+    id tag?.id
+    name tag?.name
+    language tag.language
+    type tag.type
+}

@@ -14,6 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.contentextraction
 
 import com.ctacorp.syndication.commons.util.Util
+import grails.util.Holders
 import groovy.json.JsonSlurper
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,7 +23,6 @@ import org.jsoup.select.Elements
 
 class JsoupWrapperService {
     static transactional = false
-    def grailsApplication
     def webUtilService
 
     /**
@@ -34,7 +34,7 @@ class JsoupWrapperService {
     String extract(String sourceContent, Map params){
         Document doc = Jsoup.parse(sourceContent)
         //Read the class defined in params if it exists, else use config file class if exists, else fall back to 'syndicate'
-        String extractionCSSClass = params.cssClass ?: grailsApplication.config.syndication.contentExtraction.cssClassName ?: 'syndicate'
+        String extractionCSSClass = params.cssClass ?: Holders.config.SYNDICATION_EXTRACTION_CSSCLASSNAME ?: 'syndicate'
         String extractedContent = getElementByClassFromDocument(doc, extractionCSSClass)
 
         String newUrlBase = params.newUrlBase
@@ -137,7 +137,7 @@ class JsoupWrapperService {
 
         def desc = descriptionMetas[0]?.attr("content")
         //CDC Bad metadata hack
-        if(desc.startsWith("<p>")){
+        if(desc?.startsWith("<p>")){
             try {
                 return desc[3..(-1) - 4]
             }catch (e){
@@ -317,7 +317,7 @@ class JsoupWrapperService {
 
     private Document removeClassesFromDocument(Document doc){
         Elements eles = doc.select("[class]")
-        String extractionClass = grailsApplication.config.syndication.contentExtraction.cssClassName ?: 'syndicate'
+        String extractionClass = Holders.config.SYNDICATION_EXTRACTION_CSSCLASSNAME ?: 'syndicate'
         eles.each{ ele ->
             if(extractionClass in ele.attr("class").split(" ")){
                 ele.removeAttr("class")
@@ -338,6 +338,11 @@ class JsoupWrapperService {
         Elements images = doc.getElementsByTag("img")
         images.each { image ->
             image.attr("src", qualifyLink(image.attr("src"), newUrlBase))
+        }
+
+        Elements iframes = doc.getElementsByTag("iframe")
+        iframes.each { iframe ->
+            iframe.attr("src", qualifyLink(iframe.attr("src"), newUrlBase))
         }
 
         doc

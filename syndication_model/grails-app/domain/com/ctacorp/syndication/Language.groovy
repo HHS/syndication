@@ -16,15 +16,13 @@ package com.ctacorp.syndication
 import com.ctacorp.grails.swagger.annotations.*
 import grails.util.Environment
 
-@Model(id = "Language", properties = [
-    @ModelProperty(propertyName = "id",         attributes = [@PropertyAttribute(type = "integer", format = "int64",     required = true)]),
-    @ModelProperty(propertyName = "name",       attributes = [@PropertyAttribute(type = "string",   required = true)]),
-    @ModelProperty(propertyName = "isoCode",    attributes = [@PropertyAttribute(type = "string",   required = true)]),
-    @ModelProperty(propertyName = "isActive",   attributes = [@PropertyAttribute(type = "boolean",  required = true)])
-])
+@Definition
 class Language {
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String name                 // Display Name
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String isoCode              // ISO 639-2 value
+    @DefinitionProperty(type=DefinitionPropertyType.BOOLEAN)
     boolean isActive = false    // is this an active language
 
     static constraints = {

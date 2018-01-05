@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="grails.util.Holders" contentType="text/html;charset=UTF-8" %>
 <html>
 	<head>
 		<meta name="layout" content="storefront"/>
@@ -93,11 +93,12 @@
 		<div id="page-body" role="main" style="height:1000px;">
 			<h1>Application Status</h1>
 			<ul>
-				<li><strong>App version:</strong> <g:meta name="app.version"/></li>
-				<li><strong>App git hash:</strong> ${metaData.app.buildHash}</li> 
-				<li><strong>App build date:</strong> ${metaData.app.buildDate}</li>
-				 <li><strong>Git commit date:</strong> ${metaData.app.lastGitCommitDate}</li>
-				<li><strong>Grails version:</strong> <g:meta name="app.grails.version"/></li>
+				<li><strong>App version:</strong> ${Holders.config.info.app.version}</li>
+				<li><strong>App build date:</strong> ${Holders.config.info.app.build.date}</li>
+				<li><strong>Git hash:</strong> ${Holders.config.git.commit.id}</li> 
+				 <li><strong>Git commit date:</strong> ${Holders.config.git.commit.time}</li>
+				 <li><strong>Git branch/tag:</strong> ${Holders.config.git.branch}</li>
+				<li><strong>Grails version:</strong> ${Holders.config.info.app.grailsVersion}</li>
 				<li><strong>Groovy version:</strong> ${GroovySystem.getVersion()}</li>
 				<li><strong>JVM version:</strong> ${System.getProperty('java.version')}</li>
 				<li><strong>Reloading active:</strong> ${grails.util.Environment.reloadingAgentEnabled}</li>

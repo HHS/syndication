@@ -26,55 +26,55 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.show.label" args="[entityName]" /></h1>
             <synd:message/>
             <synd:errors/>
-            <synd:error/>
+            <synd:hasError/>
             <div class="row">
                 <div class="col-sm-9 col-sm-offset-1">
                     <dl class="dl-horizontal">
 
-                    <g:if test="${sourceInstance?.id}">
+                    <g:if test="${source?.id}">
                         <dt id="id-label" class="word_wrap"><g:message code="source.id.label" default="Id" /></dt>
-                        <dd class="word_wrap">${sourceInstance?.id}</dd>
+                        <dd class="word_wrap">${source?.id}</dd>
                     </g:if>
-                    <g:if test="${sourceInstance?.name}">
+                    <g:if test="${source?.name}">
                         <dt id="name-label" class="word_wrap"><g:message code="source.name.label" default="Name" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${sourceInstance}" field="name"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${source}" field="name"/></dd>
                     </g:if>
 
-                    <g:if test="${sourceInstance?.acronym}">
+                    <g:if test="${source?.acronym}">
                         <dt id="acronym-label" class="word_wrap"><g:message code="source.acronym.label" default="Acronym" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${sourceInstance}" field="acronym"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${source}" field="acronym"/></dd>
                     </g:if>
 
-                    <g:if test="${sourceInstance?.description}">
+                    <g:if test="${source?.description}">
                         <dt id="description-label" class="word_wrap"><g:message code="source.description.label" default="Description" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${sourceInstance}" field="description"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${source}" field="description"/></dd>
                     </g:if>
-                    <g:if test="${sourceInstance?.contactEmail}">
+                    <g:if test="${source?.contactEmail}">
                         <dt id="contactEmail-label" class="word_wrap"><g:message code="source.contactEmail.label" default="Contact Email" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${sourceInstance}" field="contactEmail"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${source}" field="contactEmail"/></dd>
                     </g:if>
-                    <g:if test="${sourceInstance?.websiteUrl}">
+                    <g:if test="${source?.websiteUrl}">
                         <dt id="websiteUrl-label" class="word_wrap"><g:message code="source.websiteUrl.label" default="Website Url" /></dt>
-                        <dd class="word_wrap"><a target="_blank" href="${sourceInstance?.websiteUrl}"><g:fieldValue bean="${sourceInstance}" field="websiteUrl"/></a></dd>
+                        <dd class="word_wrap"><a target="_blank" href="${source?.websiteUrl}"><g:fieldValue bean="${source}" field="websiteUrl"/></a></dd>
                     </g:if>
 
-                    <g:if test="${sourceInstance?.largeLogoUrl}">
+                    <g:if test="${source?.largeLogoUrl}">
                         <dt id="largeLogoUrl-label" class="word_wrap"><g:message code="source.largeLogoUrl.label" default="Large Logo Url" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${sourceInstance}" field="largeLogoUrl"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${source}" field="largeLogoUrl"/></dd>
                     </g:if>
 
-                    <g:if test="${sourceInstance?.smallLogoUrl}">
+                    <g:if test="${source?.smallLogoUrl}">
                         <dt id="smallLogoUrl-label" class="word_wrap"><g:message code="source.smallLogoUrl.label" default="Small Logo Url" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${sourceInstance}" field="smallLogoUrl"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${source}" field="smallLogoUrl"/></dd>
                     </g:if>
 			        </dl>
                 </div>
             </div>
 			<div class="col-sm-8">
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                <g:form url="[resource:sourceInstance, action:'delete']" method="DELETE">
+                <g:form url="[resource:source, action:'delete']" method="DELETE">
                     <fieldset class="buttons">
-                        <g:link class="btn btn-success" action="edit" resource="${sourceInstance}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
+                        <g:link class="btn btn-success" action="edit" resource="${source}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
                         <g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
                         <g:link class="btn btn-default" action="index">
                             Cancel

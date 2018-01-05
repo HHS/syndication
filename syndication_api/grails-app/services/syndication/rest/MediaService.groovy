@@ -15,6 +15,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.rest
 
+import com.amazonaws.auth.profile.ProfileCredentialsProvider
+import com.amazonaws.services.s3.AmazonS3Client
+
 import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.commons.util.Hash
@@ -33,10 +36,10 @@ import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import com.ctacorp.syndication.*
 import grails.util.Holders
-import org.codehaus.groovy.grails.commons.DefaultGrailsDomainClass
+import org.grails.core.DefaultGrailsDomainClass
 import com.ctacorp.syndication.exception.*
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-import org.codehaus.groovy.grails.web.util.WebUtils
+import org.grails.web.servlet.mvc.GrailsWebRequest
+import org.grails.web.util.WebUtils
 import com.ctacorp.syndication.exception.UnauthorizedException
 import org.hibernate.NonUniqueResultException
 
@@ -44,11 +47,12 @@ import java.security.MessageDigest
 
 @Transactional
 class MediaService {
+
     def tagsService
     def tinyUrlService
     def contentRetrievalService
     def youtubeService
-    def solrIndexingService
+    def elasticsearchService
     def cmsManagerService
     def grailsApplication
     def analyticsService
@@ -57,7 +61,8 @@ class MediaService {
     def groovyPageRenderer
     def mediaService
     def assetResourceLocator
-    def aws
+
+    def s3Client = new AmazonS3Client(new ProfileCredentialsProvider())
 
     @NotTransactional
     String renderHtml(Html html, params){
@@ -70,6 +75,8 @@ class MediaService {
         if(!MediaItem.exists(id)){
             return
         }
+
+        def clazz = MediaItem.get(id).class.name
 
         createAndFindMediaItemSubscriber(MediaItem.get(id))
 
@@ -233,6 +240,9 @@ class MediaService {
                 id == mi.id
             }.deleteAll()
         }
+
+        tagsService.removeContentItem(id)
+        elasticsearchService.deleteMediaItemIndex(id, clazz)
     }
 
     MediaItem archiveMedia(long id){
@@ -309,10 +319,17 @@ class MediaService {
         content
     }
 
+    def getBucketName(){
+        Holders.config.AWS_S3_BUCKET
+    }
+
     String renderPdf(PDF pdf, params){
         def urlHash = MessageDigest.getInstance("MD5").digest(pdf.sourceUrl.bytes).encodeHex().toString()
 
-        String content = groovyPageRenderer.render(template: "/media/pdfView", model: [pdf:pdf, s3Url:aws.s3().on("syndication-files").publicUrlFor(1.hour, "pdf-files/"+urlHash + ".pdf")])
+        String content = groovyPageRenderer.render(template: "/media/pdfView",
+                model: [pdf:pdf,
+                        s3Url:s3Client.getResourceUrl(getBucketName(), "pdf-files/"+urlHash + ".pdf")])
+
         content = contentRetrievalService.wrapWithSyndicateDiv(content, pdf)
         content = contentRetrievalService.addAttributionToExtractedContent(pdf.id, content)
         content += analyticsService.getGoogleAnalyticsString(pdf, params)
@@ -426,19 +443,19 @@ class MediaService {
         String url
         switch(mediaSource){
             case UserMediaList:
-                url = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/userMediaLists/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                url = Holders.config.API_SERVER_URL + "/api/v2/resources/userMediaLists/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
                 break
             case TagHolder:
-                url = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/tags/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                url = Holders.config.API_SERVER_URL + "/api/v2/resources/tags/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
                 break;
             case SourceHolder:
-                url = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/sources/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                url = Holders.config.API_SERVER_URL + "/api/v2/resources/sources/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
                 break;
             case CampaignHolder:
-                url = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/campaigns/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                url = Holders.config.API_SERVER_URL + "/api/v2/resources/campaigns/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
                 break;
             default:
-                url = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/media/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
+                url = Holders.config.API_SERVER_URL + "/api/v2/resources/media/${mediaSource.id}/syndicate.html?${mediaService.getExtractionParams(params)}"
         }
         String width = params.width ?: "775"
         String height = params.height ?: "650"
@@ -563,7 +580,6 @@ class MediaService {
                         extractedContent = lastKnownGood.content
                     } else {
                         throw new ContentNotExtractableException("There is no syndicated markup/content found!")
-                        return
                     }
                 } else{ //Else update the lastKnownGood if it's out of date
                     if(!lastKnownGood || lastKnownGood.mediaItem.hash != newHash){
@@ -618,17 +634,7 @@ class MediaService {
     }
 
     def saveCollection(Collection collectionInstance) {
-        if (!collectionInstance.validate()) {
-            return collectionInstance
-        }
-
-        MediaItemSubscriber mediaItemSubscriber = createAndFindMediaItemSubscriber(collectionInstance)
-
-        collectionInstance.manuallyManaged = false
-        collectionInstance.save(flush: true)
-        mediaItemSubscriber.save()
-
-        collectionInstance
+        createOrUpdateMediaItem(collectionInstance, generalMediaItemLoader) as Collection
     }
 
     def saveFAQ(FAQ faqInstance) {
@@ -644,21 +650,40 @@ class MediaService {
 
         faqInstance
     }
-    private generalMediaItemLoader = { MediaItem item ->
+
+    private def sourceUrlIsHttpsConversion(String sourceUrl) {
+        def firstFive = sourceUrl.substring(0,5)
+        if(firstFive == "https") {
+            String newSourceUrl = sourceUrl.replaceFirst("s", "")
+            def item = findMediaItemBySourceUrl(newSourceUrl)
+            return item
+        }
+        return null
+    }
+
+    private def findMediaItemBySourceUrl(String sourceUrl) {
         def result
         try {
-            def sourceUrlHash = Hash.md5(item.sourceUrl)
+            def sourceUrlHash = Hash.md5(sourceUrl)
             result = MediaItem.createCriteria().get {
                 eq 'sourceUrlHash', sourceUrlHash
 
                 lock true
             }
         } catch (NonUniqueResultException e){
-            log.error("Found Duplicate SourceURL! ${item.sourceUrl}")
+            log.error("Found Duplicate SourceURL! ${sourceUrl}")
             throw e
         } catch(e){
             log.error e
             throw e
+        }
+        result
+    }
+
+    private generalMediaItemLoader = { MediaItem item ->
+        def result = findMediaItemBySourceUrl(item.sourceUrl)
+        if(result == null) {
+            result = sourceUrlIsHttpsConversion(item.sourceUrl)
         }
         result
     }
@@ -837,18 +862,15 @@ class MediaService {
             try {
                 result = item.save()
             } catch (e) {
-                log.error ("Could not save mediaItem: ${item.id}: ${item.sourceUrl}")
-                println e
+                log.error "Could not save mediaItem: ${item.id}: ${item.sourceUrl}", e
             }
             if(!result){
                 log.error "Media mediaSource didn't save. Errors were: ${item.errors}"
             } else {
-                mediaItemSubscriber.save()
 
+                mediaItemSubscriber.save()
                 log.info "media saved: ${item.id} - ${item.sourceUrl}"
-                if (grailsApplication.config.syndication.solrService.useSolr) {
-                    solrIndexingService.inputMediaItem(item, contentAndHash.content)
-                }
+                elasticsearchService.indexMediaItem(item)
             }
             log.info "Media Item Created/Updated: ${item.id} - ${item.sourceUrl}"
         }
@@ -958,7 +980,7 @@ class MediaService {
             log.error("Tag service could not be reached - ${e}")
         }
 
-        if (tagInfo instanceof org.codehaus.groovy.grails.web.json.JSONObject) {
+        if (tagInfo instanceof org.grails.web.json.JSONObject) {
             if (tagInfo.error) {
                 return []
             }

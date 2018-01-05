@@ -26,7 +26,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1><g:message code="default.list.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-lg-12">
@@ -50,7 +50,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         </tr>
                         </thead>
                         <tbody>
-                        <g:each in="${FAQInstanceList}" status="i" var="faqInstance">
+                        <g:each in="${FAQList}" status="i" var="faqInstance">
                             <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 
                                 <td>${faqInstance?.id}</td>

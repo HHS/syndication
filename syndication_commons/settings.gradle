@@ -1,11 +1,11 @@
 def projectName = 'syndication-commons'
 def projectGroup = 'com.ctacorp.syndication'
-def projectVersion = '1.3.1'
+def projectVersion = '3.0.0'
 
 def sourceLevel = JavaVersion.VERSION_1_7
 def targetLevel = JavaVersion.VERSION_1_7
 
-def gradleWrapperVersion = '2.6'
+def gradleWrapperVersion = '3.0'
 
 // DO NOT MODIFY
 

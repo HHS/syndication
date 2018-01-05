@@ -19,11 +19,17 @@ class ConsumerMetricsController {
     def publisherItems = { MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id ?: [] }
 
     def viewLocation() {
-        String profileId = Holders.config.google.analytics.profileId
+        String profileId = Holders.config.GOOGLE_ANALYTICS_PROFILEID
         def results
         def items = []
 
-        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(',') ?: []) ?: []
+        def mediaToGraph
+        if(params.mediaItem?.tokenize(',')) {
+            mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(','))
+        } else {
+            mediaToGraph = []
+        }
+
         String mediaForTokenInput = mediaToGraph.collect{ [id:it.id, name:"${it.name}"] } as JSON
 
         def mediaFilters = getPublisherFilters(mediaToGraph)
@@ -72,7 +78,7 @@ class ConsumerMetricsController {
             endDate.set(params.int("end_year"), params.int("end_month") - 1, params.int("end_day"))
         }
 
-        String profileId = Holders.config.google.analytics.profileId
+        String profileId = Holders.config.GOOGLE_ANALYTICS_PROFILEID
         def pagination = params.int("pagination")
         def results
         ArrayList<Map> items = []
@@ -87,7 +93,13 @@ class ConsumerMetricsController {
         Credential cred = googleAnalyticsService.authorize()
         cred.refreshToken()
 
-        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(',') ?: []) ?: []
+        def mediaToGraph
+        if(params.mediaItem?.tokenize(',')) {
+            mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(','))
+        } else {
+            mediaToGraph = []
+        }
+
         String mediaForTokenInput = mediaToGraph.collect{ [id:it.id, name:"${it.name}"] } as JSON
 
         [
@@ -101,10 +113,15 @@ class ConsumerMetricsController {
     }
 
     def getWhosEmbedding() {
-        String profileId = Holders.config.google.analytics.profileId
+        String profileId = Holders.config.GOOGLE_ANALYTICS_PROFILEID
         def items = []
         def results
-        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',') ?: []) ?: []
+        def mediaToGraph
+        if(params.mediaItem?.tokenize(',')) {
+            mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(','))
+        } else {
+            mediaToGraph = []
+        }
 
         def mediaFilters = getPublisherFilters(mediaToGraph, ";ga:hostname!=digitalmedia.hhs.gov;ga:hostname!=api.digitalmedia.hhs.gov;ga:hostname!=digitalmedia.hhs.gov.googleweblight.com")
         mediaFilters.each { filterSet ->
@@ -124,10 +141,15 @@ class ConsumerMetricsController {
 
     def generalViews() {
         Credential cred = googleAnalyticsService.authorize()
-        cred.refreshToken()
-        String profileId = Holders.config.google.analytics.profileId
 
-        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(',') ?: []) ?: []
+        cred.refreshToken()
+        String profileId = Holders.config.GOOGLE_ANALYTICS_PROFILEID
+        def mediaToGraph
+        if(params.mediaItem?.tokenize(',')) {
+            mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(','))
+        } else {
+            mediaToGraph = []
+        }
         String mediaForTokenInput = mediaToGraph.collect{ [id:it.id, name:"${it.name}"] } as JSON
 
         def mediaFilters = getPublisherFilters(mediaToGraph)
@@ -178,10 +200,16 @@ class ConsumerMetricsController {
     }
 
     def getTotalViews() {
-        String profileId = Holders.config.google.analytics.profileId
+        String profileId = Holders.config.GOOGLE_ANALYTICS_PROFILEID
         def items = []
         def results
-        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',') ?: []) ?: []
+
+        def mediaToGraph
+        if(params.mediaItem?.tokenize(',')) {
+            mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(','))
+        } else {
+            mediaToGraph = []
+        }
 
         def mediaFilters = getPublisherFilters(mediaToGraph)
         mediaFilters.each { filterSet ->
@@ -198,10 +226,15 @@ class ConsumerMetricsController {
     }
 
     def getTotalMobileViews() {
-        String profileId = Holders.config.google.analytics.profileId
+        String profileId = Holders.config.GOOGLE_ANALYTICS_PROFILEID
         def items = []
         def results
-        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',') ?: []) ?: []
+        def mediaToGraph
+        if(params.mediaItem?.tokenize(',')) {
+            mediaToGraph = MediaItem.findAllByIdInList(params.mediaItem?.tokenize(','))
+        } else {
+            mediaToGraph = []
+        }
 
         def mediaFilters = getPublisherFilters(mediaToGraph)
         mediaFilters.each { filterSet ->

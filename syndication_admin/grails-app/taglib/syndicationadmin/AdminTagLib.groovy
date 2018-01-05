@@ -26,7 +26,7 @@ class AdminTagLib {
             serverLink: 'raw',
             mediaIcon:'raw',
             eventIcon:'raw',
-            error:'raw',
+            hasError:'raw',
             errors:'raw',
             message:'raw',
             messages:'raw',
@@ -37,7 +37,6 @@ class AdminTagLib {
 
     static namespace = "synd"
 
-    def grailsApplication
     def springSecurityService
 
     def mediaIcon = { attrs, body ->
@@ -56,12 +55,12 @@ class AdminTagLib {
     }
 
     def serverLink = { attrs, body ->
-        out << "<a href='${grailsApplication.config.grails.serverURL}' class='bannerLink'>"
+        out << "<a href='${config?.API_SERVER_URL}' class='bannerLink'>"
         out << body()
         out << "</a>"
     }
 
-    def error = {attrs ->
+    def hasError = {attrs ->
         if(!flash.error){ return }
         out << "<div class=\"row\"><div class=\"alert alert-danger alert-dismissable break-word\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-hidden=\"true\">&times;</button><ul>"
         out << "<li>${flash.error}</li>"

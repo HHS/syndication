@@ -31,7 +31,7 @@
                     <div class="microsite-grid-left-col-top">
 
                         <div class="microsite-article on-color clearfix">
-                            <g:render template="../microsite/displayStyle"
+                            <g:render template="/microsite/displayStyle"
                                   model="[mediaArea: microSite.mediaArea2, mediaItems: pane2MediaItems, panel:1]"/>
                         </div>
 
@@ -41,7 +41,7 @@
                     <div class="microsite-grid-left-col-bottom clearfix">
 
                         <div class="microsite-article on-color clearfix">
-                            <g:render template="../microsite/displayStyle"
+                            <g:render template="/microsite/displayStyle"
                                   model="[mediaArea: microSite.mediaArea3, mediaItems: pane3MediaItems, panel:2]"/>
                         </div>
 
@@ -81,7 +81,7 @@
 
             </div><!-- end col-sm-7 col-xs-1 js-masonry-->
 
-            <g:render template="/microsite/mediaItemModals"/>
+            <g:render template="/microsite/mediaItemModals" model="[apiBaseUrl:apiBaseUrl]"/>
 
         </div><!-- end microsite-grid-content row -->
 

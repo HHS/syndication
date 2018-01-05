@@ -17,35 +17,35 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 
 
-<div class="fieldcontain ${hasErrors(bean: mediaMetricInstance, field: 'day', 'error')} required">
+<div class="fieldcontain ${hasErrors(bean: mediaMetric, field: 'day', 'error')} required">
 	<label for="day">
 		<g:message code="mediaMetric.day.label" default="Day" />
 		<span class="required-indicator">*</span>
 	</label>
-	<g:datePicker name="day" precision="minute" relativeYears="[-20..1]"  value="${mediaMetricInstance?.day}"  />
+	<g:datePicker name="day" precision="minute" relativeYears="[-20..1]"  value="${mediaMetric?.day}"  />
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: mediaMetricInstance, field: 'storefrontViewCount', 'error')} required">
+<div class="fieldcontain ${hasErrors(bean: mediaMetric, field: 'storefrontViewCount', 'error')} required">
 	<label for="storefrontViewCount">
 		<g:message code="mediaMetric.storefrontViewCount.label" default="Storefront View Count" />
 		<span class="required-indicator">*</span>
 	</label>
-	<g:field name="storefrontViewCount" type="number" min="0" max="9223372036854775806" value="${mediaMetricInstance.storefrontViewCount}" required=""/>
+	<g:field name="storefrontViewCount" type="number" min="0" max="9223372036854775806" value="${mediaMetric.storefrontViewCount}" required=""/>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: mediaMetricInstance, field: 'apiViewCount', 'error')} required">
+<div class="fieldcontain ${hasErrors(bean: mediaMetric, field: 'apiViewCount', 'error')} required">
 	<label for="apiViewCount">
 		<g:message code="mediaMetric.apiViewCount.label" default="Api View Count" />
 		<span class="required-indicator">*</span>
 	</label>
-	<g:field name="apiViewCount" type="number" min="0" max="9223372036854775806" value="${mediaMetricInstance.apiViewCount}" required=""/>
+	<g:field name="apiViewCount" type="number" min="0" max="9223372036854775806" value="${mediaMetric.apiViewCount}" required=""/>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: mediaMetricInstance, field: 'media', 'error')} required">
+<div class="fieldcontain ${hasErrors(bean: mediaMetric, field: 'media', 'error')} required">
 	<label for="media">
 		<g:message code="mediaMetric.media.label" default="Media ID" />
 		<span class="required-indicator">*</span>
 	</label>
-    <g:field name="media.id" type="number" min="1" max="9223372036854775806" value="${mediaMetricInstance?.media?.id}" required="true"/>
+    <g:field name="media.id" type="number" min="1" max="9223372036854775806" value="${mediaMetric?.media?.id}" required="true"/>
 </div>
 

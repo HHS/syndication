@@ -31,7 +31,7 @@
                     </div>
 
                     <div class="right_side">
-                        <input type='text' class='text_' name='j_username' id='username' />
+                        <input type='text' class='text_' name='username' id='username' />
                     </div>
                 </div>
 
@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="right_side">
-                        <input type='password' class='text_' name='j_password' id='password'/>
+                        <input type='password' class='text_' name='password' id='password'/>
                     </div>
                 </div>
 
@@ -81,7 +81,7 @@
 <script type='text/javascript'>
 	<!--
 	(function() {
-		document.forms['loginForm'].elements['j_username'].focus();
+		document.forms['loginForm'].elements['username'].focus();
 	})();
 	// -->
 </script>

@@ -29,35 +29,29 @@
         </div> <!-- end .address -->
         <div class="global-footer-links">
             <ul class="links">
-                <li><a href="http://www.hhs.gov/">HHS Home</a></li>
-                <li><a href="http://www.hhs.gov/open/">HHS/Open</a></li>
-                <li><a href="http://archive.hhs.gov/">HHS Archive</a></li>
-                <li><a href="http://www.hhs.gov/budget">Budget/Performance</a></li>
-                <li class="last"><a href="http://www.hhs.gov/foia/">FOIA</a></li>
+                <li><a href="https://www.hhs.gov/about/contact-us/index.html">Contact HHS</a></li>
+                <li><a href="https://www.hhs.gov/about/careers/index.html">Careers</a></li>
+                <li><a href="https://www.hhs.gov/answers/">HHS FAQs</a></li>
+                <li><a href="https://www.hhs.gov/civil-rights/for-individuals/nondiscrimination/index.html">Nondiscrimination Notice</a></li>
             </ul>
 
             <ul class="links">
-                <li><a href="http://www.hhs.gov/accessibility.html">Accessibility</a></li>
-                <li><a href="http://www.hhs.gov/privacy.html">Privacy Policy</a></li>
-                <li><a href="http://www.hhs.gov/disclaimer.html">Disclaimers</a></li>
-                <li><a href="http://www.hhs.gov/plugins.html">Viewers &amp; Players</a></li>
-                <li class="last"><a href="http://www.hhs.gov/about/careers/index.html">Careers</a></li>
+                <li><a href="https://archive.hhs.gov/">HHS Archive</a></li>
+                <li><a href="https://www.hhs.gov/accessibility.html">Accessibility</a></li>
+                <li><a href="https://www.hhs.gov/privacy.html">Privacy Policy</a></li>
+                <li><a href="https://www.hhs.gov/plugins.html">Viewers &amp; Players</a></li>
             </ul>
 
             <ul class="links">
-                <li><a href="http://www.whitehouse.gov/">The White House</a></li>
-                <li><a href="http://www.usa.gov/">USA.gov</a></li>
-                <li><a href="http://www.hhs.gov/environmentaljustice/">Environmental Justice</a></li>
-                <li><a href="http://www.hhs.gov/open/plain-writing/index.html">Plain Writing Act</a></li>
-                <li class="last"><a href="http://www.hhs.gov/asa/eeo/resources/index.html">EEO/No FEAR Act</a></li>
-            </ul>
-
-            <ul class="links">
-                <li><a href="http://www.hhs.gov/answers/">HHS FAQs</a></li>
+                <li><a href="https://www.hhs.gov/about/budget/index.html">Budget/Performance</a></li>
                 <li><a href="http://oig.hhs.gov/">Inspector General</a></li>
-                <li><a href="https://forms.oig.hhs.gov/hotlineoperations/">Report Fraud</a></li>
-                <li><a href="http://www.paymentaccuracy.gov">PaymentAccuracy.gov</a></li>
-                <li class="last"><a href="http://www.hhs.gov/contactus.html">Contact HHS</a></li>
+                <li class="last"><a href="https://www.hhs.gov/about/agencies/asa/eeo/resources/no-fear-act/index.html">EEO/No Fear Act</a></li>
+            </ul>
+
+            <ul class="links">
+                <li><a href="https://www.hhs.gov/foia/">FOIA</a></li>
+                <li><a href="https://www.whitehouse.gov/">The White House</a></li>
+                <li><a href="https://www.usa.gov/">USA.gov</a></li>
             </ul>
             <div class="clear-both">
             </div> <!-- end .clear-both -->

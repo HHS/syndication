@@ -1,13 +1,14 @@
 package com.ctacorp.tinyurl
 
 import grails.rest.Resource
+import grails.util.Holders
 
 class MediaMapping {
     String targetUrl
     Long syndicationId
     String guid
 
-    def transient grailsApplication
+    def config = Holders.config
 
     static constraints = {
         targetUrl       nullable: false, minSize:11, maxSize:2000
@@ -20,7 +21,7 @@ class MediaMapping {
     }
 
     public String getTinyUrl(){
-        "${grailsApplication.config.grails.serverURL}/${getToken()}"
+        "${config.TINYURL_SERVER_URL}/${getToken()}"
     }
 
     String toString(){

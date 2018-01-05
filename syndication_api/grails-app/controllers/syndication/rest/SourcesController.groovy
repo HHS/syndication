@@ -19,20 +19,16 @@ package syndication.rest
 
 import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.Source
+import com.ctacorp.syndication.api.ApiResponse
 import com.ctacorp.syndication.data.SourceHolder
 import grails.transaction.Transactional
-import org.codehaus.groovy.grails.web.mime.MimeType
+import grails.util.Holders
+import grails.web.mime.MimeType
 import com.ctacorp.syndication.api.ApiResponse
 import com.ctacorp.syndication.api.Embedded
-import com.ctacorp.syndication.api.Message
-import com.ctacorp.syndication.api.Meta
-import com.ctacorp.syndication.api.Pagination
+import static com.ctacorp.grails.swagger.annotations.HTTPMethod.GET
 
-@API(swaggerDataPath = "/sources", description = "Information about sources.", modelRefs = [Source, ApiResponse, Meta, Pagination, Message], modelExtensions = [
-    @ModelExtension(id="Sources", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type = "array", typeRef="Source", required = true)]),
-    ], removeProperties = ["results"])
-])
+@Tag(name = 'sources', description = 'Information about tags')
 @Transactional(readOnly = true)
 class SourcesController {
     static allowedMethods = [
@@ -46,18 +42,20 @@ class SourcesController {
 
     def sourceService
     def mediaService
+    def config = Holders.config
 
     def beforeInterceptor = {
         response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
     }
 
-    @APIResource(path = "/resources/sources/{id}.json", description = "Information about a specific source.", operations = [
-        @Operation(httpMethod = "GET", notes="Returns the Source identified by the 'id'.", nickname="getSourceById", type = "Sources", summary = "Get Source by ID", responseMessages = [
-            @ResponseMessage(code = 400, description = "Invalid ID"),
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ], parameters = [
-            @Parameter(name = "id", type="integer", format="int64", description = "The id of the source to look up", required = true, paramType = "path")
-        ])
+    @Path(path = '/resources/sources/{id}.json', operations = [
+            @Operation(method = GET, description = "Information about a specific source.", summary = "Get Source by ID", responses = [
+                    @Response(code = 200, description = "Returns the Source identified by the 'id'.", schema = @DataSchema(title = 'ArrayOfSources', type = DataSchemaType.ARRAY, reference = '#/definitions/SourceWrapped')),
+                    @Response(code = 400, description = 'Invalid ID'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], parameters = [
+                    @Parameter(name = 'id', type = ParameterType.INTEGER, format = ParameterFormat.INT_64, description = 'The id of the source to look up', required = true, whereIn = ParameterLocation.PATH),
+            ], tags = ['sources']),
     ])
     def show(Long id) {
         def sourceInstance = Source.read(id)
@@ -66,33 +64,35 @@ class SourcesController {
             respond ApiResponse.get400NotFoundResponse()
             return
         }
-        respond ApiResponse.get200Response([sourceInstance]).autoFill(params)
+        respond ApiResponse.get200Response([sourceInstance]).autoFill(params), view:"index"
     }
 
-    @APIResource(path = "/resources/sources.json", description = "Source Listings", operations = [
-        @Operation(httpMethod = "GET", notes="Returns the list of Sources.", nickname="getSources", type = "Sources", summary = "Get Sources", responseMessages = [
-            @ResponseMessage(code = 400, description = "Bad Request"),
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ], parameters = [
-            @Parameter(name = "max",    type="integer", format="int32",         description = "The maximum number of records to return",                required = false, paramType = "query"),
-            @Parameter(name = "offset", type="integer", format="int32",         description = "The offset of the records set to return for pagination", required = false, paramType = "query"),
-            @Parameter(name = "sort",   type = "string",    description = "* Set of fields to sort the records by.",                required = false, paramType = "query")
-        ])
+    @Path(path = '/resources/sources.json', operations = [
+            @Operation(method = GET, description = "Source Listings", summary = "Get Sources", responses = [
+                    @Response(code = 200, description = "Returns the list of Sources.", schema = @DataSchema(title = 'ArrayOfSources', type = DataSchemaType.ARRAY, reference = '#/definitions/SourceWrapped')),
+                    @Response(code = 400, description = 'Invalid ID'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], parameters = [
+                    @Parameter(name = 'max', type = ParameterType.INTEGER, format = ParameterFormat.INT_32, description = 'The maximum number of records to return', required = false),
+                    @Parameter(name = 'offset', type = ParameterType.INTEGER, format = ParameterFormat.INT_32, description = 'Return records starting at the offset index.', required = false),
+                    @Parameter(name = 'sort', type = ParameterType.STRING, description = 'The name of the property to which sorting will be applied', required = false),
+            ], tags = ['sources']),
     ])
     def list() {
         def sourceList = sourceService.listSources(params)
         params.total = sourceList.totalCount
-        respond ApiResponse.get200Response(sourceList).autoFill(params)
+        respond ApiResponse.get200Response(sourceList).autoFill(params), view:"index"
     }
 
-    @APIResource(path="/resources/sources/{id}/syndicate.{format}", description="MediaItem", operations=[
-            @Operation(httpMethod="GET", notes="Renders the list of MediaItems associated with the Source identified by the 'id'.", nickname="syndicate", type = "MediaItems", summary = "Get MediaItems for Source", responseMessages=[
-                    @ResponseMessage(code = 400, description = "Bad Request"),
-                    @ResponseMessage(code = 500, description = "Internal Server Error")
+    @Path(path = '/resources/sources/{id}/syndicate.{format}', operations = [
+            @Operation(method = GET, description = "MediaItem", summary = "Get MediaItems for Source", responses = [
+                    @Response(code = 200, description = "Renders the list of MediaItems associated with the Source identified by the 'id'.", schema = @DataSchema(title = 'ArrayOfSyndicatedItems', type = DataSchemaType.ARRAY, reference = '#/definitions/MediaItemWrapped')),
+                    @Response(code = 400, description = 'Invalid ID'),
+                    @Response(code = 500, description = 'Internal Server Error'),
             ], parameters = [
-                    @Parameter(name = "id",          type="integer", format="int64", description = "The id of the record to look up", required = true, paramType = "path"),
-                    @Parameter(name="displayMethod", type="string",                  description="Method used to render an html request. Accepts one: [mv, list, feed]", required=false, paramType = "query")
-            ])
+                    @Parameter(name = 'id', type = ParameterType.INTEGER, format = ParameterFormat.INT_64, description = 'The id of the record to look up', required = true, whereIn = ParameterLocation.PATH),
+                    @Parameter(name = 'displayMethod', type = ParameterType.STRING, description = 'Method used to render an html request. Accepts one: [mv, list, feed]', required = false),
+            ], tags = ['sources']),
     ])
     def syndicate(Long id){
         def sourceInstance = Source.read(id)
@@ -113,7 +113,7 @@ class SourcesController {
             }
             json{
                 def resp = new Embedded(id:id, content:content, name: sourceInstance.name, description: "Media belonging to '${sourceInstance.name}'")
-                respond ApiResponse.get200Response([resp]).autoFill(params)
+                respond ApiResponse.get200Response([resp]).autoFill(params), view:"/mediaItem/syndicate"
             }
         }
     }
@@ -126,7 +126,7 @@ class SourcesController {
             return
         }
         String renderedResponse
-        String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/sources/${id}"
+        String url = config.API_SERVER_URL + "/resources/sources/${id}"
         SourceHolder sourceHolder = new SourceHolder([id:id, name:sourceName])
         switch(params.displayMethod ? params.displayMethod.toLowerCase() : "feed"){
             case "mv":

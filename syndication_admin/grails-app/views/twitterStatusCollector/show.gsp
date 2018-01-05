@@ -17,7 +17,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <html>
 <head>
     <meta name="layout" content="main">
-    <g:set var="entityName" value="${message(code: 'twitterStatusCollector.label', default: 'Tweet Auto Importerr')}"/>
+    <g:set var="entityName" value="${message(code: 'twitterStatusCollector.label', default: 'Tweet Auto Importer')}"/>
     <title><g:message code="default.show.label" args="[entityName]"/></title>
 </head>
 
@@ -26,7 +26,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1><g:message code="default.show.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-md-10 col-md-offset-2">

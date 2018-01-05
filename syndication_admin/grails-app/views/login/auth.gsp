@@ -40,14 +40,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <g:if test='${flash.message}'>
                         <div class='panel-body'><span class="text-info"><i class="fa fa-info"></i> ${flash.message}</span></div>
                     </g:if>
+
                     <form action='${postUrl}' method='POST' id='loginForm' class='cssform' autocomplete='off'>
                         <fieldset>
                             <div class="form-group">
-                                <input id="username" autocomplete="off" class="form-control" placeholder="Email" name="j_username" type="text" autofocus>
+                                <input id="username" autocomplete="off" class="form-control" placeholder="Email" name="username" type="text" autofocus>
                             </div>
 
                             <div class="form-group">
-                                <input class="form-control" autocomplete="off" id="password" placeholder="Password" name="j_password" type="password" value="">
+                                <input class="form-control" autocomplete="off" id="password" placeholder="Password" name="password" type="password" value="">
                             </div>
 
                             <div class="form-group">

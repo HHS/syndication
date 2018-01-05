@@ -1,3 +1,4 @@
+<%@ page import="grails.util.Holders" %>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -58,10 +59,12 @@
 <body>
 <div>
     <div class="clearfix"></div>
-    <div class="banner"><div class="logo"><asset:image absolute="true" alt="syndication logo" src="smallSyndicationLogo.png"/></div><span>HHS Media Services</span></div>
+    <div class="banner"><div class="logo">
+        <img absolute="true" src="${assetPath(src: 'smallSyndicationLogo.png')}" alt="syndication logo"/>
+    </div><span>HHS Media Services</span></div>
     <div class="clearfix"></div>
     <div class="message_body">
-        <h1>Your password for ${grailsApplication.config.grails.serverURL} has been reset!</h1>
+        <h1>Your password for ${grails.util.Holders.config.grails.serverURL} has been reset!</h1>
         <p>Please log in and change your password.</p>
         <p>Your current login information is:</p>
         <ul>

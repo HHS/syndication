@@ -42,6 +42,7 @@
   <ul class="nav nav-pills">
     <li role="presentation"><g:link action="index">Flagged Media</g:link></li>
     <li role="presentation" class="active"><g:link action="ignored">Ignored Media</g:link></li>
+      <li role="presentation"><g:link action="search">Search Media</g:link></li>
   </ul>
   <br/>
 

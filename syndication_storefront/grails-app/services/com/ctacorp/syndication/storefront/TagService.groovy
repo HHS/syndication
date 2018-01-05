@@ -6,6 +6,7 @@ import com.google.common.cache.Cache
 import com.google.common.cache.CacheLoader
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
+import grails.util.Holders
 
 import javax.annotation.PostConstruct
 import java.util.concurrent.TimeUnit
@@ -15,17 +16,17 @@ class TagService {
     def grailsApplication
     String serverAddress
     RestBuilder rest = new RestBuilder()
-    Cache cache;
+    Cache cache
 
     @PostConstruct
     void init() {
         rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
-        serverAddress = grailsApplication.config.tagCloud.serverAddress
+        serverAddress = Holders.config.TAG_CLOUD_SERVER_URL
         cache = CacheBuilder.newBuilder().
                 expireAfterWrite(30, TimeUnit.SECONDS).
                 maximumSize(500).
                 build(new CacheLoader<Long, Collection>() {
-                    public Collection load(Long key) throws Exception {
+                    Collection load(Long key) throws Exception {
                         restGet("${serverAddress}/tags/getTagsForSyndicationId.json?syndicationId=${key}") ?: []
                     }
                 })
@@ -81,8 +82,8 @@ class TagService {
     private restGet(String url, params = null) {
         try {
             rest.get(url + aggregateParams(params)) { accept "application/json" }.json
-        } catch (e) {
-            log.warn "Tag Service could not be reached."
+        } catch (t) {
+            log.error "Tag Service could not be reached.", t
         }
     }
 

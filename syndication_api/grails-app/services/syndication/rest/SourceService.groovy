@@ -22,7 +22,7 @@ import com.ctacorp.syndication.*
 class SourceService {
 
     def listSources(params){
-        params.max = getMax(params)
+        params.max = 1000
         if(params.id){
             return Source.get(params.id)
         }

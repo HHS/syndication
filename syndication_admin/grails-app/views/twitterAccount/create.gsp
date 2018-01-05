@@ -25,10 +25,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1>Add Twitter Account</h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
     <div class="row">
         <div class="col-md-8">
-            <g:form class="form-horizontal" url="[resource:twitterAccountInstance, action:'save']" >
+            <g:form class="form-horizontal" url="[resource:twitterAccount, action:'save']" >
                 <fieldset class="form">
                     <g:render template="form"/>
                 </fieldset>

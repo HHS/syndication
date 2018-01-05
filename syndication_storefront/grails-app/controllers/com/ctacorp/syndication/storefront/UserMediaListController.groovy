@@ -1,5 +1,7 @@
 package com.ctacorp.syndication.storefront
 
+import grails.util.Holders
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -11,6 +13,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 
 import grails.transaction.Transactional
+import grails.util.Holders
 
 @Transactional(readOnly = true)
 @Secured(['ROLE_STOREFRONT_USER', 'ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_USER', 'ROLE_BASIC', 'ROLE_STATS', "ROLE_PUBLISHER"])
@@ -20,7 +23,7 @@ class UserMediaListController {
 
     def springSecurityService
     def mediaService
-
+    def config = Holders.config
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
 
@@ -28,15 +31,16 @@ class UserMediaListController {
             user == springSecurityService.currentUser as User
         }.list(params)
         respond userMediaLists, view:'index', model: [userMediaListInstanceCount: userMediaLists.totalCount,
-                                                      featuredMedia: mediaService.getFeaturedMedia(max:20)]
+                                                      featuredMedia: mediaService.getFeaturedMedia(max:20),
+                                                      API_SERVER_URL: config?.API_SERVER_URL]
     }
 
     def show(UserMediaList userMediaListInstance) {
-        respond userMediaListInstance, model: [featuredMedia: mediaService.getFeaturedMedia(max:20),userId:springSecurityService?.currentUser?.id ?: -1]
+        respond userMediaListInstance, model: [featuredMedia: mediaService.getFeaturedMedia(max:20),userId:springSecurityService?.currentUser?.id ?: -1, API_SERVER_URL: config?.API_SERVER_URL]
     }
 
     def create() {
-        respond new UserMediaList(params), model: [featuredMedia: mediaService.getFeaturedMedia(max:20)]
+        respond new UserMediaList(params), model: [featuredMedia: mediaService.getFeaturedMedia(max:20), API_SERVER_URL: config?.API_SERVER_URL]
     }
 
     def mediaSearch(String q){
@@ -83,7 +87,7 @@ class UserMediaListController {
         }
 
         String mediaItemList = userMediaListInstance.mediaItems?.collect{ [id:it.id, name:"${it.name}"] } as JSON
-        respond userMediaListInstance, model:[mediaItemList:mediaItemList, featuredMedia: mediaService.getFeaturedMedia(max:20)]
+        respond userMediaListInstance, model:[mediaItemList:mediaItemList, featuredMedia: mediaService.getFeaturedMedia(max:20),API_SERVER_URL: config?.API_SERVER_URL]
     }
 
     @Transactional

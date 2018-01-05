@@ -6,8 +6,7 @@ import grails.transaction.Transactional
 import grails.plugins.rest.client.RestBuilder
 import groovy.time.TimeCategory
 import grails.util.Holders
-import com.ctacorp.solr.EntityType
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import grails.web.servlet.mvc.GrailsParameterMap
 
 import javax.annotation.PostConstruct
 
@@ -17,7 +16,7 @@ class MediaService {
     RestBuilder rest = new RestBuilder()
     def config = Holders.config
     def grailsApplication
-    def solrSearchService
+    def elasticsearchService
 
     def getFeaturedMedia(params = [:]) {
         def featured = FeaturedMedia.where {
@@ -57,27 +56,30 @@ class MediaService {
                 restrictToSet               : params.topicItems,
                 createdByContains           : params.createdBy
         ]).list(max: params.max, offset: params.offset)
+
     }
 
-    def mediaItemSolrSearch(String searchQuery, params = [:]) {
-        def solrSearchResults
-        try {
-            solrSearchResults = solrSearchService.search(searchQuery ?: "", EntityType.MEDIAITEM)
-        } catch (ex) {
-            log.error "solr is down: ${ex.getMessage()}", ex
+    def mediaItemElasticSearch(String searchQuery, params = [:]) {
+
+        if(!searchQuery) {
             return []
         }
 
-        def mediaItemType = EntityType.MEDIAITEM.toString()
-        def ids = []
+        def elasticsearchFoundIds
 
-        solrSearchResults.getResults().each { searchResult ->
-            ids << searchResult.id.replace("${mediaItemType}-", '')
+        try {
+            elasticsearchFoundIds = elasticsearchService.search(searchQuery).collect { it._id }
+        } catch(e) {
+            log.error('error occurred during elasticsearch search', e)
+        }
+
+        if(!elasticsearchService) {
+            return []
         }
 
         params.offset = params.offset ?: 0
-        def mediaItems = MediaItem.facetedSearch(restrictToSet: ids.join(','), active: true, visibleInStorefront: true, syndicationVisibleBeforeDate: new Date().toString()).list(max: params.max, offset: params.offset)
-        mediaItems = bubbleExactFieldMatcheToTheTop(mediaItems, searchQuery, params.offset ?: 0)
+        def mediaItems = MediaItem.facetedSearch(restrictToSet: elasticsearchFoundIds.join(','), active: true, visibleInStorefront: true, syndicationVisibleBeforeDate: new Date().toString()).list(max: params.max, offset: params.offset)
+        mediaItems = bubbleExactFieldMatcheToTheTop(mediaItems, searchQuery, params.offset ?: "0")
         mediaItems
     }
 
@@ -97,14 +99,14 @@ class MediaService {
         mediaTypes.sort{ it.name }
     }
 
-    def bubbleExactFieldMatcheToTheTop(def mediaItems, String searchQuery, def offset) {
+    def bubbleExactFieldMatcheToTheTop(def mediaItems, String searchQuery, String offset) {
         def item = MediaItem.findBySourceUrlOrName(searchQuery,searchQuery)
-        if(item){
-            if(mediaItems.id.contains(item.id) && offset) {
+        if(item && item.active && item.visibleInStorefront){
+            if(mediaItems.id.contains(item.id) && offset == "0") {
                 def index = mediaItems.findIndexOf{it.id==item.id}
                 mediaItems.removeAt(index)
             }
-            if(offset == "0" || offset == 0){
+            if(offset == "0"){
                 mediaItems.add(0, item)
             }
         }

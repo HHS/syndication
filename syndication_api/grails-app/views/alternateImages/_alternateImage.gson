@@ -1,0 +1,13 @@
+import com.ctacorp.syndication.AlternateImage
+
+model {
+    AlternateImage alternateImage
+}
+
+json {
+    id alternateImage.id
+    name alternateImage.name
+    url alternateImage.url
+    height alternateImage.height
+    width alternateImage.width
+}

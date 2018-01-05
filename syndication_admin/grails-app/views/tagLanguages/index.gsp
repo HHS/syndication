@@ -50,7 +50,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 
     <synd:message/>
-    <synd:error/>
+    <synd:hasError/>
     <synd:errors/>
 
     <div class="row">

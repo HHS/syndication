@@ -26,29 +26,26 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
+			<synd:hasError/>
 			<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
 				<div class="row">
 					<div class="col-md-8">
-						<g:form class="form-horizontal" url="[resource:imageInstance, action:'update']" method="PUT" >
-							<g:hiddenField name="version" value="${imageInstance?.version}" />
+						<g:form class="form-horizontal" url="[resource:image, action:'update']" method="PUT" id="updateMediaItem">
+							<g:hiddenField name="version" value="${image?.version}" />
 							<fieldset class="form">
 								<g:render template="form"/>
 							</fieldset>
-							<fieldset class="buttons">
+							<fieldset class="buttons" id="mediaItemSubmitButton">
 								<g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-								<g:link class="btn btn-default" id="${imageInstance.id}" resource="${imageInstance}" action="show">
+								<g:link class="btn btn-default" id="${image.id}" resource="${image}" action="show">
 									Cancel
 								</g:link>
-                                <g:link controller="mediaPreviewThumbnail" class="btn btn-warning pull-right" id="${imageInstance?.id}" action="flush">
-                                    Regenerate Thumbnail & Preview
-                                </g:link>
 							</fieldset>
 						</g:form>
 					</div>
 				</div>
 			</sec:ifAnyGranted>
-            <g:render template="/mediaItem/addAttributeOrImage" model="[mediaItemInstance: imageInstance]"/>
+			<g:render template="/mediaItem/addAttributeOrImage" model="[mediaItemInstance: image]"/>
 		</div>
 	</body>
 </html>

@@ -1,3 +1,4 @@
+<%@ page import="grails.util.Holders" %>
 
 <script>
 
@@ -15,8 +16,8 @@
             $('#'+lastTab).tab('show');
         }
     });
-    
-    
+
+
     %{--Single MediaItems--}%
     $(document).ready(function(){
         if(localStorage.getItem('lastTab') == "singleMediaItem"){
@@ -24,7 +25,7 @@
             initDayDonut();
             initWeekDonut();
         }
-        
+
         $("#singleMediaApi").click(function(){
             var labelText = $(this).text();
             $("#lineChartLabel").html("'" + labelText + "' Views Per Month");
@@ -43,7 +44,7 @@
     });
 
     function updateLineChart(whichData) {
-        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/mediaContent.json?mediaToGraph=${mediaToGraph.id}&whichData=' + whichData, function (data) {
+        $.getJSON('${grails.util.Holders.config.ADMIN_SERVER_URL}/metricReport/mediaContent.json?mediaToGraph=${mediaToGraph.id}&whichData=' + whichData, function (data) {
             $("div#viewGraph").html('');
             lineTopTen(data,"viewGraph");
         });
@@ -51,7 +52,7 @@
 
     function initLineChart(){
         $("div#viewGraph").text("");
-        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/mediaContent.json?mediaToGraph=${mediaToGraph.id}&whichData=', function (data) {
+        $.getJSON('${Holders.config.ADMIN_SERVER_URL}/metricReport/mediaContent.json?mediaToGraph=${mediaToGraph.id}&whichData=', function (data) {
             line(data, "viewGraph");
         });
     }
@@ -96,24 +97,24 @@
     function updatePercentDonutGraph(range) {
         console.log('getting data for ' + range);
 
-        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/updatePercentOfTotalViews.json?mediaToGraph=${mediaToGraph.id}&whichData=apiViewCount&range=' + range, function (data) {
+        $.getJSON('${Holders.config.ADMIN_SERVER_URL}/metricReport/updatePercentOfTotalViews.json?mediaToGraph=${mediaToGraph.id}&whichData=apiViewCount&range=' + range, function (data) {
             dayDonutGraph.setData(data);
         });
-        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/updatePercentOfTotalViews.json?mediaToGraph=${mediaToGraph.id}&whichData=storefrontViewCount&range=' + range, function (data) {
+        $.getJSON('${Holders.config.ADMIN_SERVER_URL}/metricReport/updatePercentOfTotalViews.json?mediaToGraph=${mediaToGraph.id}&whichData=storefrontViewCount&range=' + range, function (data) {
             weekDonutGraph.setData(data);
         });
     }
 
     function initDayDonut(){
         $("div#day").text("");
-        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/updatePercentOfTotalViews.json?mediaToGraph=${mediaToGraph.id}&range=1&whichData=', function (data) {
+        $.getJSON('${Holders.config.ADMIN_SERVER_URL}/metricReport/updatePercentOfTotalViews.json?mediaToGraph=${mediaToGraph.id}&range=1&whichData=', function (data) {
             dayPercentOfTotal(data, "day");
         });
     }
 
     function initWeekDonut(){
         $("div#week").text("");
-        $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/updatePercentOfTotalViews.json?mediaToGraph=${mediaToGraph.id}&range=1&whichData=', function (data) {
+        $.getJSON('${Holders.config.ADMIN_SERVER_URL}/metricReport/updatePercentOfTotalViews.json?mediaToGraph=${mediaToGraph.id}&range=1&whichData=', function (data) {
             weekPercentOfTotal(data, "week");
         });
     }
@@ -157,7 +158,7 @@
         $(".topTenViewSelector").click(function(){
             var labelText = $(this).text();
             $("#topTenLineLabel").html("'" + labelText + "' Views Per Month");
-            $.getJSON('${grailsApplication.config.grails.serverURL}/metricReport/getTopTen.json?extra=555&typeGraph=line&range=365&whichData=' + $(this).attr("id"), function (data) {
+            $.getJSON('${Holders.config.ADMIN_SERVER_URL}/metricReport/getTopTen.json?extra=555&typeGraph=line&range=365&whichData=' + $(this).attr("id"), function (data) {
                 $("div#topTenGraph").html('');
                 lineTopTen(data,"topTenGraph");
             });
@@ -397,7 +398,7 @@
             initAgencyStorefrontDonut();
             initAgencyApiDonut();
         }
-        
+
         $("#agencyTab").click(function(){
             initAgencyLineChart();
             initAgencyStorefrontDonut();

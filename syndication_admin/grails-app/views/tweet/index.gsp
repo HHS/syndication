@@ -28,7 +28,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <synd:message/>
     <synd:messages/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-lg-12">
@@ -55,7 +55,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         </tr>
                         </thead>
                         <tbody>
-                        <g:each in="${tweetInstanceList}" status="i" var="tweetInstance">
+                        <g:each in="${tweetList}" status="i" var="tweetInstance">
                             <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 
                                 <td>${tweetInstance?.id}</td>

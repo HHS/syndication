@@ -1,0 +1,141 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url "https://repo.grails.org/grails/core" }
+    }
+    dependencies {
+        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.14.1"
+    }
+}
+
+version "3.0.1"
+group "com.ctacorp.syndication"
+
+apply plugin:"eclipse"
+apply plugin:"idea"
+apply plugin:"org.grails.grails-plugin"
+apply plugin:"org.grails.grails-plugin-publish"
+apply plugin:"org.grails.grails-gsp"
+apply plugin:"asset-pipeline"
+
+repositories {
+    mavenLocal()
+    maven { url "https://repo.grails.org/grails/core" }
+    maven { url "http://ctacdev.com:8080/artifactory/central" }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.grails:grails-bom:$grailsVersion"
+    }
+    applyMavenExclusions false
+}
+
+dependencies {
+    compile "org.springframework.boot:spring-boot-starter-logging"
+    compile "org.springframework.boot:spring-boot-autoconfigure"
+    compile "org.grails:grails-core"
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    compile "org.springframework.boot:spring-boot-starter-tomcat"
+    compile "org.grails:grails-dependencies"
+    compile "org.grails:grails-web-boot"
+    compile "org.grails.plugins:cache"
+    compile "org.grails.plugins:scaffolding"
+    console "org.grails:grails-console"
+    profile "org.grails.profiles:web-plugin"
+    provided "org.grails:grails-plugin-services"
+    provided "org.grails:grails-plugin-domain-class"
+    runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.14.1"
+
+    compile "com.ctacorp:syndication-model:3.0.0"
+    compile "org.jsoup:jsoup:1.8.1"
+    compile 'org.grails:grails-datastore-rest-client'
+
+    compile 'org.grails.plugins:joda-time:2.0.0'
+    runtime 'org.jsoup:jsoup:1.8.1' //html extraction/manipulation
+    runtime 'com.ctacorp:syndication-commons:3.0.0'
+    runtime 'com.google.guava:guava:18.0'
+    //Misc http
+    compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1') {
+        exclude group:'xalan'
+        exclude group:'xml-apis'
+        exclude group:'groovy'
+    }
+
+    testCompile "org.grails:grails-plugin-testing"
+    testCompile "org.grails.plugins:geb"
+    testCompile "org.grails.plugins:hibernate4"
+    testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
+    testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
+}
+
+bootRun {
+    jvmArgs('-Dspring.output.ansi.enabled=always')
+}
+// enable if you wish to package this plugin as a standalone application
+bootRepackage.enabled = false
+grailsPublish {
+    // TODO: Provide values here
+    user = 'user'
+    key = 'key'
+    githubSlug = 'foo/bar'
+    license {
+        name = 'Apache-2.0'
+    }
+    title = "My Plugin"
+    desc = "Full plugin description"
+    developers = [johndoe:"John Doe"]
+    portalUser = ""
+    portalPassword = ""
+}
+
+assets {
+    packagePlugin = true
+}
+
+integrationTest {
+    ignoreFailures = true
+}
+
+String repo = version.endsWith('SNAPSHOT') ? 'plugins-snapshot-local' : 'plugins-release-local'
+//_____________________
+// Release plugin info \_________________________________________________________________
+// |
+// | to push a snapshot, run 'gradle publish' (Warning: failure in the end expected here)
+// | to release, ensure version doesn't have '-SNAPSHOT' & run 'gradle publish'
+// | to install locally, run 'gradle publishToMavenLocal'
+//_______________________________________________________________________________________
+publishing {
+    repositories {
+        maven {
+            credentials {
+                username "${artifactory_user}"
+                password "${artifactory_password}"
+            }
+
+            url "${artifactory_contextUrl}/${repo}/"
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'com.ctacorp.syndication'
+            artifactId rootProject.name
+            version version as String
+            pom.withXml {
+                def pomNode = asNode()
+                pomNode.dependencyManagement.replaceNode {}
+
+                // simply remove dependencies without a version
+                // version-less dependencies are handled with dependencyManagement
+                // see https://github.com/spring-gradle-plugins/dependency-management-plugin/issues/8 for more complete solutions
+                pomNode.dependencies.dependency.findAll {
+                    it.version.text().isEmpty()
+                }.each {
+                    it.replaceNode {}
+                }
+            }
+            from components.java
+        }
+    }
+}

@@ -65,7 +65,7 @@
 
                         <div class="microsite-article on-color">
 
-                            <g:render template="../microsite/displayStyle"
+                            <g:render template="/microsite/displayStyle"
                                       model="[mediaArea: microSite.mediaArea2, mediaItems: pane2MediaItems, panel:1]"/>
 
                         </div><!-- end microsite-article  -->
@@ -78,7 +78,7 @@
 
                         <div class="microsite-article on-color">
 
-                            <g:render template="../microsite/displayStyle" model="[mediaArea: microSite.mediaArea3, mediaItems: pane3MediaItems, panel:2]"/>
+                            <g:render template="/microsite/displayStyle" model="[mediaArea: microSite.mediaArea3, mediaItems: pane3MediaItems, panel:2]"/>
 
                         </div>
 

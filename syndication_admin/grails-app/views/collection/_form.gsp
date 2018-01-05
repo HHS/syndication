@@ -14,7 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <%@ page import="com.ctacorp.syndication.media.Collection" %>
 
-<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:collectionInstance]"/>
+<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:collection]"/>
 
 <!-- Select Multiple -->
 <div class="form-group">

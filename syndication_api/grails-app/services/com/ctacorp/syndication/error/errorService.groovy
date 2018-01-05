@@ -1,6 +1,6 @@
 package com.ctacorp.syndication.error
 
-import org.codehaus.groovy.grails.web.errors.GrailsWrappedRuntimeException
+import org.grails.web.errors.GrailsWrappedRuntimeException
 import grails.converters.JSON
 import com.ctacorp.syndication.api.ApiResponse
 import com.ctacorp.syndication.api.Message

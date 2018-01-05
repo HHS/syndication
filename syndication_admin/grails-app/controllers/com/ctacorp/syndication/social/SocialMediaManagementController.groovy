@@ -19,11 +19,10 @@ import grails.plugin.springsecurity.annotation.Secured
 
 @Secured(['ROLE_ADMIN'])
 class SocialMediaManagementController {
-    def grailsApplication
 
     static defaultView = "authorizeFacebookAccount"
 
     def authorizeFacebookAccount(){
-        [appId:grailsApplication.config.syndication.facebookAppId]
+        [appId:config?.FACEBOOKAPPID]
     }
 }

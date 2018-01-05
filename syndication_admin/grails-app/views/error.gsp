@@ -13,12 +13,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 --}%
 
 <!DOCTYPE html>
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="grails.util.Holders" contentType="text/html;charset=UTF-8" %>
 <html>
 	<head>
 		<title>
 			<g:if env="development">Grails Runtime Exception</g:if>
-			<g:if env="production" test="${grailsApplication.config.showDetailedErrorMessagesInProduction}">Grails Runtime Exception</g:if>
+			<g:if env="production" test="${grails.util.Holders.config.SHOW_DETAILED_ERROR_MESSAGES_IN_PRODUCTION}">Grails Runtime Exception</g:if>
 			<g:elseif env="production">General Error</g:elseif>
 		</title>
 		<meta name="layout" content="main">
@@ -28,7 +28,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 		<g:if env="development">
 			<g:renderException exception="${exception}"/>
 		</g:if>
-		<g:if env="production" test="${grailsApplication.config.showDetailedErrorMessagesInProduction}">
+		<g:if env="production" test="${Holders.config.SHOW_DETAILED_ERROR_MESSAGES_IN_PRODUCTION}">
 			<g:renderException exception="${exception}" />
 		</g:if>
 		<g:elseif env="production">

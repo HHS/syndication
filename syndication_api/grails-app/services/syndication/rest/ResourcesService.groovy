@@ -16,151 +16,109 @@ package syndication.rest
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import com.ctacorp.syndication.media.*
-import com.ctacorp.solr.EntityType
 
 @Transactional()
 class ResourcesService {
 
     static transactional = false
 
-    def tagsService
-    def solrSearchService
+    static final Map<String,String> TYPE_TO_GROUP_MAP = [
+            Html.simpleName, 'htmls',
+            Image.simpleName, 'images',
+            Infographic.simpleName, 'infographics',
+            Video.simpleName, 'videos',
+            Tweet.simpleName, 'tweet',
+            Collection.simpleName, 'collections'
+    ].toSpreadMap()
 
-
-    private static int getMax(params) {
-        Math.min(params.int("max") ?: 20, 1000)
-    }
-
-    @Transactional(readOnly = true)
-    def mediaSearch(params) {
-        if (!params.q?.trim())
-            return []
-
-        def mediaItemType = EntityType.MEDIAITEM.toString()
-        def fullSolrResultList = []
-
-        try {
-            def solrSearchResults = solrSearchService.search(params.q,EntityType.MEDIAITEM)
-            fullSolrResultList = solrSearchResults.getResults().collect {
-                it.id.replace("${mediaItemType}-", '')
-            }
-        } catch (ex) {
-            log.info "failed on search ${ex}"
-        }
-
-        if (fullSolrResultList.isEmpty()) {
-            return [list:[], listCount: 0]
-        }
-
-        def newList = fullSolrResultList
-        def startIndex = params.offset ? params.offset as int : 0
-        def endIndex = null
-        if(params.max) {
-            endIndex = startIndex + new Integer(params.max) - 1
-            if(endIndex >= newList.size()){
-                endIndex = newList.size()-1
-            }
-        }
-        else {
-            startIndex = null
-            endIndex = null
-        }
-
-        if(startIndex!=null && endIndex!=null ) {
-            newList = newList[startIndex..endIndex]
-        }
-
-        params.restrictToSet = newList.join(',')
-        params['active'] = true
-
-        def mediaItemsList = MediaItem.facetedSearch(params).list()
-        def mediaItemsMap = mediaItemsList.collectEntries{[it.id, (it)]}
-        def response = []
-
-        newList.each {
-            if(mediaItemsMap.containsKey(new Long(it))) {
-                response << mediaItemsMap[new Long(it)]
-            }
-        }
-
-        return [list:response, listCount: fullSolrResultList.size()]
-    }
+    def elasticsearchService
 
     @Transactional(readOnly = true)
-    def globalSearch(params) {
-        def total = 0
-        if (!params.q?.trim()) {
-            return []
+    def mediaSearch(Map params) {
+
+        def response = [list:[], count: 0]
+        def query = params.q?.trim() ?: '_all:*'
+        params.max = params.max?.toInteger() ?: 20
+        params.offset = params.offset?.toInteger() ?: 0
+
+        setSortOrder(params)
+
+        def results = findIds(query, [max: 10000, offset: 0])
+
+        if(results.ids) {
+
+            results.total = MediaItem.countByIdInList(results.ids)
+
+            if(params.sort) {
+                response.list = MediaItem.findAllByIdInList(results.ids, params)
+            } else {
+
+                def idsForQuery = results.ids.join(',')
+                def foundIds = MediaItem.executeQuery("select m.id from MediaItem m where m.id in (${idsForQuery}) order by field (m.id,${idsForQuery})", [:], params)
+                response.list = MediaItem.getAll(foundIds)
+            }
         }
 
-        def solrSearchResults
-        try {
-            solrSearchResults = solrSearchService.search(params.q ?: "")
-        } catch (ex) {
-            log.error "solr is down: ${ex.getMessage()}", ex
-            return []
-        }
-
-        def mediaItemType = EntityType.MEDIAITEM.toString()
-        def camaignType =EntityType.CAMPAIGN.toString()
-        def sourceType = EntityType.SOURCE.toString()
-        def tagType = EntityType.TAG.toString()
-        def response = [:]
-        def ids = []
-
-        solrSearchResults.getResults().each { searchResult ->
-
-            if(searchResult.entityType == mediaItemType) {
-                ids << searchResult.id.replace("${mediaItemType}-", '')
-            }
-            if(searchResult.entityType == camaignType) {
-                def item = [id: searchResult.id.replace("${camaignType}-", ''), name: searchResult.name]
-                total = total + addGroupedMedia(response, "campaigns", item)
-            }
-            if(searchResult.entityType == sourceType) {
-                def item = [id: searchResult.id.replace("${sourceType}-", ''), name: searchResult.name]
-                total = total + addGroupedMedia(response, "sources", item)
-            }
-            if (searchResult.entityType == tagType) {
-                def item = [id: searchResult.id.replace("${tagType}-", ''), name: searchResult.name]
-                total = total + addGroupedMedia(response, "tags", item)
-            }
-         }
-
-        /* get the results from solr and then return the objects from the ids */
-        try {
-            params.restrictToSet = ids.join(',')
-            def limits = [max: params.max, offset: params.offset]
-            params['active'] = true
-
-            def mediaItemsMap = (ids.size() > 0) ? MediaItem.facetedSearch(params).list().collectEntries{[it.id, (it)]} : null
-
-            ids.each {
-                def searchResult = mediaItemsMap[new Long(it)]
-                def item = [id: searchResult.id, name: searchResult.name]
-                switch (searchResult) {
-                    case Html: total = total + addGroupedMedia(response, "htmls", item, searchResult.getClass().simpleName); break;
-                    case Image: total = total + addGroupedMedia(response, "images", item, searchResult.getClass().simpleName); break;
-                    case Infographic: total = total + addGroupedMedia(response, "infographics", item, searchResult.getClass().simpleName); break;
-                    case Video: total = total + addGroupedMedia(response, "videos", item, searchResult.getClass().simpleName); break;
-                    case Tweet: total = total + addGroupedMedia(response, "tweet", searchResult.getClass().simpleName); break;
-                    case Collection: total = total + addGroupedMedia(response,"collections",item,searchResult.getClass().simpleName); break;
-                    default: log.error("Unsupported type in global search: ${item}")
-                }
-            }
-
-        } catch (e) {
-            log.error "solr is down: ${e.getMessage()}", e
-        }
-        if (response.isEmpty()) {
-            return null
-        }
-        response.total = total
+        response.total = results.total
+        response.count = response.list.size()
         response
     }
 
+    @Transactional(readOnly = true)
+    def globalSearch(Map params) {
+
+        def response = [total: 0, count:0]
+        def query = params.q?.trim() ?: '_all:*'
+        params.max = params.max?.toInteger() ?: 20
+        params.offset = params.offset?.toInteger() ?: 0
+
+        setSortOrder(params)
+
+        def addMediaToGroup = {
+
+            def type = it.class.simpleName
+            addGroupedMedia(response, TYPE_TO_GROUP_MAP[type], [id: it.id, name: it.name], type)
+        }
+
+        def results = findIds(query, [max: 10000, offset: 0])
+
+        if(results.ids) {
+
+            results.total = MediaItem.countByIdInList(results.ids)
+
+            if(params.sort) {
+                response.count = MediaItem.findAllByIdInList(results.ids, params).collect { addMediaToGroup it }.sum()
+            } else {
+
+                def idsForQuery = results.ids.join(',')
+                def foundIds = MediaItem.executeQuery("select m.id from MediaItem m where m.id in (${idsForQuery}) order by field (m.id,${idsForQuery})", [:], params)
+                response.count = MediaItem.getAll(foundIds).collect { addMediaToGroup it }.sum()
+            }
+        }
+
+        response.total = results.total
+        response
+    }
+
+    private def findIds(String query, Map params) {
+
+        try {
+
+            elasticsearchService.luceneSearch(query, [
+                    max   : params.sort ? 10000 : params.max,
+                    offset: params.sort ? 0 : params.offset,
+                    order : params.sort ? (params.sort?.startsWith('-') ? 'desc' : 'asc') : null
+            ])
+
+        } catch(Throwable t) {
+
+            log.error('could not connect to elasticsearch', t)
+            [ids: [], total: 0]
+        }
+    }
+
     @NotTransactional()
-    private addGroupedMedia(Map groups, String group, itemToAdd, String mediaType = null) {
+    private static addGroupedMedia(Map groups, String group, itemToAdd, String mediaType = null) {
         def count = 0
         if (!groups[group]) {
             groups[group] = [items: []]
@@ -175,4 +133,18 @@ class ResourcesService {
         return count
     }
 
+    private setSortOrder(params) {
+
+        if(params.sort) {
+
+            if(params.sort.startsWith('-')) {
+
+                params.sort = params.sort.replace('-', '')
+                params.order = 'desc'
+
+            } else {
+                params.order = 'asc'
+            }
+        }
+    }
 }

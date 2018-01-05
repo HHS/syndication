@@ -52,7 +52,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <hr/>
 
 <div class="link">
-    <g:link controller="init" action="seedSolr">Seed Solr</g:link>
+    <g:link controller="init" action="indexElasticSearch">Index Elastic Search</g:link>
 </div>
 <hr/>
 

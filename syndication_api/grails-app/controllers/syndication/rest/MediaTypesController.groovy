@@ -15,24 +15,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.rest
 
 import com.ctacorp.grails.swagger.annotations.*
+import com.ctacorp.syndication.api.ApiResponse
 import com.ctacorp.syndication.media.MediaItem
 import grails.transaction.Transactional
 import grails.util.Holders
-import com.ctacorp.syndication.api.ApiResponse
-import com.ctacorp.syndication.api.Message
-import com.ctacorp.syndication.api.Meta
-import com.ctacorp.syndication.api.Pagination
 import com.ctacorp.syndication.marshal.MediaTypeHolder
+import static com.ctacorp.grails.swagger.annotations.HTTPMethod.GET
 
-@API(swaggerDataPath = "/mediaTypes", description = "Information about media types", modelRefs = [ApiResponse, Meta, Pagination, Message], models = [
-    @Model(id="MediaType", properties = [
-        @ModelProperty(propertyName = "name",         attributes = [@PropertyAttribute(type = "string", required = true)]),
-        @ModelProperty(propertyName = "description",  attributes = [@PropertyAttribute(type = "string", required = true)])
-    ])], modelExtensions = [
-      @ModelExtension(id="MediaTypes", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type = "array", typeRef="MediaType", required = true)]),
-    ], removeProperties = ["results"])
-])
+@Tag(name = 'mediaTypes', description = 'Information about media types')
 @Transactional(readOnly = true)
 class MediaTypesController {
     def apiResponseBuilderService
@@ -46,17 +36,19 @@ class MediaTypesController {
         response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
     }
 
-    @APIResource(path = "/resources/mediaTypes.{format}", description = "Information about media types", operations = [
-        @Operation(httpMethod = "GET", notes="Returns the list of available MediaTypes.", nickname="getMediaTypes", type = "MediaTypes", summary = "Get MediaTypes", responseMessages = [
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ])
+    @Path(path = '/resources/mediaTypes.{format}', operations = [
+            @Operation(method = GET, description = "Information about media types", summary = "Get MediaTypes", responses = [
+                    @Response(code = 200, description = "Returns the list of available MediaTypes.", schema = @DataSchema(title = 'ArrayOfMediaTypes', type = DataSchemaType.ARRAY, reference = '#/definitions/MediaTypeHolderWrapped')),
+                    @Response(code = 400, description = 'Invalid ID'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], tags = ['mediaTypes']),
     ])
     def list() {
         def types = getMediaTypes().sort{ it.name }
         params.sort = "name"
         params.order = "ASC"
         params.max = types.size()
-        respond ApiResponse.get200Response(types).autoFill(params)
+        respond ApiResponse.get200Response(types).autoFill(params), view:"index"
     }
 
     private getMediaTypes() {

@@ -48,6 +48,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
     function updateAreaChart(whichData){
         $.getJSON('${grailsApplication.config.grails.serverURL}/dashboard/contentByAgencyAreaChart.json?whichDate=' + whichData, function (data) {
+            areaChart.options.ymax = data.ymax
             areaChart.setData(data.data);
         });
     }
@@ -72,6 +73,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             ykeys: data.ykeys,
             labels: data.labels,
             pointSize: 2,
+            ymax: data.ymax,
             hideHover: 'auto',
             resize: true
         });
@@ -87,8 +89,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     }
 
     var areaChart;
-    initContentByAgencyArea();
-    initPublisherContentArea();
-    initContentByAgencyDonut();
-    initContentDistributionDonut();
+    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
+        initContentByAgencyArea();
+        initContentByAgencyDonut();
+        initContentDistributionDonut();
+    </sec:ifAnyGranted>
+    <sec:ifAnyGranted roles="ROLE_PUBLISHER">
+        initPublisherContentArea();
+        initContentDistributionDonut();
+    </sec:ifAnyGranted>
 </g:javascript>

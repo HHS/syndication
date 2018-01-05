@@ -40,7 +40,7 @@
         </div>
         <g:link action="embedCodeForSource" controller="storefront" id="${sourceId}" params="[sourceName:sourceName]">>> Click here to get embed code for this source</g:link>
     </div>
-    <g:render template="rightBoxes"/>
+    <g:render template="rightBoxes" model="[API_SERVER_URL:API_SERVER_URL]"/>
 </div>
 </body>
 </html>

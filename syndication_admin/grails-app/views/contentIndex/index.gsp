@@ -68,13 +68,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
     <ul class="nav nav-tabs" role="tablist">
         <li class="active"><a href="#mediaTab" role="tab" data-toggle="tab">Media</a></li>
-        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-            <li><a href="#sourceTab" role="tab" data-toggle="tab">Sources</a></li>
-        </sec:ifAnyGranted>
-        <li><a href="#campaignTab" role="tab" data-toggle="tab">Campaigns</a></li>
-        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-            <li><a href="#tagTab" role="tab" data-toggle="tab">Tags</a></li>
-        </sec:ifAnyGranted>
+
+        %{--<li><a href="#campaignTab" role="tab" data-toggle="tab">Campaigns</a></li>--}%
+
     </ul>
     <br/>
     <div class="tab-content">
@@ -112,128 +108,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 </div>
             </div>
         </div>
-
-        <div class="row tab-pane" id="sourceTab">
-            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-map-marker fa-fw"></i> Re-index Source</h3>
-                    </div>
-                    <div class="panel-body">
-                        <p>Begin typing the name of a source, then select a match from the dropdown list. Add as many items as desired.</p>
-                        <fieldset>
-                            <div class="form-group">
-                                <form id="sourceSearchForm" action="${g.createLink(controller:'contentIndex', action: 'reIndexSource')}">
-                                    <g:textField name="sourceIds" id="sourceSearchField" class="form-control"/>
-                                    <br>
-                                    <button type="submit" id="reindexBySourceNameSearch" class="btn btn-warning btn-block">Re-index Source By Name</button>
-                                </form>
-                            </div>
-                        </fieldset>
-
-                        <h4 class="text-center">OR</h4>
-
-                        <p>Supply a single source ID, or a list of source IDs delimited by commas.</p>
-                        <fieldset>
-                            <div class="form-group">
-                                <form id="sourceIdListForm" action="${g.createLink(controller:'contentIndex', action: 'reIndexSource')}">
-                                    <g:textField name="sourceIds" style="width:100%" class="form-control"/>
-                                    <br>
-                                    <button type="submit" id="reindexBySourceIdList" class="btn btn-warning btn-block">Re-index Source by ID[s]</button>
-                                </form>
-                            </div>
-                         </fieldset>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row tab-pane" id="campaignTab">
-            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-flag fa-fw"></i> Re-index Campaign</h3>
-                    </div>
-                    <div class="panel-body">
-                        <p>Begin typing the name of a campaign, then select a match from the dropdown list. Add as many items as desired.</p>
-                        <fieldset>
-                            <div class="form-group">
-                                <form id="campaignSearchForm" action="${g.createLink(controller:'contentIndex', action: 'reIndexCampaign')}">
-                                    <g:textField name="campaignIds" id="campaignSearchField" class="form-control"/>
-                                    <br>
-                                    <button type="submit" id="reindexByCampaignNameSearch" class="btn btn-warning btn-block">Re-index Campaign By Name</button>
-                                </form>
-                            </div>
-                        </fieldset>
-
-                        <h4 class="text-center">OR</h4>
-
-                        <p>Supply a single campaign ID, or a list of campaign IDs delimited by commas.</p>
-                        <fieldset>
-                            <div class="form-group">
-                                <form id="campaignIdListForm" action="${g.createLink(controller:'contentIndex', action: 'reIndexCampaign')}">
-                                    <g:textField name="campaignIds" style="width:100%" class="form-control"/>
-                                    <br>
-                                    <button type="submit" id="reindexByCampaignIdList" class="btn btn-warning btn-block">Re-index Campaign By ID[s]</button>
-                                </form>
-                            </div>
-                        </fieldset>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row tab-pane" id="tagTab">
-            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-tags fa-fw"></i>  Re-index Tag</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="pull-right">
-                            <label for="language">Language:</label>
-                            <select name="language" id="language">
-                                <g:each in="${languages}" var="language">
-                                    <option value="${language.id}">${language.name}</option>
-                                </g:each>
-                            </select>
-                            <span   style="margin-right:10px;">&nbsp;</span>
-                            <label for="tagType">Type:</label>
-                            <select name="tagType" id="tagType" style="width:20%">
-                                <g:each in="${tagTypes}" var="tagType">
-                                    <option value="${tagType.id}">${tagType.name}</option>
-                                </g:each>
-                            </select>
-                        </div>
-                        <p>Begin typing the name of a tag, then select a match from the dropdown list. Add as many items as desired.</p>
-                        <fieldset>
-                            <div class="form-group">
-                                <form id="tagSearchForm" action="${g.createLink(controller:'contentIndex', action: 'reIndexTag')}">
-                                    <div id="tokenHolder">
-                                        <g:textField name="tagIds" id="tagSearchField" class="form-control"/>
-                                    </div>
-                                    <br>
-                                    <button type="submit" id="reindexByTagNameSearch" class="btn btn-warning btn-block">Re-index Tag By Name</button>
-                                </form>
-                            </div>
-                        </fieldset>
-
-                        <h4 class="text-center">OR</h4>
-
-                        <p>Supply a single tag ID, or a list of tag IDs delimited by commas.</p>
-                        <fieldset>
-                            <div class="form-group">
-                                <form id="tagIdListForm" action="${g.createLink(controller:'contentIndex', action: 'reIndexTag')}">
-                                    <g:textField name="tagIds" style="width:100%" class="form-control"/>
-                                    <br>
-                                    <button type="submit" id="reindexByTagIdList" class="btn btn-warning btn-block">Re-index Tag By ID[s]</button>
-                                </form>
-                            </div>
-                        </fieldset>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
 
@@ -244,17 +118,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                     <h3 class="panel-title">Re-index All</h3>
                 </div>
                 <div class="panel-body">
-                    <fieldset>
-                        <!-- Change this to a button or input when using this as a form -->
-                        <g:link controller="contentIndex" action="reindexAllMedia" class="btn btn-danger" onclick="return confirm('Are you sure? This could take a long time.')"><i class="fa fa-sitemap fa-fw"></i> All Media</g:link>
-                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                            <g:link controller="contentIndex" action="reindexAllSource" class="btn btn-danger" onclick="return confirm('Are you sure? This could take a long time.')"><i class="fa fa-map-marker fa-fw"></i> All Sources</g:link>
-                        </sec:ifAnyGranted>
-                        <g:link controller="contentIndex" action="reindexAllCampaign" class="btn btn-danger" onclick="return confirm('Are you sure? This could take a long time.')"><i class="fa fa-flag fa-fw"></i> All Campaigns</g:link>
-                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                            <g:link controller="contentIndex" action="reindexAllTags" class="btn btn-danger" onclick="return confirm('Are you sure? This could take a long time.')"><i class="fa fa-tags fa-fw"></i> All Tags</g:link>
-                        </sec:ifAnyGranted>
-        </fieldset>
+                <g:if test="${fullReindexRunning}">
+                    <button class="btn btn-danger" disabled>
+                </g:if>
+                <g:else>
+                    <button class="btn btn-danger">
+                </g:else>
+                        <g:link style="color: white;" controller="contentIndex" action="bulkReindex"><i class="fa fa-sitemap fa-fw"></i> Run</g:link>
+                    </button>
+                    <span style="padding-left: 20px;"><b>Status: </b>${fullReindexRunning ? 'Running since' : 'Last ran on'} ${lastJobExecutionTime}, <b>Count: </b>${itemCount}</span>
                 </div>
             </div>
         </div>

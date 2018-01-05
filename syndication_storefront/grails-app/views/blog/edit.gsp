@@ -31,7 +31,7 @@
 
         <p>You're editing '${microSite?.title ?: "a none titled microsite"}'</p>
 
-          <g:render template="../microsite/formDirections"/>
+          <g:render template="/microsite/formDirections"/>
 
       </div>
 
@@ -100,7 +100,7 @@
 
 <g:render template="/microsite/micrositeFooter"/>
 
-<g:render template="../microsite/scripts"/>
+<g:render template="/microsite/scripts"/>
 
 </body>
 </html>

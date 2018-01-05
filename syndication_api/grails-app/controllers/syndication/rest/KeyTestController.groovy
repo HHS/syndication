@@ -15,13 +15,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.rest
 
 import grails.converters.JSON
+import grails.util.Holders
 
 class KeyTestController {
     def authorizationService
 
     def index() {
-        def url = grailsApplication.config.grails.serverURL + request.forwardURI[request.contextPath.size()..-1]
-        log.info url
+        def url = Holders.config.API_SERVER_URL + request.forwardURI[request.contextPath.size()..-1]
         def dateHeader = request.getHeader("date")
 
         def authHeaders = [

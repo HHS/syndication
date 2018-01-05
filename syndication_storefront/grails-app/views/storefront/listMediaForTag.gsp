@@ -1,9 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: sgates
-  Date: 3/13/14
-  Time: 2:48 PM
---%>
 <!DOCTYPE html>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
@@ -19,13 +13,7 @@
 
         <p>The HHS Syndication Storefront allows you to syndicate (import) content from many HHS websites directly into your own website or application.  These services are provided by HHS free of charge.</p>
 
-        <div id="searchBox">
-            <div class="bluebox">
-                <div id="searchOptions">
-                    <g:render template="basicSearch"/>
-                </div>
-            </div>
-        </div>
+        <g:render template="search"/>
 
         <div id="contentListBox">
             <form name="chooseListForm">

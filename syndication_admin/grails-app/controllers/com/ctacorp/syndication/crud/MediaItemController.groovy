@@ -23,10 +23,13 @@ import grails.plugins.rest.client.RestBuilder
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 class MediaItemController {
+
     def tagService
     def mediaItemsService
     def springSecurityService
     def cmsManagerKeyService
+    def elasticsearchService
+
     RestBuilder rest = new RestBuilder()
 
     def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id}
@@ -99,14 +102,113 @@ class MediaItemController {
                 return
             }
         }
+
         if(q.isInteger()){
-            render MediaItem.findAllByIdLikeOrNameIlike(q.toInteger(), "%${q}%", [max:20]).collect{ [id:it.id, name:"$it.id - $it.name"] } as JSON
+
+            def search = MediaItem.withCriteria(params, {
+
+                and {
+
+                    or {
+                        eq 'id', q.toLong()
+                        like 'name', "%${q}%"
+                    }
+
+                    eq 'active', params.active?.toBoolean() ?: true
+                    eq 'visibleInStorefront', params.visibleInStorefront?.toBoolean() ?: true
+                }
+            })
+
+            render search.collect{ [id:it.id, name:"$it.name"] } as JSON
+
         } else {
             render MediaItem.facetedSearch([nameContains: "${q}", active:params.active, visibleInStorefront:params.visibleInStorefront]).list([max:20]).collect{ [id:it.id, name:"$it.name"] } as JSON
         }
     }
 
-    def search(){
+    def search() {
+
+        if((params.title || params.fullText) && !params.id) {
+            elasticsearch()
+        } else {
+            originalSearch()
+        }
+    }
+
+    def elasticsearch() {
+
+        def results = [total: 0, ids: []]
+        def mediaItems = []
+        def accessibleIds = []
+
+        params.max = params.max ?: 15
+        params.offset = params.offset ?: 0
+
+        def isPublisher = UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"
+
+        if(isPublisher){
+            accessibleIds = publisherItems()
+        } else {
+
+            if(params.subscriberId) {
+                accessibleIds = MediaItemSubscriber.findAllBySubscriberId(params.int("subscriberId") ?: 0).collect { it.id }.toList()
+            }
+        }
+
+        def esParams = params.clone() as Map
+        esParams.visibleInStorefront = false
+        esParams.max = 10000
+        esParams.offset = 0
+
+        if(params.sort) {
+
+            esParams.remove('sort')
+            esParams.remove('order')
+
+            results = elasticsearchService.searchForIds(esParams, accessibleIds)
+
+            if(results.ids) {
+
+                results.total = MediaItem.countByIdInList(results.ids)
+                mediaItems = MediaItem.findAllByIdInList(results.ids, params)
+            }
+
+        } else {
+
+            results = elasticsearchService.searchForIds(esParams, accessibleIds)
+
+            if(results.ids) {
+
+                results.total = MediaItem.countByIdInList(results.ids)
+
+                def idsForQuery = results.ids.join(',')
+                def foundIds = MediaItem.executeQuery("select m.id from MediaItem m where m.id in (${idsForQuery}) order by field (m.id,${idsForQuery})", [:], params)
+                mediaItems = MediaItem.getAll(foundIds)
+            }
+        }
+
+        render view:"search", model:[
+                fullText:params.fullText,
+                mediaItemInstanceList:mediaItems,
+                mediaItems:"something",
+                mediaItemInstanceCount: results.total,
+                title:params.title,
+                id:params.id,
+                url:params.url,
+                languageList:Language.findAllByIsActive(true),
+                language:params.language,
+                mediaTypeList:mediaItemsService.getMediaTypes(),
+                mediaType:params.mediaType,
+                subscriberList:cmsManagerKeyService.listSubscribers(),
+                subscriberId:params.subscriberId,
+                sourceList:Source.list(),
+                sourceId:params.sourceId,
+                createdBy:params.createdBy,
+                max: params.max
+        ]
+    }
+
+    def originalSearch(){
         params.max = params.max ?: 15
         def mediaItems = null
         def subscriberList = null

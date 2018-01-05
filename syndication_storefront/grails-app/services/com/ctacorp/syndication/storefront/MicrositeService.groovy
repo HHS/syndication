@@ -9,27 +9,24 @@ import com.ctacorp.syndication.microsite.MicroSite
 import com.ctacorp.syndication.microsite.MediaSelector
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
-import org.codehaus.groovy.grails.validation.routines.UrlValidator
-import org.hibernate.validator.internal.constraintvalidators.URLValidator
+import grails.util.Holders
+import org.grails.validation.routines.UrlValidator
+//import org.hibernate.validator.internal.constraintvalidators.URLValidator
 
 import javax.annotation.PostConstruct
 
 @Transactional
 class MicrositeService {
-    
+
     def springSecurityService
     def tagService
     def grailsApplication
-    def mediaService
+    def config = Holders.config
     RestBuilder rest = new RestBuilder()
 
     @PostConstruct
     void init() {
         rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
-    }
-
-    def serviceMethod() {
-
     }
 
     def saveBuild(params, templateType){
@@ -62,7 +59,7 @@ class MicrositeService {
 
         microSite.save(flush:true)
     }
-    
+
     def updateBuild(MicroSite microSite, params){
         def validator = new UrlValidator()
         microSite.user = User.get(springSecurityService.currentUser.id)
@@ -136,7 +133,7 @@ class MicrositeService {
         }
         mediaItems
     }
-    
+
     def getSelectorTypeItem(type,Long itemId){
         switch(type){
             case "TAG":tagService.getTag(itemId)
@@ -151,23 +148,23 @@ class MicrositeService {
                 break
         }
     }
-    
+
     def getMediaData(def mediaItemIds,params){
         def resp = null
         try {
-            resp = rest.get(grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath + "/resources/media.json?max=10&restrictToSet=${mediaItemIds}&sort=${params.sort}&order=${params.order}")?.json
+            resp = rest.get(config?.API_SERVER_URL + config?.SYNDICATION_APIPATH + "/resources/media.json?max=10&restrictToSet=${mediaItemIds}&sort=${params.sort}&order=${params.order}")?.json
         }catch(e){
             log.error(e)
             println "error: " + e
         }
         resp
     }
-    
+
     def getMediaContents(def mediaItems, int offset = 0, int amount = 10){
         def resp = []
         for(int index = offset;index<(offset + amount) && (mediaItems?.size() ?: 0) > index;index++){
             try {
-                resp << rest.get(grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath + "/resources/media/${mediaItems[index].id}/syndicate.json?autoplay=false")
+                resp << rest.get(config?.API_SERVER_URL + config?.SYNDICATION_APIPATH + "/resources/media/${mediaItems[index].id}/syndicate.json?autoplay=false")
             }catch(e){
                 log.error(e)
                 println "error: " + e

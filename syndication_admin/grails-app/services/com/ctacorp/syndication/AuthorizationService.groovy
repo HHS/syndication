@@ -13,27 +13,26 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication
 
 import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
-import com.icegreen.greenmail.imap.AuthorizationException
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.util.Holders
+import org.springframework.security.access.AuthorizationServiceException
 import org.springframework.web.client.ResourceAccessException
 
 import javax.annotation.PostConstruct
 
 class AuthorizationService {
     static transactional = false
-    
+
     private AuthorizationHeaderGenerator generator
     private AuthorizationHeaderGenerator.KeyAgreement keyAgreement
     def config = Holders.config
 
     @PostConstruct
     void init() {
-        String privateKey = config.cmsManager.privateKey
-        String publicKey = config.cmsManager.publicKey
-        String secret = config.cmsManager.secret
-
+        String privateKey = config?.CMSMANAGER_PRIVATEKEY
+        String publicKey = config?.CMSMANAGER_PUBLICKEY
+        String secret = config?.CMSMANAGER_SECRET
         if (privateKey && publicKey && secret) {
             RestBuilder rest = new RestBuilder()
             rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
@@ -42,7 +41,7 @@ class AuthorizationService {
             keyAgreement.setPublicKey(publicKey)
             keyAgreement.setSecret(secret)
 
-            generator = new AuthorizationHeaderGenerator(config.apiKey.keyName ?: "syndication_api_key", keyAgreement)
+            generator = new AuthorizationHeaderGenerator(config?.apiKey_keyName ?: "syndication_api_key", keyAgreement)
             generator.printToConsole = false
         }
     }
@@ -56,7 +55,7 @@ class AuthorizationService {
         log.debug "The authorizationRequest is \n${authorizationRequest}"
 
         String date = new Date().toString()
-        String requestUrl = config.cmsManager.serverUrl + config.cmsManager.verifyAuthPath
+        String requestUrl = config?.CMSMANAGER_SERVER_URL + config?.CMSMANAGER_VERIFYAUTHPATH
         log.debug "The requestUrl is ${requestUrl}"
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([
                 date: date,
@@ -84,8 +83,13 @@ class AuthorizationService {
         ]
         if (body) {
             requestHeaders['Content-Length'] = body.bytes.size() as String
-        } else if(!config.cmsManager.headerContentLength){
-            requestHeaders['Content-Length'] = "0"
+        } else {
+
+            def headerContentLength = config?.hasProperty('CMSMANAGER_HEADERCONTENTLENGTH') ? config.CMSMANAGER_HEADERCONTENTLENGTH : true
+
+            if(!headerContentLength) {
+                requestHeaders['Content-Length'] = '0'
+            }
         }
 
         def apiKeyHeaderValue = generator.getApiKeyHeaderValue(requestHeaders, url, method, body)
@@ -130,7 +134,7 @@ class AuthorizationService {
         if (resp?.status == 403) {
             String responseDetails = "Status code:${resp.status}\nJsonBody: ${resp.json}"
             log.error(responseDetails)
-            throw new AuthorizationException("Access Denied - Your authorization keys have been denied.")
+            throw new AuthorizationServiceException("Access Denied - Your authorization keys have been denied.")
         }
 
         if(!resp || !resp.json){
@@ -155,7 +159,7 @@ class AuthorizationService {
 
     boolean amIAuthorized() {
         String date = new Date().toString()
-        String requestUrl = config.cmsManager.serverUrl + config.cmsManager.selfAuthPath
+        String requestUrl = config?.CMSMANAGER_SERVER_URL + config?.CMSMANAGER_SELFAUTHPATH
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([date: date], requestUrl, "GET", null)
         RestBuilder rest = new RestBuilder()
         def resp = rest.get(requestUrl) {

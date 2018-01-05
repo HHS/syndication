@@ -27,6 +27,7 @@ import grails.transaction.Transactional
 import groovyx.net.http.URIBuilder
 import org.joda.time.format.*
 import org.joda.time.*
+import grails.util.Holders
 
 @Transactional(readOnly = true)
 class YoutubeService {
@@ -205,13 +206,13 @@ class YoutubeService {
     def grailsApplication
     private String getVideoFeedUrl(String sourceUrl) {
         String videoId = getVideoId(sourceUrl)
-        String youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${grailsApplication.config.google.youtube.apiKey}&part=snippet,contentDetails"
+        String youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${Holders.config.YOUTUBE_API_KEY}&part=snippet,contentDetails"
         youtubeFeedUrl
     }
 
     private String getPlaylistFeedUrl(String sourceUrl) {
         String playlistId = getPlaylistId(sourceUrl)
-        String youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlistId}&key=${grailsApplication.config.google.youtube.apiKey}"
+        String youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlistId}&key=${Holders.config.YOUTUBE_API_KEY}"
         youtubeFeedUrl
     }
 
@@ -219,9 +220,9 @@ class YoutubeService {
         String playlistId = getPlaylistId(sourceUrl)
         String youtubeFeedUrl
         if(pageToken){
-            youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&key=${grailsApplication.config.google.youtube.apiKey}&pageToken=${pageToken}"
+            youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&key=${Holders.config.YOUTUBE_API_KEY}&pageToken=${pageToken}"
         } else {
-            youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&key=${grailsApplication.config.google.youtube.apiKey}"
+            youtubeFeedUrl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&key=${Holders.config.YOUTUBE_API_KEY}"
         }
         youtubeFeedUrl
     }
@@ -243,7 +244,7 @@ class YoutubeService {
     private getMediaItemsFromVideoIds(def videoIds, Source source, Language language, def playlistJsonData) {
         def mediaItems = []
         videoIds.each{ videoId ->
-            def itemJsonData = rest.get("https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${grailsApplication.config.google.youtube.apiKey}&part=snippet,contentDetails").json
+            def itemJsonData = rest.get("https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${Holders.config.YOUTUBE_API_KEY}&part=snippet,contentDetails").json
             Video videoInstance
             if(Video.findBySourceUrl("https://www.youtube.com/watch?v="+videoId+"&list="+playlistJsonData.items[0].id)){
                 videoInstance = Video.findBySourceUrl("https://www.youtube.com/watch?v="+videoId+"&list="+playlistJsonData.items[0].id)

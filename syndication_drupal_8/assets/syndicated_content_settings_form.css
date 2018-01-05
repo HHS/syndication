@@ -1,0 +1,39 @@
+.right-button {
+    float:right;
+}
+
+fieldset#edit-type-mapping .fieldset-wrapper .form-type-select.form-item-float-left {
+    float: left;
+}
+
+fieldset#edit-type-mapping .fieldset-wrapper .form-type-select.form-item-float-right select {
+    margin-left: 6px;
+}
+
+fieldset#edit-type-mapping .fieldset-wrapper label {
+    float: left;
+    width: 150px;
+}
+
+fieldset#edit-type-mapping .fieldset-wrapper .field_layer {
+    padding: 2px;
+    border: 1px solid #ccc;
+    border-top-color: #999;
+    background: #fff;
+    color: #333;
+}
+div.synd_couple div.form-item.form-type-select.form-group select.form-control.form-select {
+    width: auto;
+    display: inline-block;
+}
+.synd_error {
+    border: 1px solid red;
+}
+
+.version {
+    
+}
+
+.synd_couple {
+    clear: both;
+}

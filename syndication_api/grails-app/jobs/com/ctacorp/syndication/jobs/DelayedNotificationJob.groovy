@@ -1,12 +1,12 @@
 package com.ctacorp.syndication.jobs
 
 class DelayedNotificationJob {
-    def queueService
+    def cmsService
 
     def execute(context) {
         def msg = context.mergedJobDataMap.get('msg')
         if(msg) {
-            queueService.sendMessage(msg)
+            cmsService.sendMessage(msg)
         }
     }
 }

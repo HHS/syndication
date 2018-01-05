@@ -25,7 +25,7 @@ class ContentItem{
     static constraints = {
         url             nullable: false, blank: false, url:true, maxSize: 2000
         externalUID     nullable: true,  blank: false
-        syndicationId   nullable: true,  unique:true, min: 1L, max: Long.MAX_VALUE - 1
+        syndicationId   nullable: false,  unique:true, min: 1L, max: Long.MAX_VALUE - 1
     }
 
     static marshalling = {

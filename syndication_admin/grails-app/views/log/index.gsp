@@ -62,22 +62,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <div class="row">
                             <div class="col-md-12">
                                 <div id="adminLogDisplay" class="logDisplayWindow logViewPanelConstrained"></div>
+                                <div class="pagination" id="pageNumberforAdmin">
+                                </div>
+
                             </div>
                         </div>
                         <br/>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="pull-right">
-                                    <ul class="nav nav-pills">
-                                        <li class="active adminPill"><a href="#" id="adminErrorButton">Errors</a></li>
-                                        <li class="adminPill"><a href="#" id="adminInfoButton">Details</a></li>
-                                    </ul>
-                                </div>
-                                <g:link action="logDownload" params="[file:'adminErrorLog']">
-                                    <input class="btn btn-primary" type="button" value="Download Errors Log"/>
-                                </g:link>
-                                <g:link action="logDownload" params="[file:'adminInfoLog']">
-                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
+                               <g:link action="logDownload" params="[stream:'syndication_admin']">
+                                    <input class="btn btn-primary" type="button" value="Download Errors Log" id="adminlogDownload"/>
                                 </g:link>
                             </div>
                         </div>
@@ -105,17 +99,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <br/>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="pull-right">
-                                    <ul class="nav nav-pills">
-                                        <li class="active apiPill"><a href="#" id="apiErrorButton">Errors</a></li>
-                                        <li class="apiPill"><a href="#" id="apiInfoButton">Details</a></li>
-                                    </ul>
-                                </div>
-                                <g:link action="logDownload" params="[file:'apiErrorLog']">
+                                <g:link action="logDownload" params="[stream:'syndication_api']">
                                     <input class="btn btn-primary" type="button" value="Download Errors Log"/>
-                                </g:link>
-                                <g:link action="logDownload" params="[file:'apiInfoLog']">
-                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
                                 </g:link>
                             </div>
                         </div>
@@ -143,17 +128,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <br/>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="pull-right">
-                                    <ul class="nav nav-pills">
-                                        <li class="active cmsPill"><a href="#" id="cmsLogButton">Log</a></li>
-                                        <li class="cmsPill"><a href="#" id="cmsApiKeyLogButton">Api Key Log</a></li>
-                                    </ul>
-                                </div>
-                                <g:link action="logDownload" params="[file:'cmsErrorLog']">
+                                <g:link action="logDownload" params="[stream:'cms_manager']">
                                     <input class="btn btn-primary" type="button" value="Download Errors Log"/>
-                                </g:link>
-                                <g:link action="logDownload" params="[file:'cmsInfoLog']">
-                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
                                 </g:link>
                             </div>
                         </div>
@@ -181,18 +157,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <br/>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="pull-right">
-                                    <ul class="nav nav-pills">
-                                        <li class="active storefrontPill"><a href="#" id="storefrontErrorButton">Errors</a></li>
-                                        <li class="storefrontPill"><a href="#" id="storefrontInfoButton">Details</a></li>
-                                    </ul>
-                                </div>
-                                <g:link action="logDownload" params="[file:'storefrontErrorLog']">
+                                <g:link action="logDownload" params="[stream:'syndication_storefront']">
                                     <input class="btn btn-primary" type="button" value="Download Errors Log"/>
                                 </g:link>
-                                <g:link action="logDownload" params="[file:'storefrontInfoLog']">
-                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
-                                </g:link>
+
                             </div>
                         </div>
                     </div>
@@ -219,18 +187,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <br/>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="pull-right">
-                                    <ul class="nav nav-pills">
-                                        <li class="active tinyPill"><a href="#" id="tinyErrorButton">Errors</a></li>
-                                        <li class="tinyPill"><a href="#" id="tinyInfoButton">Details</a></li>
-                                    </ul>
-                                </div>
-                                <g:link action="logDownload" params="[file:'tinyErrorLog']">
+                                <g:link action="logDownload" params="[stream:'tiny_url']">
                                     <input class="btn btn-primary" type="button" value="Download Errors Log"/>
                                 </g:link>
-                                <g:link action="logDownload" params="[file:'tinyInfoLog']">
-                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
-                                </g:link>
+
                             </div>
                         </div>
                     </div>
@@ -257,17 +217,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <br/>
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="pull-right">
-                                    <ul class="nav nav-pills">
-                                        <li class="active tagPill"><a href="#" id="tagErrorButton">Errors</a></li>
-                                        <li class="tagPill"><a href="#" id="tagInfoButton">Details</a></li>
-                                    </ul>
-                                </div>
-                                <g:link action="logDownload" params="[file:'tagErrorLog']">
+
+                                <g:link action="logDownload" params="[stream:'tag_cloud']">
                                     <input class="btn btn-primary" type="button" value="Download Errors Log"/>
-                                </g:link>
-                                <g:link action="logDownload" params="[file:'tagInfoLog']">
-                                    <input class="btn btn-primary" type="button" value="Download Details Log"/>
                                 </g:link>
                             </div>
                         </div>

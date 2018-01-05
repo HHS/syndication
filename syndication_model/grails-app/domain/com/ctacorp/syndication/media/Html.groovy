@@ -13,10 +13,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
  */
 package com.ctacorp.syndication.media
 
-import com.ctacorp.grails.swagger.annotations.ModelExtension
+import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.ExtractionOptions
 
-@ModelExtension(id = "Html", model = "MediaItem")
+@Definition
 class Html extends MediaItem {
     ExtractionOptions extractionOptions
 

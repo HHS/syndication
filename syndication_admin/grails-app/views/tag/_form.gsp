@@ -9,9 +9,13 @@
                         <option value="${language.id}" selected>${language.name}</option>
                     </g:if>
                     <g:else>
-                        <option value="${language.id}">${language.name}</option>
+                        <g:if test="${['create','new'].contains(actionName) && language.id == 1}">
+                            <option value="${language.id}" selected>${language.name}</option>
+                        </g:if>
+                        <g:else>
+                            <option value="${language.id}">${language.name}</option>
+                        </g:else>
                     </g:else>
-
                 </g:each>
             </select>
         </div>

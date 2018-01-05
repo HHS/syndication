@@ -4,13 +4,13 @@ import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.contact.EmailContact
 import grails.plugin.springsecurity.annotation.Secured
 import com.ctacorp.syndication.microsite.MicrositeRegistration
+import grails.util.Holders
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
 class MicrositeRegistrationController {
 
     def springSecurityService
     def mailService
-    def grailsApplication
 
     def registration() {
 
@@ -34,7 +34,7 @@ class MicrositeRegistrationController {
             async true
             to mailRecipiants
             subject "Microsite registration request"
-            html g.render(template: 'registrationEmail', model:[userInstance: User.get(springSecurityService.currentUser.id), registration: registration, adminUrl:grailsApplication.config.admin.serverUrl])
+            html g.render(template: 'registrationEmail', model:[userInstance: User.get(springSecurityService.currentUser.id), registration: registration, adminUrl:Holders.config.ADMIN_SERVER_URL])
         }
 
         redirect controller: "storefront", action:"index"

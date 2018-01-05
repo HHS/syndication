@@ -14,13 +14,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <%@ page import="com.ctacorp.syndication.media.Video" %>
 
-<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:videoInstance]"/>
+<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:video]"/>
 
 <!-- Text input-->
 <div class="form-group">
     <label class="col-md-4 control-label" for="duration">Duration (Seconds)<span class="required-indicator">*</span></label>
     <div class="col-md-8">
-        <input id="duration" name="duration" type="number" min="1" max="2147483646" value="${videoInstance?.duration}" required="" placeholder="Duration in Seconds" class="form-control input-md">
+        <input id="duration" name="duration" type="number" min="1" max="2147483646" value="${video?.duration}" required="" placeholder="Duration in Seconds" class="form-control input-md">
     </div>
 </div>
 
@@ -28,7 +28,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="width">Width</label>
     <div class="col-md-8">
-        <input id="width" name="width" type="number" min="1" max="2147483646" value="${videoInstance?.width}" placeholder="Width in Pixels" class="form-control input-md">
+        <input id="width" name="width" type="number" min="1" max="2147483646" value="${video?.width}" placeholder="Width in Pixels" class="form-control input-md">
     </div>
 </div>
 
@@ -36,6 +36,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="height">Height</label>
     <div class="col-md-8">
-        <input id="height" name="height" type="number" min="1" max="2147483646" value="${videoInstance?.height}" placeholder="Height in Pixels" class="form-control input-md">
+        <input id="height" name="height" type="number" min="1" max="2147483646" value="${video?.height}" placeholder="Height in Pixels" class="form-control input-md">
     </div>
 </div>

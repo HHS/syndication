@@ -1,3 +1,4 @@
+<%@ page import="grails.util.Holders" %>
 <h3>Form Directions:</h3>
 
   <i>All fields are optional in this form. The generated website will directly
@@ -14,7 +15,7 @@
       </p>
       <p>1. Pick one Media Source. Options include:</p>
     <ul>
-      <li>My List: Custom list of Media Items that you can create <a target="_blank" href="${grailsApplication.config.grails.serverURL}/userMediaList/index">here.</a></li>
+      <li>My List: Custom list of Media Items that you can create <a target="_blank" href="${grails.util.Holders.config.API_SERVER_URL}/userMediaList/index">here.</a></li>
       <li>Collection: A grouping of items curated by the source agency.</li>
       <li>Tag: Media Items that to a topic or idea</li>
       <li>Source: All media items published by the specified agency.</li>

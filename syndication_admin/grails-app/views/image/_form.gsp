@@ -14,8 +14,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <%@ page import="com.ctacorp.syndication.media.Image" %>
 
-<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:imageInstance]"/>
+<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:image]"/>
 
-<g:render template="/mediaItem/imageAndInfographicFields" model="[mediaItemInstance:imageInstance]"/>
+<g:render template="/mediaItem/imageAndInfographicFields" model="[mediaItemInstance:image]"/>
 
 <g:render template="/mediaItem/mediaTypeValidationScript"/>

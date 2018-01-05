@@ -1,0 +1,14 @@
+import tag_cloud.api.PaginatedTag
+
+model {
+//    PagedResultList tagList
+    PaginatedTag paginatedTag
+}
+
+json {
+    tags tmpl.'tag'(paginatedTag.tagList ?: [])
+    total paginatedTag.total
+    dataSize paginatedTag.dataSize
+    max 1
+    offset 1
+}

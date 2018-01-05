@@ -37,7 +37,7 @@
 					</tr>
 				</thead>
 				<tbody>
-				<g:each in="${mediaMappingInstanceList}" status="i" var="mediaMappingInstance">
+				<g:each in="${mediaMappingList}" status="i" var="mediaMappingInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
                         <td><g:link action="show" id="${mediaMappingInstance.id}">${fieldValue(bean: mediaMappingInstance, field: "id")}</g:link></td>
 

@@ -104,7 +104,7 @@
             <div class="row tab-pane${microSite ? ' active':''}" id="pane${area}Summary">
                 <div class="container-fluid">
                     <div id="summary${area}">
-                        <g:render template="../microsite/summary"/>
+                        <g:render template="/microsite/summary"/>
                     </div>
                     <a tabindex="0" href="#pane${area}Details" class="nav-bottom-links btn pull-left pane${area}-sortingLeft"><i class='socialIcons fa fa-arrow-left'></i> Change Content Details</a>
                     <a tabindex="0" href="#pane${area}Type" class="nav-bottom-links btn pull-right pane${area}-newList">Start Over <i class='socialIcons fa fa-undo'></i></a>

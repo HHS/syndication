@@ -26,9 +26,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
-			<g:form class="form-horizontal" url="[resource:sourceInstance, action:'update']" method="PUT" >
-				<g:hiddenField name="version" value="${sourceInstance?.version}" />
+			<synd:hasError/>
+			<g:form class="form-horizontal" url="[resource:source, action:'update']" method="PUT" >
+				<g:hiddenField name="version" value="${source?.version}" />
 				<fieldset class="form">
 					<g:render template="form"/>
 				</fieldset>
@@ -37,7 +37,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <label class="col-md-4 control-label" for="edit"></label>
                         <div class="col-md-8">
                             <g:actionSubmit id="edit" class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                            <g:link class="btn btn-default" resource="${sourceInstance}" action="show">
+                            <g:link class="btn btn-default" resource="${source}" action="show">
                                 Cancel
                             </g:link>
                         </div>

@@ -2,14 +2,18 @@ package com.ctacorp.syndication.storefront
 
 import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.authentication.UserRole
+import grails.util.Holders
 import org.pegdown.PegDownProcessor
 
 class StorefrontTagLib {
     static defaultEncodeAs = 'html'
     static encodeAsForTags = [markdown: 'raw', currentUser: 'raw', mediaListApiLink:'raw', pageContentAnchor:'raw', hasErrors: 'raw', errors:'raw']
-    def grailsApplication
 
     static namespace = "sf"
+
+    def config = Holders.config
+    def serverUrl = config.API_SERVER_URL ?: 'http://localhost:8080'
+    def apiPath = config.SYNDICATION_APIPATH ?: '/api/v2'
 
     def springSecurityService
 
@@ -55,7 +59,7 @@ class StorefrontTagLib {
 
     def mediaListApiLink = { attrs, body ->
         if(attrs.id){
-            String linkText = "${grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath}/resources/userMediaLists/${attrs.id}"
+            String linkText = "${serverUrl}${apiPath}/resources/userMediaLists/${attrs.id}"
             out << "<a href='${linkText}'>${linkText.encodeAsHTML()}</a>"
         } else{
             out << ""

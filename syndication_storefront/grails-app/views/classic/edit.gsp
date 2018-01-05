@@ -17,7 +17,7 @@
 
 <body>
 
-<g:render template="../microsite/topNav"/>
+<g:render template="/microsite/topNav"/>
 <g:form action="update" id="${microSite?.id}" name="micrositeForm" method="post" class="form-horizontal helps-footer">
     <div class="container microsite-builder">
 
@@ -31,7 +31,7 @@
 
                 <p>You're editing '${microSite?.title ?: "a none titled microsite"}'</p>
 
-                <g:render template="../microsite/formDirections"/>
+                <g:render template="/microsite/formDirections"/>
 
             </div><!-- end microsite-builder-header col-sm-4 -->
 
@@ -103,6 +103,6 @@
 
 <g:render template="/microsite/micrositeFooter"/>
 
-<g:render template="../microsite/scripts"/>
+<g:render template="/microsite/scripts"/>
 </body>
 </html>

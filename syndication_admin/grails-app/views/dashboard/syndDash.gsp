@@ -38,7 +38,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <!-- /.col-lg-12 -->
 </div>
 <synd:message/>
-<synd:error/>
+<synd:hasError/>
 <!-- /.row -->
 <div class="row">
 <div class="col-lg-8">

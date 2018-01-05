@@ -16,6 +16,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
+import grails.util.Holders
 
 import javax.annotation.PostConstruct
 
@@ -30,9 +31,9 @@ class AuthorizationService {
 
     @PostConstruct
     void init() {
-        String privateKey = grailsApplication.config.cmsManager.privateKey
-        String publicKey = grailsApplication.config.cmsManager.publicKey
-        String secret = grailsApplication.config.cmsManager.secret
+        String privateKey = Holders.config.CMSMANAGER_PRIVATEKEY
+        String publicKey = Holders.config.CMSMANAGER_PUBLICKEY
+        String secret = Holders.config.CMSMANAGER_SECRETKEY
         if (privateKey && publicKey && secret) {
             rest = new RestBuilder()
             rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
@@ -53,7 +54,7 @@ class AuthorizationService {
         def authorizationRequest = (thirdPartyRequest as JSON).toString()
 
         String date = new Date().toString()
-        String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.verifyAuthPath
+        String requestUrl = Holders.config.CMSMANAGER_SERVER_URL + Holders.config.CMSMANAGER_VERIFYAUTHPATH
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([
                 date: date,
                 "content-type": "application/json",
@@ -121,7 +122,7 @@ class AuthorizationService {
 
     boolean amIAuthorized() {
         String date = new Date().toString()
-        String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.selfAuthPath
+        String requestUrl = Holders.config.CMSMANAGER_SERVER_URL + Holders.config.CMSMANAGER_SELFAUTHPATH
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([date: date], requestUrl, "GET", null)
         def resp = rest.get(requestUrl) {
             header 'Date', date

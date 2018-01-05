@@ -14,6 +14,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.preview
 
+import grails.util.Holders
+
 
 class UrlService {
     static transactional = false
@@ -21,15 +23,15 @@ class UrlService {
     def grailsApplication
 
     def getContentUrl(Long id) {
-        "${grailsApplication.config.grails.serverURL}/api/v2/resources/media/$id/content"
+        "${Holders.config.API_SERVER_URL}/api/v2/resources/media/$id/content"
     }
 
     def getThumbnailUrl(Long id){
-        "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${id}/thumbnail.jpg"
+        "${Holders.config.API_SERVER_URL}/api/v2/resources/media/${id}/thumbnail.jpg"
     }
 
     def getPreviewUrl(Long id){
-        "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${id}/preview.jpg"
+        "${Holders.config.API_SERVER_URL}/api/v2/resources/media/${id}/preview.jpg"
     }
 
     def String aggregateSupportedCommands(Map params){

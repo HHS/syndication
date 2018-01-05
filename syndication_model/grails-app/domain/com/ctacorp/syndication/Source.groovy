@@ -15,22 +15,20 @@ package com.ctacorp.syndication
 
 import com.ctacorp.grails.swagger.annotations.*
 
-@Model(id = "Source", properties = [
-    @ModelProperty(propertyName = "id",             attributes = [@PropertyAttribute(type = "integer", format = "int64",       required = true)]),
-    @ModelProperty(propertyName = "name",           attributes = [@PropertyAttribute(type = "string",     required = true)]),
-    @ModelProperty(propertyName = "acronym",        attributes = [@PropertyAttribute(type = "string",     required = true)]),
-    @ModelProperty(propertyName = "websiteUrl",     attributes = [@PropertyAttribute(type = "string",     required = true)]),
-    @ModelProperty(propertyName = "largeLogoUrl",   attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "smallLogoUrl",   attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "contactEmail",   attributes = [@PropertyAttribute(type = "string")])
-])
+@Definition
 class Source {
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String name
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String acronym
     String description
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String websiteUrl
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String largeLogoUrl
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String smallLogoUrl
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String contactEmail
 
     static mapping = {

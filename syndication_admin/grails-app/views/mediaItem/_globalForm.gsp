@@ -19,8 +19,7 @@
 
 %{--QuestionAndAnswer has an extra field that needs to be near the question for clarity--}%
 <g:if test="${mediaItemInstance.getClass().simpleName == 'QuestionAndAnswer'}">
-    <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'name', 'errors')}"
-         xmlns="http://www.w3.org/1999/html">
+    <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'name', 'errors')}" xmlns="http://www.w3.org/1999/html">
         <label class="col-md-4 control-label" for="answer">Answer<span class="required-indicator">*</span></label>
 
         <div class="col-md-8">
@@ -47,7 +46,7 @@
                     Verify URL
                 </button>
                 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                    <g:render template="../mediaTestPreview/testModal"/>
+                    <g:render template="/mediaTestPreview/testModal"/>
                 </div>
             </div>
         </g:if>
@@ -58,7 +57,12 @@
         </g:else>
     </div>
 </g:else>
-
+<div class="form-group ${hasErrors(bean:mediaItemInstance, field:'customAttributionUrl', 'errors')}">
+    <label class="col-md-4 control-label" for="name">Custom attribution URL</label>
+        <div class="col-md-8">
+            <input id="customAttributionUrl" name="customAttributionUrl" value="${mediaItemInstance?.customAttributionUrl}" type="text" placeholder="" class="form-control input-md">
+        </div>
+</div>
 <!-- Select Basic -->
 <g:if test="${mediaItemInstance.getClass().simpleName == 'Html'}">
     <div class="form-group ${hasErrors(bean: mediaItemInstance, field: 'structuredContentType', 'errors')}">
@@ -201,14 +205,22 @@
     </div>
 </div>
 
-<!-- Radio Buttons -->
+<!-- Check Boxes -->
 <div class="form-group">
     <label class="col-md-4 control-label" for="active">
         <g:message code="${mediaTypeName}.active.label" default="Active"/>
-
     </label>
     <div class="col-md-8">
         <g:checkBox name="active" value="${mediaItemInstance?.active}"/>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-4 control-label" for="disableIframe">
+        <g:message code="${mediaTypeName}.diableIframe.label" default="Disable Iframe"/>
+    </label>
+    <div class="col-md-8">
+        <g:checkBox name="disableIframe" value="${mediaItemInstance?.disableIframe}"/>
     </div>
 </div>
 
@@ -239,3 +251,72 @@
         <input id="externalGuid" name="externalGuid" value="${mediaItemInstance?.externalGuid}" placeholder="ID of Media Item in the Source CMS" class="form-control input-md">
     </div>
 </div>
+
+<script>
+
+    function addDateWarning() {
+        var submitTags = document.getElementById("mediaItemSubmitButton");
+        if(!document.getElementById("dateAlert")) {
+            submitTags.innerHTML = "<div class='alert alert-danger' id='dateAlert'>" +
+                    "<a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a>" +
+                    "<strong>Warning!</strong> Dates need either all fields selected or all not selected</div>" +
+                    submitTags.innerHTML
+        }
+    }
+    $('#updateMediaItem').submit(function() {
+
+        //date content authored
+        var authoredDay = document.getElementById("dateContentAuthored_day");
+        var authoredMonth = document.getElementById("dateContentAuthored_month");
+        var authoredYear = document.getElementById("dateContentAuthored_year");
+        var authoredHour = document.getElementById("dateContentAuthored_hour");
+        var authoredMinute = document.getElementById("dateContentAuthored_minute");
+        if(authoredDay.value || authoredMinute.value || authoredMonth.value || authoredYear.value || authoredHour.value) {
+            if (!authoredDay.value || !authoredMinute.value || !authoredMonth.value || !authoredYear.value || !authoredHour.value) {
+                addDateWarning()
+                return false
+            }
+        }
+
+        //date content updated
+        var updatedDay = document.getElementById("dateContentUpdated_day");
+        var updatedMonth = document.getElementById("dateContentUpdated_month");
+        var updatedYear = document.getElementById("dateContentUpdated_year");
+        var updatedHour = document.getElementById("dateContentUpdated_hour");
+        var updatedMinute = document.getElementById("dateContentUpdated_minute");
+        if(updatedDay.value || updatedMinute.value || updatedMonth.value || updatedYear.value || updatedHour.value) {
+            if (!updatedDay.value || !updatedMinute.value || !updatedMonth.value || !updatedYear.value || !updatedHour.value) {
+                addDateWarning()
+                return false
+            }
+        }
+
+        //date content published
+        var publishedDay = document.getElementById("dateContentPublished_day");
+        var publishedMonth = document.getElementById("dateContentPublished_month");
+        var publishedYear = document.getElementById("dateContentPublished_year");
+        var publishedHour = document.getElementById("dateContentPublished_hour");
+        var publishedMinute = document.getElementById("dateContentPublished_minute");
+        if(publishedDay.value || publishedMinute.value || publishedMonth.value || publishedYear.value || publishedHour.value) {
+            if (!publishedDay.value || !publishedMinute.value || !publishedMonth.value || !publishedYear.value || !publishedHour.value) {
+                addDateWarning()
+                return false
+            }
+        }
+
+        //date content reviewed
+        var reviewedDay = document.getElementById("dateContentReviewed_day");
+        var reviewedMonth = document.getElementById("dateContentReviewed_month");
+        var reviewedYear = document.getElementById("dateContentReviewed_year");
+        var reviewedHour = document.getElementById("dateContentReviewed_hour");
+        var reviewedMinute = document.getElementById("dateContentReviewed_minute");
+        if(reviewedDay.value || reviewedMinute.value || reviewedMonth.value || reviewedYear.value || reviewedHour.value) {
+            if (!reviewedDay.value || !reviewedMinute.value || !reviewedMonth.value || !reviewedYear.value || !reviewedHour.value) {
+                addDateWarning()
+                return false
+            }
+        }
+
+        return true; // return false to cancel form action
+    });
+</script>

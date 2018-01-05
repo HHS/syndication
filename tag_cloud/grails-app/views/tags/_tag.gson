@@ -1,0 +1,20 @@
+import tagcloud.domain.Tag
+
+model {
+    Tag tag
+}
+
+json {
+    id tag.id
+    language {
+        id tag.language.id
+        isActive tag.language.isActive
+        isoCode tag.language.isoCode
+        name tag.language.name
+    }
+    name tag.name
+    type {
+        id tag.type.id
+        name tag.type.name
+    }
+}

@@ -66,9 +66,10 @@ class ViewMetricService {
     }
 
     def getMediaData(mediaToGraph, whichData){
+        def tokenizedMediaToGraph = mediaToGraph?.tokenize(',[]') ?: [0]
         def data = []
         def dates = getDateRangesForLast12Months()
-        mediaToGraph = MediaItem.findAllByIdInList(mediaToGraph?.tokenize(',[]'))
+        mediaToGraph = MediaItem.findAllByIdInList(tokenizedMediaToGraph)
 
         dates.each{ def date ->
             def monthData = [month:"${date.date}"]
@@ -94,7 +95,8 @@ class ViewMetricService {
     }
 
     def getMediaTotals(mediaToGraph, whichData, range){
-        mediaToGraph = MediaItem.findAllByIdInList(mediaToGraph?.tokenize(',[]'))
+        mediaToGraph = mediaToGraph?.tokenize(',[]') ?: [0]
+        mediaToGraph = MediaItem.findAllByIdInList(mediaToGraph)
         def labels = []
         def noData = true
         Date today = new Date().clearTime() + 1
@@ -138,11 +140,12 @@ class ViewMetricService {
     }
 
     def getLineDataForMediaItemsInList(mediaIds, params){
+        def tokenizedMediaIds = mediaIds?.tokenize(',[]') ?: [0]
         def data = [
                 data:[],
                 xkey:"month",
-                ykeys:MediaItem.findAllByIdInList(mediaIds?.tokenize(',[]') ?: []).name,
-                labels:MediaItem.findAllByIdInList(mediaIds?.tokenize(',[]') ?: []).collect{
+                ykeys:MediaItem.findAllByIdInList(tokenizedMediaIds).name,
+                labels:MediaItem.findAllByIdInList(tokenizedMediaIds).collect{
                     it.id+"-"+ checkLength(it.name)
                 }
         ]

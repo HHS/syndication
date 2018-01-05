@@ -14,19 +14,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.rest
 
+import com.ctacorp.syndication.api.ApiResponse
 import grails.transaction.Transactional
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.api.ApiResponse
-import com.ctacorp.syndication.api.Meta
-import com.ctacorp.syndication.api.Pagination
-import com.ctacorp.syndication.api.Message
 import com.ctacorp.grails.swagger.annotations.*
+import static com.ctacorp.grails.swagger.annotations.HTTPMethod.GET
 
-@API(swaggerDataPath = "/languages", description = "Information about languages", modelRefs = [Language, ApiResponse, Meta, Pagination, Message], modelExtensions = [
-    @ModelExtension(id="Languages", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type = "array", typeRef="Language", required = true)]),
-    ], removeProperties = ["results"])
-])
+@Tag(name = 'languages', description = 'Information about languages')
 @Transactional(readOnly = true)
 class LanguagesController {
     static allowedMethods = [
@@ -42,13 +37,14 @@ class LanguagesController {
         response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
     }
 
-    @APIResource(path = "/resources/languages/{id}.json", description = "Information about a specific language", operations = [
-        @Operation(httpMethod = "GET", notes="Returns the Language identified by the 'id'.", nickname="getLanguageById", type = "Languages", summary = "Get Language by ID", responseMessages = [
-            @ResponseMessage(code = 400, description = "Invalid ID"),
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ], parameters = [
-            @Parameter(name = "id", type = "integer", format = "int64", description = "The id of the language to look up", required = true, paramType = "path")
-        ])
+    @Path(path = '/resources/languages/{id}.json', operations = [
+            @Operation(method = GET, description = "Information about a specific language", summary = "Get Language by ID", responses = [
+                    @Response(code = 200, description = "Returns the Language identified by the 'id'.", schema = @DataSchema(title = 'ArrayOfLanguages', type = DataSchemaType.ARRAY, reference = '#/definitions/LanguageWrapped')),
+                    @Response(code = 400, description = 'Invalid ID'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], parameters = [
+                    @Parameter(name = 'id', type = ParameterType.INTEGER, format = ParameterFormat.INT_64, description = 'The id of the language to look up', required = true, whereIn = ParameterLocation.PATH),
+            ], tags = ['languages']),
     ])
     def show(Language languageInstance) {
         if(!languageInstance){
@@ -56,22 +52,23 @@ class LanguagesController {
             respond ApiResponse.get400ResponseCustomMessage("Specified record could not be found")
             return
         }
-        respond ApiResponse.get200Response([languageInstance]).autoFill(params)
+        respond ApiResponse.get200Response([languageInstance]).autoFill(params), view:"index"
     }
 
-    @APIResource(path = "/resources/languages.json", description = "Language Listings", operations = [
-        @Operation(httpMethod = "GET", notes="Returns the list Languages.", nickname="getLanguages", type = "Languages", summary = "Get Languages", responseMessages = [
-            @ResponseMessage(code = 400, description = "Bad Request"),
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ], parameters = [
-            @Parameter(name = "max",    type = "integer", format = "int32", description="The maximum number of records to return",                required = false, paramType = "query"),
-            @Parameter(name = "offset", type = "integer", format = "int32", description="The offset of the records set to return for pagination", required = false, paramType = "query"),
-            @Parameter(name = "sort",   type = "string",                    description = "* Set of fields to sort the records by.",              required = false, paramType = "query")
-        ])
+    @Path(path = '/resources/languages.json', operations = [
+            @Operation(method = GET, description = "Language Listings", summary = "Get Languages", responses = [
+                    @Response(code = 200, description = "Returns the list Languages.", schema = @DataSchema(title = 'ArrayOfLanguages', type = DataSchemaType.ARRAY, reference = '#/definitions/LanguageWrapped')),
+                    @Response(code = 400, description = 'Bad Request'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], parameters = [
+                    @Parameter(name = 'max', type = ParameterType.INTEGER, format = ParameterFormat.INT_32, description = 'The maximum number of records to return', required = false),
+                    @Parameter(name = 'offset', type = ParameterType.INTEGER, format = ParameterFormat.INT_32, description = 'Return records starting at the offset index.', required = false),
+                    @Parameter(name = 'sort', type = ParameterType.STRING, description = 'The name of the property to which sorting will be applied', required = false),
+            ], tags = ['languages']),
     ])
     def list() {
         def languageList = languagesService.listLanguages(params)
         params.total = languageList.totalCount
-        respond ApiResponse.get200Response(languageList).autoFill(params)
+        respond ApiResponse.get200Response(languageList).autoFill(params), view:"index"
     }
 }

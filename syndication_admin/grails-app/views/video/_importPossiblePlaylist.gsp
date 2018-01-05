@@ -10,7 +10,7 @@
             <g:form action="importVideo" controller="video" class="form-horizontal" params="[videoAndPlaylist:true]">
                 <div class="modal-body">
                     <synd:errors/>
-                    <synd:error/>
+                    <synd:hasError/>
 
                     <div class="form-group">
                         <label class="sr-only" for="videoUrl">Playlist Url</label>

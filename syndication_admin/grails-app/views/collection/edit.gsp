@@ -34,18 +34,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
+			<synd:hasError/>
 			<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
 				<div class="row">
 					<div class="col-md-8">
-						<g:form class="form-horizontal" url="[resource:collectionInstance, action:'update']" method="PUT" >
-							<g:hiddenField name="version" value="${collectionInstance?.version}" />
+						<g:form class="form-horizontal" url="[resource:collection, action:'update']" method="PUT" id="updateMediaItem">
+							<g:hiddenField name="version" value="${collection?.version}" />
 							<fieldset class="form">
 								<g:render template="form"/>
 							</fieldset>
-							<fieldset class="buttons">
+							<fieldset class="buttons" id="mediaItemSubmitButton">
 								<g:actionSubmit class="btn btn-default btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-								<g:link class="btn btn-default" id="${collectionInstance.id}" resource="${collectionInstance}" action="show">
+								<g:link class="btn btn-default" id="${collection.id}" resource="${collection}" action="show">
 									Cancel
 								</g:link>
 							</fieldset>
@@ -53,7 +53,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 					</div>
 				</div>
 			</sec:ifAnyGranted>
-            <g:render template="/mediaItem/addAttributeOrImage" model="[mediaItemInstance: collectionInstance]"/>
+            <g:render template="/mediaItem/addAttributeOrImage" model="[mediaItemInstance: collection]"/>
 		</div>
 	</body>
 </html>

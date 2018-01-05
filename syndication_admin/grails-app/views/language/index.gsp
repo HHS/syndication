@@ -68,7 +68,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
                 <div class="list-group">
 
-                    <g:each in="${languageInstanceList}" status="i" var="languageInstance">
+                    <g:each in="${languageList}" status="i" var="languageInstance">
                         <a href="#" id="${languageInstance.id}" class="on-off list-group-item <g:if test="${languageInstance.isActive}">list-group-item-success</g:if><g:else>disabled</g:else>">
                             <div class="row">
                                 <div id="${languageInstance.id}-name" class="col-xs-3  col-sm-4 col-md-4">

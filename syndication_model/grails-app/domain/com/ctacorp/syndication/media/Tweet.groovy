@@ -1,23 +1,21 @@
 package com.ctacorp.syndication.media
 
-import com.ctacorp.grails.swagger.annotations.ModelExtension
-import com.ctacorp.grails.swagger.annotations.ModelProperty
-import com.ctacorp.grails.swagger.annotations.PropertyAttribute
+import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.social.TwitterAccount
 
-@ModelExtension(id = "Tweet", model = "MediaItem", addProperties = [
-    @ModelProperty(propertyName = "account",      attributes = [@PropertyAttribute(type = "TwitterAccount",             required = true)]),
-    @ModelProperty(propertyName = "tweetId",      attributes = [@PropertyAttribute(type = "integer",  format = "int64", required = true)]),
-    @ModelProperty(propertyName = "messageText",  attributes = [@PropertyAttribute(type = "string",                     required = true)]),
-    @ModelProperty(propertyName = "mediaUrl",     attributes = [@PropertyAttribute(type = "string",                     required = false)]),
-    @ModelProperty(propertyName = "tweetDate",    attributes = [@PropertyAttribute(type = "string",   format = "date",  required = true)])
-])
+@Definition
 class Tweet extends MediaItem{
+    @DefinitionProperty(type=DefinitionPropertyType.OBJECT, reference = 'TwitterAccount')
     TwitterAccount account
+    @DefinitionProperty(type=DefinitionPropertyType.INTEGER, format = "int32")
     Long tweetId
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String messageText
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String mediaUrl
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String videoVariantUrl
+    @DefinitionProperty(type=DefinitionPropertyType.STRING, format = "date")
     Date tweetDate
 
     static constraints = {

@@ -52,7 +52,7 @@ grails.project.dependency.resolution = {
     repositories {
         inherits("global") {}
 
-        mavenRepo("http://54.234.21.193:8080/artifactory/central"){
+        mavenRepo("http://ctacdev.com:8080/artifactory/central"){
             updatePolicy 'always'
         }
 
@@ -103,8 +103,8 @@ grails.project.dependency.resolution = {
         }
 
         // plugins for the compile step --------------------------------------------------------------------------------
-        compile ":syndication-model:2.9.0"   //syndication domain models
-        compile ":content-extraction-services:1.14.0"   //syndication content extraction tools
+        compile ":syndication-model:2.11.0"   //syndication domain models
+        compile ":content-extraction-services:1.18.0"   //syndication content extraction tools
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
         compile ":asset-pipeline:2.6.5"
@@ -128,10 +128,6 @@ grails.project.dependency.resolution = {
         test ":code-coverage:2.0.3-3"
         test ":auto-test:1.0.1"
 
-        // Solr --------------------------------------------------------------------------------------------------------
-        // |  Leave this at the bottom, moving it causes dependency problems at the moment                             |
-        // -------------------------------------------------------------------------------------------------------------
-        compile ":solr-operations:1.5.0"      //syndication solr stuff
 
         // uncomment these to enable additional asset-pipeline capabilities
         //compile ":sass-asset-pipeline:1.5.5"

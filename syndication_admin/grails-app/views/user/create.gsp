@@ -27,7 +27,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.create.label" args="[entityName]" /></h1>
             <synd:message/>
             <synd:errors/>
-            <synd:error/>
+            <synd:hasError/>
             <div class="row">
                 <div class="col-md-6 col-sm-10">
                     <g:form url="[resource:userInstance, action:'save']" class="form-horizontal" role="form">

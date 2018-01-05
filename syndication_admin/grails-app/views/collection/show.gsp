@@ -28,18 +28,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1><g:message code="default.show.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-md-10 col-md-offset-2">
             <dl class="dl-horizontal">
-                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: collectionInstance, mediaType:'collection']"/>
+                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: collection, mediaType:'collection']"/>
 
-                <g:if test="${collectionInstance?.mediaItems}">
+                <g:if test="${collection?.mediaItems}">
                     <dt id="mediaItems-label" class="word_wrap"><g:message code="collection.mediaItems.label" default="Media Items"/></dt>
                     <div style="height:200px; overflow-y:scroll;">
                         <ul>
-                            <g:each in="${collectionInstance.mediaItems.sort{ it.name }}" var="m">
+                            <g:each in="${collection.mediaItems.sort{ it.name }}" var="m">
                                 <li class="word_wrap fieldcontain"><span style="display:inline-block; width:3em;">${m.id}</span> <g:link controller="mediaItem" action="show" id="${m.id}">${m?.encodeAsHTML()}</g:link></li>
                             </g:each>
                         </ul>
@@ -51,8 +51,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 
     <fieldset class="buttons">
-        <g:form  url="[resource:collectionInstance, action:'edit']">
-            <a href="${apiBaseUrl + '/resources/media/'+ collectionInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
+        <g:form  url="[resource:collection, action:'edit']">
+            <a href="${apiBaseUrl + '/resources/media/'+ collection?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>
@@ -62,14 +62,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             <g:link class="btn btn-default" action="index">Cancel
             </g:link>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${collectionInstance?.id}" action="featureItem">
+                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${collection?.id}" action="featureItem">
                     Feature this Item
                 </g:link>
             </sec:ifAnyGranted>
         </g:form>
     </fieldset>
 
-    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: collectionInstance]"/>
+    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: collection]"/>
 </div>
 </body>
 </html>

@@ -9,13 +9,14 @@ import com.ctacorp.syndication.storefront.UserMediaList
 import com.ctacorp.syndication.microsite.FlaggedMicrosite
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import grails.util.Holders
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
 class CarouselController {
     def tagService
     def micrositeService
     def micrositeFilterService
-
+    def config = Holders.config
     def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
     def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
     Closure displayStyles = {MediaSelector.DisplayStyle.values()}
@@ -67,6 +68,7 @@ class CarouselController {
     @Secured(['permitAll'])
     def show(){
         def microSite = MicroSite.get(params.long("id"))
+
         if(FlaggedMicrosite.findByMicrosite(microSite) && !FlaggedMicrosite.findByMicrosite(microSite).ignored) {
             flash.error = "The Microsite is temporarily blocked."
             redirect controller: "storefront", action: "index"
@@ -78,20 +80,21 @@ class CarouselController {
         def pane2MediaItems = micrositeService.getMediaItems(microSite.mediaArea2, 50)
         def pane2MediaItemContents = micrositeService.getMediaContents(pane2MediaItems)
 
-        def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1)?.id?.join(",") ?: []
-        String carouselData = micrositeService.getMediaData(pane1MediaItems,[sort:microSite?.mediaArea1?.sortBy,order:microSite?.mediaArea1?.orderBy]) as JSON
+        def pane1MediaItems = micrositeService.getMediaItems(microSite.mediaArea1)
+        def pane1MediaItemIds = pane1MediaItems?.id?.join(",") ?: []
+        String carouselData = micrositeService.getMediaData(pane1MediaItemIds,[sort:microSite?.mediaArea1?.sortBy,order:microSite?.mediaArea1?.orderBy]) as JSON
 
 
         render view:"show", model:[
             microSite:microSite,
             carouselData:carouselData,
-            pane1MediaItems:micrositeService.getMediaItems(microSite.mediaArea1),
+            pane1MediaItems:pane1MediaItems,
             pane2MediaItems:micrositeService.getMediaItems(microSite.mediaArea2),
             pane3MediaItems:micrositeService.getMediaItems(microSite.mediaArea3),
             pane2MediaItemContents:pane2MediaItemContents,
             pane3MediaItemContents:pane3MediaItemContents,
             collection:params.collection,
-            apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+            apiBaseUrl:config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
         ]
     }
 

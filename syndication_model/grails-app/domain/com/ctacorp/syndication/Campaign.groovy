@@ -17,23 +17,21 @@ package com.ctacorp.syndication
 import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.metric.CampaignMetric
+import com.ctacorp.grails.swagger.annotations.Definition
 
-@Model(id = "Campaign", properties = [
-    @ModelProperty(propertyName = "id",             attributes = [@PropertyAttribute(type = "integer", format = "int64",      required = true)]),
-    @ModelProperty(propertyName = "name",           attributes = [@PropertyAttribute(type = "string",    required = true)]),
-    @ModelProperty(propertyName = "startDate",      attributes = [@PropertyAttribute(type = "string", format = "date",      required = true)]),
-    @ModelProperty(propertyName = "mediaItems",     attributes = [@PropertyAttribute(type = "array",     typeRef = "MediaItem")]),
-    @ModelProperty(propertyName = "description",    attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "endDate",        attributes = [@PropertyAttribute(type = "string", format = "date")]),
-    @ModelProperty(propertyName = "source",         attributes = [@PropertyAttribute(type = "Source")]),
-    @ModelProperty(propertyName = "contactEmail",   attributes = [@PropertyAttribute(type = "string")])
-])
+@Definition
 class Campaign {
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String name
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String description
+    @DefinitionProperty(type=DefinitionPropertyType.STRING, format = 'date')
     Date startDate
+    @DefinitionProperty(type=DefinitionPropertyType.STRING, format = 'date')
     Date endDate
+    @DefinitionProperty(type=DefinitionPropertyType.OBJECT, reference = 'Source')
     Source source
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String contactEmail
 
     static hasMany = [mediaItems: MediaItem, campaignMetrics: CampaignMetric]

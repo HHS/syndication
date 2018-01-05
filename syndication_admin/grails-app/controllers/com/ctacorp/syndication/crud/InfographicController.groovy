@@ -15,6 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
+import grails.util.Holders
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -35,9 +36,9 @@ class InfographicController {
 
     def mediaItemsService
     def tagService
-    def solrIndexingService
     def cmsManagerKeyService
     def springSecurityService
+    def config = Holders.config
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "POST"]
 
@@ -58,7 +59,7 @@ class InfographicController {
                                       selectedLanguage  :tagData.selectedLanguage,
                                       selectedTagType   :tagData.selectedTagType,
                                       collections       :Collection.findAll("from Collection where ? in elements(mediaItems)", [infographicInstance]),
-                                      apiBaseUrl        :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                      apiBaseUrl        :config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                       subscriber        :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(infographicInstance)?.subscriberId)
         ]
     }
@@ -84,7 +85,6 @@ class InfographicController {
             return
         }
 
-        solrIndexingService.inputMediaItem(infographicInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'infographicInstance.label', default: 'Infographic'), [infographicInstance.name]])
@@ -113,7 +113,6 @@ class InfographicController {
             return
         }
 
-        solrIndexingService.inputMediaItem(infographicInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'Infographic.label', default: 'Infographic'), [infographicInstance.name]])
@@ -137,7 +136,6 @@ class InfographicController {
         }
 
         mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(infographicInstance, true)
-        solrIndexingService.removeMediaItem(infographicInstance)
         mediaItemsService.delete(infographicInstance.id)
 
         request.withFormat {

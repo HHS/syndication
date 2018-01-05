@@ -18,7 +18,10 @@ import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.social.TwitterAccount
 import grails.transaction.NotTransactional
+import grails.util.Holders
 import twitter4j.TwitterException
+
+import java.util.concurrent.ExecutionException
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -39,10 +42,10 @@ class TweetController {
 
     def mediaItemsService
     def tagService
-    def solrIndexingService
     def cmsManagerKeyService
     def springSecurityService
     def twitterService
+    def config = Holders.config
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "POST"]
 
@@ -72,11 +75,24 @@ class TweetController {
         if(!accountName){
             render view: "importTweets",
                     model: [
+                            status:apiStatus,
+                            twitterAccountList:twitterAccountList,
+                            subscribers:subscribers,
+                            sourceList:sourceList
+                    ]
+            return
+        }
+
+        def accountIsProtected = twitterService.isProtected(accountName)
+
+        if(accountIsProtected){
+            render view: "importTweets",
+                    model: [
                         status:apiStatus,
-                        message: twitterService.isProtected(accountName) ? "This twitter account is private." :"Please add a twitter account and select it to continue.",
-                        twitterAccountList:twitterAccountList,
-                        subscribers:subscribers,
-                        sourceList:sourceList
+                        message: accountIsProtected ? "This twitter account is private." :"Please add a twitter account and select it to continue.",
+                        twitterAccountList: twitterAccountList,
+                        subscribers: subscribers,
+                        sourceList: sourceList
                     ]
             return
         }
@@ -132,29 +148,34 @@ class TweetController {
         flash.messages = []
         flash.errors = []
 
-        try {
-            tweetIds.each { tweetId ->
+        tweetIds.each { tweetId ->
+            try {
                 if (Tweet.findByTweetId(tweetId as Long)) {
+
                     def mi = Tweet.findByTweetId(tweetId as Long)
                     flash.errors << [message: mi.name + " already exists. Contact an administrator if this is an issue."]
+
                 } else {
+
                     def mediaItem = twitterService.saveTweet(tweetId as Long, sourceId, params.long("subscriberId"))
+
                     if (mediaItem.hasErrors()) {
                         flash.errors << [message: "twitter post Id: " + tweetId + " for twitter account: " + params.accountName + " has issues with its default configuration. Please Contact an administrator."]
                     } else {
-                        solrIndexingService.inputMediaItem(mediaItem)
                         flash.messages << [message: mediaItem.name + " created!"]
                     }
                 }
+            } catch(ExecutionException e){
 
+                log.error("Rate limit exceeded", e)
+                flash.errors << [message: "Twitter API Rate Limit exceeded. When too many requests are made to twitter too quickly, it exceeds a limit set by Twitter's API. Please wait a few minutes and try your import again - Twitter rate limits reset evey 15 minutes."]
+                throw e
+
+            } catch(e){
+                log.error ("Error importing tweet '${tweetId}'", e)
             }
-        }catch(java.util.concurrent.ExecutionException e){
-            log.error("Rate limit exceeded")
-            flash.errors = []
-            flash.errors << [message: "Twitter API Rate Limit exceeded. When too many requests are made to twitter too quickly, it exceeds a limit set by Twitter's API. Please wait a few minutes and try your import again - Twitter rate limits reset evey 15 minutes."]
-        }catch(e){
-            log.error ("Error importing tweets: ${e}")
         }
+
         redirect action:"index"
     }
 
@@ -170,7 +191,7 @@ class TweetController {
                                             selectedLanguage:tagData.selectedLanguage,
                                             selectedTagType :tagData.selectedTagType,
                                             collections     : Collection.findAll("from Collection where ? in elements(mediaItems)", [tweetInstance]),
-                                            apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                            apiBaseUrl      :config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                             subscriber      :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(tweetInstance)?.subscriberId)
         ]
     }
@@ -199,7 +220,6 @@ class TweetController {
             return
         }
 
-        solrIndexingService.inputMediaItem(tweetInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'tweetInstance.label', default: 'Tweet'), [tweetInstance.name]])
@@ -211,7 +231,7 @@ class TweetController {
 
     def edit(Tweet tweetInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond tweetInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(tweetInstance)?.subscriberId)]
+        respond tweetInstance, model: [tweetInstance:tweetInstance, subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(tweetInstance)?.subscriberId)]
     }
 
     def update(Tweet tweetInstance) {
@@ -227,7 +247,6 @@ class TweetController {
             return
         }
 
-        solrIndexingService.inputMediaItem(tweetInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'Tweet.label', default: 'Tweet'), [tweetInstance.name]])
@@ -250,7 +269,6 @@ class TweetController {
         }
 
         mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(tweetInstance, true)
-        solrIndexingService.removeMediaItem(tweetInstance)
         mediaItemsService.delete(tweetInstance.id)
 
         request.withFormat {

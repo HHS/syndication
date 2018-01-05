@@ -3,7 +3,7 @@ package com.ctacorp.syndication.authentication
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
-import org.springframework.security.core.authority.GrantedAuthorityImpl
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.web.context.request.RequestContextHolder
@@ -19,7 +19,7 @@ class CustomUserDetailsService implements GrailsUserDetailsService {
     static final String UNAUTHORIZED_MESSAGE = "Sorry, your account is no longer authorized. Please contact syndicationadmin@hhs.gov to get support."
     static final String INVALID_AGREEMENT_MESSAGE = "Sorry, your account is no longer authorized. Please contact syndicationadmin@hhs.gov to get support."
 
-    static final List NO_ROLES = [new GrantedAuthorityImpl(SpringSecurityUtils.NO_ROLE)]
+    static final List NO_ROLES = [new SimpleGrantedAuthority(SpringSecurityUtils.NO_ROLE)]
 
     UserDetails loadUserByUsername(String username, boolean loadRoles) throws UsernameNotFoundException {
         return loadUserByUsername(username)
@@ -42,7 +42,7 @@ class CustomUserDetailsService implements GrailsUserDetailsService {
                 }
 
             }
-            def authorities = user.authorities.collect {new GrantedAuthorityImpl(it.authority)}
+            def authorities = user.authorities.collect {new SimpleGrantedAuthority(it.authority)}
 
             return new GrailsUser(user.username, user.password, user.enabled, !user.accountExpired,
                     !user.passwordExpired, !user.accountLocked,

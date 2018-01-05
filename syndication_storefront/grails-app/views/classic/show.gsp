@@ -62,19 +62,19 @@
                 <g:if test="${pane2MediaItems && microSite.mediaArea2}">
                     <div class="microsite-classic-right-col-top row clearfix">
                         <div class="microsite-article row">
-                            <g:render template="../microsite/displayStyle"
+                            <g:render template="/microsite/displayStyle"
                                       model="[mediaArea: microSite.mediaArea2, mediaItems: pane2MediaItems, panel:1]"/>
                         </div>
                     </div>
                 </g:if>
                 <g:if test="${pane3MediaItems && microSite.mediaArea3}">
                     <div class="microsite-classic-right-col-bottom row clearfix">
-                        <g:render template="../microsite/displayStyle" model="[mediaArea: microSite.mediaArea3, mediaItems: pane3MediaItems, panel:2]"/>
+                        <g:render template="/microsite/displayStyle" model="[mediaArea: microSite.mediaArea3, mediaItems: pane3MediaItems, panel:2]"/>
                     </div>
                 </g:if>
             </div>
 
-            <g:render template="/microsite/mediaItemModals"/>
+            <g:render template="/microsite/mediaItemModals" model="[apiBaseUrl:apiBaseUrl]"/>
 
         </div><!-- end microsite-content  -->
     </div>

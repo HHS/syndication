@@ -30,23 +30,23 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1><g:message code="default.show.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
     <div class="row">
         <div class="col-md-10 col-md-offset-2">
             <dl class="dl-horizontal">
-                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: htmlInstance, mediaType:'html']"/>
+                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: html, mediaType:'html']"/>
 
-                <g:if test="${htmlInstance?.structuredContentType}">
+                <g:if test="${html?.structuredContentType}">
                     <dt id="name-label" class="word_wrap"><g:message code="html.structuredContentType.label" default="Structured Type"/></dt>
-                    <dd class="word_wrap">${htmlInstance.structuredContentType.prettyName}</dd>
+                    <dd class="word_wrap">${html.structuredContentType.prettyName}</dd>
                 </g:if>
             </dl>
         </div>
     </div>
 
     <fieldset class="buttons">
-        <g:form url="[resource:htmlInstance, action:'edit']">
-            <a href="${apiBaseUrl + '/resources/media/'+ htmlInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
+        <g:form url="[resource:html, action:'edit']">
+            <a href="${apiBaseUrl + '/resources/media/'+ html?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>
@@ -57,21 +57,30 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 Cancel
             </g:link>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${htmlInstance?.id}" action="featureItem">
+                <g:link controller="featuredMedia" style="margin-right: 3px;" class="btn btn-success pull-right" id="${html?.id}" action="featureItem">
                     Feature this Item
                 </g:link>
             </sec:ifAnyGranted>
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+                <g:link controller="mediaPreviewThumbnail" style="margin-right: 3px;"  class="btn btn-warning pull-right" id="${html?.id}" action="flush">
+                    Regenerate Thumbnail & Preview
+                </g:link>
+            </sec:ifAnyGranted>
             <sec:ifAnyGranted roles="ROLE_ADMIN">
-                <g:link controller="mediaItem" class="btn btn-primary pull-right" style="margin-right: 3px;" id="${htmlInstance?.id}" action="resetHash">
+                <g:link controller="mediaItem" class="btn btn-primary pull-right" style="margin-right: 3px;" id="${html?.id}" action="resetHash">
                     Reset Hash
                 </g:link>
-                <g:link controller="mediaItem" class="btn btn-warning pull-right" style="margin-right: 3px;" id="${htmlInstance?.id}" action="resetDBCache">
+                <g:link controller="mediaItem" class="btn btn-warning pull-right" style="margin-right: 3px;" id="${html?.id}" action="resetDBCache">
                     Flush DB Cache
                 </g:link>
             </sec:ifAnyGranted>
+
         </g:form>
+
     </fieldset>
-    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: htmlInstance]"/>
+
+    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: html]"/>
+
 </div>
 </body>
 </html>

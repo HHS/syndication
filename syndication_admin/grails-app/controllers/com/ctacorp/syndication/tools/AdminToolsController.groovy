@@ -3,6 +3,7 @@ package com.ctacorp.syndication.tools
 import com.ctacorp.syndication.authentication.Role
 import com.ctacorp.syndication.authentication.User
 import com.ctacorp.syndication.authentication.UserRole
+import com.ctacorp.syndication.jobs.ContentCacheFlushJob
 import com.ctacorp.syndication.jobs.HashResetJob
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.MediaItem
@@ -78,7 +79,9 @@ class AdminToolsController {
     }
 
     private sendMessage(recip, sub, bod, isHtml=false){
-        println "Sending email to ${recip}, subject ${sub}, body: ${bod}, isHtml?: ${isHtml}"
+
+        log.info "Sending email to ${recip}, subject ${sub}, body: ${bod}, isHtml?: ${isHtml}"
+
         if(isHtml){
             sendMail{
                 to "${recip}"
@@ -104,7 +107,7 @@ class AdminToolsController {
 
     def updateMissingTinyUrls() {
         def updatedMappings = tinyUrlService.updateItemsWithoutMappings()
-        String statusMessalge = ""
+        String statusMessage = ""
         updatedMappings.each {
             statusMessage += "${it.id} - ${it.targetUrl}<br/>"
         }
@@ -122,11 +125,19 @@ class AdminToolsController {
         redirect action: 'index'
     }
 
+    def flushAllContentCaches() {
+
+        ContentCacheFlushJob.triggerNow()
+
+        flash.message = "Content Cache Flush requested"
+        redirect action: 'index'
+    }
+
     def duplicateFinder(){
 //        params.max = Math.min(params.int('max') ?: 100, 20000)
         params.sort = "id"
         params.order = params.order ?: "DESC"
-        println "params: " + params
+
         def mediaList = MediaItem.list(params)
 
         def alreadyChecked = []
@@ -134,7 +145,6 @@ class AdminToolsController {
         def dupes = []
         mediaList.each{ mi ->
             log.info("Checking ${mi.id} for duplicates")
-            println "urlMapping: " + urlMap[mi.sourceUrl]
             if(!urlMap[mi.sourceUrl.toLowerCase()]){
                 urlMap[mi.sourceUrl.toLowerCase()] = mi.id
             }else {

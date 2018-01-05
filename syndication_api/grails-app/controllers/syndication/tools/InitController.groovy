@@ -17,12 +17,14 @@ package syndication.tools
 import com.ctacorp.syndication.MediaItemSubscriber
 import com.ctacorp.syndication.media.MediaItem
 import grails.plugin.springsecurity.annotation.Secured
+import grails.util.Holders
 
 @Secured(['ROLE_ADMIN'])
 class InitController {
+
     def tinyUrlService
     def tagsService
-    def solrService
+    def elasticsearchService
     def authorizationService
     def cmsManagerService
 
@@ -54,13 +56,12 @@ class InitController {
         render view: 'index'
     }
 
-    def seedSolr() {
-        log.info "seeding solr "
-
-        solrService.inputMediaItems()
-        solrService.inputCampaigns()
-        solrService.inputSources()
-        log.info "solr is seeded"
+    def indexElasticSearch() {
+        log.info "Indexing ElasticSearch "
+        elasticsearchService.fullReindex()
+        log.info "ElasticSearch Indexing is Completed"
+        flash.error = "Medias, Campaigns and Sources are indexed in elastic search."
+        render view: 'index'
     }
 
     private boolean ping(String serverAddress, String name){
@@ -77,7 +78,7 @@ class InitController {
     }
 
     private boolean initTinyUrlService(){
-        if(ping("${grailsApplication.config.tinyUrl.serverAddress}${grailsApplication.config.syndication.tinyUrl.mappingBase}.json", "TinyURL")){
+        if(ping("${Holders.config.TINYURL_SERVER_URL}${Holders.config.TINYURL_MAPPINGBASE}.json", "TinyURL")){
             MediaItem.list().each{ MediaItem mi->
                 def tinyInfo = tinyUrlService.getMappingByMediaItemId(mi.id)
                 if(tinyInfo.error){
@@ -87,13 +88,13 @@ class InitController {
             }
             return true
         } else{
-            log.info "Can't reach server: ${grailsApplication.config.tinyUrl.serverAddress}${grailsApplication.config.syndication.tinyUrl.mappingBase}.json"
+            log.info "Can't reach server: ${Holders.config.TINYURL_SERVER_URL}${Holders.config.TINYURL_MAPPINGBASE}.json"
         }
         false
     }
 
     private boolean initTagService(){
-        if(ping(grailsApplication.config.tagCloud.serverAddress + "/tags.json", "TagCloud")){
+        if(ping(Holders.config.TAG_CLOUD_SERVER_URL + "/tags.json", "TagCloud")){
             MediaItem.list().each{ MediaItem mi->
                 (ran.nextInt(3)+1).times{
                     def tag = randomTag()
@@ -109,7 +110,7 @@ class InitController {
     def initOwnership(){
         try{
             flash.message = "Ownership already exists"
-            def publicKey = grailsApplication.config.cmsManager.publicKey
+            def publicKey = Holders.config.CMSMANAGER_PUBLICKEY
             def subscriber = cmsManagerService.getSubscriber(publicKey)
             def mediaItems = MediaItem.list()
 

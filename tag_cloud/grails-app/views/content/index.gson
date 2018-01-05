@@ -1,0 +1,7 @@
+import tagcloud.domain.ContentItem
+
+model {
+    List<ContentItem> contentItemList
+}
+
+json tmpl.'contentItem'(contentItemList ?: [])

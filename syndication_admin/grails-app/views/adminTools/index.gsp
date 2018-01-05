@@ -38,7 +38,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-md-6">
@@ -172,6 +172,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 <div class="col-lg-12">
                     <h3>Cache Flusher</h3>
                     <g:link action="flushAllCaches" class="btn btn-primary">Flush All Caches</g:link>
+                </div>
+            </div>
+            %{--Content Cache Management ---------------------------------------------------------------------------------------------}%
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Content Cache Flusher</h3>
+                    <g:link action="flushAllContentCaches" class="btn btn-primary">Flush Content Caches</g:link>
                 </div>
             </div>
             %{--update source url md5 hash ------------------------------------------------------------------------------------}%

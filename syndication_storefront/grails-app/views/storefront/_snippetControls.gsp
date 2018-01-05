@@ -9,7 +9,7 @@
         </g:else>
 
         <div style="margin-left: 420px;">
-            <g:textArea name="embedCode" cols="80" rows="10" id="snippetCode"/>
+            <g:textArea name="embedCode" cols="70" rows="10" id="snippetCode"/>
         </div>
 
     </div>

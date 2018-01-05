@@ -1,0 +1,10 @@
+import com.ctacorp.syndication.marshal.MediaTypeHolder
+
+model {
+    MediaTypeHolder mediaTypeHolder
+}
+
+json {
+    name mediaTypeHolder.name
+    description mediaTypeHolder.description
+}

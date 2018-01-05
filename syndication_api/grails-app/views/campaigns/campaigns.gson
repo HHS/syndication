@@ -1,0 +1,11 @@
+import com.ctacorp.syndication.api.ApiResponse
+
+model {
+    ApiResponse apiResponse
+//    Campaign campaign
+}
+
+json {
+    meta apiResponse.generateMetaBlock()
+    results tmpl.campaign(apiResponse.results ?: [])
+}

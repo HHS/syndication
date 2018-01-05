@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -28,14 +29,21 @@ class MediaMappingRestController {
 
     @Transactional
     def save(MediaMapping mediaMappingInstance) {
+
         if (mediaMappingInstance == null) {
             log.error("mediaMappingInstance not found: ")
             notFound()
             return
         }
+
         log.info "Mapping save for: ${mediaMappingInstance}"
 
         mediaMappingInstance = mediaMappingService.saveMediaMapping(mediaMappingInstance)
+
+        if(!mediaMappingInstance) {
+            badRequest()
+            return
+        }
 
         request.withFormat {
             form multipartForm {
@@ -101,6 +109,16 @@ class MediaMappingRestController {
                 redirect action: "index", method: "GET"
             }
             '*'{ render status: NOT_FOUND }
+        }
+    }
+
+    protected void badRequest() {
+        request.withFormat {
+            form multipartForm {
+                flash.message = 'Bad request'
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: BAD_REQUEST }
         }
     }
 }

@@ -13,7 +13,7 @@ class AuthorizationService {
 
     static transactional = false
 
-    def grailsApplication
+    def config = Holders.config
 
     private AuthorizationHeaderGenerator generator
     private AuthorizationHeaderGenerator.KeyAgreement keyAgreement
@@ -21,9 +21,9 @@ class AuthorizationService {
 
     @PostConstruct
     void init() {
-        String publicKey = grailsApplication.config.cmsManager.publicKey
-        String privateKey = grailsApplication.config.cmsManager.privateKey
-        String secret = grailsApplication.config.cmsManager.secret
+        String publicKey = config.CMSMANAGER_PUBLICKEY
+        String privateKey = config.CMSMANAGER_PRIVATEKEY
+        String secret = config.CMSMANAGER_SECRET
 
         if (privateKey && publicKey && secret) {
             rest = new RestBuilder()
@@ -46,7 +46,7 @@ class AuthorizationService {
         log.debug "I am requesting:\n ${authorizationRequest}"
 
         String date = new Date().toString()
-        String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.verifyAuthPath
+        String requestUrl = config.CMSMANAGER_SERVER_URL + config.CMSMANAGER_VERIFYAUTHPATH
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([
             "Date": date,
             "content-type": "application/json",
@@ -66,7 +66,7 @@ class AuthorizationService {
 
     boolean amIAuthorized() {
         String date = new Date().toString()
-        String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.selfAuthPath
+        String requestUrl = config.CMSMANAGER_SERVER_URL + config.CMSMANAGER_SELFAUTHPATH
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([date: date], requestUrl, "GET", null)
         def resp = rest.get(requestUrl) {
             header 'Date', date

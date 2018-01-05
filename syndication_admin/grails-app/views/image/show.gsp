@@ -29,19 +29,19 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1><g:message code="default.show.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-md-10 col-md-offset-2">
             <dl class="dl-horizontal">
-                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: imageInstance, mediaType:'image']"/>
-                <g:render template="/mediaItem/commonShowImageAttributes" model="[mediaItemInstance: imageInstance, mediaType:'image']"/>
+                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: image, mediaType:'image']"/>
+                <g:render template="/mediaItem/commonShowImageAttributes" model="[mediaItemInstance: image, mediaType:'image']"/>
             </dl>
         </div>
     </div>
     <fieldset class="buttons">
-        <g:form  url="[resource:imageInstance, action:'edit']">
-            <a href="${apiBaseUrl + '/resources/media/'+ imageInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
+        <g:form  url="[resource:image, action:'edit']">
+            <a href="${apiBaseUrl + '/resources/media/'+ image?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>
@@ -52,13 +52,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 Cancel
             </g:link>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${imageInstance?.id}" action="featureItem">
+                <g:link controller="featuredMedia" style="margin-right: 3px;" class="btn btn-success pull-right" id="${image?.id}" action="featureItem">
                     Feature this Item
+                </g:link>
+            </sec:ifAnyGranted>
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+                <g:link controller="mediaPreviewThumbnail" style="margin-right: 3px;" class="btn btn-warning pull-right" id="${image?.id}" action="flush">
+                    Regenerate Thumbnail & Preview
                 </g:link>
             </sec:ifAnyGranted>
         </g:form>
     </fieldset>
-    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: imageInstance]"/>
+    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: image]"/>
 </div>
 </body>
 </html>

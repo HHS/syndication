@@ -21,51 +21,51 @@
                     <div class="purplebox">
                         <div id="show-userMediaList" class="content scaffold-show" role="main">
                             <h3>Show List</h3>
-                                <g:if test="${userMediaListInstance?.name}">
+                                <g:if test="${userMediaList?.name}">
                                     <div class="left_side">
                                         <p class="bold"><g:message code="userMediaList.name.label" default="Name" /></p>
                                     </div>
                                     <div class="right_side">
-                                        <p><g:fieldValue bean="${userMediaListInstance}" field="name"/></p>
+                                        <p><g:fieldValue bean="${userMediaList}" field="name"/></p>
                                     </div>
                                     <br>
                                 </g:if>
 
-                            <g:if test="${userMediaListInstance?.description}">
+                            <g:if test="${userMediaList?.description}">
                                 <div class="left_side">
                                     <p class="bold"><g:message code="userMediaList.description.label" default="Description" /></p>
                                 </div>
                                 <div class="right_side">
-                                    <p><g:fieldValue bean="${userMediaListInstance}" field="description"/></p>
+                                    <p><g:fieldValue bean="${userMediaList}" field="description"/></p>
                                 </div>
                                 <br>
                             </g:if>
 
-                            <g:if test="${userMediaListInstance?.id}">
+                            <g:if test="${userMediaList?.id}">
                                 <div class="left_side">
                                     <p class="bold"><g:message code="userMediaList.description.label" default="ID" /></p>
                                 </div>
                                 <div class="right_side">
-                                    <p><g:fieldValue bean="${userMediaListInstance}" field="id"/></p>
+                                    <p><g:fieldValue bean="${userMediaList}" field="id"/></p>
                                 </div>
                                 <br>
                             </g:if>
 
-                            <g:if test="${userMediaListInstance?.dateCreated}">
+                            <g:if test="${userMediaList?.dateCreated}">
                                 <div class="left_side">
                                     <p class="bold"><g:message code="userMediaList.dateCreated.label" default="DateCreated" /></p>
                                 </div>
                                 <div class="right_side">
-                                    <p><g:fieldValue bean="${userMediaListInstance}" field="dateCreated"/></p>
+                                    <p><g:fieldValue bean="${userMediaList}" field="dateCreated"/></p>
                                 </div>
                                 <br>
                             </g:if>
-                            <g:if test="${userMediaListInstance?.lastUpdated}">
+                            <g:if test="${userMediaList?.lastUpdated}">
                                 <div class="left_side">
                                     <p class="bold"><g:message code="userMediaList.lastUpdated.label" default="LastUpdated" /></p>
                                 </div>
                                 <div class="right_side">
-                                    <p><g:fieldValue bean="${userMediaListInstance}" field="lastUpdated"/></p>
+                                    <p><g:fieldValue bean="${userMediaList}" field="lastUpdated"/></p>
                                 </div>
                                 <br>
                             </g:if>
@@ -75,24 +75,24 @@
                                     <p class="bold"><g:message code="userMediaList.apiLink.label" default="API Link" /></p>
                                 </div>
                                 <div class="right_side">
-                                    <p><sf:mediaListApiLink id="${userMediaListInstance?.id}"/></p>
+                                    <p><sf:mediaListApiLink id="${userMediaList?.id}"/></p>
                                 </div>
                             </div>
 
-                            <g:if test="${userMediaListInstance?.mediaItems}">
+                            <g:if test="${userMediaList?.mediaItems}">
                                 <div class="fieldcontain">
                                     <div class="left_side">
                                         <p class="bold"><g:message code="userMediaList.mediaItems.label" default="Media Items" /></p>
                                     </div>
                                     <div class="right_side">
-                                        <g:each in="${userMediaListInstance?.mediaItems?.sort{it.name}}" var="mediaItemInstance">
+                                        <g:each in="${userMediaList?.mediaItems?.sort{it.name}}" var="mediaItemInstance">
                                             <p><g:link controller="storefront" action="showContent" id="${mediaItemInstance.id}">${mediaItemInstance?.encodeAsHTML()}</g:link></p>
                                         </g:each>
                                     </div>
                                 </div>
                             </g:if>
 
-                            <g:form url="[resource:userMediaListInstance, action:'update']" method="DELETE">
+                            <g:form url="[resource:userMediaList, action:'update']" method="DELETE">
                                     <g:actionSubmit class="edit" action="edit" value="Edit"/>
                                     <g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('Are you sure you want to delete this list?');" />
                                     <g:actionSubmit class="cancel" action="index" value="Cancel"/>

@@ -6,7 +6,7 @@ import grails.plugin.springsecurity.annotation.Secured
 @Secured(['permitAll'])
 class MediaMappingQueryController {
 
-    static reponseFormats = ["json"]
+    static responseFormats = ["json"]
 
     def getByTargetUrl(String targetUrl){
         MediaMapping mm = MediaMapping.findByTargetUrl(targetUrl)
@@ -28,6 +28,7 @@ class MediaMappingQueryController {
 
     def getByToken(String token){
         Long id = token.decodeBase32()
+        println "id=" + id
         MediaMapping mm = MediaMapping.get(id)
         if(mm){
             respond mm

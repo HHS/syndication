@@ -1,0 +1,95 @@
+import com.ctacorp.syndication.marshal.MediaItemMarshaller
+import com.ctacorp.syndication.media.Collection
+import com.ctacorp.syndication.media.FAQ
+import com.ctacorp.syndication.media.Html
+import com.ctacorp.syndication.media.Image
+import com.ctacorp.syndication.media.Infographic
+import com.ctacorp.syndication.media.PDF
+import com.ctacorp.syndication.media.Tweet
+import com.ctacorp.syndication.media.Video
+
+
+model {
+    MediaItemMarshaller mediaItemMarshaller
+}
+
+def mediaService
+
+json {
+    switch (mediaItemMarshaller.mediaItem.class) {
+        case Collection:
+            mediaType "Collection"
+            break
+        case FAQ:
+            mediaType "Faq"
+            break
+        case Html:
+            mediaType "Html"
+            break
+        case Image:
+            mediaType "Image"
+            break
+        case Infographic:
+            mediaType "Infographic"
+            break
+        case PDF:
+            mediaType "PDF"
+            break
+        case Tweet:
+            mediaType "Tweet"
+            break
+        case Video:
+            mediaType "Video"
+            break
+    }
+    id mediaItemMarshaller.mediaItem?.id
+    name mediaItemMarshaller.mediaItem.name
+    if (mediaItemMarshaller.mediaItem.class == Tweet) {
+        twitterAccountName mediaItemMarshaller.twitterAccountName
+        twitterAccountSubscriberId mediaItemMarshaller.twitterAccountSubscriberId
+        tweetId mediaItemMarshaller.tweetId
+        messageText mediaItemMarshaller.messageText
+        mediaUrl mediaItemMarshaller.mediaUrl
+        videoUrl mediaItemMarshaller.videoUrl
+        tweetDate mediaItemMarshaller.tweetDate
+    }
+    description mediaItemMarshaller.mediaItem.description
+    sourceUrl mediaItemMarshaller.mediaItem.sourceUrl
+    targetUrl mediaItemMarshaller.mediaItem.targetUrl
+    if (mediaItemMarshaller.mediaItem.class == Image || mediaItemMarshaller.mediaItem.class == Infographic) {
+        width mediaItemMarshaller.width
+        height mediaItemMarshaller.height
+    }
+    dateContentAuthord mediaItemMarshaller.mediaItem.dateContentAuthored
+    dateContentUpdated mediaItemMarshaller.mediaItem.dateContentUpdated
+    dateContentPublished mediaItemMarshaller.mediaItem.dateContentPublished
+    dateContentReviewed mediaItemMarshaller.mediaItem.dateContentReviewed
+    dateSyndicationVisibile mediaItemMarshaller.mediaItem.dateSyndicationVisible
+    dateSyndicationCaptured mediaItemMarshaller.mediaItem.dateSyndicationCaptured
+    dateSyndicationUpdated mediaItemMarshaller.mediaItem.dateSyndicationUpdated
+    language tmpl.'/languages/language'(mediaItemMarshaller.mediaItem.language ?: [])
+    externalGuid mediaItemMarshaller.mediaItem.externalGuid
+    contentHash mediaItemMarshaller.mediaItem.hash
+    source tmpl.'/sources/source'(mediaItemMarshaller.mediaItem.source)
+    if (mediaItemMarshaller.mediaItem.class == Html) {
+        createdBy mediaItemMarshaller.mediaItem.createdBy
+    }
+    campaigns tmpl.'/mediaItem/campaign'(mediaItemMarshaller.mediaItem.campaigns ?: [])
+    tags tmpl.'/tags/tag'(mediaItemMarshaller.tags ?: [])
+    if (mediaItemMarshaller.mediaItem.class != FAQ) {
+        tinyUrl mediaItemMarshaller.tinyUrl
+        tinyToken mediaItemMarshaller.tinyToken
+    }
+    thumbnailUrl mediaItemMarshaller.thumbnailUrl
+    previewUrl mediaItemMarshaller.previewUrl
+    alternateImages tmpl.'/alternateImages/alternateImage'(mediaItemMarshaller.mediaItem.alternateImages ?: [])
+    if (mediaItemMarshaller.mediaItem.class == FAQ) {
+        questionAndAnswers tmpl.'/mediaItems/questionAndAnswer'(mediaItemMarshaller.questionAndAnswers ?: [])
+    }
+    attribution mediaItemMarshaller.attribution
+    customThumbnailUrl mediaItemMarshaller.mediaItem.customThumbnailUrl
+    customPreviewUrl mediaItemMarshaller.mediaItem.customPreviewUrl
+    mediaItems mediaItemMarshaller.mediaItems
+
+    extendedAttributes mediaItemMarshaller.mediaItem.extendedAttributes.collectEntries { [it.name, it.value] } ?: [:]
+}

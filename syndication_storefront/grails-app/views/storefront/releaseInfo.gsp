@@ -38,7 +38,7 @@
         %{--===================================================================--}%
         </div>
     </div>
-    <g:render template="../storefront/rightBoxes"/>
+    <g:render template="/storefront/rightBoxes" />
 </div>
 </body>
 </html>

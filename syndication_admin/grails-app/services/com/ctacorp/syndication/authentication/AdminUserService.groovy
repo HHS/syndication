@@ -39,14 +39,21 @@ class AdminUserService {
         userInstance.delete flush: true
     }
 
-    def saveUserAndRole(User userInstance, Long roleId) {
+    def saveUserAndRole(User user, Long roleId) {
+
         Role role = Role.get(roleId)
+
         if(role.authority != "ROLE_PUBLISHER"){
-            userInstance.subscriberId = null
+            user.subscriberId = null
         }
-        userInstance.save flush:true
-        UserRole.removeAll(userInstance, true)
-        UserRole.create(userInstance, role, true)
+
+        user.save flush:true
+
+        UserRole.withNewTransaction {
+            UserRole.removeAll(user, true)
+        }
+
+        UserRole.create(user, role, true)
     }
     
     def indexResponse(params){

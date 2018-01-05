@@ -14,7 +14,9 @@
     <link rel="shortcut icon" href="${assetPath(src: 'favicon.ico')}" type="image/x-icon">
     %{--<link rel="apple-touch-icon" href="${resource(dir: 'images', file: 'apple-touch-icon.png')}">--}%
     %{--<link rel="apple-touch-icon" sizes="114x114" href="${resource(dir: 'images', file: 'apple-touch-icon-retina.png')}">--}%
+
     <asset:javascript src="application.js"/>
+
     <asset:stylesheet src="storefront.css"/>
     <asset:stylesheet src="templates.css"/>
     <asset:stylesheet src="preview-popup.css"/>

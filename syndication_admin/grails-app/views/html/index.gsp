@@ -28,7 +28,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
     <div class="row">
         <div class="col-lg-12">
             <!-- /.panel-heading -->
@@ -52,7 +52,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         </tr>
                         </thead>
                         <tbody>
-                        <g:each in="${htmlInstanceList}" status="i" var="htmlInstance">
+                        <g:each in="${htmlList}" status="i" var="htmlInstance">
                             <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 
                                 <td>${htmlInstance?.id}</td>

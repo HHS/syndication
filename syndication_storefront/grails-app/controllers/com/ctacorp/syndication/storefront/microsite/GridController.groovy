@@ -8,22 +8,23 @@ import com.ctacorp.syndication.Campaign
 import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.microsite.FlaggedMicrosite
 import grails.converters.JSON
+import grails.util.Holders
 import grails.plugin.springsecurity.annotation.Secured
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
 class GridController {
-    
+
     def tagService
     def micrositeService
     def micrositeFilterService
-
+    def config = Holders.config
     def sort = [[name:"Alphabetically",value:"name"], [name:"Authored Date",value:"dateContentAuthored"], [name:"Published Date", value:"dateContentPublished"]]
     def order = [[name:"Ascending", value:"asc"],[name:"Descending", value:"desc"]]
     Closure displayStyles = {MediaSelector.DisplayStyle.values()}
 
     def index(){
     }
-    
+
     def create(){
         def userMediaLists = UserMediaList.list()
         def collections = Collection.list()
@@ -60,19 +61,19 @@ class GridController {
             return
         }
         micrositeFilterService.performValidation(microSite)
-        
+
         redirect action: "show", id:microSite.id, params:[showAdminControls:true]
     }
-    
+
     def update(MicroSite microSite){
         if(!microSite?.id){
             flash.error = "Could not find microSite"
             redirect controller: "microsite", action:"index"
             return
         }
-        
+
         microSite = micrositeService.updateBuild(microSite, params)
-        
+
         if(microSite.hasErrors()){
             flash.errors = microSite.errors
             render view:"edit", model: [userMediaLists:UserMediaList.list(),
@@ -101,7 +102,6 @@ class GridController {
             flash.error = "The Microsite is temporarily blocked."
             redirect controller: "storefront", action: "index"
         }
-
         def pane3MediaItems = micrositeService.getMediaItems(microSite.mediaArea3)
         def pane2MediaItems = micrositeService.getMediaItems(microSite.mediaArea2)
 
@@ -114,7 +114,7 @@ class GridController {
             pane2MediaItems:pane2MediaItems,
             pane3MediaItems:pane3MediaItems,
             collection:params.collection,
-            apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+            apiBaseUrl:config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
             gridOffset:0,
             maxGrids:maxGrids
         ]
@@ -128,10 +128,10 @@ class GridController {
         if(!pane1MediaItems) {
             render [:] as JSON
         }
-        render template: "gridList", model:[pane1MediaItems:pane1MediaItems,gridOffset: params.int("gridOffset"),apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath]
+        render template: "gridList", model:[pane1MediaItems:pane1MediaItems,gridOffset: params.int("gridOffset"),apiBaseUrl:config?.API_SERVER_URL + config?.SYNDICATION_APIPATH]
 
     }
-    
+
     def edit(){
         def microSite = MicroSite.get(params.long("id"))
         def userMediaLists = UserMediaList.list()

@@ -19,7 +19,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="width"><g:message code="alternateImage.width.label" default="Width" /></label>
     <div class="col-md-4">
-        <input name="width" type="number" placeholder="image width" class="form-control input-md" value="${alternateImageInstance.width}">
+        <input name="width" type="number" placeholder="image width" class="form-control input-md" value="${alternateImage.width}">
     </div>
 </div>
 
@@ -27,7 +27,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="height"><g:message code="alternateImage.height.label" default="Height" /></label>
     <div class="col-md-4">
-        <input name="height" type="number" placeholder="image height" class="form-control input-md" value="${alternateImageInstance.height}">
+        <input name="height" type="number" placeholder="image height" class="form-control input-md" value="${alternateImage.height}">
     </div>
 </div>
 
@@ -38,7 +38,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <span class="required-indicator">*</span>
     </label>
     <div class="col-md-4">
-        <input name="name" type="text" placeholder="image name" class="form-control input-md" value="${alternateImageInstance?.name}">
+        <input name="name" type="text" placeholder="image name" class="form-control input-md" value="${alternateImage?.name}">
     </div>
 </div>
 
@@ -49,7 +49,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <span class="required-indicator">*</span>
     </label>
     <div class="col-md-4">
-        <input name="url" type="url" placeholder="location" class="form-control input-md" value="${alternateImageInstance?.url}">
+        <input name="url" type="url" placeholder="location" class="form-control input-md" value="${alternateImage?.url}">
     </div>
 </div>
 

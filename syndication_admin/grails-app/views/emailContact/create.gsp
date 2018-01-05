@@ -34,9 +34,10 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <g:if test="${flash.message}">
         <div class="message" role="status">${flash.message}</div>
     </g:if>
-    <g:hasErrors bean="${emailContactInstance}">
+
+    <g:hasErrors bean="${emailContact}">
         <ul class="errors" role="alert">
-            <g:eachError bean="${emailContactInstance}" var="error">
+            <g:eachError bean="${emailContact}" var="error">
                 <li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
             </g:eachError>
         </ul>
@@ -44,13 +45,13 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-md-10">
-            <g:form class="form-horizontal" url="[resource:emailContactInstance, action:'save']" >
+            <g:form class="form-horizontal" url="[resource:emailContact, action:'save']" >
                 <fieldset class="form">
-                    <g:render template="form" model="[emailContactInstance:emailContactInstance]"/>
+                    <g:render template="form" model="[emailContactInstance:emailContact]"/>
                 </fieldset>
                 <fieldset class="buttons">
                     <g:submitButton name="create" class="btn btn-default btn-success" value="${message(code: 'default.button.create.label', default: 'Create')}" />

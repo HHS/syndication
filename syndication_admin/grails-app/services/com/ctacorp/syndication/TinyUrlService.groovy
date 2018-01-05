@@ -19,18 +19,21 @@ import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
+import grails.util.Holders
 
 import javax.annotation.PostConstruct
 
 @Transactional(readOnly = true)
 class TinyUrlService {
     def grailsApplication
+    def config = Holders.config
+
     private String apiUrl
     private RestBuilder rest = new RestBuilder()
 
     @PostConstruct
     void init() {
-        apiUrl = grailsApplication.config.tinyUrl.serverAddress + grailsApplication.config.tinyUrl.mappingBase
+        apiUrl = config?.TINYURL_SERVER_URL + config?.TINYURL_MAPPINGBASE
         //This still needed?
         rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
     }
@@ -58,7 +61,7 @@ class TinyUrlService {
 
             def resp = rest.post(apiUrl + "/bulkAdd.json") {
                 header 'Date', new Date().toString()
-                header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+                header 'Authorization', config.SYNDICATION_INTERNALAUTHHEADER ?: ""
                 header 'Content-Type', "application/json;charset=UTF-8"
                 accept 'application/json'
 
@@ -106,7 +109,7 @@ class TinyUrlService {
         log.info("creating mapping for syndid: " + syndicationId)
         def resp = rest.post(apiUrl) {
             header 'Date', new Date().toString()
-            header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+            header 'Authorization', Holders.config.SYNDICATION_INTERNALAUTHHEADER ?: ""
             header 'Content-Type', "application/json;charset=UTF-8"
             accept 'application/json'
 

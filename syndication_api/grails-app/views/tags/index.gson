@@ -1,0 +1,10 @@
+import com.ctacorp.syndication.api.ApiResponse
+
+model {
+    ApiResponse apiResponse
+}
+
+json {
+    meta apiResponse.generateMetaBlock()
+    results tmpl.'/tags/tag'(apiResponse.results ?: [])
+}

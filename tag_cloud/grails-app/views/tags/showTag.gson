@@ -1,0 +1,25 @@
+import tagcloud.domain.Tag
+
+model {
+    Tag tag
+}
+
+json {
+    "class" "tagcloud.domain.Tag"
+    id tag.id
+    contentItems tmpl.'/content/contentItem'(tag.contentItems ?: [])
+    dateCreated tag.dateCreated
+    language {
+        id tag.language.id
+        isActive tag.language.isActive
+        isoCode tag.language.isoCode
+        name tag.language.name
+    }
+    lastUpdated tag.lastUpdated
+    name tag.name
+    type {
+        id tag.type.id
+        description tag.type.description
+        name tag.type.name
+    }
+}

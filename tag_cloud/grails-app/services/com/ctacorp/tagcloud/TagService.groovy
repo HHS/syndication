@@ -23,7 +23,7 @@ import tagcloud.domain.TagType
 @Transactional(readOnly = true)
 class TagService {
     def contentItemService
-    def solrIndexingService
+
 
     @Transactional
     ContentItem tagContentItem(ContentItem ci, Tag tag) {
@@ -89,7 +89,6 @@ class TagService {
     @Transactional
     Tag findOrSaveTag(String tagName, Long languageId, Long tagTypeId){
         Tag tag = findOrSaveTag(tagName, Language.load(languageId), TagType.load(tagTypeId))
-        solrIndexingService.inputTag("${tag.id}", tagName)
         tag
     }
 
@@ -101,10 +100,12 @@ class TagService {
     @Transactional
     def deleteTag(Long id){
         Tag tag = Tag.get(id)
-        tag.delete(flush:true)
+        tag?.delete(flush:true)
     }
 
     def findTagsByTagName(String tagName, params = [:]){
+        params.sort = params.sort ?: 'name'
+        params.order = params.order ?: 'asc'
         Tag.where{
             if(params.tagTypeId){
                 type{
@@ -118,7 +119,7 @@ class TagService {
                 }
             }
 
-            name =~ "%${tagName}%"
+            name =~ "${tagName}%"
         }.list(params)
     }
 
@@ -129,6 +130,7 @@ class TagService {
     TagType getTagTypeByName(String name) {
         TagType.findByName(name)
     }
+
 
     Tag getTag(Long id){
         Tag.get(id)
@@ -201,22 +203,16 @@ class TagService {
         }.list(params) ?: []
     }
 
-    def getRelatedTagsByTagId(Long tagId, params = [:]) {
-        def contentItems = ContentItem.where{
-            tags{
-                id == tagId
-            }
-        }.list()
+    def getRelatedTagsByTagId(Long tagId, Map params = [:]) {
 
-        //TODO we can probably do this a better way
-        def tags = []
-        contentItems*.tags.each{
-            tags.addAll(it)
+        def tag = Tag.findById(tagId)
+
+        if(!tag) {
+            return []
         }
-        tags = tags.unique() - Tag.load(tagId)
-        Tag.where{
-            id in tags*.id
-        }.list(params) ?: []
+
+        def tagIds = tag.contentItems.collect { it.tags.collect { it.id } }.flatten().unique()
+        Tag.findAllByIdInList(tagIds, params) ?: []
     }
 
     def tagExists(Language languageInstance) {

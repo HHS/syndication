@@ -2,7 +2,7 @@
 <div class="form-group">
     <label class="col-md-5 control-label" for="accountName">Account Name</label>
     <div class="col-md-7">
-        <input id="accountName" name="accountName" required="" value="${twitterAccountInstance?.accountName}" type="text" placeholder="Account Name" class="form-control input-md">
+        <input id="accountName" name="accountName" required="required" value="${twitterAccountInstance?.accountName}" type="text" placeholder="Account Name" class="form-control input-md">
     </div>
 </div>
 
@@ -10,7 +10,7 @@
     <div class="form-group">
         <label class="col-md-5 control-label" for="subscriberId">Subscriber</label>
         <div class="col-md-7">
-            <g:select from="${subscribers}" name="subscriberId" optionKey="id" optionValue="name" value="${twitterAccountInstance?.subscriberId}" noSelection="['':'-Choose an Owner-']" class="form-control"/>
+            <g:select from="${subscribers}" required="required" name="subscriberId" optionKey="id" optionValue="name" value="${twitterAccountInstance?.subscriberId}" noSelection="['':'-Choose an Owner-']" class="form-control"/>
         </div>
     </div>
 </sec:ifAnyGranted>

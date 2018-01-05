@@ -11,19 +11,14 @@ import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.cache.CachedContent
 import com.ctacorp.syndication.health.FlaggedMedia
 import com.ctacorp.syndication.media.QuestionAndAnswer
-import com.ctacorp.syndication.media.Video
 import com.ctacorp.syndication.metric.MediaMetric
-import com.ctacorp.syndication.preview.MediaPreview
-import com.ctacorp.syndication.preview.MediaThumbnail
 import com.ctacorp.syndication.storefront.UserMediaList
 import com.ctacorp.syndication.preview.MediaPreview
 import com.ctacorp.syndication.preview.MediaThumbnail
-import grails.plugin.cache.web.filter.PageFragmentCachingFilter
 import grails.transaction.NotTransactional
 import grails.util.Environment
 import grails.transaction.Transactional
-import org.springframework.transaction.interceptor.TransactionAspectSupport
-import org.springframework.transaction.support.DefaultTransactionStatus
+import grails.util.Holders
 
 @Transactional
 class MediaItemsService {
@@ -33,7 +28,8 @@ class MediaItemsService {
     def springSecurityService
     def cmsManagerKeyService
     def contentRetrievalService
-    def solrIndexingService
+    def elasticsearchService
+    def tagService
 
     def publisherItems = {
         MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id
@@ -63,6 +59,9 @@ class MediaItemsService {
         if(!MediaItem.exists(id)){
             return
         }
+
+        def clazz = MediaItem.get(id).class.name
+
         //Alternate Images -----------------------------------------------
         AlternateImage.withTransaction {
             MediaItem mi = MediaItem.get(id)
@@ -219,10 +218,11 @@ class MediaItemsService {
         //The media item itself --------------------------------------------------
         MediaItem.withTransaction {
             MediaItem mi = MediaItem.get(id)
-            MediaItem.where{
-                id == mi.id
-            }.deleteAll()
+              mi.delete()
         }
+
+        tagService.removeContentItem(id)
+        elasticsearchService.deleteMediaItemIndex(id, clazz)
     }
 
     @Transactional(readOnly = true)
@@ -297,6 +297,7 @@ class MediaItemsService {
         params.title = params.title ?: ""
         params.url = params.url ?: ""
         params.nameContains = params.title.replace('%', '\\%')
+        params.language = params.language ?: "1"
         params.languageName = Language.get(params.language)
         params.sourceUrlContains = params.url
         params.restrictToSet = params.inList
@@ -371,7 +372,7 @@ class MediaItemsService {
             }
             if (UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER") {
                 if (!springSecurityService.currentUser.subscriberId) {
-                    mediaItem.errors.reject("SubscriberId invalid", "You do not have a valid subscriber. For help contact " + grailsApplication.config.grails.mail.default.from)
+                    mediaItem.errors.reject("SubscriberId invalid", "You do not have a valid subscriber. For help contact " + Holders.config.MAIL_DEFAULT_FROM)
                     log.error("The publisher " + springSecurityService.currentUser.name)
                 }
                 if (mediaItemSubscriber) {
@@ -404,6 +405,7 @@ class MediaItemsService {
 
         mediaItem.save(flush: true)
         mediaItemSubscriber?.save(flush: true)
+        elasticsearchService.indexMediaItem(mediaItem)
 
         //Add URL Mapping
         DelayedTinyUrlJob.schedule(new Date(System.currentTimeMillis() + 5000), [mediaId:mediaItem.id, sourceUrl: mediaItem.sourceUrl, externalGuid:mediaItem.externalGuid])
@@ -418,19 +420,25 @@ class MediaItemsService {
     }
 
     private updateAndNotify(mediaItems) {
+
         mediaItems.each { MediaItem mediaItem ->
+
             try {
-                Map freshExtraction = contentRetrievalService.getContentAndMd5Hashcode(mediaItem.sourceUrl)
+
+                def freshExtraction = contentRetrievalService.getContentAndMd5Hashcode(mediaItem.sourceUrl)
+
                 if (freshExtraction.hash != mediaItem.hash) {
+
                     mediaItem.hash = freshExtraction.hash
                     mediaItem.save(flush: true)
-                    solrIndexingService.inputMediaItem(mediaItem, freshExtraction.content)
+
+                    elasticsearchService.indexMediaItem(mediaItem, freshExtraction.content)
                 }
+
             } catch (e) {
-                log.error("Could not extract content, page was found but not marked up at url: ${mediaItem.sourceUrl}")
+                log.error "Could not extract content, page was found but not marked up at url: ${mediaItem.sourceUrl}", e
             }
         }
-        //remote cache flushed in syndication model MediaItemChangeListener
     }
 
     def resetHash(Long mediaId) {

@@ -1,21 +1,19 @@
 package com.ctacorp.syndication.tools
 
 import com.ctacorp.syndication.commons.util.Hash
-import com.ctacorp.syndication.jobs.DelayedMediaPreviewThumbnailJob
 import com.ctacorp.syndication.media.MediaItem
-import com.ctacorp.syndication.preview.MediaPreview
-import com.ctacorp.syndication.preview.MediaThumbnail
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
-import grails.util.Holders
-import org.apache.commons.io.IOUtils
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional
 class MediaPreviewThumbnailController {
-    def mediaPreviewThumbnailService
+
+    static final GET_IMAGE_BASE_URL = "${System.getenv('API_SERVER_URL')}${System.getenv('SYNDICATION_APIPATH')}"
+
     def remoteCacheService
     def mediaPreviewThumbnailJobService
+    def awsSnsThumbnailPreviewService
 
     def index() {
         redirect action: 'allThumbnails'
@@ -23,21 +21,21 @@ class MediaPreviewThumbnailController {
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
     def flush(MediaItem mi) {
-        mediaPreviewThumbnailService.generate(mi.id)
-        String key = Hash.md5("${mi.id}")
-        remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", key)
+
+        awsSnsThumbnailPreviewService.generatePreviewAndThumbnail(mi)
         flash.message = "The media item's thumbnail and preview images are now being regenerated."
         redirect controller:'mediaItem', action:'show', id: mi.id
     }
 
     @Secured(['ROLE_ADMIN'])
-    def allThumbnails(){
+    def allThumbnails() {
         params.max = params.max?:100
-        [mediaItems:MediaItem.list(params)]
+        def mediaItems = MediaItem.list(params)
+        [mediaItems: mediaItems]
     }
 
     @Secured(['ROLE_ADMIN'])
-    def regenerateThumbnailsForCollection(Long collectionId, Long manualCollectionId){
+    def regenerateThumbnailsForCollection(Long collectionId, Long manualCollectionId) {
         if(manualCollectionId){
             if(!com.ctacorp.syndication.media.Collection.exists(manualCollectionId)){
                 flash.error = "No campaign found with ID: ${manualCollectionId}"
@@ -64,12 +62,12 @@ class MediaPreviewThumbnailController {
     def regenerateThumbnailPreviewForSingleItem(MediaItem mi){
         def errorCode = System.nanoTime()
         try {
-            mediaPreviewThumbnailService.generate(mi.id)
+            awsSnsThumbnailPreviewService.generatePreviewAndThumbnail(mi.id)
             String key = Hash.md5("${mi.id}")
             remoteCacheService.flushRemoteCacheByNameAndKey("imageCache", key)
-            render """<img src="${Holders.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/thumbnail.jpg"/>"""
+            render """<img src="${GET_IMAGE_BASE_URL}/resources/media/${mi.id}/thumbnail.jpg"/>"""
         } catch(e){
-            log.error("Error Code: ${errorCode}\n"+e)
+            log.error("Error Code: ${errorCode}", e)
             e.printStackTrace()
             render "Error code: ${errorCode}"
         }

@@ -7,6 +7,6 @@ import grails.plugin.springsecurity.annotation.Secured
 class StatusCheckController {
 
     def index() {
-        render "${params.callback}(${([running:"roger"] as JSON)});"
+        render contentType: 'application/json', text: "${params.callback}(${([running:"roger"] as JSON)});"
     }
 }

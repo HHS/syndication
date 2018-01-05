@@ -1,5 +1,5 @@
 <%@ page import="com.ctacorp.syndication.storefront.UserMediaList" %>
-<div class="fieldcontain ${hasErrors(bean: userMediaListInstance, field: 'name', 'error')} ">
+<div class="fieldcontain ${hasErrors(bean: userMediaList, field: 'name', 'error')} ">
     <div class="left_side">
         <label for="name">
             <g:message code="userMediaList.name.label" default="Name" />
@@ -7,11 +7,11 @@
         </label>
     </div>
     <div class="right_side">
-	    <g:textField name="name" required="" maxlength="255" value="${userMediaListInstance?.name}"/>
+	    <g:textField name="name" required="" maxlength="255" value="${userMediaList?.name}"/>
     </div>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: userMediaListInstance, field: 'description', 'error')}">
+<div class="fieldcontain ${hasErrors(bean: userMediaList, field: 'description', 'error')}">
     <div class="left_side">
         <label for="description">
             Description
@@ -19,11 +19,11 @@
         </label>
     </div>
     <div class="right_side">
-        <g:textArea class="mediaListDesc" maxlength="2048" rows="5" required="" cols="40" name="description" value="${userMediaListInstance?.description}"/>
+        <g:textArea class="mediaListDesc" maxlength="2048" rows="5" required="" cols="40" name="description" value="${userMediaList?.description}"/>
     </div>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: userMediaListInstance, field: 'mediaItems', 'error')} ">
+<div class="fieldcontain ${hasErrors(bean: userMediaList, field: 'mediaItems', 'error')} ">
     <div class="left_side">
         <label for="mediaItemIds">
             <g:message code="userMediaList.mediaItems.label" default="Media Items" />

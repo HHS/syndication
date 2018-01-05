@@ -78,7 +78,7 @@ class ExtendedAttributeController {
 
         if (extendedAttributeInstance.hasErrors()) {
             flash.errors = extendedAttributeInstance.errors.allErrors.collect{[message:g.message([error : it])]}
-            String mediaForTokenInput = featuredMedia.collect{ [id:it?.id, name:"$it.id - ${it?.name}"] } as JSON
+            String mediaForTokenInput = params.mediaItem?.collect{ [id:it?.id, name:"$it.id - ${it?.name}"] } as JSON
             redirect action: 'create', params:params, model:[mediaForTokenInput:mediaForTokenInput]
             return
         }
@@ -106,7 +106,6 @@ class ExtendedAttributeController {
         }
         def mediaItem = [extendedAttributeInstance?.mediaItem]
         String mediaForTokenInput = mediaItem.collect{ [id:it?.id, name:"$it.id - ${it?.name}"] } as JSON
-        println "items: " + mediaForTokenInput
         respond extendedAttributeInstance, model:[user:springSecurityService.currentUser,mediaForTokenInput:mediaForTokenInput]
     }
 

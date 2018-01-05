@@ -1,0 +1,12 @@
+import com.ctacorp.syndication.Language
+
+model {
+    Language language
+}
+
+json {
+    id language.id
+    name language.name
+    isoCode language.isoCode
+    isActive language.isActive
+}

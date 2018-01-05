@@ -12,7 +12,7 @@
     <h1><g:message code="default.list.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-lg-12">
@@ -43,7 +43,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <g:each in="${PDFInstanceList}" status="i" var="PDFInstance">
+                            <g:each in="${PDFList}" status="i" var="PDFInstance">
                                 <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 
                                     <td>${PDFInstance?.id}</td>

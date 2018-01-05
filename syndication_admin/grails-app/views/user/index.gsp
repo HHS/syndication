@@ -32,62 +32,69 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
-    <g:render template="search"/>
+    <synd:hasError/>
 
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-            <tr>
+    <form role="search" class="form-horizontal" action="index">
+        <g:render template="search"/>
 
-                <g:sortableColumn class="idTables" property="user.id" title="${message(code: 'user.id.label', default: 'ID')}" params="[role:params.role]"/>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                <tr>
 
-                <g:sortableColumn property="user.username" title="${message(code: 'user.username.label', default: 'Username')}" params="[role:params.role]"/>
+                    <g:sortableColumn class="idTables" property="user.id" title="${message(code: 'user.id.label', default: 'ID')}" params="[role:params.role]"/>
 
-                <g:sortableColumn property="user.name" title="${message(code: 'user.name.label', default: 'Name')}" params="[role:params.role]"/>
+                    <g:sortableColumn property="user.username" title="${message(code: 'user.username.label', default: 'Username')}" params="[role:params.role]"/>
 
-                <g:sortableColumn property="user.accountExpired" title="${message(code: 'user.accountExpired.label', default: 'Account Expired')}" params="[role:params.role]"/>
+                    <g:sortableColumn property="user.name" title="${message(code: 'user.name.label', default: 'Name')}" params="[role:params.role]"/>
 
-                %{--<g:sortableColumn property="user.accountLocked" title="${message(code: 'user.accountLocked.label', default: 'Account Locked')}" params="[role:params.role]"/>--}%
+                    <g:sortableColumn property="user.accountExpired" title="${message(code: 'user.accountExpired.label', default: 'Account Expired')}" params="[role:params.role]"/>
 
-                <g:sortableColumn property="user.enabled" title="${message(code: 'user.enabled.label', default: 'Enabled')}" params="[role:params.role]"/>
+                    %{--<g:sortableColumn property="user.accountLocked" title="${message(code: 'user.accountLocked.label', default: 'Account Locked')}" params="[role:params.role]"/>--}%
 
-                <g:sortableColumn property="role" title="${message(code: 'user.role.label', default: 'Role')}" params="[role:params.role]"/>
+                    <g:sortableColumn property="user.enabled" title="${message(code: 'user.enabled.label', default: 'Enabled')}" params="[role:params.role]"/>
 
-                <th>Reset Password</th>
+                    <g:sortableColumn property="role" title="${message(code: 'user.role.label', default: 'Role')}" params="[role:params.role]"/>
 
-            </tr>
-            </thead>
-            <tbody>
-            <g:each in="${userRoles}" status="i" var="userRoleInstance">
-                <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-
-                    <td>${userRoleInstance?.user?.id}</td>
-
-                    <td><g:link action="show" id="${userRoleInstance.user.id}">${fieldValue(bean: userRoleInstance.user, field: "username")}</g:link></td>
-
-                    <td>${fieldValue(bean: userRoleInstance.user, field: "name")}</td>
-
-                    <td><g:formatBoolean boolean="${userRoleInstance.user.accountExpired}"/></td>
-
-                    %{--<td><g:formatBoolean boolean="${userRoleInstance.user.accountLocked}"/></td>--}%
-
-                    <td><g:formatBoolean boolean="${userRoleInstance.user.enabled}"/></td>
-
-                    <td>${userRoleInstance.role}</td>
-
-                    <td><input type="button" id="resetPassword" name="resetPassword" onclick="resetPassword(${userRoleInstance.user.id})" class="btn btn-primary" value="Reset Password"/></td>
+                    <th>Reset Password</th>
 
                 </tr>
-            </g:each>
-            </tbody>
-        </table>
-    </div>
-    <g:if test="${userInstanceCount > params.max}">
-        <div class="pagination">
-            <g:paginate total="${userInstanceCount ?: 0}" params="[role:params.role]"/>
+                </thead>
+                <tbody>
+                <g:each in="${userRoles}" status="i" var="userRoleInstance">
+                    <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+
+                        <td>${userRoleInstance?.user?.id}</td>
+
+                        <td><g:link action="show" id="${userRoleInstance.user.id}">${fieldValue(bean: userRoleInstance.user, field: "username")}</g:link></td>
+
+                        <td>${fieldValue(bean: userRoleInstance.user, field: "name")}</td>
+
+                        <td><g:formatBoolean boolean="${userRoleInstance.user.accountExpired}"/></td>
+
+                        %{--<td><g:formatBoolean boolean="${userRoleInstance.user.accountLocked}"/></td>--}%
+
+                        <td><g:formatBoolean boolean="${userRoleInstance.user.enabled}"/></td>
+
+                        <td>${userRoleInstance.role}</td>
+
+                        <td><input type="button" id="resetPassword" name="resetPassword" onclick="resetPassword(${userRoleInstance.user.id})" class="btn btn-primary" value="Reset Password"/></td>
+
+                    </tr>
+                </g:each>
+                </tbody>
+            </table>
         </div>
-    </g:if>
+        <g:if test="${userInstanceCount > params.max}">
+            <div class="pagination">
+                <g:paginate total="${userInstanceCount ?: 0}" params="[
+                        role:params.role,
+                        search:params.search,
+                        searchSelector:params.searchSelector
+                ]"/>
+            </div>
+        </g:if>
+    </form>
     <script>
         function resetPassword( id ) {
             $.ajax({

@@ -1,0 +1,8 @@
+import tagcloud.domain.Tag
+
+model {
+    List<Tag> tagList
+}
+
+
+json tmpl.'tag'(tagList ?: [])

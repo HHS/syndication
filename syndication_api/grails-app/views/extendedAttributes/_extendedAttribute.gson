@@ -1,0 +1,11 @@
+import com.ctacorp.syndication.ExtendedAttribute
+
+model {
+    ExtendedAttribute extendedAttribute
+}
+
+json {
+    id extendedAttribute.id
+    name extendedAttribute.name
+    value extendedAttribute.value
+}

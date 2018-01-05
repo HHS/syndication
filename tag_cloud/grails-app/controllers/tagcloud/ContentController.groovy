@@ -17,9 +17,7 @@ class ContentController {
      * @return
      */
     def index() {
-        JSON.use("contentList") {
-            respond ContentItem.list(params)
-        }
+        respond ContentItem.list(params)
     }
 
     /**
@@ -28,9 +26,7 @@ class ContentController {
      * @return
      */
     def getRelatedContentBySyndicationId(Long syndicationId) {
-        JSON.use("contentList") {
-            respond contentItemService.getRelatedContentItemsBySyndicationId(syndicationId, params)
-        }
+        respond contentItemService.getRelatedContentItemsBySyndicationId(syndicationId, params), view:"index"
     }
 
     /**
@@ -46,9 +42,7 @@ class ContentController {
             return
         }
 
-        JSON.use("contentList") {
-            respond contentItemService.getRelatedContentItemsByContentItem(ci, params)
-        }
+        respond contentItemService.getRelatedContentItemsByContentItem(ci, params), view:"index"
     }
 
     /**
@@ -62,9 +56,7 @@ class ContentController {
         tags*.contentItems.each{ contentItems ->
             content.addAll(contentItems)
         }
-        JSON.use("contentList") {
-            respond content.unique()
-        }
+        respond content.unique(), view:"index"
     }
 
     /**
@@ -73,9 +65,8 @@ class ContentController {
      * @return
      */
     def getContentForTagId(Long tagId){
-        JSON.use("contentList"){
-            respond contentItemService.getContentForTagId(tagId, params)
-        }
+        def items = contentItemService.getContentForTagId(tagId, params) as List<ContentItem> ?: []
+        respond items, view:"index"
     }
 
     /**
@@ -84,8 +75,7 @@ class ContentController {
      * @return
      */
     def getContentForTagIds(String id){
-        JSON.use("contentList"){
-            respond contentItemService.getContentForTagIds(id, params)
-        }
+        respond contentItemService.getContentForTagIds(id, params), view:"index"
+
     }
 }

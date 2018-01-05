@@ -1,0 +1,206 @@
+---
+grails:
+    profile: web
+    codegen:
+        defaultPackage: cms.manager
+    spring:
+        transactionManagement:
+            proxies: false
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+spring:
+    main:
+        banner-mode: "off"
+    groovy:
+        template:
+            check-template-location: false
+
+# Spring Actuator Endpoints are Disabled by Default
+endpoints:
+    enabled: false
+    jmx:
+        enabled: true
+
+---
+grails:
+    mime:
+        disable:
+            accept:
+                header:
+                    userAgents:
+                        - Gecko
+                        - WebKit
+                        - Presto
+                        - Trident
+        types:
+            all: '*/*'
+            atom: application/atom+xml
+            css: text/css
+            csv: text/csv
+            form: application/x-www-form-urlencoded
+            html:
+              - text/html
+              - application/xhtml+xml
+            js: text/javascript
+            json:
+              - application/json
+              - text/json
+            multipartForm: multipart/form-data
+            pdf: application/pdf
+            rss: application/rss+xml
+            text: text/plain
+            hal:
+              - application/hal+json
+              - application/hal+xml
+            xml:
+              - text/xml
+              - application/xml
+    urlmapping:
+        cache:
+            maxsize: 1000
+    controllers:
+        defaultScope: singleton
+    converters:
+        encoding: UTF-8
+    views:
+        default:
+            codec: html
+        gsp:
+            encoding: UTF-8
+            htmlcodec: xml
+            codecs:
+                expression: html
+                scriptlets: html
+                taglib: none
+                staticparts: none
+endpoints:
+    jmx:
+        unique-names: true
+
+---
+hibernate:
+    cache:
+        queries: false
+        use_second_level_cache: true
+        use_query_cache: false
+        region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+
+dataSource:
+    pooled: true
+    jmxExport: true
+    driverClassName: com.mysql.jdbc.Driver
+    dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    username: "${MYSQL_USER}"
+    password: "${MYSQL_PASSWORD}"
+
+environments:
+    development:
+        dataSource:
+            dbCreate: update
+            url: jdbc:mysql://localhost/cms_manager?useSSL=false
+    test:
+        dataSource:
+            dbCreate: update
+            url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+        grails:
+            serverURL: http://localhost:9090/CmsManager
+    production:
+        dataSource:
+            dbCreate: update
+            url: "${CMSMANAGER_DB_URL}"
+            properties:
+                jmxEnabled: true
+                initialSize: 5
+                maxActive: 50
+                minIdle: 5
+                maxIdle: 25
+                maxWait: 10000
+                maxAge: 600000
+                timeBetweenEvictionRunsMillis: 5000
+                minEvictableIdleTimeMillis: 60000
+                validationQuery: SELECT 1
+                validationQueryTimeout: 3
+                validationInterval: 15000
+                testOnBorrow: true
+                testWhileIdle: true
+                testOnReturn: false
+                jdbcInterceptors: ConnectionState
+                defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+        grails:
+            serverURL: "${CMSMANAGER_SERVER_URL}"
+
+greenmail:
+  ports:
+    smtp: 3028
+
+grails:
+  mail:
+    host: "${MAIL_HOST}"
+    port: ${MAIL_PORT}
+  plugin:
+    springsecurity:
+      useSecurityEventListener : true
+      userLookup:
+        userDomainClassName : 'com.ctacorp.syndication.manager.cms.User'
+        authorityJoinClassName : 'com.ctacorp.syndication.manager.cms.UserRole'
+        authority.className : 'com.ctacorp.syndication.manager.cms.Role'
+      controllerAnnotations.staticRules :
+        - {pattern: '/login/**', access: ['permitAll']}
+        - {pattern: '/logout/**', access: ['permitAll']}
+        - {pattern: '/api/**', access: ['permitAll']}
+        - {pattern: '/**', access: ['permitAll']}
+        - {pattern: '/index', access: ['permitAll']}
+        - {pattern: '/index.gsp', access: ['permitAll']}
+        - {pattern: '/greenmail/**', access: ['permitAll']}
+        - {pattern: '/assets/**', access: ['permitAll']}
+        - {pattern: '/**/js/**', access: ['permitAll']}
+        - {pattern: '/**/css/**', access: ['permitAll']}
+        - {pattern: '/**/images/**', access: ['permitAll']}
+        - {pattern: '/**/favicon.ico', access: ['permitAll']}
+    xframeoptions:
+      deny: true
+
+---
+test:
+  subscriber:
+    email:
+      address: test@example.com
+    keyAgreement:
+      entity1: cmsmanager.syndication.hhs.gov
+      entity2: test.syndication.hhs.gov
+      entity1PublicKey: mmpJ+xLlpSjjACMOT7BPy3aQdVOtX31iyBKk0ZoNdv2GTzLx5in74TEYu1UuNn/hRtwNbTtzceEiWE391n+3jg==
+      entity1PrivateKey: bRvubHYL0nO4VZ2dLV+5y9uL0ZVTRXdsalMCB6vmxQlAEdovUYc7IOciN04ITT00SjKhz2FfIloxErY15XccOQ==
+      entity2PublicKey: 9k+x8vDQJBcEYcEb/y/iipg8kXMU7sFfk1klV3PqMZkUBuJ/rDgVZtHmJGBydEKfnGKPAf6y9DBb7a+1tAz9Bg==
+      entity2PrivateKey: UxMt4OpdAZhJFMOF/kmv/lZAYXjE4hV8EI9UdmQP71J9VbbIvmR0DEhX2D3He7AKTq1IQz4tAqDX+Jy1Svxlqw==
+      secret: xjY3i4AnsZ9wWuDKboD1XbAdtX1hgOh2tYMnwCWnXhweO94IKrbVJuPZIQsyO5Sa40CjAMF9tG5ciI+cXITjVw==
+      prime: 9sXU4jNSYQ954vTLuA+dD3rinMXQjBTgHhyCyfqhWVBfUEcJOc8vJGXNVmWH9JRvc2SpfDC0yXRL8DxZ5KiHIw==
+      generator: Ag==
+  rhythmyxSubscriber:
+    instanceName: tobacco
+    rhythmyxHost: 127.0.0.1
+    rhythmyxPort: 3000
+    rhythmyxUser: rsrw_man
+    rhythmyxPassword: rsrw_pass
+    rhythmyxCommunity: rsrw_community
+    subscriber: test.syndication.hhs.gov
+  emailSubscriber:
+    email: syndication@ctacorp.com
+  restSubscribers:
+    - deliveryEndpoint: http://127.0.0.1:3000/delivery/endpoint/410
+      subscriber: test.syndication.hhs.gov
+    - deliveryEndpoint: http://127.0.0.1:3000/delivery/endpoint/400
+      subscriber: test.syndication.hhs.gov
+    - deliveryEndpoint: http://127.0.0.1:3000/delivery/endpoint/200
+      subscriber: test.syndication.hhs.gov
+
+apiKey:
+  filteredUri: /api/v1/**
+  headerName: Authorization
+  keyName: syndication_api_key
+  entities:
+    - cmsManager: cmsmanager.syndication.hhs.gov
+    - syndication: syndication.hhs.gov
+  includeAuthorizationFailureDetails: false

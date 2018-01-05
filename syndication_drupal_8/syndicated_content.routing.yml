@@ -1,0 +1,9 @@
+syndicated_content.syndicated_content_config_form:
+  path: 'admin/config/syndicated_content/sources'
+  defaults:
+    _form: '\Drupal\syndicated_content\Form\SyndicatedContentConfigForm'
+    _title: 'Syndicated Content Sources'
+  requirements:
+    _permission: 'syndication configuration'
+  options:
+    _admin_route: TRUE

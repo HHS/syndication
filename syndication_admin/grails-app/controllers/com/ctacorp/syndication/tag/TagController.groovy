@@ -16,20 +16,29 @@ import grails.plugin.springsecurity.annotation.Secured
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 class TagController {
     def tagService
-    def solrIndexingService
 
     def index(Long prepopulateTagId) {
         listTagHelper(prepopulateTagId)
     }
 
     def show(Long id, Integer max) {
+
+        def mediaItems = []
+        def total = 0
         def tag = tagService.getTag(id)
+        def syndicationIdsForTag = tag?.contentItems?.collect { it.syndicationId } ?: []
+
         params.max = Math.min(max ?: 10, 20)
-        [
-                tag           : tag,
-                mediaItemsList: MediaItem.findAllByIdInList(tag.contentItems.syndicationId, params),
-                total         : tag.contentItems.size()
-        ]
+
+        if(syndicationIdsForTag) {
+            mediaItems = MediaItem.findAllByIdInList(syndicationIdsForTag, params)
+        }
+
+        if(mediaItems) {
+            total = MediaItem.countByIdInList(syndicationIdsForTag)
+        }
+
+        [tag: tag, mediaItemsList: mediaItems, total: total]
     }
 
     def showMediaItem(MediaItem mi) {
@@ -68,34 +77,46 @@ class TagController {
     }
 
     def save(String name, Long tagType, Long language) {
-        def tag
-        if (tagService.checkTagExistence(name, tagType, language)) {
-            flash.message = "Tag [${params.name}] has already been created."
-        } else {
-            tag = tagService.createTag(name, tagType, language)
-        }
-        if (tag && !tag.errors) {
-            def createdTags = tagService.findTagsByTagName(name, [languageId: language, tagTypeId: tagType])
 
-            solrIndexingService.inputTag(String.valueOf(createdTags[0].id), name)
-            flash.message = "Tag [${params.name}] created!"
-        } else {
-            flash.errors = tag?.errors
+        if(tagService.findTagsByTagName(name, [languageId: language, tagTypeId: tagType]).size() > 0) {
+
+            flash.error = "Tag already exists"
             redirect action: 'create'
             return
         }
+
+        def tag = tagService.createTag(name, tagType, language)
+
+        if (tag && !tag.errors) {
+            flash.message = "Tag [${params.name}] created!"
+        } else {
+
+            flash.errors = tag?.errors
+            render action: 'create'
+            return
+        }
+
         redirect action: 'index', params: [prepopulateTagId: tag.id]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
     def update(Long id, String name, Long language, Long tagType) {
+
+        if(tagService.findTagsByTagName(name, [languageId: language, tagTypeId: tagType]).size() > 0) {
+
+            flash.error = "Tag already exists"
+            redirect action: 'edit'
+            return
+        }
+
         def resp = tagService.updateTag(id, params.name, language, tagType)
-        if (resp.message == "Invalid Values") {
+
+        if (resp?.message == "Invalid Values") {
             flash.errors = resp.details.errors
             redirect action: 'edit', id: id
             return
         }
-        solrIndexingService.inputTag(String.valueOf(id), params.name)
+
         flash.message = "Tag [${params.name}] Updated!"
         redirect action: 'index'
     }
@@ -104,7 +125,6 @@ class TagController {
     def delete(Long id) {
         String tagName = tagService.getTag(id).name
         tagService.deleteTag(id)
-        solrIndexingService.removeTag(id)
         flash.message = "Tag [${tagName}] deleted."
         redirect action: 'index'
     }
@@ -133,11 +153,12 @@ class TagController {
             return
         }
         def taggedItems = tagService.tagMultiple(tagIds, mediaIds, params)
-        if (taggedItems == [] || taggedItems.isEmpty()) {
+        if (!taggedItems) {
             flash.error = "Unable to Tag media items!"
             redirect action: "tagger", model: [successfullyTaggedItems: ""]
             return
         }
+
         def mediaItems = MediaItem.restrictToSet(taggedItems*.syndicationId.join(",")).list()
         flash.message = "Items Successfully Tagged!"
         redirect action: "tagger", model: [successfullyTaggedItems: mediaItems]
@@ -154,7 +175,6 @@ class TagController {
         if (currentTags || !tagIds.isEmpty()) {
             flash.message = "Tags have been updated"
         }
-
         redirect controller:"mediaItem", action: "show", params:[id:mi.id, languageId: languageId, tagTypeId: tagTypeId]
     }
 
@@ -185,9 +205,6 @@ class TagController {
         } else {
             tags = tagService.findTagsByTagName(q, params)
         }
-        if(tagService.checkTagExistence(q,params.long("tagTypeId") ?: 1, params.long("languageId") ?: 1) && !tags.name.contains(q)) {
-            tags << tagService.checkTagExistence(q,params.long("tagTypeId") ?: 1, params.long("languageId") ?: 1)
-        }
 
         tags.each { tag ->
             resp << [id: tag.id, name: "${tag.name}", lowerName:tag.name.toLowerCase() as String]
@@ -196,7 +213,6 @@ class TagController {
         if (!resp.lowerName.contains(q.toLowerCase()) && !q.isInteger()) {
             resp << [id: "'" + "${q}" + "'", name: "${q} - Create New"]
         }
-
 
         render resp as JSON
     }

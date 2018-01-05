@@ -43,7 +43,7 @@
                         </div>
                 </div>
             </div>
-            <g:render template="/storefront/rightBoxes" model="[featuredMedia: featuredMedia]"/>
+            <g:render template="/storefront/rightBoxes" model="[featuredMedia: featuredMedia, API_SERVER_URL : API_SERVER_URL]"/>
         </div>
 	</body>
 </html>

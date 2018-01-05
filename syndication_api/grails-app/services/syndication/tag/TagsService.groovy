@@ -32,7 +32,7 @@ class TagsService {
     @PostConstruct
     void init() {
         rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
-        serverAddress = Holders.config.tagCloud.serverAddress
+        serverAddress = Holders.config.TAG_CLOUD_SERVER_URL
     }
 
     @Transactional(readOnly = true)
@@ -75,7 +75,7 @@ class TagsService {
 
         def resp = rest.post("${serverAddress}/tags/tagSyndicatedItemByTagIds") {
             header 'Date', new Date().toString()
-            header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+            header 'Authorization', Holders.config.SYNDICATION_INTERNALAUTHHEADER ?: ""
             header 'Content-Type', "application/json;charset=UTF-8"
             accept 'application/json'
 
@@ -115,7 +115,7 @@ class TagsService {
                        typeId:typeId] as JSON
         def resp = rest.post("${serverAddress}/tags/tagSyndicatedItemByTagName") {
             header 'Date', new Date().toString()
-            header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+            header 'Authorization', Holders.config.SYNDICATION_INTERNALAUTHHEADER ?: ""
             header 'Content-Type', "application/json;charset=UTF-8"
             accept 'application/json'
 
@@ -161,6 +161,9 @@ class TagsService {
         params.tagId = tagId
         params.includePaginationFields = true
         restGet("${serverAddress}/tags/getTagsRelatedToTagId.json", params) ?: []
+    }
+    def getTagsForSyndicationId(Long id) {
+        restGet("${serverAddress}/tags/getTagsForSyndicationId.json?syndicationId=${id}")
     }
 
     @NotTransactional
@@ -211,6 +214,22 @@ class TagsService {
         }
     }
 
+    def removeContentItem(Long id) {
+
+        def path = "/tags/deleteContentItem/${id}.json"
+
+        try {
+            def resp = rest.delete((config?.TAG_CLOUD_SERVER_URL ?: "") + path) {
+                header 'Date', new Date().toString()
+                header 'Authorization', config.SYNDICATION_INTERNALAUTHHEADER ?: ""
+                header 'Content-Type', "application/json;charset=UTF-8"
+            }
+            return resp
+        } catch (e) {
+            log.error "Could not connect to: ${path}"
+            return null
+        }
+    }
 
     private String aggregateParams(p) {
         if (!p) {

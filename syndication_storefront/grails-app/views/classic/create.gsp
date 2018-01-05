@@ -20,7 +20,7 @@
 
 </script>
 
-<g:render template="../microsite/topNav"/>
+<g:render template="/microsite/topNav"/>
 <g:form action="save" name="micrositeForm" method="post" class="form-horizontal helps-footer">
 <div class="container microsite-builder">
 
@@ -34,7 +34,7 @@
 
             <p>You've chosen the classic template.<br/>Click on any section to get started.</p>
 
-            <g:render template="../microsite/formDirections"/>
+            <g:render template="/microsite/formDirections"/>
 
         </div><!-- end microsite-builder-header col-sm-4 -->
 
@@ -109,6 +109,6 @@
 
 <g:render template="/microsite/micrositeFooter"/>
 
-<g:render template="../microsite/scripts"/>
+<g:render template="/microsite/scripts"/>
 </body>
 </html>

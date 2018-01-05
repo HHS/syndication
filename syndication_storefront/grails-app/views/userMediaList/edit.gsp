@@ -25,9 +25,9 @@
 <g:if test="${flash.error}">
     <div class="errors" role="status"><li>${flash.error}</li></div>
 </g:if>
-<g:hasErrors bean="${userMediaListInstance}">
+<g:hasErrors bean="${userMediaList}">
     <div class="errors">
-        <g:renderErrors bean="${userMediaListInstance}" as="list" />
+        <g:renderErrors bean="${userMediaList}" as="list" />
     </div>
 </g:hasErrors>
 <div id="home">
@@ -42,8 +42,8 @@
                     <h3>Edit List</h3>
                 %{--<h3><g:message code="default.edit.label" args="[entityName]"/></h3>--}%
 
-                    <g:form url="[resource: userMediaListInstance, action: 'update']" method="PUT">
-                        <g:hiddenField name="version" value="${userMediaListInstance?.version}"/>
+                    <g:form url="[resource: userMediaList, action: 'update']" method="PUT">
+                        <g:hiddenField name="version" value="${userMediaList?.version}"/>
                         <g:render template="form"/>
                         <g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}"/>
                         <g:actionSubmit class="cancel" action="show" value="Cancel"/>

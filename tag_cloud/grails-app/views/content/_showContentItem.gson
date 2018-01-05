@@ -1,0 +1,14 @@
+import tagcloud.domain.ContentItem
+
+model {
+    ContentItem contentItem
+}
+
+json {
+    "class" "tagcloud.domain.ContentItem"
+    id contentItem.id
+    externalUID contentItem.externalUID
+    syndicationId contentItem.syndicationId
+    tags tmpl.'tagId'(contentItem.tags ?: [])
+    url contentItem.url
+}

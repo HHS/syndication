@@ -16,6 +16,7 @@ package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.social.TwitterStatusCollector
+import grails.util.Holders
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -37,9 +38,9 @@ class CollectionController {
 
     def mediaItemsService
     def tagService
-    def solrIndexingService
     def cmsManagerKeyService
     def springSecurityService
+    def config = Holders.config
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "POST"]
 
@@ -59,7 +60,7 @@ class CollectionController {
                                       tagTypeId         :params.tagTypeId,
                                       selectedLanguage  :tagData.selectedLanguage,
                                       selectedTagType   :tagData.selectedTagType,
-                                      apiBaseUrl        :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                      apiBaseUrl        :config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                       subscriber        :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(collectionInstance)?.subscriberId)
         ]
     }
@@ -91,13 +92,12 @@ class CollectionController {
                                                                subscribers:subscribers]
             return
         }
-        
+
         def mediaItems = params.allMediaItems ?:  ","
         mediaItems.split(",").collect{ it as Long }.each{ mediaId ->
             collectionInstance?.addToMediaItems(MediaItem.load(mediaId as Long))
         }
-        
-        solrIndexingService.inputMediaItem(collectionInstance)
+
         request.withFormat {
             form {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'collectionInstance.label', default: 'Collection'), collectionInstance.name])
@@ -125,7 +125,7 @@ class CollectionController {
             notFound()
             return
         }
-        
+
         collectionInstance =  mediaItemsService.updateItemAndSubscriber(collectionInstance, params.long('subscriberId'))
         if(collectionInstance.hasErrors()){
             flash.errors = collectionInstance.errors.allErrors.collect { [message: g.message([error: it])] }
@@ -143,7 +143,6 @@ class CollectionController {
             collectionInstance?.addToMediaItems(MediaItem.load(mediaId))
         }
 
-        solrIndexingService.inputMediaItem(collectionInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'Collection.label', default: 'Collection'), [collectionInstance.name]])
@@ -169,8 +168,8 @@ class CollectionController {
         TwitterStatusCollector.where {
             collection == collectionInstance
         }.deleteAll()
+
         mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(collectionInstance, true)
-        solrIndexingService.removeMediaItem(collectionInstance)
         mediaItemsService.delete(collectionInstance.id)
 
         request.withFormat {

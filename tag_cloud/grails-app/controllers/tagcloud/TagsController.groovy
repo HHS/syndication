@@ -17,6 +17,7 @@ package tagcloud
 import com.ctacorp.syndication.Language
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import tag_cloud.api.PaginatedTag
 import tagcloud.domain.ContentItem
 import tagcloud.domain.Tag
 import tagcloud.domain.TagType
@@ -28,7 +29,7 @@ class TagsController {
     static responseFormats = ['json']
     static allowedMethods = [
         index:'GET', show:'GET', getTagsForSyndicationId:'GET',
-        getTagsByTypeName:'GET',
+        getTagsByTypeName:'GET', deleteContentItem: 'DELETE',
         deleteTag: 'DELETE', tagSyndicatedItemByName:'POST', findOrSaveTag:'POST',
         tagItemByTagId: 'POST', setTagsForSyndicatedItemByTagIds: 'POST', updateTag: 'POST',
         getTagsRelatedToTagId:'GET', tagUrlByTagId: 'POST', tagSyndicatedItemsByTagIds: 'POST',
@@ -40,20 +41,33 @@ class TagsController {
 
     def index() {
         params.max = Math.min(params.int('max') ?: 20, 100000)
-        JSON.use("tagList") {
-            if (Util.isTrue(params.includePaginationFields, false)) {
-                def tags = tagService.listTags(params)
-                respond([tags: tags, total: tags.totalCount, dataSize: tags.size(), max: params.max, offset: params.offset?:0])
-            } else {
-                respond tagService.listTags(params) ?: []
-            }
+        if (Util.isTrue(params.includePaginationFields, false)) {
+            def tags = tagService.listTags(params)
+            PaginatedTag object = new PaginatedTag([tagList: tags, total: tags.totalCount ?: 0, dataSize: tags.size(), max: params.max as long, offset: params.offset as long])
+            respond object, view:"paginatedIndex"
+        } else {
+            respond tagService.listTags(params) ?: []
         }
     }
 
     def allSyndicationIds(){
-        JSON.use("syndicationIdList") {
-            render ContentItem.list() as JSON
+        respond ContentItem.list()
+    }
+
+    def deleteContentItem(Long id) {
+
+        def contentItem = ContentItem.findBySyndicationId(id)
+        def tags = contentItem?.tags ?: []
+
+        tags.each { tag ->
+
+            tag.contentItems?.remove(contentItem)
+            tag.save(flush: true)
         }
+
+        contentItem?.delete(flush: true)
+
+        sendEmptyResponse(204)
     }
 
     def deleteTag(Long id){
@@ -66,140 +80,201 @@ class TagsController {
         }
     }
 
-    def findOrSaveTag(Tag tagInstance){
-        Tag existing = Tag.findByNameAndLanguageAndType(tagInstance.name, tagInstance.language, tagInstance.type)
-        if(!existing){
-            if(tagInstance.hasErrors()){
-                respond tagInstance.errors
-                return
-            }
-            existing = tagInstance.save(flush:true)
-        }
+    def findOrSaveTag() {
 
-        JSON.use("showTag") {
-            respond existing
-        }
-    }
+        def data = isJSONValid(request)
 
-    def show(Tag tagInstance) {
-        JSON.use("showTag") {
-            respond tagInstance
-        }
-    }
-
-    def query(String q){
-        def matchingTags = Tag.findAllByNameIlike("%${q}%", [max:20, sort:'name', order:'ASC'])
-        JSON.use("tagList"){
-            respond matchingTags
-        }
-    }
-
-    def updateTag(Tag tagInstance){
-        if (tagInstance == null) {
-            render(text:[success:false, message:"Record not found"] as JSON, status: 400, contentType: "application/json")
+        if(!data) {
+            render400('invalid json')
             return
         }
+
+        def type = TagType.findById(data.type as Long)
+        def language = Language.findById(data.language as Long)
+
+        if (!type || !language) {
+            render400('language or type not found')
+            return
+        }
+
+        def tagInstance = Tag.findOrCreateWhere(
+                name: data.name,
+                type: type,
+                language: language
+        )
+
+        tagInstance.save(flush: true)
 
         if (tagInstance.hasErrors()) {
-            render(text:[success:false, message:"Invalid Values", details:tagInstance.errors] as JSON, status: 400, contentType: "application/json")
+            render400(tagInstance.errors as JSON)
+        } else {
+            respond tagInstance, view: 'showTag', status: 200
+        }
+    }
+
+    def show(Long id) {
+
+        def tag = Tag.findById(id)
+
+        if(!tag) {
+            sendEmptyResponse(404)
+        } else {
+            respond tag, view:"showTag"
+        }
+    }
+
+    def query(String q) {
+
+        def matchingTags = Tag.findAllByNameIlike("%${q}%", [max:20, sort:'name', order:'ASC'])
+        respond matchingTags, view:"index"
+    }
+
+    def updateTag() {
+
+        def data = isJSONValid(request)
+
+        if(!data) {
+            render400('invalid json')
             return
         }
 
-        Language newlanguage = Language.findById(params.languageId)
-        TagType newTagType = TagType.findById(params.tagTypeId)
-        tagInstance.setLanguage(newlanguage)
-        tagInstance.setType(newTagType)
+        def tagInstance = Tag.findById(data.id as Long)
+        def language = Language.findById params.languageId as Long
+        def tagType = TagType.findById params.tagTypeId as Long
+
+        if (!tagInstance) {
+            sendEmptyResponse(404)
+            return
+        }
+
+        if (!language || !tagType) {
+            render400('language or type not found')
+            return
+        }
+
+        tagInstance.language = language
+        tagInstance.type = tagType
+        tagInstance.name = data.name
         tagInstance.save flush:true
 
-        JSON.use("showTag") {
-            respond tagInstance
+        if(tagInstance.hasErrors()) {
+            render400(tagInstance.errors as JSON)
+        } else {
+            respond tagInstance, view: 'showTag', status: 200
         }
     }
 
-    def getTagsForSyndicationId(Long syndicationId) {
+
+    def getTagsForSyndicationId() {
         params.max = Util.getMax(params)
-        JSON.use("tagList") {
-            def tags = tagService.getTagsForSyndicationId(syndicationId, params)
-            if (Util.isTrue(params.includePaginationFields, false)) {
-                respond([tags: tags, total: tags.totalCount, max: params.max, offset: params.offset?:0])
-            } else {
-                respond tags
-            }
+        def tags = tagService.getTagsForSyndicationId(params.syndicationId as Long, params)
+        if (Util.isTrue(params.includePaginationFields, false)) {
+            PaginatedTag object = new PaginatedTag([tagList: tags, total: tags.totalCount ?: 0, dataSize: tags.size(), max: params.max, offset: params.offset?:0])
+            respond object, view:"paginatedIndex"
+        } else {
+            respond tags, view:"index"
         }
     }
 
-    def tagUrlByTagId(){
-        def data = request.JSON
+    def tagUrlByTagId() {
+
+        def data = isJSONValid(request)
+
+        if(!data) {
+            render400('invalid json')
+            return
+        }
+
         String url  = data.url
         Long tagId = data.tagId as Long
-
         Tag tag = tagService.getTag(tagId)
         ContentItem contentItem = contentItemService.findOrSaveContentItem(url)
-
-        JSON.use("showContentItem"){
-            respond tagService.tagContentItem(contentItem, tag)
-        }
+        respond tagService.tagContentItem(contentItem, tag), view:"showContentItem"
     }
 
     def tagSyndicatedItemByTagIds() {
-        def data = request.JSON
+
+        def data = isJSONValid(request)
+
+        if(!data) {
+            render400('invalid json')
+            return
+        }
+
         Long syndicationId = data.syndicationId as Long
         String url = data.url
-        data.tagIds.split(",").collect{it as Long}.each{ Long tagId ->
+
+        data.tagIds?.split(',')?.collect{it as Long}?.each{ Long tagId ->
             tagService.tagSyndicatedItem(tagId as Long, url, syndicationId)
         }
 
-        JSON.use("showContentItem") {
-            respond ContentItem.findBySyndicationId(syndicationId)
-        }
+        respond ContentItem.findBySyndicationId(syndicationId), view:"showContentItem"
     }
 
     def tagSyndicatedItemsByTagIds() {
-        def data = request.JSON
-        String syndicationIds = data.syndicationIds
-        String urls = data.urls
-        String tagIds = data.tagIds
+
+        def data = isJSONValid(request)
+
+        if(!data) {
+            render400('invalid json')
+            return
+        }
+
+        def syndicationIds = data.syndicationIds?.split(',')?.collect { it as Long } ?: []
+        def urls = (data.urls?.split(",") ?: []) as Collection<String>
+        def tagIds = data.tagIds?.split(",")?.collect { it as Long } ?: []
 
         def taggedItems = []
-        if(syndicationIds && urls && tagIds) {
-            def tIds = tagIds.split(",").collect { it as Long }
-            def sIds = syndicationIds.split(",").collect { it as Long }
-            def sUrls = urls.split(",")
 
-            for (i in 0..tIds.size() - 1) {
-                for (j in 0..sIds.size() - 1) {
-                    taggedItems << tagService.tagSyndicatedItem(tIds[i], sUrls[j], sIds[j])
+        if(syndicationIds.size() > 0 && syndicationIds.size() == urls.size()) {
+
+            for (i in 0..tagIds.size() - 1) {
+                for (j in 0..syndicationIds.size() - 1) {
+                    taggedItems << tagService.tagSyndicatedItem(tagIds[i], urls[j], syndicationIds[j])
                 }
             }
-        }
-        JSON.use("showContentItem") {
-            respond taggedItems.unique()
+
+            respond taggedItems.unique(), view:"showContentItems"
+        } else {
+            render400('{"error": "syndicationIds, urls and tagIds must be the same length"}')
         }
     }
 
-    def bulkTag(){
-        def data = request.JSON
+    def bulkTag() {
+
+        def data = isJSONValid(request)
+
+        if(!data) {
+            render400('invalid json')
+            return
+        }
+
         log.info "Bulk tag request for: ${data}"
         def taggedItems = []
-        data.bulkTags.each{ tagEntry ->
-            log.debug tagEntry
-            tagEntry.value.tagNames.each{ String tagName ->
-                log.debug tagName
-                taggedItems << tagService.tagSyndicatedItemByName(
+
+        data.bulkTags.each { tagEntry ->
+            tagEntry.value.tagNames.each { String tagName ->
+                def taggedItem = tagService.tagSyndicatedItemByName(
                         tagName,
                         tagEntry.value.url as String,
                         tagEntry.key as Long,
                         data.language as Long,
                         data.tagType as Long)
+                taggedItems << taggedItem
             }
         }
-        JSON.use("showContentItem") {
-            render taggedItems as JSON
-        }
+
+        respond taggedItems.unique(), view:"showContentItems"
     }
 
     def tagSyndicatedItemByTagName() {
-        def data = request.JSON
+
+        def data = isJSONValid(request)
+
+        if(!data) {
+            render400('invalid json')
+            return
+        }
 
         ContentItem ci = tagService.tagSyndicatedItemByName(
                 data.tagName as String,
@@ -207,6 +282,7 @@ class TagsController {
                 data.syndicationId as Long,
                 data.languageId as Long,
                 data.typeId as Long)
+
         if(!ci){
             response.sendError(400, "item could not be created")
             String code = Long.toString(System.nanoTime(), 32)
@@ -217,15 +293,20 @@ class TagsController {
                     "languageId:${data.languageId}")
             return
         }
-        JSON.use("showContentItem") {
-            respond ci
-        }
+        respond ci, view:"showContentItem"
     }
 
     //This is a pretty naive way of doing this, if it becomes a problem, we should do
     //more than just clear all tags and re-tag
     def setTagsForSyndicatedItemByTagIds() {
-        def data = request.JSON
+
+        def data = isJSONValid(request)
+
+        if(!data) {
+            render400('invalid json')
+            return
+        }
+
         Long syndicationId = data.syndicationId
         String url = data.url
         String tagIds = data.tagIds
@@ -240,61 +321,96 @@ class TagsController {
             ci = tagService.clearTags(url, syndicationId, tagTypeId, languageId)
 
             tIds.each{ tagId ->
-                tagService.tagSyndicatedItem(tagId, url, syndicationId)
+                tagService.tagSyndicatedItem(tagId as long, url, syndicationId)
             }
         }
-        JSON.use("showContentItem") {
-            respond ci
-        }
+        respond ci, view:'showContentItem'
     }
 
-    def getTagsByTypeName(String typeName) {
-        if (!typeName) {
-            response.sendError(400, "Missing 'typeName' parameter.")
-        }
-        params.max = Util.getMax(params)
-        JSON.use("tagList") {
-            def tags = tagService.getTagsByTypeName(typeName, params)
-            if (Util.isTrue(params.includePaginationFields, false)) {
-                respond([tags: tags, total: tags.totalCount, max: params.max, offset: params.offset?:0])
-            } else {
-                respond tags
-            }
-        }
-    }
+    def getTagsByTypeName() {
 
-    def getTagsRelatedToTagId(Long tagId){
-        params.max = Util.getMax(params)
-        JSON.use("tagList") {
-            def tags = tagService.getRelatedTagsByTagId(tagId, params)
-            if(Util.isTrue(params.includePaginationFields, false)) {
-                respond ([tags:tags, total:tags.totalCount, max:params.max, offset:params.offset?:0])
-            } else{
-                respond tags
-            }
-        }
-    }
-
-    def findTagsByTagName(String tagName){
-        params.max = Util.getMax(params)
-        JSON.use("tagList") {
-            def tags = tagService.findTagsByTagName(tagName, params)
-            if (Util.isTrue(params.includePaginationFields, false)) {
-                respond([tags: tags, total: tags.totalCount, max: params.max, offset: params.offset?:0])
-            } else {
-                respond tags
-            }
-        }
-    }
-
-    def checkTagExistence(){
-        Tag existing = Tag.findByNameAndLanguageAndType("${params.name}", Language.get(params.language), TagType.get(params.tagTypeId))
-        if(!existing){
-            respond null
+        if (!params.typeName) {
+            render400("Missing 'typeName' parameter.")
             return
         }
-        JSON.use("showTag") {
-            respond existing
+
+        params.max = Util.getMax(params)
+        def tags = tagService.getTagsByTypeName(params.typeName, params)
+        if (Util.isTrue(params.includePaginationFields, false)) {
+            PaginatedTag object = new PaginatedTag([tagList: tags, total: tags.totalCount ?: 0, dataSize: tags.size(), max: params.max, offset: params.offset?:0])
+            respond object, view:"paginatedIndex"
+        } else {
+            respond tags, view:"index"
+        }
+    }
+
+    def getTagsRelatedToTagId() {
+
+        if (!params.tagId) {
+            render400("Missing 'tagId' parameter.")
+            return
+        }
+
+        params.max = Util.getMax(params)
+        def tags = tagService.getRelatedTagsByTagId(params.tagId as Long, params)
+        if(Util.isTrue(params.includePaginationFields, false)) {
+            PaginatedTag object = new PaginatedTag([tagList: tags, total: tags.totalCount ?: 0, dataSize: tags.size(), max: params.max, offset: params.offset?:0])
+            respond object, view:"paginatedIndex"
+        } else{
+            respond tags, view:"index"
+        }
+    }
+
+    def findTagsByTagName() {
+
+        if (!params.tagName) {
+            render400("Missing 'tagName' parameter.")
+            return
+        }
+
+        params.max = Util.getMax(params)
+        def tags = tagService.findTagsByTagName(params.tagName as String, params)
+        if (Util.isTrue(params.includePaginationFields, false)) {
+            PaginatedTag object = new PaginatedTag([tagList: tags, total: tags.totalCount ?: 0, dataSize: tags.size(), max: params.max, offset: params.offset?:0])
+            respond object, view:"paginatedIndex"
+        } else {
+            respond tags, view:"index"
+        }
+    }
+
+    def getTagNameByIds() {
+
+        def data = isJSONValid(request)
+
+        if(!data) {
+            render400('invalid json')
+            return
+        }
+
+        def tagName=[]
+        def ids = data.ids
+
+        ids.each {
+            tagName << Tag.findById(it as long).getName()
+        }
+
+        render tagName
+    }
+
+    private sendEmptyResponse(code) {
+        render status: code, text: '', contentType: 'application/json'
+    }
+
+    private render400(message) {
+        render status: 400, text: "{\"error\":\"${message}\"}", contentType: 'application/json'
+    }
+
+    def isJSONValid(request) {
+
+        try {
+            return request.JSON
+        } catch (ignored) {
+            false
         }
     }
 }

@@ -16,7 +16,7 @@ class ReleaseNoteController {
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        respond list(params), model:[releaseNoteInstanceCount: count()]
+        respond list(params), model:[releaseNoteInstaCount: releaseNote.count()]
     }
 
     @Secured(['permitAll'])

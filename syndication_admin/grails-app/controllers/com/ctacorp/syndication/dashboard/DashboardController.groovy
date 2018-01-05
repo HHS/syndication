@@ -29,6 +29,7 @@ import com.ctacorp.syndication.authentication.UserRole
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
+import grails.util.Holders
 import org.apache.commons.lang.RandomStringUtils
 
 @Secured(["ROLE_ADMIN", "ROLE_MANAGER", "ROLE_PUBLISHER"])
@@ -37,7 +38,7 @@ class DashboardController {
     def systemEventService
     def springSecurityService
     def tagService
-
+    def config= Holders.config
     def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id}
 
     static defaultAction = "syndDash"
@@ -66,7 +67,8 @@ class DashboardController {
         if(!tagService.status()) {
             flash.error = message(code: "tag.failure.UNREACHABLE")
         }
-        [timelineEvents:timelineEvents.sort{it.timestamp}.reverse(), events:recentEvents]
+
+        [ADMIN_SERVER_URL:config?.ADMIN_SERVER_URL, API_SERVER_URL:config?.API_SERVER_URL, syndication_storefront:config?.STOREFRONT_SERVER_URL, timelineEvents:timelineEvents.sort{it.timestamp}.reverse(), events:recentEvents]
     }
 
     def listEvents(){
@@ -122,7 +124,8 @@ class DashboardController {
             data:[],
             xkey:"month",
             ykeys:Source.list()*.acronym,
-            labels:Source.list()*.acronym
+            labels:Source.list()*.acronym,
+            ymax:'auto'
         ]
 
         def dates = getDateRangesForLast12Months()
@@ -141,6 +144,9 @@ class DashboardController {
                     case "areaDateSelectorContentPublished": items      = MediaItem.countBySourceAndDateContentPublishedBetween(source, date.firstDay, date.lastDay); break;
                     case "areaDateSelectorContentReviewed": items       = MediaItem.countBySourceAndDateContentReviewedBetween(source, date.firstDay, date.lastDay); break;
                     default: items                                      = MediaItem.countBySourceAndDateSyndicationCapturedBetween(source, date.firstDay, date.lastDay);
+                }
+                if(items && items >= 1000) {
+                    data.ymax = '1000'
                 }
                 monthData << [
                     "${source.acronym}":items
@@ -181,7 +187,8 @@ class DashboardController {
         render data as JSON
     }
 
-    def error500(){
+    def error500() {
+
         def errorCode = RandomStringUtils.randomAlphabetic(10).toUpperCase()
         log.error(errorCode)
         render view:'/error', model:[errorCode:errorCode]

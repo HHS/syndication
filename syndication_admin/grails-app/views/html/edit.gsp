@@ -26,12 +26,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
+			<synd:hasError/>
 			<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
 				<div class="row">
 					<div class="col-md-8">
-						<g:form class="form-horizontal" url="[resource:htmlInstance, action:'update']" method="PUT" >
-							<g:hiddenField name="version" value="${htmlInstance?.version}" />
+						<g:form class="form-horizontal" url="[resource:html, action:'update']" method="PUT" id="updateMediaItem">
+							<g:hiddenField name="version" value="${html?.version}" />
 							<fieldset class="form">
 								<g:render template="form"/>
 								<!-- Text input-->
@@ -39,27 +39,25 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 									<label class="col-md-4 control-label" for="campaigns">Campaigns</label>
 									<div class="col-md-4">
 										<ul class="one-to-many">
-											<g:each in="${htmlInstance?.campaigns?}" var="campaignInstance">
+											<g:each in="${html?.campaigns?}" var="campaignInstance">
 												<li><g:link controller="campaign" action="show" id="${campaignInstance.id}">${campaignInstance?.encodeAsHTML()}</g:link></li>
 											</g:each>
 										</ul>
 									</div>
 								</div>
 							</fieldset>
-							<fieldset class="buttons">
+							<fieldset class="buttons" id="mediaItemSubmitButton">
 								<g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-								<g:link class="btn btn-default" id="${htmlInstance.id}" resource="${htmlInstance}" action="show">
+								<g:link class="btn btn-default" id="${html.id}" resource="${html}" action="show">
 									Cancel
 								</g:link>
-                                <g:link controller="mediaPreviewThumbnail" class="btn btn-warning pull-right" id="${htmlInstance?.id}" action="flush">
-                                    Regenerate Thumbnail & Preview
-                                </g:link>
+
 							</fieldset>
 						</g:form>
 					</div>
 				</div>
 			</sec:ifAnyGranted>
-            <g:render template="/mediaItem/addAttributeOrImage" model="[mediaItemInstance: htmlInstance]"/>
+            <g:render template="/mediaItem/addAttributeOrImage" model="[mediaItemInstance: html]"/>
 		</div>
 	</body>
 </html>

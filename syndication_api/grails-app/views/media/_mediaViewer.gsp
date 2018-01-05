@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="grails.util.Holders" contentType="text/html;charset=UTF-8" %>
 <html lang="en">
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
@@ -27,7 +27,7 @@
 
         <div class="slick-navigation">
             <g:each in="${mediaItemContent}" var="mediaItem">
-                <div><img src="${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${mediaItem.meta.id}/thumbnail.jpg" alt="Thumbnail for media item ${mediaItem.meta.name}"></div>
+                <div><img src="${grails.util.Holders.config.API_SERVER_URL}/api/v2/resources/media/${mediaItem.meta.id}/thumbnail.jpg" alt="Thumbnail for media item ${mediaItem.meta.name}"></div>
             </g:each>
         </div>
 

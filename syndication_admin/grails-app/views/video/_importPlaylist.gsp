@@ -11,7 +11,7 @@
                 <div class="modal-body">
                     <synd:message/>
                     <synd:errors/>
-                    <synd:error/>
+                    <synd:hasError/>
 
                     <div class="form-group">
                         <label class="sr-only" for="videoUrl">Playlist Url</label>

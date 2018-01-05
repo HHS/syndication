@@ -1,13 +1,24 @@
 <div style="width: 400px; float: left;">
     <span>Copy and paste this snippet into your existing web-page, and when the page is viewed by a user, the syndicated content will inject itself automatically!</span>
     <p>
-        <g:radioGroup name="jsOrIframe"
-                      id="jsOrIframe"
-                      labels="['Javascript', 'Iframe (no javascript)']"
-                      values="['javascript', 'iframe']"
-                      value="javascript">
-            ${it.radio} ${it.label}
-        </g:radioGroup>
+        <g:if test="${mediaItemInstance?.disableIframe}">
+            <g:radioGroup name="jsOrIframe"
+                          id="jsOrIframe"
+                          labels="['Javascript']"
+                          values="['javascript']"
+                          value="javascript">
+                ${it.radio} ${it.label}
+            </g:radioGroup>
+        </g:if>
+        <g:else>
+            <g:radioGroup name="jsOrIframe"
+                          id="jsOrIframe"
+                          labels="['Javascript', 'Iframe (no javascript)']"
+                          values="['javascript', 'iframe']"
+                          value="javascript">
+                ${it.radio} ${it.label}
+            </g:radioGroup>
+        </g:else>
     </p>
     <div style="width: 100%; overflow: hidden;">
         <div style="width: 200px; float: left;">

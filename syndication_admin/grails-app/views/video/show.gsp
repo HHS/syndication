@@ -29,32 +29,32 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1><g:message code="default.show.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
     <div class="row">
         <div class="col-md-10 col-md-offset-2">
             <dl class="dl-horizontal">
-                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: videoInstance, mediaType:'video']"/>
+                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: video, mediaType:'video']"/>
 
-                <g:if test="${videoInstance?.duration}">
+                <g:if test="${video?.duration}">
                     <dt id="duration-label"  class="word_wrap"><g:message code="video.duration.label" default="Duration"/></dt>
-                    <dd  class="word_wrap"><g:fieldValue bean="${videoInstance}" field="duration"/></dd>
+                    <dd  class="word_wrap"><g:fieldValue bean="${video}" field="duration"/></dd>
                 </g:if>
 
-                <g:if test="${videoInstance?.width}">
+                <g:if test="${video?.width}">
                     <dt id="width-label"  class="word_wrap"><g:message code="video.width.label" default="Width"/></dt>
-                    <dd  class="word_wrap"><g:fieldValue bean="${videoInstance}" field="width"/></dd>
+                    <dd  class="word_wrap"><g:fieldValue bean="${video}" field="width"/></dd>
                 </g:if>
 
-                <g:if test="${videoInstance?.height}">
+                <g:if test="${video?.height}">
                     <dt id="height-label"  class="word_wrap"><g:message code="video.height.label" default="Height"/></dt>
-                    <dd class="word_wrap"><g:fieldValue bean="${videoInstance}" field="height"/></dd>
+                    <dd class="word_wrap"><g:fieldValue bean="${video}" field="height"/></dd>
                 </g:if>
             </dl>
         </div>
     </div>
     <fieldset class="buttons">
-        <g:form  url="[resource:videoInstance, action:'edit']">
-            <a href="${apiBaseUrl + '/resources/media/'+ videoInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
+        <g:form  url="[resource:video, action:'edit']">
+            <a href="${apiBaseUrl + '/resources/media/'+ video?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>
@@ -65,13 +65,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 Cancel
             </g:link>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${videoInstance?.id}" action="featureItem">
+                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${video?.id}" action="featureItem">
                     Feature this Item
+                </g:link>
+            </sec:ifAnyGranted>
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+                <g:link controller="mediaPreviewThumbnail" style="margin-right: 3px;" class="btn btn-warning pull-right" id="${video?.id}" action="flush">
+                    Regenerate Thumbnail & Preview
                 </g:link>
             </sec:ifAnyGranted>
         </g:form>
     </fieldset>
-    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: videoInstance]"/>
+    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: video]"/>
 </div>
 </body>
 </html>

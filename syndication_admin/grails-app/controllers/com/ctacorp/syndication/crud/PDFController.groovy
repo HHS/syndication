@@ -1,7 +1,13 @@
 package com.ctacorp.syndication.crud
 
+import com.amazonaws.services.s3.model.ObjectMetadata
 import com.ctacorp.syndication.Language
 import com.ctacorp.syndication.media.MediaItem
+import grails.util.Holders
+import com.amazonaws.services.s3.AmazonS3Client
+import groovyx.net.http.HTTPBuilder
+import groovyx.net.http.Method
+import org.apache.http.impl.client.DefaultRedirectStrategy;
 
 import java.security.MessageDigest
 
@@ -22,14 +28,18 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class PDFController {
 
+    def s3Client = new AmazonS3Client()
     def mediaItemsService
     def tagService
-    def solrIndexingService
     def cmsManagerKeyService
     def springSecurityService
-    def aws
+    def config = Holders.config
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "POST"]
+
+    String getBucketName(){
+         Holders.config.AWS_S3_BUCKET
+    }
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -53,8 +63,8 @@ class PDFController {
                                     tagTypeId       :params.tagTypeId,
                                     selectedLanguage:tagData.selectedLanguage,
                                     selectedTagType :tagData.selectedTagType,
-                                    collections     : Collection.findAll("from Collection where ? in elements(mediaItems)", [pdfInstance]),
-                                    apiBaseUrl      :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                    collections     :Collection.findAll("from Collection where ? in elements(mediaItems)", [pdfInstance]),
+                                    apiBaseUrl      :config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                     subscriber      :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(pdfInstance)?.subscriberId)
         ]
     }
@@ -92,7 +102,6 @@ class PDFController {
             return
         }
 
-        solrIndexingService.inputMediaItem(pdfInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'pdfInstance.label', default: 'PDF'), [pdfInstance.name]])
@@ -104,7 +113,11 @@ class PDFController {
 
     def edit(PDF pdfInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond pdfInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(pdfInstance)?.subscriberId)]
+        respond pdfInstance, model: [
+                pdfInstance: pdfInstance,
+                subscribers:subscribers,
+                currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(pdfInstance)?.subscriberId)
+        ]
     }
 
     @Transactional
@@ -114,7 +127,7 @@ class PDFController {
             return
         }
         String oldSourceUrl = ""
-        def dirty = pdfInstance.isDirty("sourceUrl")
+        def dirty = pdfInstance.isDirty("sourceUrl") || isMissing(pdfInstance.sourceUrl)
         if(dirty) {
             oldSourceUrl = pdfInstance.getPersistentValue("sourceUrl")
         }
@@ -140,7 +153,6 @@ class PDFController {
             }
         }
 
-        solrIndexingService.inputMediaItem(pdfInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'PDF.label', default: 'PDF'), [pdfInstance.name]])
@@ -153,13 +165,11 @@ class PDFController {
     @Secured(['ROLE_ADMIN', 'ROLE_PUBLISHER'])
     @Transactional
     def delete(PDF pdfInstance) {
-        println "pdf: " + pdfInstance
+
         if (pdfInstance == null) {
-            println "is null"
             notFound()
             return
         }
-        println "after"
 
         def featuredItem = FeaturedMedia.findByMediaItem(pdfInstance)
         if(featuredItem){
@@ -167,7 +177,6 @@ class PDFController {
         }
 
         mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(pdfInstance, true)
-        solrIndexingService.removeMediaItem(pdfInstance)
         deleteFromBucket(pdfInstance.sourceUrl)
         mediaItemsService.delete(pdfInstance.id)
 
@@ -191,22 +200,44 @@ class PDFController {
     }
 
     def addToBucket(PDF pdfInstance, String oldSourceUrl) {
+
         if(oldSourceUrl) {
-            //remove old path
             deleteFromBucket(oldSourceUrl)
         }
-        //add to bucket
-        URL file = new URL(pdfInstance.sourceUrl)
-        def urlHash = MessageDigest.getInstance("MD5").digest(pdfInstance.sourceUrl.bytes).encodeHex().toString()
-        def s3file = file.openStream().s3upload(urlHash + ".pdf") {
-            path "pdf-files"
+
+        def stream = null
+
+        try {
+
+            def url = new URL(pdfInstance.sourceUrl)
+            stream = url.openStream()
+
+            ObjectMetadata metadata = new ObjectMetadata()
+            metadata.setContentType('application/pdf')
+
+            s3Client.putObject(getBucketName(), getPdfKey(pdfInstance.sourceUrl), stream, metadata)
+
+        } catch(e) {
+            log.error "could not add pdf to bucket", e
+        } finally {
+            stream?.close()
         }
+    }
+
+    private isMissing(String sourceUrl) {
+        !s3Client.doesObjectExist(getBucketName(), getPdfKey(sourceUrl))
+    }
+
+    private GString getPdfKey(String sourceUrl) {
+        "pdf-files/${getUrlHash(sourceUrl)}.pdf"
     }
 
     private deleteFromBucket(String sourceUrl) {
-        def path = new URL(sourceUrl).getPath()
-        def urlHash = MessageDigest.getInstance("MD5").digest(sourceUrl.bytes).encodeHex().toString()
-        aws.s3().on("syndication-files").delete("pdf-files/"+urlHash + ".pdf")
+        s3Client.deleteObject(getBucketName(), getPdfKey(sourceUrl))
+
     }
 
+    private static String getUrlHash(String sourceUrl) {
+        MessageDigest.getInstance("MD5").digest(sourceUrl.bytes).encodeHex().toString()
+    }
 }

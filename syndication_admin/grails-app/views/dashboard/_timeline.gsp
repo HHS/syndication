@@ -13,15 +13,15 @@
                     </div>
                     <div class="timeline-panel">
                         <div class="timeline-heading">
-                            <h4 class="timeline-title" style="word-wrap: break-word"><a href="${grailsApplication.config.grails.serverURL}/mediaItem/show?id=${timelineEvent.id}">${timelineEvent?.title}</a></h4>
-                            <h4 class="timeline-title" style="word-wrap: break-word"><a href="${grailsApplication.config.storefront.serverAddress}/storefront/showContent/${timelineEvent.id}">Storefront Page</a></h4>
+                            <h4 class="timeline-title" style="word-wrap: break-word"><a href="${ADMIN_SERVER_URL}/mediaItem/show?id=${timelineEvent.id}">${timelineEvent?.title}</a></h4>
+                            <h4 class="timeline-title" style="word-wrap: break-word"><a href="${syndication_storefront}/storefront/showContent/${timelineEvent.id}">Storefront Page</a></h4>
                             <p>
                                 <small class="text-muted"><i class="fa fa-clock-o"></i> <prettytime:display date="${timelineEvent?.timestamp}" /></small>
                             </p>
                         </div>
 
                         <div class="timeline-body">
-                            <img class="timeline_thumbnail" src="${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${timelineEvent.id}/preview.jpg"/>
+                            <img class="timeline_thumbnail" src="${System.getenv('API_SERVER_URL')}${System.getenv('SYNDICATION_APIPATH')}/resources/media/${timelineEvent.id}/preview.jpg"/>
                             <p><synd:shortenString string="${timelineEvent?.message}"/></p>
                         </div>
                     </div>

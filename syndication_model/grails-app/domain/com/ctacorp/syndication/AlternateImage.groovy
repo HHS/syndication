@@ -14,22 +14,21 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication
 
-import com.ctacorp.grails.swagger.annotations.Model
-import com.ctacorp.grails.swagger.annotations.ModelProperty
+import com.ctacorp.grails.swagger.annotations.Definition
+import com.ctacorp.grails.swagger.annotations.DefinitionProperty
+import com.ctacorp.grails.swagger.annotations.DefinitionPropertyType
 import com.ctacorp.grails.swagger.annotations.PropertyAttribute
 import com.ctacorp.syndication.media.MediaItem
 
-@Model(id = "AlternateImage", properties = [
-    @ModelProperty(propertyName = "id",     attributes = [@PropertyAttribute(type = "integer", format = "int64",       required = true)]),
-    @ModelProperty(propertyName = "url",    attributes = [@PropertyAttribute(type = "string",     required = true)]),
-    @ModelProperty(propertyName = "name",   attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "width",  attributes = [@PropertyAttribute(type = "integer", format = "int32")]),
-    @ModelProperty(propertyName = "height", attributes = [@PropertyAttribute(type = "integer", format = "int32")])
-])
+@Definition
 class AlternateImage {
+    @DefinitionProperty(type=DefinitionPropertyType.INTEGER, format = 'int32')
     Integer width
+    @DefinitionProperty(type=DefinitionPropertyType.INTEGER, format = 'int32')
     Integer height
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String  name
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String  url
 
     static belongsTo = [mediaItem:MediaItem]

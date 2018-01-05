@@ -24,18 +24,7 @@
                 <g:if test="${flash.message}">
                     <div class="message">${flash.message}</div>
                 </g:if>
-                <div id="searchBox">
-                    <div class="bluebox">
-                        <div id="searchOptions">
-                            <g:if test="${searchType == 'basic'}">
-                                <g:render template="basicSearch" model="${[searchQuery: searchQuery]}"/>
-                            </g:if>
-                            <g:else test="${searchType == 'advanced'}">
-                                <g:render template="otherLookupOptions"/>
-                            </g:else>
-                        </div>
-                    </div>
-                </div>
+                <g:render template="search"/>
 
                 <div id="contentListBox">
                     <form name="chooseListForm">
@@ -51,7 +40,7 @@
                 </div>
             </div>
         </div>
-        <g:render template="rightBoxes" model="[featuredMedia: featuredMedia]"/>
+        <g:render template="rightBoxes" model="[featuredMedia: featuredMedia, API_SERVER_URL:API_SERVER_URL]"/>
     </div>
 </body>
 </html>

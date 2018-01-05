@@ -26,38 +26,38 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.show.label" args="[entityName]" /></h1>
             <synd:message/>
             <synd:errors/>
-            <synd:error/>
+            <synd:hasError/>
             <div class="row">
                 <div class="col-sm-9 col-sm-offset-1">
                     <dl class="dl-horizontal">
 
-                    <g:if test="${extendedAttributeInstance?.id}">
+                    <g:if test="${extendedAttribute?.id}">
                         <dt id="id-label" class="word_wrap"><g:message code="extendedAttribute.id.label" default="Id" /></dt>
-                        <dd class="word_wrap">${extendedAttributeInstance?.id}</dd>
+                        <dd class="word_wrap">${extendedAttribute?.id}</dd>
                     </g:if>
 
-                    <g:if test="${extendedAttributeInstance?.name}">
+                    <g:if test="${extendedAttribute?.name}">
                         <dt id="name-label" class="word_wrap"><g:message code="extendedAttribute.name.label" default="Name" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${extendedAttributeInstance}" field="name"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${extendedAttribute}" field="name"/></dd>
                     </g:if>
 
-                    <g:if test="${extendedAttributeInstance?.value}">
+                    <g:if test="${extendedAttribute?.value}">
                         <dt id="value-label" class="word_wrap"><g:message code="extendedAttribute.value.label" default="Value" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${extendedAttributeInstance}" field="value"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${extendedAttribute}" field="value"/></dd>
                     </g:if>
 
-                    <g:if test="${extendedAttributeInstance?.mediaItem}">
+                    <g:if test="${extendedAttribute?.mediaItem}">
                         <dt id="mediaItem-label" class="word_wrap"><g:message code="extendedAttribute.mediaItem.label" default="Media Item" /></dt>
-                        <dd class="word_wrap"><g:link controller="mediaItem" action="show" id="${extendedAttributeInstance?.mediaItem?.id}">${extendedAttributeInstance?.mediaItem?.encodeAsHTML()}</g:link></dd>
+                        <dd class="word_wrap"><g:link controller="mediaItem" action="show" id="${extendedAttribute?.mediaItem?.id}">${extendedAttribute?.mediaItem?.encodeAsHTML()}</g:link></dd>
                     </g:if>
 			        </dl>
                 </div>
             </div>
 			<div class="col-sm-8">
-                <g:form url="[resource:extendedAttributeInstance, action:'delete']" method="DELETE">
+                <g:form url="[resource:extendedAttribute, action:'delete']" method="DELETE">
                     <g:hiddenField name="mediaId" value="${params.mediaId}"/>
                     <fieldset class="buttons">
-                        <g:link class="btn btn-success" action="edit" params="[mediaId:params.mediaId]" resource="${extendedAttributeInstance}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
+                        <g:link class="btn btn-success" action="edit" params="[mediaId:params.mediaId]" resource="${extendedAttribute}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
                         <g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
                         <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_MANAGER">
                             <g:link class="btn btn-default" action="index">

@@ -31,7 +31,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <div class="row">
         <div class="col-lg-8">
             <synd:message/>
-            <synd:error/>
+            <synd:hasError/>
             <synd:errors/>
 
             <g:form class="form-horizontal" action="update">

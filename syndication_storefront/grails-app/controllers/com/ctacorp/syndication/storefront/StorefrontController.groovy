@@ -1,7 +1,6 @@
 package com.ctacorp.syndication.storefront
 
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.contact.EmailContact
 import com.ctacorp.syndication.media.MediaItem
 import com.ctacorp.syndication.Source
@@ -15,17 +14,20 @@ import grails.util.Holders
 
 @Secured(['permitAll'])
 class StorefrontController {
+
+    def elasticsearchService
     def mediaService
-    def grailsApplication
     def tagService
     def springSecurityService
     def likeService
     def mediaListService
+    def recaptchaService
+    def config = Holders.config
+
     RestBuilder rest = new RestBuilder()
 
     def index() {
-        def model = mediaTagHelper()
-        model
+        mediaTagHelper()
     }
 
     def embedCodeForTag(Long id) {
@@ -37,21 +39,30 @@ class StorefrontController {
     }
 
     def listMediaForTag(Long id) {
+
         params.max = params.max ? Math.min(params.int('max'), 100) : 15
+
         def mediaItemInstanceList = tagService.getMediaForTagId(id, params)
         def tagsForMedia = [:]
         mediaItemInstanceList.each {
             def allTags = tagService.getTagsForMediaId(it.id)
             tagsForMedia[it.id] = allTags.collect { [name: it.name, id: it.id] }
         }
-        [
+        render view: 'index', model: [
                 mediaItemInstanceList: mediaItemInstanceList,
                 tagsForMedia         : tagsForMedia,
                 tagName              : params.tagName,
                 tagId                : id,
                 likeInfo             : likeService.getAllMediaLikeInfo(mediaItemInstanceList),
-                total                :mediaItemInstanceList.totalCount,
-                tag                 :id
+                total                : mediaItemInstanceList.totalCount,
+                tag                  : id,
+                language             : params.language,
+                languageList         : Language.findAllByIsActive(true),
+                sourceList           : Source.list(sort: "name", order: "ASC"),
+                source               : params.source,
+                mediaTypes           : mediaService.getMediaTypes(),
+                mediaType            : params.mediaType,
+                title                : params.title
         ]
     }
 
@@ -70,7 +81,8 @@ class StorefrontController {
                 likeInfo             : likeService.getAllMediaLikeInfo(mediaItemInstanceList),
                 total                : mediaItemInstanceList.totalCount,
                 sourceId               : id,
-                sourceName           :Source.get(id).name
+                sourceName           :Source.get(id).name,
+                API_SERVER_URL : config?.API_SERVER_URL
         ]
     }
 
@@ -100,7 +112,7 @@ class StorefrontController {
     }
 
     def usageGuidelines() {
-        render view: 'usageGuidelines', model: [syndicationEmail: grailsApplication.config.grails.mail.default.from]
+        render view: 'usageGuidelines', model: [syndicationEmail: config?.MAIL_DEFAULT_FROM]
     }
 
     def roadMap() {}
@@ -108,7 +120,7 @@ class StorefrontController {
     def faq() {}
 
     def qa() {
-        def adminEmail = grailsApplication.config.grails.mail.default.from
+        def adminEmail = config?.MAIL_DEFAULT_FROM
 
         [adminEmail: adminEmail]
     }
@@ -118,24 +130,35 @@ class StorefrontController {
     }
 
     def sendProblemReport() {
-        flash.message = "Report has been filed."
-        def mailRecipiants = EmailContact.list()?.email ?: "syndication@ctacorp.com"
 
-        sendMail {
-            to mailRecipiants
-            subject "Issue Report: ${new Date()}"
-            body """\
-            Syndication Error Report: ${new Date()}
+        boolean validCaptcha = recaptchaService.verifyAnswer(session, request.getRemoteAddr(), params)
 
-            URL in question: ${params.badURL}
-
-            Problem Description: ${params.problemDescription}
-
-            Reply to email: ${params.reporterEmailAddress}
-            """
+        if (!validCaptcha) {
+            flash.error = "Recaptcha verfication failed!"
+            render view:"_reportAProblem"
+            return
         }
 
-        render view: "thankyou"
+        flash.message = "Report has been filed."
+        def mailRecipiants = EmailContact.list()?.email ?: "syndication@ctacorp.com"
+        if(params.badURL!='' || params.problemDescription!='' ||  params.reporterEmailAddress!=''){
+            sendMail {
+                to mailRecipiants
+                subject "Issue Report: ${new Date()}"
+                body """\
+                Syndication Error Report: ${new Date()}
+
+                URL in question: ${params.badURL}
+
+                Problem Description: ${params.problemDescription}
+
+                Reply to email: ${params.reporterEmailAddress}
+                """
+            }
+        }
+
+        render view: 'thankyou'
+
     }
 
     def sendSyndicationRequest() {
@@ -164,6 +187,13 @@ class StorefrontController {
     }
 
     def showContent(MediaItem mediaItemInstance) {
+
+        if(!mediaItemInstance) {
+            log.error("Trying to show media that doesn't exist")
+            response.sendError(404)
+            return
+        }
+
         User currentUser = springSecurityService.currentUser as User
         boolean alreadyLiked = false
         if (currentUser) {
@@ -172,29 +202,30 @@ class StorefrontController {
         int likeCount = likeService.getLikeCount(mediaItemInstance?.id)
         def userMediaLists = UserMediaList.findAllByUser(currentUser)
 
-        if (mediaItemInstance == null || !mediaItemInstance?.active || !mediaItemInstance?.visibleInStorefront) {
-            log.error("Trying to show media that doesn't exist or is inactive: ${mediaItemInstance?.id}\nActive:${mediaItemInstance?.active}\nVisible in Storefront:${mediaItemInstance?.visibleInStorefront}")
+        if (!mediaItemInstance.active || !mediaItemInstance.visibleInStorefront) {
+            log.error("Trying to show media that is inactive: ${mediaItemInstance.id}\nActive:${mediaItemInstance.active}\nVisible in Storefront:${mediaItemInstance.visibleInStorefront}")
             response.sendError(404)
+            return
         } else {
             DelayedMetricAddJob.schedule(new Date(System.currentTimeMillis() + 10000), [mediaId: mediaItemInstance.id])
         }
+
         rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
         def stripScripts = (!params.submitChangesButton || params.stripScripts == "on")
         def stripStyles = (!params.submitChangesButton || params.stripStyles == "on")
         def stripImages = !params.stripImages || params.stripStyles != "on"  ? false : true
-
         [
                 tags             : getTagsForMediaItem(mediaItemInstance),
                 userMediaLists   : userMediaLists,
                 alreadyLiked     : alreadyLiked,
                 likeCount        : likeCount,
                 mediaItemInstance: mediaItemInstance,
-                apiBaseUrl       : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                apiBaseUrl       : config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                 userId           : springSecurityService?.currentUser?.id ?: -1,
                 stripScripts     : stripScripts,
                 stripStyles      : stripStyles,
                 stripImages      : stripImages,
-                outsidePreview   : mediaItemInstance.foreignSyndicationAPIUrl ? rest.get("${Holders.config.syndication.swaggerAddress}/api/v2/resources/media/${mediaItemInstance.id}/embed.json?autoplay=0&userId=${springSecurityService?.currentUser?.id ?: -1}&stripImages=${stripImages ? 1 : 0}&stripStyles=${stripStyles ? 1 : 0}&stripScripts=${stripScripts ? 1 : 0}").json.results[0].snippet.decodeHTML() : null
+                outsidePreview   : mediaItemInstance.foreignSyndicationAPIUrl ? rest.get("${config?.API_SERVER_URL}/api/v2/resources/media/${mediaItemInstance.id}/embed.json?autoplay=0&userId=${springSecurityService?.currentUser?.id ?: -1}&stripImages=${stripImages ? 1 : 0}&stripStyles=${stripStyles ? 1 : 0}&stripScripts=${stripScripts ? 1 : 0}").json.results[0].snippet.decodeHTML() : null
         ]
     }
 
@@ -237,77 +268,91 @@ class StorefrontController {
     }
 
     @Transactional
-    def Map mediaTagHelper() {
-        if(params.sourceId){
-            redirect action: "listMediaForSource", id:params.sourceId, params:params
-        }
-        if(params.tag){
-            redirect action: "listMediaForTag", id:params.tag, params:params
-        }
-        params.max = params.max ? Math.min(params.int('max'), 100) : 15
+    Map mediaTagHelper() {
 
-        String searchQuery = ""
-        String searchType = "basic"
-        String contentTitle
-        String advanced = null
+        def mediaItems = []
+        def isDefaultSearch = true
+        def searchFields = 'fullText,title,createdBy,sourceUrl,mediaType,sourceId,languageId'
 
-        def mediaItemInstanceList
-        def total
-        Map likeInfo
+        params.max = params.max ?: 10
+        params.offset = params.offset ?: 0
 
-        //used if basic search is submitted
-        if (params.searchQuery) {
-            DelayedQueryLogJob.schedule(new Date(System.currentTimeMillis() + 10000), [queryString: params.searchQuery])
-            searchQuery = params.searchQuery
-            mediaItemInstanceList = mediaService.mediaItemSolrSearch(searchQuery, params)
-            total = mediaItemInstanceList?.totalCount
-            contentTitle = "Search Results: '${params.searchQuery}'"
-            likeInfo = likeService.getAllMediaLikeInfo(mediaItemInstanceList)
-        }
+        searchFields.split(',').each {
 
-        //used if advanced search is submitted
-        else if (params.advancedSearch) {
-            if (params.title) {
-                DelayedQueryLogJob.schedule(new Date(System.currentTimeMillis() + 10000), [queryString: params.title])
+            if(params[it]) {
+                isDefaultSearch = false
             }
-            params.topicItems = tagService.getMediaForTagId((params?.topic ?: 0) as Long, params).id.toListString() - '[' - ']'
-            mediaItemInstanceList = mediaService.findMediaByAll(params)
-            total = mediaItemInstanceList?.totalCount
-            searchType = "advanced"
-            contentTitle = "Search Results: 'Advanced Search'"
-            advanced = "true"
-            likeInfo = likeService.getAllMediaLikeInfo(mediaItemInstanceList)
-        } else{ // regular index listing
-            mediaItemInstanceList = mediaService.listNewestMedia(params)
-            total = mediaItemInstanceList.totalCount
-            likeInfo = likeService.getAllMediaLikeInfo(mediaItemInstanceList)
-            contentTitle = "Newest Syndicated Content"
         }
+
+        def results = [total: 0, ids: []]
+        def filters = params.clone() as Map
+        filters.visibleInStorefront = true
+
+        if(params.languageId) {
+            filters.language = params.languageId
+        }
+
+        if(params.sourceUrl) {
+            filters.url = params.sourceUrl
+        }
+
+        if(isDefaultSearch) {
+
+            filters.sort = 'mediaId'
+            filters.order = 'desc'
+        }
+
+        filters.max = 10000
+        filters.offset = 0
+
+        if(params.tagId) {
+
+            def accessibleIds = tagService.getMediaForTagId(params.tagId.toLong(), [:]).collect { it.id }
+            results = elasticsearchService.searchForIds(filters, accessibleIds)
+
+        } else {
+            results = elasticsearchService.searchForIds(filters)
+        }
+
+        def contentTitle = isDefaultSearch ? 'Newest Syndicated Content' : "${results.total} Search Results"
+
+        if(results.ids) {
+
+            results.total = MediaItem.countByIdInList(results.ids)
+
+            def idsForQuery = results.ids.join(',')
+            def foundIds = MediaItem.executeQuery("select m.id from MediaItem m where m.id in (${idsForQuery}) order by field (m.id,${idsForQuery})", [:], params)
+            mediaItems = MediaItem.getAll(foundIds)
+        }
+
+        def likeInfo = likeService.getAllMediaLikeInfo(mediaItems)
+        DelayedQueryLogJob.schedule(new Date(System.currentTimeMillis() + 10000), [queryString: "${request.queryString}"])
 
         User currentUser = springSecurityService.currentUser as User
         [
-                mediaItemInstanceList: mediaItemInstanceList,
-                total                : total,
-                apiBaseUrl           : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
-                tagsForMedia         : getTagsForMediaItems(mediaItemInstanceList),
+                mediaItemInstanceList: mediaItems,
+                total                : results.total,
+                apiBaseUrl           : config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
+                tagsForMedia         : getTagsForMediaItems(mediaItems),
                 featuredMedia        : mediaService.getFeaturedMedia(max: 10),
                 userMediaLists       : UserMediaList.findAllByUser(currentUser),
                 contentTitle         : contentTitle,
-                searchQuery          : searchQuery,
                 title                : params.title,
                 language             : params.language,
                 languageList         : Language.findAllByIsActive(true),
                 domain               : params.domain,
                 mediaType            : params.mediaType,
                 createdBy            : params.createdBy,
-                searchType           : searchType,
+                searchType           : "FIX THIS",
                 sourceList           : Source.list(sort: "name", order: "ASC"),
                 source               : params.source,
                 topic                : params.topic,
                 topicList            : tagService.getTagsByType('topic'),
                 mediaTypes           : mediaService.getMediaTypes(),
-                advancedSearch       : advanced,
-                likeInfo             : likeInfo
+                advancedSearch       : "FIX THIS",
+                likeInfo             : likeInfo,
+                tagId                : params.tagId,
+                API_SERVER_URL : config?.API_SERVER_URL
         ]
     }
 
@@ -323,6 +368,6 @@ class StorefrontController {
     }
 
     def fiveOhEight() {
-        [featuredMedia: mediaService.getFeaturedMedia(max: 10)]
+        [featuredMedia: mediaService.getFeaturedMedia(max: 10),API_SERVER_URL : config?.API_SERVER_URL]
     }
 }

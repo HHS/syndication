@@ -10,22 +10,22 @@
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: twitterStatusCollectorInstance, field: 'startDate', 'error')} required">
+<div class="form-group ${hasErrors(bean: twitterStatusCollector, field: 'startDate', 'error')} required">
     <label class="col-md-5 control-label" for="startDate">
         Start Date
         <span class="required-indicator">*</span>
     </label>
     <div class="col-md-7">
-        <g:datePicker name="startDate" precision="day" relativeYears="[-1..5]" value="${twitterStatusCollectorInstance?.startDate}"/>
+        <g:datePicker name="startDate" precision="day" relativeYears="[-1..5]" value="${twitterStatusCollector?.startDate}"/>
     </div>
 </div>
 
-<div class="form-group ${hasErrors(bean: twitterStatusCollectorInstance, field: 'endDate', 'error')} required">
+<div class="form-group ${hasErrors(bean: twitterStatusCollector, field: 'endDate', 'error')} required">
     <label class="col-md-5 control-label" for="startDate">
         End Date
     </label>
     <div class="col-md-7">
-        <g:datePicker name="endDate" precision="day" relativeYears="[0..5]" value="${twitterStatusCollectorInstance?.endDate}"/>
+        <g:datePicker name="endDate" precision="day" relativeYears="[0..5]" value="${twitterStatusCollector?.endDate}"/>
     </div>
 </div>
 

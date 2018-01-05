@@ -1,3 +1,4 @@
+
 <div class="modal fade" id="preview_popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -21,7 +22,7 @@
         $("#modal_popup_body").html("<i class='fa fa-spinner fa-spin fa-lg fa-fw'></i> &nbsp;Loading...")
 
         var mediaId = element.attr("data-media_id");
-        $.getJSON("${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/"+mediaId+"/syndicate.json?callback=?", function(data){
+        $.getJSON("${apiBaseUrl}/resources/media/"+mediaId+"/syndicate.json?callback=?", function(data){
             $("#modal_popup_body").html(data.results[0].content)
             $("#myModalLabel").html(data.results[0].name)
         })

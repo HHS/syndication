@@ -3,9 +3,12 @@ package com.ctacorp.syndication.microsites
 import com.ctacorp.syndication.microsite.FlaggedMicrosite
 import com.ctacorp.syndication.microsite.MicroSite
 import grails.plugin.springsecurity.annotation.Secured
+import grails.util.Holders
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER'])
 class MicrositeController {
+
+    def config = Holders.config
 
     def index() {
         def userMicrosites = MicroSite.list()
@@ -22,7 +25,7 @@ class MicrositeController {
 
         render view:"show", model:[
                 micrositeInstance: microsite,
-                apiBaseUrl:grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+                apiBaseUrl:config?.API_SERVER_URL + config?.SYNDICATION_APIPATH
         ]
     }
 

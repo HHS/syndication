@@ -18,62 +18,68 @@ import com.ctacorp.syndication.AlternateImage
 import com.ctacorp.syndication.Campaign
 import com.ctacorp.syndication.ExtendedAttribute
 import com.ctacorp.syndication.Language
+import com.ctacorp.syndication.commons.mq.Message
+import com.ctacorp.syndication.commons.mq.MessageType
 import com.ctacorp.syndication.metric.MediaMetric
 import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.commons.util.Hash
-import com.ctacorp.syndication.preview.MediaPreview
-import com.ctacorp.syndication.preview.MediaThumbnail
 
-@Model(id="MediaItem", properties = [
-    @ModelProperty(propertyName = "id",                      attributes = [@PropertyAttribute(type = "integer",  format = "int64",  required = true)]),
-    @ModelProperty(propertyName = "name",                    attributes = [@PropertyAttribute(type = "string",                      required = true)]),
-    @ModelProperty(propertyName = "mediaType",               attributes = [@PropertyAttribute(type = "string",                      required = true)]),
-    @ModelProperty(propertyName = "sourceUrl",               attributes = [@PropertyAttribute(type = "string",                      required = true)]),
-    @ModelProperty(propertyName = "targetUrl",               attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "customThumbnailUrl",      attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "customPreviewUrl",        attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "dateSyndicationCaptured", attributes = [@PropertyAttribute(type = "string",    format = "date",  required = true)]),
-    @ModelProperty(propertyName = "dateSyndicationUpdated",  attributes = [@PropertyAttribute(type = "string",    format = "date",  required = true)]),
-    @ModelProperty(propertyName = "dateSyndicationVisible",  attributes = [@PropertyAttribute(type = "string",    format = "date",  required = true)]),
-    @ModelProperty(propertyName = "language",                attributes = [@PropertyAttribute(type = "Language",                    required = true)]),
-    @ModelProperty(propertyName = "source",                  attributes = [@PropertyAttribute(type = "Source",                      required = true)]),
-    @ModelProperty(propertyName = "description",             attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "dateContentAuthored",     attributes = [@PropertyAttribute(type = "string",    format = "date")]),
-    @ModelProperty(propertyName = "dateContentUpdated",      attributes = [@PropertyAttribute(type = "string",    format = "date")]),
-    @ModelProperty(propertyName = "dateContentPublished",    attributes = [@PropertyAttribute(type = "string",    format = "date")]),
-    @ModelProperty(propertyName = "dateContentReviewed",     attributes = [@PropertyAttribute(type = "string",    format = "date")]),
-    @ModelProperty(propertyName = "externalGuid",            attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "hash",                    attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "extendedAttributes",      attributes = [@PropertyAttribute(type = "Map")]),
-    @ModelProperty(propertyName = "createdBy",               attributes = [@PropertyAttribute(type = "string",                      required = true)]),
-    @ModelProperty(propertyName = "foreignSyndicationAPIUrl",attributes = [@PropertyAttribute(type = "string",                      required = true)])
-])
+@Definition
 class MediaItem {
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String name
+    @DefinitionProperty(name = "mediaType", type=DefinitionPropertyType.STRING)//holder for mediaType for swagger spec
+    Set metrics
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String description
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String sourceUrl
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
+    String customAttributionUrl
+    @DefinitionProperty(name = "campaigns", type=DefinitionPropertyType.ARRAY, reference = 'Campaign')//holder for campaigns for swagger specs
     String sourceUrlHash
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String targetUrl
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String customThumbnailUrl
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String customPreviewUrl
+    @DefinitionProperty(type=DefinitionPropertyType.STRING, format = 'date')
     Date dateContentAuthored
+    @DefinitionProperty(type=DefinitionPropertyType.STRING, format = 'date')
     Date dateContentUpdated
+    @DefinitionProperty(type=DefinitionPropertyType.STRING, format = 'date')
     Date dateContentPublished
+    @DefinitionProperty(type=DefinitionPropertyType.STRING, format = 'date')
     Date dateContentReviewed
+    @DefinitionProperty(type=DefinitionPropertyType.STRING, format = 'date')
     Date dateSyndicationCaptured    = new Date()
+    @DefinitionProperty(type=DefinitionPropertyType.STRING, format = 'date')
     Date dateSyndicationUpdated     = new Date()
+    @DefinitionProperty(type=DefinitionPropertyType.STRING, format = 'date')
     Date dateSyndicationVisible
+    @DefinitionProperty(type=DefinitionPropertyType.OBJECT, reference = 'Language')
     Language language
     boolean active = true
     boolean visibleInStorefront = true
     boolean manuallyManaged = true
+    boolean disableIframe = false
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String externalGuid
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String hash
+    @DefinitionProperty(type=DefinitionPropertyType.OBJECT, reference = 'Source')
     Source source
-    Set metrics
     StructuredContentType structuredContentType
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String createdBy
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String foreignSyndicationAPIUrl
+
+    def cmsService
+    def mediaPreviewThumbnailJobService
+
+    static transients = ['cmsService', 'mediaPreviewThumbnailJobService']
 
     enum StructuredContentType{
         BLOG_POSTING("BlogPosting"),                // https://schema.org/BlogPosting
@@ -87,6 +93,7 @@ class MediaItem {
         }
     }
 
+    @DefinitionProperty(name = "extendedAttributes", type=DefinitionPropertyType.ARRAY, reference = 'ExtendedAttribute')
     static hasMany = [
         campaigns: Campaign,
         metrics: MediaMetric,
@@ -100,6 +107,7 @@ class MediaItem {
         name                        nullable: false,    blank: false,               maxSize: 255
         description                 nullable: true,     blank: false,               maxSize: 2000
         sourceUrl                   nullable: false,    blank: false,   url:true,   maxSize: 2000
+        customAttributionUrl        nullable: true,     url:true,       maxSize: 2000
         sourceUrlHash               nullable: false,    blank: false,   unique: true
         targetUrl                   nullable: true,     blank:false,    url:true,   maxSize: 2000
         customThumbnailUrl          nullable: true,     blank:false,    url:true,   maxSize: 2000
@@ -115,6 +123,7 @@ class MediaItem {
         active()
         visibleInStorefront()
         manuallyManaged()
+        disableIframe()
         externalGuid                nullable: true,                                 maxSize: 255
         hash                        nullable: true,     blank: false,               maxSize: 255
         source                      nullable: false
@@ -144,6 +153,33 @@ class MediaItem {
 
     def beforeUpdate () {
         dateSyndicationUpdated = new Date()
+    }
+
+    def afterInsert () {
+
+        if(mediaPreviewThumbnailJobService) {
+            mediaPreviewThumbnailJobService.delayedPreviewAndThumbnailGeneration(Long.valueOf(id))
+        }
+    }
+
+    def afterUpdate () {
+
+        if(cmsService) {
+            cmsService.flushCacheForMediaItemUpdate(id)
+            cmsService.sendDelayedMessage(new Message(messageType:MessageType.UPDATE, mediaId:id))
+        }
+
+        if(mediaPreviewThumbnailJobService) {
+            mediaPreviewThumbnailJobService.delayedPreviewAndThumbnailGeneration(Long.valueOf(id))
+        }
+    }
+
+    def beforeDelete() {
+
+        if(cmsService) {
+            cmsService.flushCacheForMediaItemUpdate(id)
+            cmsService.sendDelayedMessage(new Message(messageType: MessageType.DELETE, mediaId: id))
+        }
     }
 
     private static transient mediaTypeMapping = [
@@ -338,11 +374,18 @@ class MediaItem {
         mediaTypes { params ->
             if(params.mediaTypes){
                 def resolveTypes = { String theTypes ->
+                    
                     def t = theTypes.toLowerCase().replace(" ","").split(",")
                     def types = []
-                    t.each{ type ->
-                        types << mediaTypeMapping[type]
+                    
+                    t.each { type ->
+
+                        def mapping = mediaTypeMapping[type]
+                        if(mapping) {
+                            types << mapping
+                        }
                     }
+
                     types
                 }
 
@@ -430,6 +473,16 @@ class MediaItem {
             }
         }
 
+        languageIdIsContained { ArrayList languageIds ->
+            def idsl = []
+            languageIds.each {
+                idsl << it.toLong()
+            }
+            language {
+                'in'('id', idsl)
+            }
+        }
+
         languageNameIs { String languageName ->
             language {
                 eq "name", languageName, [ignoreCase: true]
@@ -453,6 +506,16 @@ class MediaItem {
         sourceIdIs { Long sourceId ->
             source {
                 idEq sourceId
+            }
+        }
+
+        sourceIdIsContained { ArrayList sourceIds ->
+            def idsl = []
+            sourceIds.each {
+                idsl << it.toLong()
+            }
+            source {
+                'in'('id', idsl)
             }
         }
 
@@ -695,6 +758,9 @@ class MediaItem {
                 if (params.sourceId) {
                     sourceIdIs(params.sourceId.toLong())
                 }
+                if (params.sourceIdIsContained) {
+                    sourceIdIsContained((ArrayList) params.sourceIdIsContained)
+                }
                 if (params.sourceName) {
                     sourceNameIs((String) params.sourceName)
                 }
@@ -712,6 +778,9 @@ class MediaItem {
                 }
                 if (params.languageId) {
                     languageIdIs(params.languageId.toLong())
+                }
+                if (params.languageIdIsContained) {
+                    languageIdIsContained((ArrayList) params.languageIdIsContained)
                 }
                 if (params.languageName) {
                     languageNameIs((String) params.languageName)

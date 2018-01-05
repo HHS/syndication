@@ -26,22 +26,19 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
+			<synd:hasError/>
 			<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
 				<div class="row">
 					<div class="col-md-8">
-						<g:form class="form-horizontal" url="[resource:tweetInstance, action:'update']" method="PUT" >
+						<g:form class="form-horizontal" url="[resource:tweetInstance, action:'update']" method="PUT" id="updateMediaItem">
 							<g:hiddenField name="version" value="${tweetInstance?.version}" />
 							<fieldset class="form">
 								<g:render template="form"/>
 							</fieldset>
-							<fieldset class="buttons">
+							<fieldset class="buttons" id="mediaItemSubmitButton">
 								<g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
 								<g:link class="btn btn-default" id="${tweetInstance.id}" action="show" resource="${tweetInstance}">
 									Cancel
-								</g:link>
-								<g:link controller="mediaPreviewThumbnail" class="btn btn-warning pull-right" id="${tweetInstance?.id}" action="flush">
-									Regenerate Thumbnail & Preview
 								</g:link>
 							</fieldset>
 						</g:form>

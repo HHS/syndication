@@ -25,55 +25,55 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.show.label" args="[entityName]" /></h1>
             <synd:message/>
             <synd:errors/>
-            <synd:error/>
+            <synd:hasError/>
             <div class="row">
                  <div class="col-sm-9 col-sm-offset-1">
                     <dl class="dl-horizontal">
 
-                    <g:if test="${campaignInstance?.id}">
+                    <g:if test="${campaign?.id}">
                         <dt id="id-label" class="word_wrap"><g:message code="campaign.id.label" default="Id" /></dt>
-                        <dd class="word_wrap">${campaignInstance?.id}</dd>
+                        <dd class="word_wrap">${campaign?.id}</dd>
                     </g:if>
-                    <g:if test="${campaignInstance?.name}">
+                    <g:if test="${campaign?.name}">
                         <dt id="name-label" class="word_wrap"><g:message code="campaign.name.label" default="Name" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${campaignInstance}" field="name"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${campaign}" field="name"/></dd>
                     </g:if>
 
-                    <g:if test="${campaignInstance?.description}">
+                    <g:if test="${campaign?.description}">
                         <dt id="description-label" class="word_wrap"><g:message code="campaign.description.label" default="Description" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${campaignInstance}" field="description"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${campaign}" field="description"/></dd>
                     </g:if>
 
-                    <g:if test="${campaignInstance?.contactEmail}">
+                    <g:if test="${campaign?.contactEmail}">
                         <dt id="contactEmail-label" class="word_wrap"><g:message code="campaign.contactEmail.label" default="Contact Email" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${campaignInstance}" field="contactEmail"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${campaign}" field="contactEmail"/></dd>
                     </g:if>
 
-                    <g:if test="${campaignInstance?.startDate}">
+                    <g:if test="${campaign?.startDate}">
                         <dt id="startDate-label" class="word_wrap"><g:message code="campaign.startDate.label" default="Start Date" /></dt>
-                        <dd class="word_wrap"><g:formatDate date="${campaignInstance?.startDate}" /></dd>
+                        <dd class="word_wrap"><g:formatDate date="${campaign?.startDate}" /></dd>
                     </g:if>
 
-                    <g:if test="${campaignInstance?.endDate}">
+                    <g:if test="${campaign?.endDate}">
                         <dt id="endDate-label" class="word_wrap"><g:message code="campaign.endDate.label" default="End Date" /></dt>
-                        <dd class="word_wrap"><g:formatDate date="${campaignInstance?.endDate}" /></dd>
+                        <dd class="word_wrap"><g:formatDate date="${campaign?.endDate}" /></dd>
                     </g:if>
 
-                    <g:if test="${campaignInstance?.source}">
+                    <g:if test="${campaign?.source}">
                         <dt id="source-label" class="word_wrap"><g:message code="campaign.source.label" default="Source" /></dt>
-                        <dd class="word_wrap"><g:link controller="source" action="show" id="${campaignInstance?.source?.id}">${campaignInstance?.source?.encodeAsHTML()}</g:link></dd>
+                        <dd class="word_wrap"><g:link controller="source" action="show" id="${campaign?.source?.id}">${campaignInstance?.source?.encodeAsHTML()}</g:link></dd>
                     </g:if>
 
-                    <g:if test="${campaignInstance?.campaignMetrics}">
+                    <g:if test="${campaign?.campaignMetrics}">
                         <dt id="campaignMetrics-label" class="word_wrap"><g:message code="campaign.campaignMetrics.label" default="Campaign Metrics" /></dt>
-                        <g:each in="${campaignInstance.campaignMetrics}" var="c">
+                        <g:each in="${campaign.campaignMetrics}" var="c">
                             <dd class="word_wrap"><g:link controller="campaignMetric" action="show" id="${c.id}">${c?.encodeAsHTML()}</g:link></dd>
                         </g:each>
                     </g:if>
 
-                    <g:if test="${campaignInstance?.mediaItems}">
+                    <g:if test="${campaign?.mediaItems}">
                         <dt id="mediaItems-label" class="word_wrap"><g:message code="campaign.mediaItems.label" default="Media Items" /></dt>
-                        <g:each in="${campaignInstance.mediaItems}" var="m">
+                        <g:each in="${campaign.mediaItems}" var="m">
                             <dd class="word_wrap"><g:link controller="mediaItem" action="show" id="${m.id}">${m?.encodeAsHTML()}</g:link></dd>
                         </g:each>
                     </g:if>
@@ -82,9 +82,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
             </div>
 			<div class="col-sm-8">
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
-                <g:form url="[resource:campaignInstance, action:'delete']" method="DELETE">
+                <g:form url="[resource:campaign, action:'delete']" method="DELETE">
                     <fieldset class="buttons">
-                        <g:link class="btn btn-success" action="edit" resource="${campaignInstance}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
+                        <g:link class="btn btn-success" action="edit" resource="${campaign}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
                             <g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
                         <g:link class="btn btn-default" action="index">
                             Cancel

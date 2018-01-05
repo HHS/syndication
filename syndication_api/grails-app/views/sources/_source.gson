@@ -1,0 +1,15 @@
+import com.ctacorp.syndication.Source
+
+model {
+    Source source
+}
+
+json {
+    id source.id
+    name source.name
+    acronym source.acronym
+    websiteUrl source.websiteUrl
+    contactEmail source.contactEmail
+    largeLogoUrl source.largeLogoUrl
+    smallLogoUrl source.smallLogoUrl
+}

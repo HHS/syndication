@@ -26,12 +26,12 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
+			<synd:hasError/>
 			<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
 				<div class="row">
 					<div class="col-md-8">
-						<g:form class="form-horizontal" url="[resource:questionAndAnswerInstance, action:'update']" method="PUT" >
-							<g:hiddenField name="version" value="${questionAndAnswerInstance?.version}" />
+						<g:form class="form-horizontal" url="[resource:questionAndAnswer, action:'update']" method="PUT" id="updateMediaItem">
+							<g:hiddenField name="version" value="${questionAndAnswer?.version}" />
 							<fieldset class="form">
 								<g:render template="form"/>
 								<!-- Text input-->
@@ -39,27 +39,24 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 									<label class="col-md-4 control-label" for="campaigns">Campaigns</label>
 									<div class="col-md-4">
 										<ul class="one-to-many">
-											<g:each in="${questionAndAnswerInstance?.campaigns?}" var="campaignInstance">
-												<li><g:link controller="campaign" action="show" id="${campaignInstance.id}">${campaignInstance?.encodeAsHTML()}</g:link></li>
+											<g:each in="${questionAndAnswer?.campaigns?}" var="campaignInstance">
+												<li><g:link controller="campaign" action="show" id="${campaign.id}">${campaign?.encodeAsHTML()}</g:link></li>
 											</g:each>
 										</ul>
 									</div>
 								</div>
 							</fieldset>
-							<fieldset class="buttons">
+							<fieldset class="buttons" id="mediaItemSubmitButton">
 								<g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-								<g:link class="button" id="${questionAndAnswerInstance.id}" resource="${questionAndAnswerInstance}" action="show">
+								<g:link class="button" id="${questionAndAnswer.id}" resource="${questionAndAnswer}" action="show">
 									<button type="button" class="btn">Cancel</button>
 								</g:link>
-                                <g:link controller="mediaPreviewThumbnail" id="${questionAndAnswerInstance?.id}" action="flush">
-                                    <button type="button" class="btn btn-warning pull-right">Regenerate Thumbnail & Preview</button>
-                                </g:link>
 							</fieldset>
 						</g:form>
 					</div>
 				</div>
 			</sec:ifAnyGranted>
-            <g:render template="/mediaItem/addAttributeOrImage" model="[mediaItemInstance: questionAndAnswerInstance]"/>
+            <g:render template="/mediaItem/addAttributeOrImage" model="[mediaItemInstance: questionAndAnswer]"/>
 		</div>
 	</body>
 </html>

@@ -30,23 +30,23 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1><g:message code="default.show.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
     <div class="row">
         <div class="col-md-10 col-md-offset-2">
                 <dl class="dl-horizontal">
-                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: questionAndAnswerInstance, mediaType:'questionAndAnswer']"/>
+                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: questionAndAnswer, mediaType:'questionAndAnswer']"/>
 
-                <g:if test="${questionAndAnswerInstance?.structuredContentType}">
+                <g:if test="${questionAndAnswer?.structuredContentType}">
                     <dt id="name-label" class="word_wrap"><g:message code="questionAndAnswer.structuredContentType.label" default="Structured Type"/></dt>
-                    <dd class="word_wrap">${questionAndAnswerInstance.structuredContentType.prettyName}</dd>
+                    <dd class="word_wrap">${questionAndAnswer.structuredContentType.prettyName}</dd>
                 </g:if>
             </dl>
         </div>
     </div>
 
     <fieldset class="buttons">
-        <g:form url="[resource:questionAndAnswerInstance, action:'edit']">
-            <a href="${apiBaseUrl + '/resources/media/'+ questionAndAnswerInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
+        <g:form url="[resource:questionAndAnswer, action:'edit']">
+            <a href="${apiBaseUrl + '/resources/media/'+ questionAndAnswer?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>
@@ -57,13 +57,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 Cancel
             </g:link>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${questionAndAnswerInstance?.id}" action="featureItem">
+                <g:link controller="featuredMedia" style="margin-right: 3px;" class="btn btn-success pull-right" id="${questionAndAnswer?.id}" action="featureItem">
                     Feature this Item
+                </g:link>
+            </sec:ifAnyGranted>
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+                <g:link controller="mediaPreviewThumbnail"  id="${questionAndAnswer?.id}" action="flush">
+                    <button type="button" class="btn btn-warning pull-right" style="margin-right: 3px;">Regenerate Thumbnail & Preview</button>
                 </g:link>
             </sec:ifAnyGranted>
         </g:form>
     </fieldset>
-    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: questionAndAnswerInstance]"/>
+    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: questionAndAnswer]"/>
 </div>
 </body>
 </html>

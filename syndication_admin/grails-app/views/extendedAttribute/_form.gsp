@@ -21,7 +21,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="name">Name<span class="required-indicator">*</span></label>
     <div class="col-md-4">
-        <input name="name" type="text" value="${extendedAttributeInstance.name}" placeholder="attribute name" class="form-control input-md">
+        <input name="name" type="text" value="${extendedAttribute.name}" placeholder="attribute name" class="form-control input-md">
     </div>
 </div>
 
@@ -29,7 +29,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 <div class="form-group">
     <label class="col-md-4 control-label" for="value">Value<span class="required-indicator">*</span></label>
     <div class="col-md-4">
-        <textarea class="form-control" cols="40" rows="5" maxlength="255" placeholder="description" required="" value="" name="value">${extendedAttributeInstance?.value}</textarea>
+        <textarea class="form-control" cols="40" rows="5" maxlength="255" placeholder="description" required="" value="" name="value">${extendedAttribute?.value}</textarea>
     </div>
 </div>
 

@@ -1,19 +1,21 @@
 package com.ctacorp.syndication
 
 import com.ctacorp.syndication.authentication.UserRole
-import com.ctacorp.syndication.commons.util.Util
 import com.ctacorp.syndication.media.MediaItem
+import com.ctacorp.syndication_elasticsearch_plugin.ElasticsearchJob
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
+import grails.util.Holders
 
 import javax.annotation.PostConstruct
 
 @Transactional(readOnly = true)
 class TagService {
     def grailsApplication
-    def languageService
     def springSecurityService
+    def config = Holders.config
+    def elasticsearchService
 
     RestBuilder rest = new RestBuilder()
 
@@ -113,6 +115,10 @@ class TagService {
         suggestions.unique()
     }
 
+    def removeContentItem(Long id) {
+        delete("/tags/deleteContentItem/${id}.json")
+    }
+
     def getTag(Long id) {
         get("/tags/show/${id}.json")
     }
@@ -122,6 +128,8 @@ class TagService {
     }
 
     def deleteTag(Long id) {
+
+        ElasticsearchJob.triggerNow([command: ElasticsearchJob.INDEX_BY_TAG, tagId: id])
         delete("/tags/deleteTag/${id}")
     }
 
@@ -135,12 +143,15 @@ class TagService {
     }
 
     def setTags(String tagIds, Long mediaId, params = [:]) {
+
         tagIds = checkForNewTags(tagIds, params)
-        
+
         def url = MediaItem.get(mediaId).sourceUrl
         params.languageId = params.languageId ?: 1
         params.tagTypeId = params.tagTypeId ?: 1
-        post("/tags/setTagsForSyndicatedItemByTagIds.json", [syndicationId: mediaId, tagIds: tagIds, url: url, languageId: params.languageId, tagTypeId: params.tagTypeId])
+        def resp = post("/tags/setTagsForSyndicatedItemByTagIds.json", [syndicationId: mediaId, tagIds: tagIds, url: url, languageId: params.languageId, tagTypeId: params.tagTypeId])
+        elasticsearchService.indexMediaItem(mediaId)
+        resp
     }
 
     def checkForNewTags(tagIds, params) {
@@ -163,7 +174,7 @@ class TagService {
         get("/tags/getTagsForSyndicationId.json?syndicationId=${id}&languageId=${languageId}&tagTypeId=${tagTypeId}")
     }
 
-    def bulkTag(mediaItems, mediaAndTags, languageId){
+    def bulkTag(List<MediaItem> mediaItems, mediaAndTags, languageId){
         long tagType = 1L //hardcoded to "General" at this time
         def bulkTags = [:]
         int mediaCount, tagCount
@@ -192,7 +203,9 @@ class TagService {
         }
 
         def bulkTagData = [tagType:tagType, language:languageId, bulkTags:bulkTags]
-        post("/tags/bulkTag", bulkTagData)
+        def resp = post("/tags/bulkTag", bulkTagData)
+        elasticsearchService.indexMediaItems(mediaItems.collect { it.id as Long })
+        resp
     }
 
     def createTag(String tagName, Long tagTypeId, Long languageId) {
@@ -208,11 +221,19 @@ class TagService {
     }
 
     def updateTag(Long id, String name, Long languageId, Long tagTypeId) {
-        post("/tags/updateTag?languageId=${languageId}&tagTypeId=${tagTypeId}", [name: name, id: id])
+
+        def resp = post("/tags/updateTag?languageId=${languageId}&tagTypeId=${tagTypeId}", [name: name, id: id])
+        ElasticsearchJob.triggerNow([command: ElasticsearchJob.INDEX_BY_TAG, tagId: id])
+        resp
     }
 
     def getTagType(Long id) {
         get("/tagTypes/getTagTypeById/${id}")
+    }
+
+    def getTagNameByIds(List ids){
+        def tagName = post("/tags/getTagNameByIds",[ids:ids])
+        tagName
     }
 
     def getTagTypeByName(String name) {
@@ -260,15 +281,20 @@ class TagService {
     //This tags multiple media items with the SAME set of tags, for instance, add the same
     //three tags to 100 different media items
     def tagMultiple(String tagIds, String mediaIds, params = []) {
+
         def urls = []
         tagIds = checkForNewTags(tagIds, params)
         def mediaIdsAsLongs = mediaIds.split(",").collect { it as Long }.unique()
         mediaIds = mediaIdsAsLongs.join(',')
-
         mediaIdsAsLongs.each { mediaId ->
             urls << MediaItem.get(mediaId).sourceUrl
         }
-        post("/tags/tagSyndicatedItemsByTagIds.json", [syndicationIds: mediaIds, tagIds: tagIds, urls: urls.join(",")])
+
+        def response = post("/tags/tagSyndicatedItemsByTagIds.json", [syndicationIds: mediaIds, tagIds: tagIds, urls: urls.join(",")])
+
+        elasticsearchService.indexMediaItems(mediaIdsAsLongs)
+
+        response
     }
 
     /*
@@ -296,7 +322,7 @@ class TagService {
 
     private get(String path) {
         try {
-            def resp = rest.get(grailsApplication.config.tagCloud.serverAddress + path)
+            def resp = rest.get(config?.TAG_CLOUD_SERVER_URL + path)
             return resp.json
         } catch (e) {
             log.error "Could not connect to: ${path}"
@@ -306,10 +332,9 @@ class TagService {
 
     private post(String path, params) {
         try {
-
-            def resp = rest.post((grailsApplication.config.tagCloud.serverAddress ?: "") + path) {
+            def resp = rest.post((config?.TAG_CLOUD_SERVER_URL ?: "") + path) {
                 header 'Date', new Date().toString()
-                header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+                header 'Authorization', config?.SYNDICATION_INTERNALAUTHHEADER ?: ""
                 header 'Content-Type', "application/json;charset=UTF-8"
                 accept 'application/json'
 
@@ -324,9 +349,9 @@ class TagService {
 
     private delete(String path) {
         try {
-            def resp = rest.delete((grailsApplication.config.tagCloud.serverAddress ?: "") + path) {
+            def resp = rest.delete((config?.TAG_CLOUD_SERVER_URL ?: "") + path) {
                 header 'Date', new Date().toString()
-                header 'Authorization', grailsApplication.config.syndication.internalAuthHeader ?: ""
+                header 'Authorization', config.SYNDICATION_INTERNALAUTHHEADER ?: ""
                 header 'Content-Type', "application/json;charset=UTF-8"
             }
             return resp
@@ -1992,4 +2017,5 @@ class TagService {
                                                'zealous',
                                                'zesty',
                                                'zigzag']
+
 }

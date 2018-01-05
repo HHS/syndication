@@ -14,8 +14,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 <%@ page import="com.ctacorp.syndication.media.Infographic" %>
 
-<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:infographicInstance]"/>
+<g:render template="/mediaItem/globalForm" model="[mediaItemInstance:infographic]"/>
 
-<g:render template="/mediaItem/imageAndInfographicFields" model="[mediaItemInstance:infographicInstance]"/>
+<g:render template="/mediaItem/imageAndInfographicFields" model="[mediaItemInstance:infographic]"/>
 
 <g:render template="/mediaItem/mediaTypeValidationScript"/>

@@ -1,6 +1,7 @@
 package com.ctacorp.syndication.dashboard
 
 import com.ctacorp.syndication.MediaItemSubscriber
+import com.ctacorp.syndication.Source
 import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.health.FlaggedMedia
 import com.ctacorp.syndication.jobs.MediaValidationJob
@@ -15,6 +16,9 @@ class HealthReportController {
     def mediaValidationService
     def springSecurityService
     def mediaItemsService
+    def cmsManagerKeyService
+
+    def publisherItems = {MediaItemSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.mediaItem?.id}
 
     def index(Integer max) {
         setDefaultParams(max)
@@ -54,6 +58,56 @@ class HealthReportController {
         def ignoredItems = getFlaggedItems(true)
 
         [flaggedMediaItems:ignoredItems, totalCount:ignoredItems.totalCount] << getStabilityStats()
+    }
+
+    def search(Integer max) {
+        setDefaultParams(max)
+        def subscriberList = null
+        def flaggedMedia = null
+        if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
+            params.inList = publisherItems()
+        } else {
+            if(params.subscriberId){
+                params.inList = MediaItemSubscriber?.findAllBySubscriberId(params.int("subscriberId") ?: 0)?.mediaItem?.id ?: []
+            }
+            subscriberList = cmsManagerKeyService.listSubscribers()
+        }
+
+        flaggedMedia = FlaggedMedia.createCriteria().list([max:params.max,offset:params.offset]) {
+            mediaItem {
+                if(params.name){
+                    eq 'name', params.name
+                }
+                if(params.id) {
+                    eq 'id', params.long('id')
+                }
+                if(params.mediaType) {
+                    eq 'class', "com.ctacorp.syndication.media.${params.mediaType}"
+                }
+                if(params.subscriberId) {
+                    'in' 'id', params.inList
+                }
+                if(params.sourceId) {
+                    source {
+                        eq 'id', params.long('sourceId')
+                    }
+                }
+            }
+        }
+
+        [
+                flaggedMediaItems:flaggedMedia, totalCount:FlaggedMedia.count(),
+                id:params.id,
+                name:params.name,
+                mediaTypeList:mediaItemsService.getMediaTypes(),
+                mediaType:params.mediaType,
+                subscriberList:subscriberList,
+                subscriberId:params.subscriberId,
+                sourceList:Source.list(),
+                sourceId:params.sourceId,
+                totalCount:flaggedMedia.totalCount,
+                max: params.max
+        ]
     }
 
     @Transactional

@@ -13,6 +13,7 @@ import com.ctacorp.syndication.microsite.MicroSite.TemplateType
 import com.ctacorp.syndication.storefront.UserMediaList
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import grails.util.Holders
 
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER', 'ROLE_STOREFRONT_USER'])
 class MicrositeController {
@@ -20,12 +21,14 @@ class MicrositeController {
     def mediaService
     def tagService
     def micrositeService
+    def config = Holders.config
 
     def index() {
         def userMicrosites = MicroSite.findAllByUser(User.get(springSecurityService.currentUser.id))
         [
             featuredMedia: mediaService.getFeaturedMedia(max: 10),
-            userMicrosites:userMicrosites
+            userMicrosites:userMicrosites,
+            API_SERVER_URL:config?.API_SERVER_URL
         ]
     }
 
@@ -124,19 +127,20 @@ class MicrositeController {
                 render template: "userMediaList", model:[selectorType:"USER_MEDIA_LIST", userMediaLists:userMediaLists, area:params.mediaAreaValue]
                 break
             case "COLLECTION":
-                    render template: "collections", model:[selectorType:"COLLECTION", collections: Collection.findAllByLanguageAndActiveAndVisibleInStorefront(Language.get(params.long("language") ?: 1),true,true), area:params.mediaAreaValue, selectedLanguage:params.long("language"), languages:Language.findAllByIsActive(true)]
+                render template: "collections", model:[selectorType:"COLLECTION", collections: Collection.findAllByLanguageAndActiveAndVisibleInStorefront(Language.get(params.long("language") ?: 1),true,true), area:params.mediaAreaValue, selectedLanguage:params.long("language"), languages:Language.findAllByIsActive(true)]
                 break
             case "TAG":
                 def tagTypes = tagService.getTagTypes()
                 def languages = tagService.getAllActiveTagLanguages()
                 def tagInfo = tagService.listTags([max:1000,languageId: params.int("languageId"),typeId: params.int("typeId")])
                 def tags = tagInfo?.tags
-
-                render template: "tags", model:[selectorType:"TAG", tags: tags.sort{it.name}, area:params.mediaAreaValue, selectedLanguage:languages.find { "${it.id}" == "${params.languageId}" }?.id ?: 1, languages:languages, selectedTagType:tagTypes.find { "${it.id}" == "${params.typeId}" }?.id ?: 1, tagTypes:tagTypes, currentServerUrl:grailsApplication.config.grails.serverURL]
+                render template: "tags", model:[selectorType:"TAG", tags: tags.sort{it.name}, area:params.mediaAreaValue, selectedLanguage:languages.find { "${it.id}" == "${params.languageId}" }?.id ?: 1, languages:languages, selectedTagType:tagTypes.find { "${it.id}" == "${params.typeId}" }?.id ?: 1, tagTypes:tagTypes, currentServerUrl:Holders.config.API_SERVER_URL]
                 break
-            case "SOURCE": render template: "sources", model:[selectorType:"SOURCE", sources:Source.list(), area:params.mediaAreaValue]
+            case "SOURCE":
+                render template: "sources", model:[selectorType:"SOURCE", sources:Source.list(), area:params.mediaAreaValue]
                 break
-            case "CAMPAIGN": render template: "campaigns", model:[selectorType:"CAMPAIGN", campaigns:Campaign.list(), area:params.mediaAreaValue]
+            case "CAMPAIGN":
+                render template: "campaigns", model:[selectorType:"CAMPAIGN", campaigns:Campaign.list(), area:params.mediaAreaValue]
                 return
         }
     }

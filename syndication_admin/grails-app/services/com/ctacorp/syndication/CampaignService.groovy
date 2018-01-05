@@ -3,6 +3,7 @@ package com.ctacorp.syndication
 import com.ctacorp.syndication.authentication.UserRole
 import com.ctacorp.syndication.media.MediaItem
 import grails.transaction.Transactional
+import grails.util.Holders
 
 /**
  * Created by nburk on 1/12/15.
@@ -11,7 +12,7 @@ import grails.transaction.Transactional
 class CampaignService {
     def springSecurityService
     def grailsApplication
-    
+
     def publisherCampaigns(){
         CampaignSubscriber?.findAllBySubscriberId(springSecurityService.currentUser.subscriberId)?.campaign?.id
     }
@@ -22,13 +23,13 @@ class CampaignService {
         }
         return true
     }
-    
+
     def mediaItemBelongsToSubscriber(campaignInstance, mediaId){
-        
+
         return !CampaignSubscriber.findByCampaign(campaignInstance) || MediaItemSubscriber.findAllByMediaItem(MediaItem.get(mediaId)).subscriberId.contains(CampaignSubscriber.findByCampaign(campaignInstance).subscriberId)
-        
+
     }
-    
+
     def updateCampaignAndSubscriber(Campaign campaign, subscriberId = null){
         def campaignSubscriber = null
         campaign.validate()
@@ -38,7 +39,7 @@ class CampaignService {
         }
         if(UserRole.findByUser(springSecurityService.currentUser).role.authority == "ROLE_PUBLISHER"){
             if(!springSecurityService.currentUser.subscriberId){
-                campaign.errors.reject("Invalid Subscriber", "You do not have a valid subscriber. For help contact " + grailsApplication.config.grails.mail.default.from)
+                campaign.errors.reject("Invalid Subscriber", "You do not have a valid subscriber. For help contact " + Holders.config.MAIL_DEFAULT_FROM)
                 log.error("The publisher " + springSecurityService.currentUser.name)
             }
             if(campaignSubscriber){

@@ -17,6 +17,7 @@ package com.ctacorp.tagcloud
 import com.ctacorp.syndication.commons.util.Util
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.Transactional
+import grails.util.Holders
 
 @Transactional (readOnly = true)
 class SyndicationService {
@@ -26,8 +27,8 @@ class SyndicationService {
         try{
             RestBuilder rest = new RestBuilder()
             rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
-            String syndicationUrl = grailsApplication.config.syndication.serverUrl
-            String path = grailsApplication.config.syndication.apiPath
+            String syndicationUrl = Holders.config.API_SERVER_URL
+            String path = Holders.config.SYNDICATION_APIPATH
             String mediaResource = "/resources/media.json"
             String query = Util.buildQuery(params)
             String apiCall = syndicationUrl + path + mediaResource + query

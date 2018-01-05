@@ -39,12 +39,7 @@ class MediaMappingController {
 //                    render "<p>${mm.targetUrl}</p>"
                     def dupes = MediaMapping.findAllBySyndicationIdAndTargetUrl(mm.syndicationId, mm.targetUrl, [sort: "id", order: "DESC"])
                     if (dupes.size() > 1) {
-//                    render "<ul>"
-//                    dupes.each { dupe ->
-//                        render "<li>${dupe.id} - ${dupe.targetUrl}</li>"
-//                    }
                         flaggedForDeletion.addAll(dupes[0..-2]*.id)
-//                    render "</ul>"
                     }
                     if (flaggedForDeletion) {
                         def beforeCount = MediaMapping.count()
@@ -67,18 +62,16 @@ class MediaMappingController {
             notFound()
             return
         }
-
         if (mediaMappingInstance.hasErrors()) {
             respond mediaMappingInstance.errors, view: 'create'
             return
         }
-
         mediaMappingInstance.save flush: true
-
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'mediaMappingInstance.label', default: 'MediaMapping'), mediaMappingInstance.id])
                 redirect mediaMappingInstance
+
             }
             '*' { respond mediaMappingInstance, [status: CREATED] }
         }
@@ -113,7 +106,6 @@ class MediaMappingController {
 
     @Transactional
     def delete(MediaMapping mediaMappingInstance) {
-
         if (mediaMappingInstance == null) {
             notFound()
             return

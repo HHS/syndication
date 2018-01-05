@@ -1,6 +1,6 @@
 package com.ctacorp.syndication.commons.util
 
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsParameterMap
+import grails.web.servlet.mvc.GrailsParameterMap
 
 class Util {
     public static int getMax(params) {

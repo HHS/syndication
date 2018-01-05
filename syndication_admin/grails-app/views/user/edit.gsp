@@ -37,18 +37,18 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1><g:message code="default.edit.label" args="[entityName]"/></h1>
     <div id="safari-auto-complete"></div>
     <synd:message/>
-    <synd:error/>
+    <synd:hasError/>
     <br/>
     <synd:errors/>
 
     <div class="row">
         <div class="col-md-6 col-sm-10">
 
-            <g:form class="form-horizontal" url="[resource: userInstance, action: 'update']" method="PUT">
-                <g:hiddenField name="version" value="${userInstance?.version}"/>
+            <g:form class="form-horizontal" url="[resource: user, action: 'update']" method="PUT">
+                <g:hiddenField name="version" value="${user?.version}"/>
                     <g:render template="form"/>
                     <g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}"/>
-                    <g:link class="btn btn-default" action="show" resource="${userInstance}" value="Cancel">Cancel</g:link>
+                    <g:link class="btn btn-default" action="show" resource="${user}" value="Cancel">Cancel</g:link>
             </g:form>
         </div>
         <div class="hidden-lg hidden-md col-sm-12"><br></div>

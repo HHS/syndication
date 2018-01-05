@@ -39,7 +39,7 @@
 
         <p class="purple">An API, or Application Programming Interface, is a way for two computer applications to talk to each other in a common language that they both understand. HHS's API provides a structured way to get HHS content in a predictable, flexible and powerful format.</p>
 
-        <p class="all"><a href="${grailsApplication.config.syndication.swaggerAddress}">API Documentation >></a></p>
+        <p class="all"><a href="${API_SERVER_URL}">API Documentation >></a></p>
     </div>
 
     <div class="sidebar_box_blue_bottom"></div>

@@ -12,27 +12,27 @@ class CmsManagerKeyService {
 
     def getSubscriberById(subscriberId){
         try{
-            return authorizationService.getRest(config.cmsManager.serverUrl + "/api/v1/subscriber.json?id=${subscriberId}")
+            return authorizationService.getRest("${config?.CMSMANAGER_SERVER_URL}/api/v1/subscriber.json?id=${subscriberId}")
         } catch (e) {
-            log.error("Can't connect to CMS Manager!")
+            log.error("Can't connect to CMS Manager!", e)
             return []
         }
     }
 
     def listSubscribers(){
-        def resp
+
+        def resp = null
+
         try{
-            resp = authorizationService.getRest(config.cmsManager.serverUrl + "/api/v1/subscribers.json?sort=name")
-            def validSubscribers = resp.findAll{ subscriber ->
-                subscriber.id as String != "null"
-            }
-            return validSubscribers
+
+            resp = authorizationService.getRest("${config?.CMSMANAGER_SERVER_URL}/api/v1/subscribers.json?sort=name")
+            return resp.findAll { resp?.id != null && resp.id != 'null'}
+
         } catch (e) {
-            log.error("CMS Manager is either unavailable, or the keys are invalid. Response was: ${resp}")
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            log.error sw.toString();
+
+            log.error("CMS Manager is either unavailable, or the keys are invalid", e)
+            e.printStackTrace(new PrintWriter(new StringWriter()))
+            log.error new StringWriter().toString()
 
             return []
         }

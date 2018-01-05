@@ -31,9 +31,9 @@ class AlternateImagesController {
     def saveAlternateImage(AlternateImage alternateImageInstance) {
         def result = alternateImagesService.save(alternateImageInstance,params.long("mediaId"))
         if (result.id) {
-            respond ApiResponse.get200Response([result]).autoFill(params)
+            respond ApiResponse.get200Response([result]).autoFill(params), view:"index"
         } else {
-            respond ApiResponse.get400InvalidInstanceErrorResponse([result]).autoFill(params)
+            respond ApiResponse.get400InvalidInstanceErrorResponse([result]).autoFill(params), view:"index"
         }
     }
 }

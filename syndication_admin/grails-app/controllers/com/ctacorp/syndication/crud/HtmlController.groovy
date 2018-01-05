@@ -14,7 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.media.MediaItem
+import grails.util.Holders
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
@@ -25,7 +25,7 @@ import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.FeaturedMedia
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.MediaItemSubscriber
-import com.ctacorp.syndication.jobs.UpdateSolrIndexJob
+
 import grails.plugins.rest.client.RestBuilder
 import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
@@ -33,12 +33,12 @@ import grails.transaction.Transactional
 @Secured(['ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_PUBLISHER'])
 @Transactional(readOnly = true)
 class HtmlController {
+
     def mediaItemsService
     def tagService
-    def solrIndexingService
     def cmsManagerKeyService
     def springSecurityService
-    def jobService
+    def config = Holders.config
 
     RestBuilder rest = new RestBuilder()
 
@@ -46,7 +46,7 @@ class HtmlController {
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        
+
         def indexResponse = mediaItemsService.getIndexResponse(params, Html)
         respond indexResponse.mediaItemList, model: [htmlInstanceCount: indexResponse.mediaItemInstanceCount, mediaType:"Html"]
     }
@@ -62,7 +62,7 @@ class HtmlController {
                                       selectedLanguage  : tagData?.selectedLanguage,
                                       selectedTagType   : tagData?.selectedTagType,
                                       collections       : Collection.findAll("from Collection where ? in elements(mediaItems)", [htmlInstance]),
-                                      apiBaseUrl        : grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                      apiBaseUrl        : config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                       subscriber        : cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(htmlInstance)?.subscriberId)
         ]
     }
@@ -80,19 +80,19 @@ class HtmlController {
 
     @Transactional
     def save(Html htmlInstance) {
-        if (htmlInstance == null) {
+
+        if (!htmlInstance) {
             notFound()
             return
         }
 
-        htmlInstance =  mediaItemsService.updateItemAndSubscriber(htmlInstance, params.long('subscriberId'))
+        htmlInstance = mediaItemsService.updateItemAndSubscriber(htmlInstance, params.long('subscriberId'))
+
         if(htmlInstance.hasErrors()){
             flash.errors = htmlInstance.errors.allErrors.collect { [message: g.message([error: it])] }
             respond htmlInstance, view:'create', model: [subscribers:cmsManagerKeyService.listSubscribers()]
             return
         }
-
-        jobService.solrUpdate10SecondDelay(htmlInstance.id)
 
         request.withFormat {
             form multipartForm{
@@ -105,7 +105,11 @@ class HtmlController {
 
     def edit(Html htmlInstance) {
         def subscribers = cmsManagerKeyService.listSubscribers()
-        respond htmlInstance, model: [subscribers:subscribers, currentSubscriber:cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(htmlInstance)?.subscriberId)]
+        def currentSubscriber = cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(htmlInstance)?.subscriberId)
+        respond htmlInstance, model:[
+                subscribers:subscribers,
+                currentSubscriber:currentSubscriber,
+        ]
     }
 
     @Transactional
@@ -121,8 +125,6 @@ class HtmlController {
             redirect action:"edit", id:params.id
             return
         }
-
-        jobService.solrUpdate10SecondDelay(htmlInstance.id)
 
         request.withFormat {
             form multipartForm{
@@ -147,7 +149,6 @@ class HtmlController {
         }
 
         mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(htmlInstance, true)
-        solrIndexingService.removeMediaItem(htmlInstance)
         mediaItemsService.delete(htmlInstance.id)
 
         request.withFormat {

@@ -10,6 +10,13 @@ function initButtonListeners(){
         loadAdminErrorLog()
         toggleAdminPill($('#adminErrorButton'))
     })
+
+    $('#adminlogDownload').click(function(){
+        var replacedHref=$("#adminlogDownload").parent('a').attr("href").replace( /(downloadFor=)[\d\D]+/ig, '$1'+$('#currentToken').val());
+        $("#adminlogDownload").parent('a').attr("href", replacedHref);
+
+    })
+
     $('#apiTab').click(function(){
         loadApiErrorLog()
         toggleApiPill($('#apiErrorButton'))
@@ -39,21 +46,6 @@ function initButtonListeners(){
     $('#adminConstrainedScreenButton').click(function(){
         $('#adminLogDisplay').addClass("logViewPanelConstrained")
     })
-
-    $('#adminErrorButton').click(function(){
-        loadAdminErrorLog()
-        toggleAdminPill($(this))
-    })
-
-    $('#adminInfoButton').click(function(){
-        loadAdminInfoLog()
-        toggleAdminPill($(this))
-    })
-
-    function toggleAdminPill(pill){
-        $('.adminPill').removeClass("active")
-        pill.parent().addClass("active")
-    }
 
     //API -----------------------------------------------------------------------------
     $('#apiFullscreenButton').click(function(){
@@ -174,14 +166,12 @@ function initButtonListeners(){
         $('.tagPill').removeClass("active")
         pill.parent().addClass("active")
     }
-}
 
-function loadAdminInfoLog(){
-    loadLog("adminInfoLog", $('#adminLogDisplay'))
+
 }
 
 function loadAdminErrorLog(){
-    loadLog("adminErrorLog", $('#adminLogDisplay'))
+    loadLog("adminErrorLog", $('#adminLogDisplay'), $('#pageNumberforAdmin'))
 }
 
 function loadApiInfoLog(){
@@ -224,9 +214,19 @@ function loadTagErrorLog(){
     loadLog("tagErrorLog", $('#tagLogDisplay'))
 }
 
-function loadLog(name, logWindow){
+function loadLog(name, logWindow, pageWindow){
     $.getJSON(name, function(data){
         logWindow.html(data.logData)
+        if(data.pageNextBack){
+            pageWindow.html(data.pageNextBack)
+        }
+
+        $('#pageNumberforAdmin a').click(function(e) {
+            e.preventDefault();
+            loadLog('adminErrorLog?firstForwardToken='+data.firstForwardToken+'&token='+$(this).data("token"),$('#adminLogDisplay'), $('#pageNumberforAdmin'))
+        })
         logWindow.scrollTop(logWindow[0].scrollHeight);
+
     })
+
 }

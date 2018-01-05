@@ -25,7 +25,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
+			<synd:hasError/>
 			<g:form url="[resource:campaignMetricInstance, action:'update']" method="PUT" >
 				<g:hiddenField name="version" value="${campaignMetricInstance?.version}" />
 				<fieldset class="form">

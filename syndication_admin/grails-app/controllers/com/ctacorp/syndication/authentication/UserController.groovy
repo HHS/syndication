@@ -196,6 +196,7 @@ class UserController {
 
     @Transactional
     def updateMyAccount(User userInstance){
+
         if (userInstance == null) {
             notFound()
             return
@@ -204,15 +205,16 @@ class UserController {
         def passwordValidation = passwordService.validatePassword(params.password, params.passwordRepeat)
         userInstance.validate()
         if (userInstance.hasErrors() || !passwordValidation.valid) {
+
             if(passwordValidation.validationMessage){
                 userInstance.errors.rejectValue("password", "password does not follow guidelines", passwordValidation.validationMessage)
             }
             flash.errors = userInstance.errors.allErrors.collect{[message:g.message([error : it])]}
+
             respond userInstance.errors, view: 'editMyAccount'
             transactionStatus.setRollbackOnly()
             return
         }
-
         userInstance.save(flush:true)
 
         flash.message = "Your account has been successfully updated!"

@@ -11,10 +11,11 @@
 
 <body>
 <div id="show-PDF" class="content scaffold-show" role="main">
+
     <h1><g:message code="default.show.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-md-10 col-md-offset-2">
@@ -37,8 +38,13 @@
                 Cancel
             </g:link>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${pdfInstance?.id}" action="featureItem">
+                <g:link controller="featuredMedia" style="margin-right: 3px;" class="btn btn-success pull-right" id="${pdfInstance?.id}" action="featureItem">
                     Feature this Item
+                </g:link>
+            </sec:ifAnyGranted>
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
+                <g:link controller="mediaPreviewThumbnail" style="margin-right: 3px;" class="btn btn-warning pull-right" id="${pdfInstance?.id}" action="flush">
+                    Regenerate Thumbnail & Preview
                 </g:link>
             </sec:ifAnyGranted>
         </g:form>

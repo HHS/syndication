@@ -1,3 +1,4 @@
+<%@ page import="grails.util.Holders" %>
 <style>
 .item-tweet {
     display: inline-block;
@@ -16,7 +17,7 @@
         <img style="height:100%;width:100%;" class="clickable_thumbnail" src="${tweet.mediaUrl}:thumb" alt="Image of twitter post"/>
     </g:if>
     <g:else>
-        <g:img style="height:100%;width:100%;" uri="${grailsApplication.config.grails.serverURL}/assets/defaultIcons/thumbnail/twitter.jpg"/>
+        <g:img style="height:100%;width:100%;" uri="${grails.util.Holders.config.API_SERVER_URL}/assets/defaultIcons/thumbnail/twitter.jpg"/>
     </g:else>
 </g:if>
 <g:else>

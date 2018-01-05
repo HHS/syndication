@@ -1,5 +1,6 @@
 package com.ctacorp.syndication
 
+import com.ctacorp.syndication.media.Collection
 import com.ctacorp.syndication.media.Html
 import com.ctacorp.syndication.media.Image
 import com.ctacorp.syndication.media.Infographic
@@ -13,6 +14,7 @@ import com.ctacorp.syndication.preview.MediaThumbnail
 import grails.plugins.rest.client.RestBuilder
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
+import grails.util.Holders
 
 @Transactional
 class MediaValidationService {
@@ -22,6 +24,7 @@ class MediaValidationService {
     def messageSource
     def mediaItemsService
     def springSecurityService
+    def config = Holders.config
 
     HealthReport performValidation(Long mediaId) {
         MediaItem mediaItem = MediaItem.get(mediaId)
@@ -44,7 +47,7 @@ class MediaValidationService {
         def badItems = []
         ids.each{ id ->
             def healthReport = performValidation(id)
-            if(!healthReport.valid){
+            if(healthReport && !healthReport.valid){
                 flagMediaItem(healthReport)
                 badItems << healthReport
             } else{
@@ -53,12 +56,12 @@ class MediaValidationService {
         }
         badItems
     }
-    
+
     @Transactional(readOnly = true)
     def getFlaggedMedia(){
         FlaggedMedia.findAllNotIgnored([sort:'failureType', order: 'ASC'])
     }
-    
+
     @Transactional(readOnly = true)
     def getPublisherFlaggedMedia(subscriberId){
         FlaggedMedia.findAllByMediaItemInList(MediaItemSubscriber.findAllBySubscriberId(subscriberId).mediaItem)
@@ -106,11 +109,16 @@ class MediaValidationService {
         rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
         def sourceUrlCode = null
         try{
-            sourceUrlCode = rest.head(URI.decode(mi.sourceUrl)).getStatus()
+            if(mi instanceof Collection) {
+                sourceUrlCode = 200
+            } else {
+                sourceUrlCode = rest.head(URI.decode(mi.sourceUrl)).getStatus()
+            }
+
         }catch(error){
             return new HealthReport(mediaId: mi.id, statusCode: 404, details:error, failureType: FlaggedMedia.FailureType.UNREACHABLE)
         }
-        
+
         def thumbnail = MediaThumbnail.findByMediaItem(mi)
         def preview = MediaPreview.findByMediaItem(mi)
 
@@ -179,7 +187,7 @@ class MediaValidationService {
     }
 
     private fetchContent(MediaItem mi) {
-        String apiUrl = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+        String apiUrl = config?.API_SERVER_URL + config?.SYNDICATION_APIPATH
         def mediaContent
         try {
             rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
@@ -195,7 +203,7 @@ class MediaValidationService {
     }
 
     private fetchVideoMetadata(MediaItem mi) {
-        String apiUrl = grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath
+        String apiUrl = config?.API_SERVER_URL + config?.SYNDICATION_APIPATH
         def youtubeMetaData
         try {
             rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }

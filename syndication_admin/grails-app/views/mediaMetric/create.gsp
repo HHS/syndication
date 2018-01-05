@@ -26,8 +26,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.create.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
-			<g:form url="[resource:mediaMetricInstance, action:'save']" >
+			<synd:hasError/>
+			<g:form url="[resource:mediaMetric, action:'save']" >
 				<fieldset class="form">
 					<g:render template="form"/>
 				</fieldset>

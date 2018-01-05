@@ -14,6 +14,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.crud
 
+import com.ctacorp.syndication_elasticsearch_plugin.ElasticsearchJob
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -29,8 +31,9 @@ import grails.transaction.Transactional
 @Transactional(readOnly = true)
 class SourceController {
 
+    def elasticsearchService
+
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
-    def solrIndexingService
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -44,7 +47,6 @@ class SourceController {
             sourceInstanceList = Source.list(params)
             count = Source.count()
         }
-
         render view:"index", model: [sourceInstanceCount: count, sourceInstanceList:sourceInstanceList]
     }
 
@@ -70,7 +72,6 @@ class SourceController {
         }
 
         sourceInstance.save flush: true
-        solrIndexingService.inputSource(sourceInstance)
 
         request.withFormat {
             form {
@@ -101,7 +102,8 @@ class SourceController {
         }
 
         sourceInstance.save flush: true
-        solrIndexingService.inputSource(sourceInstance)
+
+        elasticsearchService.triggerNow([command: ElasticsearchJob.INDEX_BY_SOURCE, sourceId: sourceInstance.id])
 
         request.withFormat {
             form {
@@ -126,7 +128,6 @@ class SourceController {
             return
         }
 
-        solrIndexingService.removeSource(sourceInstance)
         sourceInstance.delete flush: true
 
         request.withFormat {

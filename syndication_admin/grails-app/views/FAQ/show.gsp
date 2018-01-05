@@ -28,16 +28,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     <h1><g:message code="default.show.label" args="[entityName]"/></h1>
     <synd:message/>
     <synd:errors/>
-    <synd:error/>
+    <synd:hasError/>
 
     <div class="row">
         <div class="col-md-10 col-md-offset-2">
             <dl class="dl-horizontal">
-                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: FAQInstance, mediaType:'faq']"/>
+                <g:render template="/mediaItem/commonShowView" model="[mediaItemInstance: FAQ, mediaType:'faq']"/>
 
-                <g:if test="${FAQInstance?.questionAndAnswers}">
+                <g:if test="${FAQ?.questionAndAnswers}">
                     <dt id="questionAndAnswers-label" class="word_wrap"><g:message code="faq.questionAndAnswers.label" default="Questions and Answers"/></dt>
-                    <g:each in="${FAQInstance.questionAndAnswers.sort{ it.name }}" var="qAndA">
+                    <g:each in="${FAQ.questionAndAnswers.sort{ it.name }}" var="qAndA">
                         <dd class="word_wrap"><span style="text-align: right; display:inline-block; width:3em;">${qAndA.id}</span> <g:link controller="mediaItem" action="show" id="${qAndA.id}">${qAndA?.encodeAsHTML()}</g:link></dd>
                     </g:each>
                 </g:if>
@@ -46,8 +46,8 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
     </div>
 
     <fieldset class="buttons">
-        <g:form  url="[resource:FAQInstance, action:'edit']">
-            <a href="${apiBaseUrl + '/resources/media/'+ FAQInstance?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
+        <g:form  url="[resource:FAQ, action:'edit']">
+            <a href="${apiBaseUrl + '/resources/media/'+ FAQ?.id +'/syndicate.json'}" class="btn btn-success popup-link">Preview</a>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER, ROLE_PUBLISHER">
                 <g:actionSubmit class="btn btn-warning" value="Edit" action="edit"/>
             </sec:ifAnyGranted>
@@ -58,14 +58,14 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                 Cancel
             </g:link>
             <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
-                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${FAQInstance?.id}" action="featureItem">
+                <g:link controller="featuredMedia" class="btn btn-success pull-right" id="${FAQ?.id}" action="featureItem">
                     Feature this Item
                 </g:link>
             </sec:ifAnyGranted>
         </g:form>
     </fieldset>
 
-    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: FAQInstance]"/>
+    <g:render template="/mediaItem/addToYourCampaign" model="[mediaItemInstance: FAQ]"/>
 </div>
 </body>
 </html>

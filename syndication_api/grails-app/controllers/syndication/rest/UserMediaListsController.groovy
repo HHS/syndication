@@ -14,100 +14,36 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package syndication.rest
 
-import com.ctacorp.grails.swagger.annotations.API
-import com.ctacorp.grails.swagger.annotations.APIResource
-import com.ctacorp.grails.swagger.annotations.Model
-import com.ctacorp.grails.swagger.annotations.ModelExtension
-import com.ctacorp.grails.swagger.annotations.ModelProperty
-import com.ctacorp.grails.swagger.annotations.Operation
-import com.ctacorp.grails.swagger.annotations.Parameter
-import com.ctacorp.grails.swagger.annotations.PropertyAttribute
-import com.ctacorp.grails.swagger.annotations.ResponseMessage
-import com.ctacorp.syndication.AlternateImage
-import com.ctacorp.syndication.media.Collection
-import com.ctacorp.syndication.media.Html
-import com.ctacorp.syndication.media.Image
-import com.ctacorp.syndication.media.Infographic
-import com.ctacorp.syndication.Language
+import com.ctacorp.grails.swagger.annotations.*
+import com.ctacorp.syndication.api.ApiResponse
+import com.ctacorp.syndication.marshal.MediaItemMarshaller
 import com.ctacorp.syndication.media.MediaItem
-import com.ctacorp.syndication.Source
-import com.ctacorp.syndication.media.Tweet
-import com.ctacorp.syndication.media.Video
 import com.ctacorp.syndication.storefront.UserMediaList
-import org.codehaus.groovy.grails.web.mime.MimeType
+import grails.util.Holders
+import grails.web.mime.MimeType
 import com.ctacorp.syndication.api.ApiResponse
 import com.ctacorp.syndication.api.Embedded
-import com.ctacorp.syndication.api.Message
-import com.ctacorp.syndication.api.Meta
-import com.ctacorp.syndication.api.Pagination
+import static com.ctacorp.grails.swagger.annotations.HTTPMethod.GET
 
-@API(swaggerDataPath = "/userMediaLists", description = "Get media from user generated lists.", modelExtensions = [
-    @ModelExtension(id="MediaItems", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type="array", typeRef="MediaItem", required = true)]),
-    ], removeProperties = ["results"]),
-    @ModelExtension(id="Ratings", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type="array", typeRef="Likes", required = true)]),
-    ], removeProperties = ["results"]),
-    @ModelExtension(id="EmbedCode", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type="array", typeRef="Snippet", required = true)]),
-    ], removeProperties = ["results"]),
-    @ModelExtension(id="SyndicatedMediaItems", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type="array", typeRef="SyndicatedMediaItem", required = true)]),
-    ], removeProperties = ["results"]),
-        @ModelExtension(id="YoutubeMetadata", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type="array", typeRef="Map", required = true)]),
-    ], removeProperties = ["results"])
-    ], models = [
-    @Model(id="Likes", properties = [
-        @ModelProperty(propertyName = "likes",      attributes = [@PropertyAttribute(type="integer", format = "int32", required = true)])
-    ]),
-    @Model(id="Snippet", properties = [
-        @ModelProperty(propertyName = "snippet",    attributes = [@PropertyAttribute(type="string", required = true)])
-    ]),
-    @Model(id="SyndicatedMediaItem", properties = [
-        @ModelProperty(propertyName = "id",                     attributes = [@PropertyAttribute(type="integer", format = "int64")]),
-        @ModelProperty(propertyName = "name",                   attributes = [@PropertyAttribute(type="string")]),
-        @ModelProperty(propertyName = "content",                attributes = [@PropertyAttribute(type="string")]),
-        @ModelProperty(propertyName = "contentEncoding",        attributes = [@PropertyAttribute(type="string")]),
-        @ModelProperty(propertyName = "description",            attributes = [@PropertyAttribute(type="string")]),
-        @ModelProperty(propertyName = "mediaType",              attributes = [@PropertyAttribute(type="string")]),
-        @ModelProperty(propertyName = "text",                   attributes = [@PropertyAttribute(type="string")]),
-        @ModelProperty(propertyName = "contentType",            attributes = [@PropertyAttribute(type="string")])
-    ])
-    ],
-    modelRefs = [
-        ApiResponse,
-        MediaItem,
-        Meta,
-        Pagination,
-        Message,
-        Collection,
-        AlternateImage,
-        Html,
-        Image,
-        Infographic,
-        Language,
-        Source,
-        Tweet,
-        Video
-    ]
-)
+@Tag(name = 'userMediaLists', description = 'Get media from user generated lists.')
 class UserMediaListsController {
     def mediaService
     static responseFormats = ['json']
+    def config = Holders.config
 
     def beforeInterceptor = {
         response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
     }
 
-    @APIResource(path="/resources/userMediaLists/{id}.json", description = "Get a specific user media list.", operations = [
-        @Operation(httpMethod="GET", notes="Get a specific user media list by 'id'.", nickname="getUserMediaList", type = "MediaItems", summary = "Get UserMediaList by ID", responseMessages=[
-            @ResponseMessage(code = 400, description = "Invalid ID"),
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ], parameters = [
-            @Parameter(name="id", type="integer", format="int64", description="The id of the record to look up", required=true, paramType = "path"),
-            @Parameter(name="displayMethod", type="string", description="Method used to render an html request. Accepts one: [mv, list, feed]", required=false, paramType = "query")
-        ])
+    @Path(path = '/resources/userMediaLists/{id}.json', operations = [
+            @Operation(method = GET, description = "Get a specific user media list.", summary = "Get UserMediaList by ID", responses = [
+                    @Response(code = 200, description = "Get a specific user media list by 'id'.", schema = @DataSchema(title = 'ArrayOfMediaItems', type = DataSchemaType.ARRAY, reference = '#/definitions/MediaItemWrapped')),
+                    @Response(code = 400, description = 'Invalid ID'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], parameters = [
+                    @Parameter(name = 'id', type = ParameterType.INTEGER, format = ParameterFormat.INT_64, description = 'The id of the record to look up', required = true, whereIn = ParameterLocation.PATH),
+                    @Parameter(name = 'displayMethod', type = ParameterType.STRING, format = ParameterFormat.INT_64, description = 'Method used to render an html request. Accepts one: [mv, list, feed]', required = false),
+            ], tags = ['userMediaLists']),
     ])
     def show(Long id){
         def userMediaList = UserMediaList.read(id)
@@ -116,7 +52,11 @@ class UserMediaListsController {
             respond ApiResponse.get400NotFoundResponse().autoFill(params)
             return
         }
-        respond ApiResponse.get200Response(userMediaList.mediaItems).autoFill(params)
+        def items = []
+        userMediaList?.mediaItems?.each { MediaItem item ->
+            items << new MediaItemMarshaller(item)
+        }
+        respond ApiResponse.get200Response(items).autoFill(params), view:"/mediaItem/index"
         return
     }
 
@@ -152,7 +92,7 @@ class UserMediaListsController {
             return
         }
         String renderedResponse
-        String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/userMediaLists/${id}"
+        String url = config?.API_SERVER_URL + "/resources/userMediaLists/${id}"
 
         switch(params.displayMethod ? params.displayMethod.toLowerCase() : "feed"){
             case "mv":

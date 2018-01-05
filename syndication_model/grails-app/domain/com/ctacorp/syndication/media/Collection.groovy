@@ -14,30 +14,11 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication.media
 
-import com.ctacorp.grails.swagger.annotations.Model
-import com.ctacorp.grails.swagger.annotations.ModelProperty
+import com.ctacorp.grails.swagger.annotations.*
 import com.ctacorp.grails.swagger.annotations.PropertyAttribute
 import com.ctacorp.syndication.Campaign
 
-@Model(id="Collection", properties = [
-    @ModelProperty(propertyName = "id",                      attributes = [@PropertyAttribute(type = "integer", format = "int64")]),
-    @ModelProperty(propertyName = "name",                    attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "description",             attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "sourceUrl",               attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "dateContentAuthored",     attributes = [@PropertyAttribute(type = "string", format = "date")]),
-    @ModelProperty(propertyName = "dateContentUpdated",      attributes = [@PropertyAttribute(type = "string", format = "date")]),
-    @ModelProperty(propertyName = "dateContentPublished",    attributes = [@PropertyAttribute(type = "string", format = "date")]),
-    @ModelProperty(propertyName = "dateContentReviewed",     attributes = [@PropertyAttribute(type = "string", format = "date")]),
-    @ModelProperty(propertyName = "dateSyndicationCaptured", attributes = [@PropertyAttribute(type = "string", format = "date")]),
-    @ModelProperty(propertyName = "dateSyndicationUpdated",  attributes = [@PropertyAttribute(type = "string", format = "date")]),
-    @ModelProperty(propertyName = "dateSyndicationVisible",  attributes = [@PropertyAttribute(type = "string", format = "date")]),
-    @ModelProperty(propertyName = "language",                attributes = [@PropertyAttribute(type = "Language")]),
-    @ModelProperty(propertyName = "externalGuid",            attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "hash",                    attributes = [@PropertyAttribute(type = "string")]),
-    @ModelProperty(propertyName = "campaigns",               attributes = [@PropertyAttribute(type = "array", typeRef = "Campaign")]),
-    @ModelProperty(propertyName = "mediaItems",              attributes = [@PropertyAttribute(type = "array", typeRef = "MediaItem")]),
-    @ModelProperty(propertyName = "source",                  attributes = [@PropertyAttribute(type = "Source")])
-])
+@Definition
 class Collection extends MediaItem {
     static hasMany = [mediaItems: MediaItem, campaigns: Campaign]
 

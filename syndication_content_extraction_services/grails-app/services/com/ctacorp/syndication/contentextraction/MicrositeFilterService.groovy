@@ -5,13 +5,13 @@ import com.ctacorp.syndication.microsite.FlaggedMicrosite
 import com.ctacorp.syndication.microsite.MicroSite
 import grails.gsp.PageRenderer
 import grails.transaction.Transactional
+import grails.util.Holders
 
 @Transactional
 class MicrositeFilterService {
 
     def mailService
     PageRenderer groovyPageRenderer
-    def grailsApplication
 
     def scanAllMicrosites() {
         MicroSite.list().each { site ->
@@ -94,7 +94,7 @@ class MicrositeFilterService {
             async true
             to mailRecipiants
             subject "Microsite registration request"
-            html groovyPageRenderer.render(template: '/micrositeFilter/micrositeFlagEmail', model:[userInstance: microsite.user, microsite:microsite, serverUrl:grailsApplication.config.grails.serverURL])
+            html groovyPageRenderer.render(template: '/micrositeFilter/micrositeFlagEmail', model:[userInstance: microsite.user, microsite:microsite, serverUrl:Holders.config.GRAILS_SERVER_URL])
         }
     }
 

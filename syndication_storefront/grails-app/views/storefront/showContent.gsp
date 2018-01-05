@@ -63,7 +63,7 @@
             <g:each in="${tagsByType}" var="tagType">
                 <strong>${tagType.key}: </strong>
                 <g:each in="${tagsByType[tagType.key]}" var="tag">
-                    <span class="mediaTagListing"><a href="${createLink(action:'listMediaForTag', id:tag.id, params:[tagName:tag.name])}" class="tagLink">${tag.name}</a></span>
+                    <span class="mediaTagListing"><a href="${createLink(action:'index', params:[tagId:tag.id])}" class="tagLink">${tag.name}</a></span>
                 </g:each>
                 <br/>
             </g:each>

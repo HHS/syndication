@@ -16,13 +16,20 @@ package syndication.admin
 
 import com.ctacorp.syndication.api.ApiResponse
 import com.ctacorp.syndication.exception.UnauthorizedException
+import com.ctacorp.syndication.marshal.MediaItemMarshaller
 import com.ctacorp.syndication.media.MediaItem
 import grails.converters.JSON
+import grails.util.Holders
 
 class AdminController {
     def mediaService
+    def config = Holders.config
 
     static allowedMethods = [deleteMedia: 'DELETE', archiveMedia: "POST"]
+
+    def swaggerUi() {
+        render view:"/swagger/swaggerIndex", model:[syndication_server:config.API_SERVER_URL]
+    }
 
     def deleteMedia(long id){
         ApiResponse apiResponse
@@ -51,12 +58,15 @@ class AdminController {
     }
 
     def unarchiveMedia(long id){
+
         ApiResponse apiResponse
-        try{
-            MediaItem mi = mediaService.unarchiveMedia(id)
-            if(mi && mi.active){
-                apiResponse = ApiResponse.get200ResponseCustomUserMessage("The record was unarchived successfully", [mi])
-                apiResponse.autoFill(params)
+
+        try {
+
+            def mi = mediaService.unarchiveMedia(id)
+
+            if(mi?.active){
+                apiResponse = ApiResponse.get200ResponseCustomUserMessage("The record was unarchived successfully").autoFill(params)
             } else{
                 log.error "Either the record doesn't exist or it could not be activated: ${mi?.id} ${mi?.sourceUrl} ${mi?.active}"
                 response.status = 400

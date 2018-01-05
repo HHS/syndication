@@ -26,15 +26,15 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
-			<g:form url="[resource:mediaMetricInstance, action:'update']" method="PUT" >
-				<g:hiddenField name="version" value="${mediaMetricInstance?.version}" />
+			<synd:hasError/>
+			<g:form url="[resource:mediaMetric, action:'update']" method="PUT" >
+				<g:hiddenField name="version" value="${mediaMetric?.version}" />
 				<fieldset class="form">
 					<g:render template="form"/>
 				</fieldset>
 				<fieldset class="buttons">
 					<g:actionSubmit class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                    <g:link class="btn btn-default" resource="${mediaMetricInstance}" id="${mediaMetricInstance.id}" action="show">
+                    <g:link class="btn btn-default" resource="${mediaMetric}" id="${mediaMetric.id}" action="show">
                         Cancel
                     </g:link>
 				</fieldset>

@@ -20,8 +20,6 @@ import grails.util.Environment
 @Secured(["ROLE_ADMIN"])
 class AppInfoController {
 
-    def grailsApplication
-
     def index() {
         def metaData
         if(Environment.current == Environment.PRODUCTION){

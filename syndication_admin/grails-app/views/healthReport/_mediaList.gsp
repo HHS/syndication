@@ -2,7 +2,9 @@
     <g:hiddenField name="whereToController" value="healthReport"/>
 <table class="table table-header">
     <thead>
-        <th></th> <!-- select box -->
+        <sec:ifAllGranted roles="ROLE_ADMIN">
+            <th></th> <!-- select box -->
+        </sec:ifAllGranted>
         <th></th> <!-- Icon -->
         <g:sortableColumn action="${params.action}" defaultOrder="DESC" title="Date Flagged" property="dateFlagged"/>
         <g:sortableColumn action="${params.action}" title="Media ID" property="mediaItem.id"/>

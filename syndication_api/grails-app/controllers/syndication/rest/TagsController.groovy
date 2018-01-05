@@ -15,51 +15,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.rest
 
 import com.ctacorp.grails.swagger.annotations.*
-import com.ctacorp.syndication.Language
-import com.ctacorp.syndication.ExtendedAttribute
 import com.ctacorp.syndication.data.TagHolder
+import com.ctacorp.syndication.marshal.MediaItemMarshaller
 import com.ctacorp.syndication.media.MediaItem
-import com.ctacorp.syndication.Source
 import grails.transaction.NotTransactional
-import org.codehaus.groovy.grails.web.mime.MimeType
+import grails.util.Holders
+import grails.web.mime.MimeType
 import com.ctacorp.syndication.api.ApiResponse
 import com.ctacorp.syndication.api.Embedded
-import com.ctacorp.syndication.api.Message
-import com.ctacorp.syndication.api.Meta
-import com.ctacorp.syndication.api.Pagination
+import static com.ctacorp.grails.swagger.annotations.HTTPMethod.GET
 
-@API(swaggerDataPath = "/tags", description = "Information about tags", modelRefs = [ApiResponse, Meta, Pagination, Message, MediaItem, ExtendedAttribute, Language, Source], modelExtensions = [
-    @ModelExtension(id="MediaItems", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type = "array", typeRef="MediaItem", required = true)]),
-    ],  removeProperties = ["results"]),
-    @ModelExtension(id="TagTypes", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type = "array", typeRef="TagType", required = true)]),
-    ],  removeProperties = ["results"]),
-    @ModelExtension(id="Tags", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type = "array", typeRef="Tag", required = true)]),
-    ],  removeProperties = ["results"]),
-    @ModelExtension(id="TagLanguages", model = "ApiResponse", addProperties = [
-        @ModelProperty(propertyName = "results",    attributes = [@PropertyAttribute(type = "array", typeRef="TagLanguage", required = true)]),
-    ],  removeProperties = ["results"])
-], models = [
-    @Model(id="Tag", properties = [
-        @ModelProperty(propertyName = "id",             attributes = [@PropertyAttribute(type = "integer", format="int64", required = true)]),
-        @ModelProperty(propertyName = "name",           attributes = [@PropertyAttribute(type = "string",  required = true)]),
-        @ModelProperty(propertyName = "language",       attributes = [@PropertyAttribute(type = "Language", required = true)]),
-        @ModelProperty(propertyName = "type",           attributes = [@PropertyAttribute(type = "TagType", required = true)])
-
-    ]),
-    @Model(id="TagType", properties = [
-        @ModelProperty(propertyName = "id",             attributes = [@PropertyAttribute(type = "integer",    format="int64", required = true)]),
-        @ModelProperty(propertyName = "name",           attributes = [@PropertyAttribute(type = "string",   required = true)]),
-        @ModelProperty(propertyName = "description",    attributes = [@PropertyAttribute(type = "string")])
-    ]),
-    @Model(id="TagLanguage", properties = [
-        @ModelProperty(propertyName = "id",             attributes = [@PropertyAttribute(type = "integer",  format="int64", required = true)]),
-        @ModelProperty(propertyName = "name",           attributes = [@PropertyAttribute(type = "string",   required = true)]),
-        @ModelProperty(propertyName = "isoCode",        attributes = [@PropertyAttribute(type = "string",   required = true)])
-    ])
-])
+@Tag(name = 'tags', description = 'Information about tags')
 class TagsController {
     static allowedMethods = [
             list: 'GET',
@@ -79,13 +45,14 @@ class TagsController {
         response.characterEncoding = 'UTF-8' //workaround for https://jira.grails.org/browse/GRAILS-11830
     }
 
-    @APIResource(path="/resources/tags/{id}.{format}", description = "Information about a specific tag", operations = [
-        @Operation(httpMethod="GET", notes="Returns the Tag identified by the 'id' in the specified 'format'.", nickname="getTagById", type = "Tags", summary = "Get Tag by ID", responseMessages = [
-            @ResponseMessage(code = 400, description = "Invalid ID"),
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ], parameters = [
-            @Parameter(name="id", type="integer", format="int64", description="The id of the record to look up", required=true, paramType = "path")
-        ])
+    @Path(path = '/resources/tags/{id}.{format}', operations = [
+            @Operation(method = GET, description = "Information about a specific tag", summary = "Get Tag by ID", responses = [
+                    @Response(code = 200, description = "Returns the Tag identified by the 'id' in the specified 'format'.", schema = @DataSchema(title = 'ArrayOfTags', type = DataSchemaType.ARRAY, reference = '#/definitions/TagMarshallerWrapped')),
+                    @Response(code = 400, description = 'Invalid ID'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], parameters = [
+                    @Parameter(name = 'id', type = ParameterType.INTEGER, format = ParameterFormat.INT_64, description = 'The id of the record to look up', required = true, whereIn = ParameterLocation.PATH),
+            ], tags = ['tags']),
     ])
     def show(Long id) {
         def result = tagsService.show(id, params)
@@ -94,7 +61,7 @@ class TagsController {
             respond ApiResponse.get400NotFoundResponse()
             return
         }
-        respond ApiResponse.get200Response([result]).autoFill(params)
+        respond ApiResponse.get200Response([result]).autoFill(params), view:"index"
     }
 
     @NotTransactional
@@ -104,20 +71,21 @@ class TagsController {
         respond ApiResponse.get200Response(result).autoFill(params)
     }
 
-    @APIResource(path="/resources/tags.{format}", description="List of Tags", operations=[
-        @Operation(httpMethod = "GET", notes="Returns the list of Tags matching the specified query parameters in the specified 'format'.", nickname="getTags", type = "Tags", summary="Get Tags", responseMessages=[
-            @ResponseMessage(code = 400, description = "Bad Request"),
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ], parameters = [
-            @Parameter(name = "sort",          type = "string", description = "The name of the property to which sorting will be applied", required = false, paramType = "query"),
-            @Parameter(name = "max",           type="integer", format="int32",    description = "The maximum number of records to return",                   required = false, paramType = "query"),
-            @Parameter(name = "offset",        type="integer", format="int32",    description = "Return records starting at the offset index.",              required = false, paramType = "query"),
-            @Parameter(name = "name",          type = "string", description = "Return tags[s] matching the supplied name",                 required = false, paramType = "query"),
-            @Parameter(name = "nameContains",  type = "string", description = "Return tags which contain the supplied partial name.",      required = false, paramType = "query"),
-            @Parameter(name = "mediaId",       type="integer", format="int64",   description = "Return tags associated with the supplied media id.",        required = false, paramType = "query"),
-            @Parameter(name = "typeId",        type="integer", format="int64",   description = "Return tags belonging to the supplied tag type id.",        required = false, paramType = "query"),
-            @Parameter(name = "typeName",      type = "string", description = "Return tags belonging to the supplied tag type name.",      required = false, paramType = "query")
-        ])
+    @Path(path = '/resources/tags.{format}', operations = [
+            @Operation(method = GET, description = "List of Tags", summary = "Get Tags", responses = [
+                    @Response(code = 200, description = "Returns the list of Tags matching the specified query parameters in the specified 'format'.", schema = @DataSchema(title = 'ArrayOfTags', type = DataSchemaType.ARRAY, reference = '#/definitions/TagMarshallerWrapped')),
+                    @Response(code = 400, description = 'Bad Request'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], parameters = [
+                    @Parameter(name = 'sort', type = ParameterType.STRING, description = 'The name of the property to which sorting will be applied', required = false),
+                    @Parameter(name = 'max', type = ParameterType.INTEGER, format = ParameterFormat.INT_32, description = 'The maximum number of records to return', required = false),
+                    @Parameter(name = 'offset', type = ParameterType.INTEGER, format = ParameterFormat.INT_32, description = 'Return records starting at the offset index.', required = false),
+                    @Parameter(name = 'name', type = ParameterType.STRING, description = 'Return tags[s] matching the supplied name', required = false),
+                    @Parameter(name = 'nameContains', type = ParameterType.STRING, description = 'Return tags which contain the supplied partial name.', required = false),
+                    @Parameter(name = 'mediaId', type = ParameterType.INTEGER, format = ParameterFormat.INT_64, description = 'Return tags associated with the supplied media id.', required = false),
+                    @Parameter(name = 'typeId', type = ParameterType.INTEGER, format = ParameterFormat.INT_64, description = 'Return tags belonging to the supplied tag type id.', required = false),
+                    @Parameter(name = 'typeName', type = ParameterType.STRING, description = 'Return tags belonging to the supplied tag type name.', required = false),
+            ], tags = ['tags']),
     ])
     def list() {
         params.includePaginationFields = true
@@ -131,19 +99,20 @@ class TagsController {
 
         params.countOverRide = result.dataSize
         params.total = result.total
-        respond ApiResponse.get200Response(tags).autoFill(params)
+        respond ApiResponse.get200Response(tags).autoFill(params), view:"index"
     }
 
-    @APIResource(path = "/resources/tags/{id}/related.{format}", description = "Information about related tags to a specific tag", operations = [
-        @Operation(httpMethod = "GET", notes="Returns the list of Tags related to the Tag identified by the 'id' in the specified format.", nickname="getRelatedTagsById", type = "Tags", summary = "Get related Tags by ID", responseMessages = [
-            @ResponseMessage(code = 400, description = "Bad Request"),
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ], parameters = [
-            @Parameter(name = "id",       type="integer",   format="int64",    description="The id of the tag to look up",                                 required=true, paramType = "path"),
-            @Parameter(name = "max",      type="integer",   format="int32",     description="The maximum number of records to return",                      required=false, paramType = "query"),
-            @Parameter(name = "offset",   type="integer",   format="int32",     description="The offset of the records set to return for pagination",       required=false, paramType = "query"),
-            @Parameter(name = "sort",     type = "string",  description = "The name of the property to which sorting will be applied",  required = false, paramType = "query")
-        ])
+    @Path(path = '/resources/tags/{id}/related.{format}', operations = [
+            @Operation(method = GET, description = "Information about related tags to a specific tag", summary = "Get related Tags by ID", responses = [
+                    @Response(code = 200, description = "Returns the list of Tags related to the Tag identified by the 'id' in the specified format.", schema = @DataSchema(title = 'ArrayOfTags', type = DataSchemaType.ARRAY, reference = '#/definitions/TagMarshallerWrapped')),
+                    @Response(code = 400, description = 'Bad Request'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], parameters = [
+                    @Parameter(name = 'id', type = ParameterType.INTEGER, format = ParameterFormat.INT_64, description = 'The id of the tag to look up', required = true, whereIn = ParameterLocation.PATH),
+                    @Parameter(name = 'sort', type = ParameterType.STRING, description = 'The name of the property to which sorting will be applied', required = false),
+                    @Parameter(name = 'max', type = ParameterType.INTEGER, format = ParameterFormat.INT_32, description = 'The maximum number of records to return', required = false),
+                    @Parameter(name = 'offset', type = ParameterType.INTEGER, format = ParameterFormat.INT_32, description = 'Return records starting at the offset index.', required = false),
+            ], tags = ['tags']),
     ])
     def relatedTags(Long id) {
         def tagList = tagsService.listRelatedTags(id, params)
@@ -157,33 +126,39 @@ class TagsController {
         respond ApiResponse.get200Response(tagList.tags).autoFill(params)
     }
 
-    @APIResource(path="/resources/tags/{id}/media.{format}", description="MediaItem", operations=[
-        @Operation(httpMethod="GET", notes="Returns the list of MediaItems associated with the Tag identified by the 'id'.", nickname="getMediaByTagId", type = "MediaItems", summary = "Get MediaItems for Tag", responseMessages=[
-            @ResponseMessage(code = 400, description = "Bad Request"),
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ], parameters = [
-            @Parameter(name = "id", type="integer", format="int64", description = "The id of the record to look up", required = true, paramType = "path"),
-            @Parameter(name = "max", type="integer", format="int32", description="The maximum number of records to return", required=false, paramType = "query"),
-            @Parameter(name = "offset", type="integer", format="int32", description="The offset of the records set to return for pagination", required=false, paramType = "query"),
-            @Parameter(name = "sort", type = "string", description = "The name of the property to which sorting will be applied", required = false, paramType = "query")
-        ])
+    @Path(path = '/resources/tags/{id}/media.{format}', operations = [
+            @Operation(method = GET, description = "MediaItem", summary = "Get MediaItems for Tag", responses = [
+                    @Response(code = 200, description = "Returns the list of MediaItems associated with the Tag identified by the 'id'.", schema = @DataSchema(title = 'ArrayOfMediaItems', type = DataSchemaType.ARRAY, reference = '#/definitions/MediaItemWrapped')),
+                    @Response(code = 400, description = 'Bad Request'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], parameters = [
+                    @Parameter(name = 'id', type = ParameterType.INTEGER, format = ParameterFormat.INT_64, description = 'The id of the tag to look up', required = true, whereIn = ParameterLocation.PATH),
+                    @Parameter(name = 'sort', type = ParameterType.STRING, description = 'The name of the property to which sorting will be applied', required = false),
+                    @Parameter(name = 'max', type = ParameterType.INTEGER, format = ParameterFormat.INT_32, description = 'The maximum number of records to return', required = false),
+                    @Parameter(name = 'offset', type = ParameterType.INTEGER, format = ParameterFormat.INT_32, description = 'Return records starting at the offset index.', required = false),
+            ], tags = ['tags']),
     ])
     def listMediaForTagId(){
         def result = tagsService.getMediaForTagId(params) ?: []
 
         params.total = result?.totalCount ?: 0
         params.maxOverride = true
-        respond ApiResponse.get200Response(result).autoFill(params)
+        def items = []
+        result.each { MediaItem item ->
+            items << new MediaItemMarshaller(item)
+        }
+        respond ApiResponse.get200Response(items).autoFill(params), view:"/mediaItem/index"
     }
 
-    @APIResource(path="/resources/tags/{id}/syndicate.{format}", description="MediaItem", operations=[
-            @Operation(httpMethod="GET", notes="Renders the list of MediaItems associated with the Tag identified by the 'id'.", nickname="syndicate", type = "MediaItems", summary = "Get MediaItems for Tag", responseMessages=[
-                    @ResponseMessage(code = 400, description = "Bad Request"),
-                    @ResponseMessage(code = 500, description = "Internal Server Error")
+    @Path(path = '/resources/tags/{id}/syndicate.{format}', operations = [
+            @Operation(method = GET, description = "MediaItem", summary = "Get MediaItems for Tag", responses = [
+                    @Response(code = 200, description = "Renders the list of MediaItems associated with the Tag identified by the 'id'.", schema = @DataSchema(title = 'ArrayOfMediaItems', type = DataSchemaType.STRING)),
+                    @Response(code = 400, description = 'Invalid ID'),
+                    @Response(code = 500, description = 'Internal Server Error'),
             ], parameters = [
-                    @Parameter(name = "id",          type="integer", format="int64", description = "The id of the record to look up", required = true, paramType = "path"),
-                    @Parameter(name="displayMethod", type="string",                  description="Method used to render an html request. Accepts one: [mv, list, feed]", required=false, paramType = "query")
-            ])
+                    @Parameter(name = 'id', type = ParameterType.INTEGER, format = ParameterFormat.INT_64, description = 'The id of the record to look up', required = true, whereIn = ParameterLocation.PATH),
+                    @Parameter(name = 'displayMethod', type = ParameterType.STRING, description = 'Method used to render an html request. Accepts one: [mv, list, feed]', required = false),
+            ], tags = ['tags']),
     ])
     def syndicate(Long id){
         String tagName
@@ -204,7 +179,7 @@ class TagsController {
             }
             json{
                 def resp = new Embedded(id:id, content:content ,name: tagName, description: "Media tagged with '${tagName}'")
-                respond ApiResponse.get200Response([resp]).autoFill(params)
+                respond ApiResponse.get200Response([resp]).autoFill(params), view:"/mediaItem/syndicate"
             }
         }
     }
@@ -217,7 +192,7 @@ class TagsController {
             return
         }
         String renderedResponse
-        String url = grailsApplication.config.grails.serverURL + "/api/v2/resources/tags/${id}"
+        String url = Holders.config.API_SERVER_URL + "/resources/tags/${id}"
         TagHolder tag = new TagHolder(id:id, name:tagName)
         switch(params.displayMethod ? params.displayMethod.toLowerCase() : "feed"){
             case "mv":
@@ -240,16 +215,18 @@ class TagsController {
             }
             json {
                 response.contentType = 'application/json'
-                respond ApiResponse.get200Response([[snippet:renderedResponse]]).autoFill(params)
+                respond ApiResponse.get200Response([[snippet:renderedResponse]]).autoFill(params), view:"/mediaItem/embed"
                 return
             }
         }
     }
 
-    @APIResource(path="/resources/tags/tagTypes.{format}", description = "List of Types", operations=[
-        @Operation(httpMethod = "GET", notes="Returns the list of TagTypes", nickname="getTagTypes", type = "TagTypes", summary="Get TagTypes", responseMessages=[
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ])
+    @Path(path = '/resources/tags/tagTypes.{format}', operations = [
+            @Operation(method = GET, description = "List of Types", summary = "Get MediaItems for Tag", responses = [
+                    @Response(code = 200, description = "Renders the list of MediaItems associated with the Tag identified by the 'id'.", schema = @DataSchema(title = 'ArrayOfTagTypes', type = DataSchemaType.ARRAY, reference = '#/definitions/TagTypeMarshallerWrapped')),
+                    @Response(code = 400, description = 'Invalid ID'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], tags = ['tags']),
     ])
     def listTypes() {
         def result = tagsService.listTypes(params)
@@ -259,13 +236,15 @@ class TagsController {
             return
         }
         params.total = result.size()
-        respond ApiResponse.get200Response(result).autoFill(params)
+        respond ApiResponse.get200Response(result).autoFill(params), view:"types"
     }
 
-    @APIResource(path="/resources/tags/tagLanguages.{format}", description = "List of Tag Languages", operations=[
-        @Operation(httpMethod = "GET", notes="Returns the list of TagLanguages", nickname="getTagLanguages", type = "TagLanguages", summary="Get TagLanguages", responseMessages=[
-            @ResponseMessage(code = 500, description = "Internal Server Error")
-        ])
+    @Path(path = '/resources/tags/tagLanguages.{format}', operations = [
+            @Operation(method = GET, description = "List of Tag Languages", summary = "Get TagLanguages", responses = [
+                    @Response(code = 200, description = "Returns the list of TagLanguages", schema = @DataSchema(title = 'ArrayOfTagLanguages', type = DataSchemaType.ARRAY, reference = '#/definitions/TagLanguageMarshallerWrapped')),
+                    @Response(code = 400, description = 'Invalid ID'),
+                    @Response(code = 500, description = 'Internal Server Error'),
+            ], tags = ['tags']),
     ])
     def listLanguages() {
         def result = tagsService.listLanguages(params)
@@ -275,7 +254,7 @@ class TagsController {
             return
         }
         params.total = result.size()
-        respond ApiResponse.get200Response(result).autoFill(params)
+        respond ApiResponse.get200Response(result).autoFill(params), view:"languages"
     }
 
     def query(String q){

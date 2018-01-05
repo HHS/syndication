@@ -1,0 +1,128 @@
+def emailNotificationList = [
+        "utank@ctacorp.com",
+        "zjones@ctacorp.com"
+]
+
+node {
+
+    stage "checkout repo", {
+        deleteDir()
+        checkout scm
+    }
+
+    stage "copy build scripts", {
+        sh 'mkdir -p build/bin'
+        sh './gradlew copyJenkinsfileScripts'
+    }
+
+    if (env.JENKINS_URL == "http://ctacdev.com:8080/jenkins/") {
+
+        stage "run tests", {
+            echo 'skipping ...'
+            sh './gradlew check'
+        }
+
+        stage "generate reports", {
+            echo 'skipping ...'
+            def testPassed = true
+            try{
+                sh './gradlew cobertura codenarcMain'
+                sh 'mkdir -p build/test-results && touch build/test-results/*.xml'
+            }
+            catch(error){
+                testPassed = false
+            }
+            if (!testPassed) {
+                //Email Notification
+                sendEmail "Jenkins Build Failure for build ${env.JOB_NAME}!", "Jenkins Build Failure for build ${env.JOB_NAME} #${env.BUILD_NUMBER}.", emailNotificationList
+                //fail jenkins job
+                error "The build tests failed!"
+            }
+        }
+    }
+
+    stage "build artifacts", {
+        sh './gradlew assemble'
+
+        writeMd5()
+        writeGitlog()
+        sh "APP_NAME=${getProjectInfo().artifactId} ./build/bin/generate_awslogs_conf.sh && cp awslogs.conf build/libs"
+        //Save artifacts
+        archiveArtifacts()
+    }
+
+    if (env.JENKINS_URL == "http://ctacdev.com:8080/jenkins/") {
+
+        stage "generate docs", {
+            def artifactId = getProjectInfo().artifactId
+            sh "./build/bin/generate_docs.sh ${artifactId}"
+        }
+
+        stage "publish reports", {
+            publishHTML target:[reportName:'Automated Test Report', reportFiles:'index.html', reportDir:'build/reports/tests', allowMissing:false, alwaysLinkToLastBuild:true, keepAll:true]
+            publishHTML target:[reportName:'CodeNarc Report', reportFiles:'main.html', reportDir:'build/reports/codenarc', allowMissing:false, alwaysLinkToLastBuild:true, keepAll:true]
+            publishHTML target:[reportName:'Cobertura Report', reportFiles:'index.html', reportDir:'build/reports/cobertura', allowMissing:false, alwaysLinkToLastBuild:true, keepAll:true]
+        }
+
+        stage "push war file to s3", {
+            def projectInfo = getProjectInfo()
+            sh "./build/bin/push_file_to_s3.sh ${projectInfo.artifactId} ${projectInfo.versionNumber}"
+        }
+    }
+}
+
+def archiveArtifacts() {
+    archive 'build/libs/*.war'
+    archive 'build/libs/checksum.md5'
+    archive 'build/libs/gitLog.txt'
+    archive 'build/libs/awslogs.conf'
+}
+
+def getProjectInfo() {
+
+    def artifact = sh(script: '/bin/ls ./build/libs/*.war', returnStdout: true) as String
+    artifact = artifact.split('[.]war')[0].substring(artifact.lastIndexOf('/')+1)
+
+    def isSnapShot = artifact.endsWith('-SNAPSHOT')
+
+    artifact = isSnapShot ? artifact.split('-SNAPSHOT')[0] : artifact
+    def artifactId = artifact.substring(0, artifact.lastIndexOf('-'))
+
+    def version = artifact.substring(artifact.lastIndexOf('-')+1)
+    version = isSnapShot ? version + '-SNAPSHOT' : version
+
+    [artifactId: artifactId, versionNumber: version]
+}
+
+def writeMd5() {
+    hash = sh(returnStdout:true, returnStatus:false, script:'md5sum build/libs/*.war').trim()
+    writeFile file:'build/libs/checksum.md5', text:hash.split(" ")[0] + "\n"
+}
+
+def writeGitlog() {
+    def gitLog = sh(script:'git log -n 1', returnStdout:true, returnStatus:false).trim()
+    writeFile file:'build/libs/gitLog.txt', text:gitLog
+}
+
+def sendEmail(subject, message, Collection recipients) {
+    String emailTemplate = """\
+<html>
+    <body>
+        <h1>[[TITLE]]</h1>
+        <p>[[MESSAGE]]</p>
+    </body>
+"""
+    def htmlMessage = emailTemplate
+            .replace("[[TITLE]]", subject)
+            .replace("[[MESSAGE]]", message)
+
+    mail(
+            to:recipients.join(", "),
+            subject:subject,
+            body:htmlMessage,
+            mimeType:'text/html',
+            charset:'UTF-8',
+            from:'syndicationjenkins@ctacdev.com',
+            replyTo:'utank@ctacorp.com'
+    )
+}

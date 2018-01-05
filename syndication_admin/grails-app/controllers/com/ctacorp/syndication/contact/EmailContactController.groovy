@@ -15,7 +15,7 @@ class EmailContactController {
     }
 
     def create() {
-        [emailContactInstance: new EmailContact()]
+        [emailContact: new EmailContact()]
     }
 
     def show(EmailContact ec) {
@@ -36,7 +36,7 @@ class EmailContactController {
             "and ask to be removed from the list."
         }
         flash.message = "Test email sent to ${ec.email}"
-        respond ec, view:"show"
+        render view: "show", model: [emailContactInstance: ec]
     }
 
     def save(EmailContact ec) {

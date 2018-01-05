@@ -5,7 +5,7 @@
   Time: 9:32 AM
 --%>
 
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="grails.util.Holders" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -231,7 +231,7 @@
                 var endYearEle = document.getElementById("end_year");
                 var endYear = endYearEle.options[endYearEle.selectedIndex].value;
                 for(var pagination = 1; pagination < numPages; pagination++){
-                    $.get('${grailsApplication.config.grails.serverURL}' + "/consumerMetrics/getpaginatedLocations?pagination="+pagination+"&start_day="+startDay+"&start_month="+startMonth+"&start_year="+startYear+"&end_day="+endDay+"&end_month="+endMonth+"&end_year="+endYear+"&start=1&end=1", function(data){
+                    $.get('${grails.util.Holders.config.ADMIN_SERVER_URL}' + "/consumerMetrics/getpaginatedLocations?pagination="+pagination+"&start_day="+startDay+"&start_month="+startMonth+"&start_year="+startYear+"&end_day="+endDay+"&end_month="+endMonth+"&end_year="+endYear+"&start=1&end=1", function(data){
                         var features = [];
                         array.forEach(data, function(item){
                             var geometry = new Point(item);

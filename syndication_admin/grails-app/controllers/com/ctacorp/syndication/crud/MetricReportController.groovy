@@ -232,13 +232,7 @@ class MetricReportController {
                 count = MediaItem.countByIdInList(publisherItems()) ?: 0
             } else {
                 mediaItems = viewMetricService.findTotalViews(params)
-                def metrics = MediaItem.list().metrics
-                count = 0
-                metrics.each{
-                    if(it){
-                        count++
-                    }
-                }
+                count = MediaItem.count()
             }
 
         } else {
@@ -260,7 +254,12 @@ class MetricReportController {
 // all graphing actions
     def viewGraphs(){
         def mediaItems = MediaItem.list()
-        def mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',') ?: []) ?: []
+        def mediaToGraph
+        if(params.mediaToGraph?.tokenize(',')) {
+            mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(','))
+        } else {
+            mediaToGraph = []
+        }
         String mediaForTokenInput = mediaToGraph.collect{ [id:it.id, name:"$it.id - ${it.name}"] } as JSON
         def secondTabActive = null
         if(params.fromSecondTab){
@@ -271,12 +270,18 @@ class MetricReportController {
     }
 
     def mediaContent(){
+        def mediaToGraph
+        if(params.mediaToGraph?.tokenize(',[]')) {
+            mediaToGraph = MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',[]'))
+        } else {
+            mediaToGraph = []
+        }
         params.whichData = params.whichData ?: "apiViewCount"
         Map data = [
                 data:[],
                 xkey:"month",
-                ykeys:MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',[]') ?: []).name,
-                labels:MediaItem.findAllByIdInList(params.mediaToGraph?.tokenize(',[]') ?: []).collect{
+                ykeys:mediaToGraph.name,
+                labels:mediaToGraph.collect{
                     it.id+" " + viewMetricService.checkLength(it.name)
                 }
         ]
@@ -290,7 +295,6 @@ class MetricReportController {
         params.whichData = params.whichData ?: "storefrontViewCount"
         params.range = params.range ?: 1
         def data = viewMetricService.getMediaTotals(params.mediaToGraph, params.whichData, params.int("range"))
-
         render data as JSON
     }
 

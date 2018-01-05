@@ -67,7 +67,7 @@ grails.project.dependency.resolution = {
 
     plugins {
         compile ":rest-client-builder:2.1.1"
-        compile "org.grails.plugins:syndication-model:2.9.0"
+        compile "org.grails.plugins:syndication-model:2.10.0"
         compile "org.grails.plugins:content-extraction-services:1.13.0"
 
         compile ":bruteforce-defender:1.0.1-spring-security-core-2.0-RC4"
@@ -107,11 +107,6 @@ grails.project.dependency.resolution = {
         //compile ":less-asset-pipeline:1.10.0"
         //compile ":coffee-asset-pipeline:1.8.0"
         //compile ":handlebars-asset-pipeline:1.3.0.3"
-
-        // Solr --------------------------------------------------------------------------------------------------------
-        // |  Leave this at the bottom, moving it causes dependency problems at the moment                             |
-        // -------------------------------------------------------------------------------------------------------------
-        compile ":solr-operations:1.4.0"      //syndication solr stuff
 
         //Testing ---------------------------------------------------------------
         test ":build-test-data:2.4.0"

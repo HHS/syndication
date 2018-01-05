@@ -1,5 +1,5 @@
 
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="grails.util.Holders" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <meta name="layout" content="main">
@@ -215,7 +215,7 @@
 
     function domainsBySyndicationGraph(endDate,startDate,size,graphType) {
         $("#endUser-container").html('<div id="spinnerDiv" style="width:50px;" class="center-block"><asset:image src="spinner.gif"/></div>');
-        $.get('${grailsApplication.config.grails.serverURL}' + "/consumerMetrics/getWhosEmbedding?startDate="+startDate+"&endDate="+endDate+"&size="+size+"&mediaToGraph="+"${mediaToGraph}", function(data){
+        $.get('${grails.util.Holders.config.ADMIN_SERVER_URL}' + "/consumerMetrics/getWhosEmbedding?startDate="+startDate+"&endDate="+endDate+"&size="+size+"&mediaToGraph="+"${mediaToGraph}", function(data){
             renderData(data, graphType);
         });
     }

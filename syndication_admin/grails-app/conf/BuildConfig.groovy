@@ -38,7 +38,7 @@ grails.project.dependency.resolution = {
     repositories {
         inherits("global") {}
 
-        mavenRepo("http://54.234.21.193:8080/artifactory/central"){
+        mavenRepo("http://184.72.143.3:8080/artifactory/central"){
             updatePolicy "always"
         }
 
@@ -80,9 +80,8 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the compile step ----------------------------------------------------
-        compile ":syndication-model:2.9.0"       //Syndication domain classes
-        compile ":content-extraction-services:1.15.0"  //syndication content extraction tools
-        compile ":solr-operations:1.5.0"                  //syndication solr stuff
+        compile ":syndication-model:2.11.0"       //Syndication domain classes
+        compile ":content-extraction-services:1.18.0"  //syndication content extraction tools
 
         //plugins for the compile step
         compile ":scaffolding:2.1.2"

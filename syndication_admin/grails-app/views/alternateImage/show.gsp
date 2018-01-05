@@ -26,49 +26,49 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.show.label" args="[entityName]" /></h1>
             <synd:message/>
             <synd:errors/>
-            <synd:error/>
+            <synd:hasError/>
             <div class="row">
             <div class="col-sm-9 col-sm-offset-1">
                     <dl class="dl-horizontal">
 
-                    <g:if test="${alternateImageInstance?.id}">
+                    <g:if test="${alternateImage?.id}">
                         <dt id="id-label" class="word_wrap"><g:message code="alternateImage.id.label" default="Id" /></dt>
-                        <dd class="word_wrap">${alternateImageInstance?.id}</dd>
+                        <dd class="word_wrap">${alternateImage?.id}</dd>
                     </g:if>
 
-                    <g:if test="${alternateImageInstance?.width}">
+                    <g:if test="${alternateImage?.width}">
                         <dt id="width-label" class="word_wrap"><g:message code="alternateImage.width.label" default="Width" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${alternateImageInstance}" field="width"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${alternateImage}" field="width"/></dd>
                     </g:if>
 
-                    <g:if test="${alternateImageInstance?.height}">
+                    <g:if test="${alternateImage?.height}">
                         <dt id="height-label" class="word_wrap"><g:message code="alternateImage.height.label" default="Height" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${alternateImageInstance}" field="height"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${alternateImage}" field="height"/></dd>
                     </g:if>
 
-                    <g:if test="${alternateImageInstance?.name}">
+                    <g:if test="${alternateImage?.name}">
                         <dt id="name-label" class="word_wrap"><g:message code="alternateImage.name.label" default="Name" /></dt>
-                        <dd class="word_wrap"><g:fieldValue bean="${alternateImageInstance}" field="name"/></dd>
+                        <dd class="word_wrap"><g:fieldValue bean="${alternateImage}" field="name"/></dd>
                     </g:if>
 
-                    <g:if test="${alternateImageInstance?.url}">
+                    <g:if test="${alternateImage?.url}">
                         <dt id="url-label" class="word_wrap"><g:message code="alternateImage.url.label" default="Url" /></dt>
-                        <dd class="word_wrap"><g:link target="_blank" url="${alternateImageInstance.url}"><g:fieldValue bean="${alternateImageInstance}" field="url"/></g:link></dd>
+                        <dd class="word_wrap"><g:link target="_blank" url="${alternateImage.url}"><g:fieldValue bean="${alternateImage}" field="url"/></g:link></dd>
                     </g:if>
 
-                    <g:if test="${alternateImageInstance?.mediaItem}">
+                    <g:if test="${alternateImage?.mediaItem}">
                         <dt id="mediaItem-label" class="word_wrap"><g:message code="alternateImage.mediaItem.label" default="Media Item" /></dt>
-                        <dd class="word_wrap"><g:link controller="mediaItem" action="show" id="${alternateImageInstance?.mediaItem?.id}">${alternateImageInstance?.mediaItem?.encodeAsHTML()}</g:link></dd>
+                        <dd class="word_wrap"><g:link controller="mediaItem" action="show" id="${alternateImage?.mediaItem?.id}">${alternateImage?.mediaItem?.encodeAsHTML()}</g:link></dd>
                     </g:if>
                     </dl>
                 </div>
             </div>
 
             <div class="col-sm-8">
-                <g:form resource="${alternateImageInstance}" method="DELETE">
+                <g:form resource="${alternateImage}" method="DELETE">
                     <g:hiddenField name="mediaId" value="${params.mediaId}"/>
                     <fieldset class="buttons">
-                        <g:link class="btn btn-success" action="edit" params="[mediaId:params.mediaId]" resource="${alternateImageInstance}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
+                        <g:link class="btn btn-success" action="edit" params="[mediaId:params.mediaId]" resource="${alternateImage}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
                         <g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
                         <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_MANAGER">
                             <g:link class="btn btn-default" action="index">

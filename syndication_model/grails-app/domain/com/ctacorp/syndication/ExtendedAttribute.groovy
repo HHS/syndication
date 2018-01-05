@@ -14,11 +14,16 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 package com.ctacorp.syndication
 
+import com.ctacorp.grails.swagger.annotations.Definition
+import com.ctacorp.grails.swagger.annotations.DefinitionProperty
+import com.ctacorp.grails.swagger.annotations.DefinitionPropertyType
 import com.ctacorp.syndication.media.MediaItem
 
+@Definition
 class ExtendedAttribute {
-  
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String name
+    @DefinitionProperty(type=DefinitionPropertyType.STRING)
     String value
 
     static belongsTo = [mediaItem:MediaItem]

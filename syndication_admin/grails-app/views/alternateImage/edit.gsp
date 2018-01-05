@@ -36,9 +36,9 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
 			<synd:message/>
 			<synd:errors/>
-			<synd:error/>
-			<g:form class="form-horizontal" url="[resource:alternateImageInstance, action:'update']" method="PUT" >
-				<g:hiddenField name="version" value="${alternateImageInstance?.version}" />
+			<synd:hasError/>
+			<g:form class="form-horizontal" url="[resource:alternateImage, action:'update']" method="PUT" >
+				<g:hiddenField name="version" value="${alternateImage?.version}" />
                 <fieldset class="form">
 					<g:render template="form"/>
                 </fieldset>
@@ -48,7 +48,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
                         <label class="col-md-4 control-label" for="update"></label>
                         <div class="col-md-8">
                             <g:actionSubmit id="update" class="btn btn-success" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                            <g:link class="btn btn-default" resource="${alternateImageInstance}" action="show" params="[mediaId:params.mediaId]" >
+                            <g:link class="btn btn-default" resource="${alternateImage}" action="show" params="[mediaId:params.mediaId]" >
                                 Cancel
                             </g:link>
                         </div>

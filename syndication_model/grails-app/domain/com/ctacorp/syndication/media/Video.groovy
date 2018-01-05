@@ -15,11 +15,7 @@ package com.ctacorp.syndication.media
 
 import com.ctacorp.grails.swagger.annotations.*
 
-@ModelExtension(id = "Video", model = "MediaItem", addProperties = [
-    @ModelProperty(propertyName = "duration",  attributes = [@PropertyAttribute(type = "integer", format = "int32",     required = true)]),
-    @ModelProperty(propertyName = "width",     attributes = [@PropertyAttribute(type = "integer", format = "int32")]),
-    @ModelProperty(propertyName = "height",    attributes = [@PropertyAttribute(type = "integer", format = "int32")])
-])
+@Definition
 class Video extends MediaItem {
     Integer duration //In seconds
     Integer width

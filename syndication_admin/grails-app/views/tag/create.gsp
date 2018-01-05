@@ -32,6 +32,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
         <div class="col-lg-8">
             <synd:message/>
             <synd:errors/>
+            <synd:hasError/>
 
             <g:form class="form-horizontal" action="save">
                 <g:render template="form" model="[tagTypes:tagTypes]"/>

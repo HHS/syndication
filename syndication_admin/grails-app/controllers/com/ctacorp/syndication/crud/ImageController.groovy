@@ -15,6 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package com.ctacorp.syndication.crud
 
 import com.ctacorp.syndication.Language
+import grails.util.Holders
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 import static org.springframework.http.HttpStatus.CREATED
@@ -36,9 +37,9 @@ class ImageController {
 
     def mediaItemsService
     def tagService
-    def solrIndexingService
     def cmsManagerKeyService
     def springSecurityService
+    def config = Holders.config
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "POST"]
 
@@ -59,7 +60,7 @@ class ImageController {
                                            selectedLanguage :tagData.selectedLanguage,
                                            selectedTagType  :tagData.selectedTagType,
                                            collections      :Collection.findAll("from Collection where ? in elements(mediaItems)", [imageInstance]),
-                                           apiBaseUrl       :grailsApplication.config.syndication.serverUrl + grailsApplication.config.syndication.apiPath,
+                                           apiBaseUrl       :config?.API_SERVER_URL + config?.SYNDICATION_APIPATH,
                                            subscriber       :cmsManagerKeyService.getSubscriberById(MediaItemSubscriber.findByMediaItem(imageInstance)?.subscriberId)
         ]
     }
@@ -85,7 +86,6 @@ class ImageController {
             return
         }
 
-        solrIndexingService.inputMediaItem(imageInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.created.message', args: [message(code: 'imageInstance.label', default: 'Image'), [imageInstance.name]])
@@ -114,7 +114,6 @@ class ImageController {
             return
         }
 
-        solrIndexingService.inputMediaItem(imageInstance)
         request.withFormat {
             form {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'Image.label', default: 'Image'), [imageInstance.name]])
@@ -138,7 +137,6 @@ class ImageController {
         }
 
         mediaItemsService.removeInvisibleMediaItemsFromUserMediaLists(imageInstance, true)
-        solrIndexingService.removeMediaItem(imageInstance)
         mediaItemsService.delete(imageInstance.id)
 
         request.withFormat {

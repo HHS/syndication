@@ -31,7 +31,7 @@
 
             <p>You've chosen the grid template.<br/>Click on any section to get started.</p>
 
-            <g:render template="../microsite/formDirections"/>
+            <g:render template="/microsite/formDirections"/>
 
         </div><!-- end microsite-builder-header col-sm-4 -->
 
@@ -113,7 +113,7 @@
 
 <g:render template="/microsite/micrositeFooter"/>
 
-<g:render template="../microsite/scripts"/>
+<g:render template="/microsite/scripts"/>
 
 </body>
 </html>

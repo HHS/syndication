@@ -1,8 +1,8 @@
 package com.ctacorp.syndication.media
 
-import com.ctacorp.grails.swagger.annotations.ModelExtension
+import com.ctacorp.grails.swagger.annotations.*
 
-@ModelExtension(id = "PDF", model = "MediaItem")
+@Definition
 class PDF extends MediaItem{
 
     static constraints = {

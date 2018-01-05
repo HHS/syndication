@@ -1,0 +1,7 @@
+model {
+    Map embed
+}
+
+json {
+    snippet embed.snippet
+}

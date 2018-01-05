@@ -14,17 +14,17 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 package syndication.authorization
 
 import com.ctacorp.commons.api.key.utils.AuthorizationHeaderGenerator
+import com.ctacorp.syndication.exception.UnauthorizedException
 import grails.converters.JSON
 import grails.plugins.rest.client.RestBuilder
 import grails.util.Holders
-import org.apache.maven.wagon.authorization.AuthorizationException
 
 import javax.annotation.PostConstruct
 
 class AuthorizationService {
 
     static transactional = false
-
+    def config = Holders.config
     def grailsApplication
 
     private AuthorizationHeaderGenerator generator
@@ -33,9 +33,10 @@ class AuthorizationService {
 
     @PostConstruct
     void init() {
-        String privateKey = grailsApplication.config.cmsManager.privateKey
-        String publicKey = grailsApplication.config.cmsManager.publicKey
-        String secret = grailsApplication.config.cmsManager.secret
+        String privateKey = config?.CMSMANAGER_PRIVATEKEY
+        String publicKey = config?.CMSMANAGER_PUBLICKEY
+        String secret = config?.CMSMANAGER_SECRET
+
         if (privateKey && publicKey && secret) {
             rest = new RestBuilder()
             rest.restTemplate.messageConverters.removeAll { it.class.name == 'org.springframework.http.converter.json.GsonHttpMessageConverter' }
@@ -60,7 +61,7 @@ class AuthorizationService {
         log.debug "API: checkAuthorization: Third Party Request: ${authorizationRequest}"
 
         String date = new Date().toString()
-        String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.verifyAuthPath
+        String requestUrl = config?.CMSMANAGER_SERVER_URL + config?.CMSMANAGER_VERIFYAUTHPATH
         log.debug "API: VerifyAuthPath: ${requestUrl}"
 
         def requestHeaders = [                                                                               //headers
@@ -68,6 +69,7 @@ class AuthorizationService {
              "content-type": "application/json",
              "content-length": authorizationRequest.bytes.size() as String
         ]
+
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue(
             requestHeaders,
             requestUrl,                                                                     //requestURL
@@ -80,14 +82,12 @@ class AuthorizationService {
                 "requestUrl: ${requestUrl}\n" +
                 "authorizationRequest: ${authorizationRequest}")
 
-
         def resp = rest.post(requestUrl) {
             header 'Date', date
             header 'Authorization', apiKeyHeaderValue
 
             json thirdPartyRequest
         }
-
         log.debug("API: Authorization Response Status: ${resp.status}")
 
         if(resp.status != 204){
@@ -151,8 +151,13 @@ class AuthorizationService {
         if (body) {
             requestHeaders['Content-Type'] = "application/json"
             requestHeaders['Content-Length'] = body.bytes.size() as String
-        } else if(!grailsApplication.config.cmsManager.headerContentLength){
-            requestHeaders['Content-Length'] = "0"
+        } else {
+
+            def headerContentLength = config?.hasProperty('CMSMANAGER_HEADERCONTENTLENGTH') ? config.CMSMANAGER_HEADERCONTENTLENGTH : true
+
+            if(!headerContentLength) {
+                requestHeaders['Content-Length'] = '0'
+            }
         }
 
         def apiKeyHeaderValue = generator.getApiKeyHeaderValue(requestHeaders, url, method, body)
@@ -186,7 +191,7 @@ class AuthorizationService {
 
 
         if (resp?.status == 403) {
-            throw new AuthorizationException("Access Denied - Your authorization keys have been denied.")
+            throw new UnauthorizedException("Access Denied - Your authorization keys have been denied.")
         }
 
         resp.json
@@ -198,7 +203,7 @@ class AuthorizationService {
 
     boolean amIAuthorized() {
         String date = new Date().toString()
-        String requestUrl = grailsApplication.config.cmsManager.serverUrl + grailsApplication.config.cmsManager.selfAuthPath
+        String requestUrl = config?.CMSMANAGER_SERVER_URL + config?.CMSMANAGER_SELFAUTHPATH
         String apiKeyHeaderValue = generator.getApiKeyHeaderValue([date: date], requestUrl, "GET", null)
         def resp = rest.get(requestUrl) {
             header 'Date', date

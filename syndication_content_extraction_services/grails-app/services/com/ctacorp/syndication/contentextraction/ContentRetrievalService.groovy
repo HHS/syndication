@@ -20,6 +20,7 @@ import com.ctacorp.syndication.exception.ContentUnretrievableException
 import grails.converters.JSON
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
+import grails.util.Holders
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -29,6 +30,7 @@ class ContentRetrievalService {
     def webUtilService
     def jsoupWrapperService
     def tagsService
+    def grailsApplication
 
     @NotTransactional
     Map extractSyndicatedContent(String url, params = [:]) throws ContentUnretrievableException{
@@ -36,7 +38,6 @@ class ContentRetrievalService {
             url = url[0..-2]
         }
         params.newUrlBase = removeSuffix(url)
-
         String content = null
         int failedRequestAttempts = 4
         while(failedRequestAttempts >= 0){
@@ -56,7 +57,9 @@ class ContentRetrievalService {
                 }
                 failedRequestAttempts--
                 log.info("waiting 5 seconds retry content extraction from the URL: ${url}")
-                sleep(5000)
+                if(!Holders.config.SKIP_CONTENT_EXTRACTION_SLEEP) {
+                    sleep(5000)
+                }
             }
         }
     }
@@ -151,15 +154,21 @@ class ContentRetrievalService {
     String addAttributionToExtractedContent(Long mediaId, String content){
         MediaItem mi = MediaItem.read(mediaId)
         Source src = mi.source
-
+        def url
         if(!mi || !src){
             return content
         }
-
+        if(mi.customAttributionUrl){
+            url = mi.customAttributionUrl
+        }
+        else
+        {
+            url= mi.sourceUrl
+        }
         String attr = "" +
                 "<div class='syndicate'>" +
                 "<span><Strong>Syndicated Content Details:</strong></span><br/>" +
-                "<span>Source URL: <a href='${mi.sourceUrl}'>${mi.sourceUrl}</a></span><br/>" +
+                "<span>Source URL: <a href='${url}'>${url}</a></span><br/>" +
                 "<span>Source Agency: <a href='${src.websiteUrl}'>${src.name} (${src.acronym})</a></span><br/>" +
                 "<span>Captured Date: ${mi.dateSyndicationCaptured}</span><br/>" +
                 "</div>"

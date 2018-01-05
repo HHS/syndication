@@ -39,13 +39,14 @@ class TwitterService {
 
     @PostConstruct
     def init(){
+
         def config = Holders.config
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(false)
-                .setOAuthConsumerKey(config.syndication.twitterConsumerKey)
-                .setOAuthConsumerSecret(config.syndication.twitterConsumerSecret)
-                .setOAuthAccessToken(config.syndication.twitterAccessToken)
-                .setOAuthAccessTokenSecret(config.syndication.twitterAccessTokenSecret);
+                .setOAuthConsumerKey(config?.TWITTER_CONSUMER_KEY)
+                .setOAuthConsumerSecret(config?.TWITTER_CONSUMER_SECRET)
+                .setOAuthAccessToken(config?.TWITTER_ACCESS_TOKEN)
+                .setOAuthAccessTokenSecret(config?.TWITTER_ACCESS_TOKEN_SECRET);
         TwitterFactory tf = new TwitterFactory(cb.build());
         twitter = tf.getInstance();
     }
@@ -108,16 +109,15 @@ class TwitterService {
         def twitterAccount = TwitterAccount.findOrSaveByAccountName(status.user.screenName)
         tweet.account = twitterAccount
         tweet.tweetId = status.id
-        tweet.messageText = status.text
+        tweet.messageText = keepOnlyPrintableCharacters status.text
         tweet.mediaUrl = status.mediaEntities?.mediaURLHttps[0] ?: null
         tweet.tweetDate = status.createdAt
         if(status.extendedMediaEntities && status.extendedMediaEntities[0].videoVariants) {
             tweet.videoVariantUrl = status.extendedMediaEntities[0]?.videoVariants[0]?.url
         }
-        //media item required fields
-        //Old title method. New title method uses name and a tweet snippet.
-//        tweet.name = status.user.screenName + " Post on " + status.createdAt.format("EEE, MMM d, yyyy")
-        tweet.name = "@${status.user.screenName}: ${status.text}"
+
+        tweet.name = keepOnlyPrintableCharacters "@${status.user.screenName}: ${status.text}"
+
         if(tweet.name.size() > 255){
             tweet.name = "${tweet.name[0..251]}..."
         }
@@ -125,6 +125,13 @@ class TwitterService {
         tweet.description = status.user.description
         tweet.language = Language.findByIsoCode("eng")
         tweet.source = Source.read(sourceId)
+    }
+
+    private static keepOnlyPrintableCharacters(String string) {
+
+        def unicodeOutliers = Pattern.compile("[^\\x00-\\x7F]", Pattern.UNICODE_CASE | Pattern.CANON_EQ | Pattern.CASE_INSENSITIVE)
+        def unicodeOutlierMatcher = unicodeOutliers.matcher(string)
+        unicodeOutlierMatcher.replaceAll('')
     }
 
     def createStatusCollection(TwitterStatusCollector twitterStatusCollector) {
@@ -222,7 +229,7 @@ class TwitterService {
         try{
             user = twitter.showUser(accountName)
         } catch(e) {
-            log.error e
+            log.error "Error: ${e.message}", e
         }
         user?.getId() ?: -1
     }

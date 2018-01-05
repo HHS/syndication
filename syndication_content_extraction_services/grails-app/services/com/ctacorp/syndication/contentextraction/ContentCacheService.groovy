@@ -24,7 +24,7 @@ class ContentCacheService {
     def contentRetrievalService
 
     CachedContent cache(Long mediaId){
-        def extractionResult = contentRetrievalService.extractSyndicatedContent(media?.sourceUrl, [disableFailFast:true])
+        def extractionResult = contentRetrievalService.extractSyndicatedContent(MediaItem.get(mediaId)?.sourceUrl, [disableFailFast:true])
         String content = extractionResult.extractedContent
         cacheHelper(mediaId, content)
     }
@@ -48,7 +48,7 @@ class ContentCacheService {
             log.error e
         }
         if(cached.hasErrors()){
-            log.error(cached.errors)
+            log.error(cached.errors.toString())
         }
         cached
     }

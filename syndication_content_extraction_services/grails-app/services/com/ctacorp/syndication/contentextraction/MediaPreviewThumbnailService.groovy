@@ -16,11 +16,10 @@ import com.ctacorp.syndication.preview.MediaPreview
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import grails.util.Holders
-import org.apache.commons.io.IOUtils
+import grails.io.IOUtils
 
 @Transactional
 class MediaPreviewThumbnailService {
-    def grailsApplication
     def assetResourceLocator
 
     def config = Holders.config
@@ -31,8 +30,8 @@ class MediaPreviewThumbnailService {
             log.error("Tried to load a media item that doesn't exist: ${mediaId}")
             return null
         }
-        def htmlUrl = grailsApplication.config.syndication.serverUrl + "/api/v2/resources/media/${mi.id}/content?imageFloat=left&imageMargin=0,10,10,0"
-        def imageAndVideoUrl = "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${mi.id}/syndicate.html"
+        def htmlUrl = Holders.config.API_SERVER_URL + "/api/v2/resources/media/${mi.id}/content?imageFloat=left&imageMargin=0,10,10,0"
+        def imageAndVideoUrl = "${Holders.config.API_SERVER_URL}/api/v2/resources/media/${mi.id}/syndicate.html"
 
         switch(mi){
             case Html:
@@ -89,7 +88,7 @@ class MediaPreviewThumbnailService {
 
     @NotTransactional
     String getThumbnailUrl(Long id){
-        "${grailsApplication.config.syndication.serverUrl}/api/v2/resources/media/${id}/thumbnail.jpg"
+        "${Holders.config.API_SERVER_URL}/api/v2/resources/media/${id}/thumbnail.jpg"
     }
 
     @Transactional(readOnly = true)
@@ -139,7 +138,7 @@ class MediaPreviewThumbnailService {
     }
 
     protected saveThumbnail(MediaItem mi, InputStream is){
-        Byte[] imageData = IOUtils.toByteArray(is);
+        Byte[] imageData = IOUtils.copyToByteArray(is);
         MediaThumbnail mt = MediaThumbnail.findByMediaItem(mi)
         if(mt){
             mt.imageData = imageData
@@ -153,7 +152,7 @@ class MediaPreviewThumbnailService {
     }
 
     protected saveCustomThumbnail(MediaItem mi, InputStream is){
-        Byte[] imageData = IOUtils.toByteArray(is);
+        Byte[] imageData = IOUtils.copyToByteArray(is);
         MediaThumbnail mt = MediaThumbnail.findByMediaItem(mi)
         if(mt){
             mt.customImageData = imageData
@@ -167,7 +166,7 @@ class MediaPreviewThumbnailService {
     }
 
     protected savePreview(MediaItem mi, InputStream is){
-        Byte[] imageData = IOUtils.toByteArray(is);
+        Byte[] imageData = IOUtils.copyToByteArray(is);
         MediaPreview mt = MediaPreview.findByMediaItem(mi)
         if(mt){
             mt.imageData = imageData
@@ -181,7 +180,7 @@ class MediaPreviewThumbnailService {
     }
 
     protected saveCustomPreview(MediaItem mi, InputStream is){
-        Byte[] imageData = IOUtils.toByteArray(is);
+        Byte[] imageData = IOUtils.copyToByteArray(is);
         MediaPreview mt = MediaPreview.findByMediaItem(mi)
         if(mt){
             mt.customImageData = imageData

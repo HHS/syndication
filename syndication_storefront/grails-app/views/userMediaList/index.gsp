@@ -29,7 +29,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <g:each in="${userMediaListInstanceList}" status="i" var="userMediaListInstance">
+                            <g:each in="${userMediaListList}" status="i" var="userMediaListInstance">
                                 <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
                                     <td class="mediaListIndex"><g:link action="show"
                                                 id="${userMediaListInstance.id}">${fieldValue(bean: userMediaListInstance, field: "name")}</g:link></td>
