@@ -31,7 +31,7 @@ INSTALLATION
 
 CONFIGURATION
 -------------
-Configure user permissions in *Administration Â» Configuration Â» Syndicated Content*:
+Configure user permissions in *Administration » Configuration » Syndicated Content*:
 
 **API Urls**
 
@@ -63,7 +63,7 @@ Admin has configuration rights by default. You can give other users Syndiction c
 
 Download Link
 ----------------------
-[Download Latest Release]([Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication-client-drupal7-module.1.16.3.2.zip?raw=true))
+[Download Latest Release]([Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication_drupal_8.1.18.1.5.zip?raw=true))
 
 CHANGE LOG
 ------------
