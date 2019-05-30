@@ -63,7 +63,7 @@ Admin has configuration rights by default. You can give other users Syndiction c
 
 Download Link
 ----------------------
-[Download Latest Release]([Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication_drupal_8.2.0.5.30.zip?raw=true))
+[Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication_drupal_8.2.0.5.30.zip?raw=true)
 
 CHANGE LOG
 ------------
@@ -72,4 +72,4 @@ CHANGE LOG
 Ported the Drupal 7 module to Drupal 8. The Drupal 8 module does not include the Ingestion section, only the publishing content.
 
 **2.0.5.30**
-Added auto syndicate. Added custom content type to be syndicsted.
+Added auto syndicate. Added custom content type to be syndicated.
