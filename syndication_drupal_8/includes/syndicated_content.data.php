@@ -1,5 +1,7 @@
 <?php
+
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\Messenger\MessengerTrait;
 
 /// BEFORE NODE SAVE - we need to this run before any other actions take place, so I choose hook_validate over hook_presave
 /// this catches and syndication specific actions before regular form actions(edit|save|delete) are processed
@@ -338,85 +340,6 @@ function _syndicated_content_form_submit( $form, &$form_state )
             'syndication_media_id' => $syndication_media_id
         )));
 
-        /// do not add directly anymore, simple prefill the standard form
-        /*
-        /// request full content from syndication
-        $syndication = _syndicated_content_api_factory();
-
-        $response = $syndication->getMediaMetadataByMediaId($syndication_media_id);
-        if ( ! $response->success )
-        {
-            /// return to new syndicated content screen
-            drupal_set_message(t('No Syndicated Content Found.'));
-            return;
-        }
-
-        $metadata = empty($response->results)?null:array_shift($response->results);
-        $title    = empty($metadata['name'])?'Title':$metadata['name'];
-
-        $response = $syndication->getMediaContentByMediaId($syndication_media_id);
-        $content  = empty($response->results)?null:$response->results;
-
-        if ( empty($content) )
-        {
-            /// return to new syndicated content screen
-            drupal_set_message(t('No Syndicated Content Found'));
-            return;
-        }
-
-        /// hop over to the content types creation form
-
-        /// lookup drupal content type associated with syndication content type
-        $drupal_type = 'page';
-
-        $node = new stdClass();
-        $node->type = $drupal_type;
-        /// FROM SYND
-        $node->language = \Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED;
-        node_object_prepare($node);
-        $node->title = $title;
-        $node->body[$node->language][0]['value']   = $content;
-        $node->body[$node->language][0]['summary'] = text_summary($content);
-        $node->body[$node->language][0]['format']  = 'full_html';
-        /// FROM SETTINGS
-        $node->status  = 1;
-        $node->comment = 0;
-        /// DEFAULTS
-        $node->created = time();
-        $node->changed = time();
-        $node->promote = 0;
-        $node->sticky  = 0;
-        $node->uid = (isset($user->uid) && !empty($user->uid)?$user->uid:1);
-        $node->timestamp = time();
-        $node->revision = 0;
-
-        $node->is_new = TRUE;
-
-        /// taxonomy: +subscribed
-
-        $node = node_submit($node);
-        node_save($node);
-        if ( !empty($node->nid) || $node->nid==='0'  )
-        {
-            drupal_set_message(t('Content saved'));
-            db_insert('syndicated_content')->fields(array(
-                'node_id'        => $node->nid,
-                'syndication_source_id'      => 1, /// hard coded for-now
-                'media_id'       => $syndication_media_id,
-                'media_type'     => $metadata['mediaType'],
-                'source_url'     => $metadata['sourceUrl'],
-                'tiny_url'       => $metadata['tinyUrl'],
-                'locally_owned'  => 0,
-                'date_authored'  => $metadata['dateSyndicationVisible'],
-                'date_updated'   => $metadata['dateContentUpdated'],
-                'date_synced'    => _syndicated_content_date(),
-                'metadata'       => '',
-            ))->execute();
-            drupal_goto("/node/{$node->nid}");
-        } else {
-            drupal_set_message(t('Content did not save'));
-        }
-*/
     } else if ( in_array($form['#form_id'],array('syndicated_content_node_form')) ) {
         /// NEW NODE COMING IN - PRESAVE
     }
@@ -532,8 +455,11 @@ function _syndicated_content_update($node_id, $params, $publish = false) {
             break;
     }
 
+
     $syndication = _syndicated_content_api_factory();
+
     $response = $syndication->publishMedia($params);
+
 
     #drupal_set_message('<a href="#" onclick="javascript:var d=document.getElementById(\'dbg_s'.__LINE__.'\');d.style.display=(d.style.display==\'none\')?\'block\':\'none\'">SYNDICATION CALL DEBUG</a>:<pre id="dbg_s'.__LINE__.'">'.print_r($response->raw,true).'</pre>','error');
     if ( !$response->success ) {
@@ -566,10 +492,15 @@ function _syndicated_content_update($node_id, $params, $publish = false) {
 
         _syndicated_content_save_metadata_for_node( $node, $syndication_metadata );
 
-        drupal_set_message('Published To Syndication Source.');
+        //drupal_set_message('Published To Syndication Source.');
+        $set_message = \Drupal::messenger();
+        $set_message->addMessage('Published To Syndication Source.');
 
     } else {
-        drupal_set_message('Not Published. No Messages Received','error');
+        //drupal_set_message('Not Published. No Messages Received','error');
+        $set_message = \Drupal::messenger();
+        $set_message->addMessage('Not Published. No Messages Received', 'error');
+
         //_syndicated_content_stop_destination($node);
     }
 

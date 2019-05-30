@@ -14,8 +14,6 @@ Syndication Content Client, a Drupal 8 Module.
 
 The Syndicated Content module adds the capability to publish local content to an external source and provides a callback url for handling messages from the external source.
 
-This README includes basic installation, configuration and usage instructions. A more detailed set of configuration and usage instructions, including screenshots, can be found in the [Drupal 8 Content Syndication Plugin User Guide](Drupal%208%20Content%20Syndication%20Plugin%20v1.1.pdf).
-
 REQUIREMENTS
 ------------
 This module requires Drupal 8. No other modules are required.
@@ -23,6 +21,7 @@ This module requires Drupal 8. No other modules are required.
 Publishing and Subscribing to content does require an *api identity*.
 
 Api Identity Keys are acquired directly from the Syndication Source's CMS Manager. Contact the desired source's site admin to acquire identity keys.
+
 
 INSTALLATION
 ------------
@@ -32,8 +31,7 @@ INSTALLATION
 
 CONFIGURATION
 -------------
-
-Configure user permissions in *Administration » Configuration » Syndicated Content*:
+Configure user permissions in *Administration ï¿½ Configuration ï¿½ Syndicated Content*:
 
 **API Urls**
 
@@ -65,10 +63,13 @@ Admin has configuration rights by default. You can give other users Syndiction c
 
 Download Link
 ----------------------
-[Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication_drupal_8.1.18.1.5.zip?raw=true)
+[Download Latest Release]([Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication_drupal_8.1.18.1.5.zip?raw=true))
 
 CHANGE LOG
 ------------
 
 **1.18.1.5**
 Ported the Drupal 7 module to Drupal 8. The Drupal 8 module does not include the Ingestion section, only the publishing content.
+
+**2.0.5.30**
+Added auto syndicate. Added custom content type to be syndicsted.

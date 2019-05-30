@@ -17,6 +17,6 @@ This release includes the following applications:
 - syndication_commons v3.0.0
 - syndication_desktop_client v1.1.0
 - syndication-client-drupal7-module v1.16.7.27
-- syndication-client-drupal8-module v1.18.1.5
+- syndication-client-drupal8-module v2.0.5.30
 - api_key_utils v1.6.1
 

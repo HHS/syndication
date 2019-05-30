@@ -80,7 +80,16 @@ class SyndicatedContentConfigForm extends ConfigFormBase {
     // get the content types
     $contentTypes = \Drupal::service('entity_type.manager')->getStorage('node_type')->loadMultiple();
 
+    $conn = \Drupal::database();
+
     foreach ($contentTypes as $contentType) {
+
+      // get the syndication type to update the select form.
+      $syn_type = $conn->select('syndicated_content_types', 'sct')
+        ->fields('sct')
+        ->condition('sct.drupal_type', $contentType->id())
+        ->execute()
+        ->fetchAssoc();
 
       $form['syndication_' . $contentType->id()] = [
         '#type' => 'select',
@@ -91,23 +100,27 @@ class SyndicatedContentConfigForm extends ConfigFormBase {
           'infographic' => $this->t('Infographic'),
           'video' => $this->t('Video'),
         ],
-        '#default_value' => 'html',
+        '#default_value' => $syn_type['syndication_type'],
       ];
-    }
 
-    /*
-    $form['syndication_article'] = [
-      '#type' => 'select',
-      '#title' => 'Article',
-      '#options' => [
-        'html' => $this->t('Html'),
-        'image' => $this->t('Image'),
-        'infographic' => $this->t('Infographic'),
-        'video' => $this->t('Video'),
-      ],
-      '#default_value' => 'html',
-    ];
-    */
+      // auto syndicate
+      // check if field exists
+      $check_auto_syndicated_field = $conn->schema()->fieldExists('syndicated_content_types', 'auto_syndicate');
+      if($check_auto_syndicated_field) {
+        // check to see if content type is auto syndicated
+        if ($syn_type['auto_syndicate'] == 1) {
+          $auto_syn_checked = 'checked';
+        } else {
+          $auto_syn_checked = NULL;
+        }
+        $form['auto_syndicate_' . $contentType->id()] = [
+          '#type' => 'checkboxes',
+          '#attributes' => array($auto_syn_checked => $auto_syn_checked),
+          '#options' => ['1' => $this->t('Auto Syndicate')],
+          '#default_value' => $syn_type['auto_syndicate'],
+        ];
+      }
+    }
 
     // start organization name dropdown
     $org_options = array();
@@ -293,7 +306,8 @@ class SyndicatedContentConfigForm extends ConfigFormBase {
         array(
           'syndication_source_id' => $form_state->getValue('source_id'),
           'syndication_type' => $form_state->getValue('syndication_' . $contentType->id()),
-          'drupal_type' => $contentType->id()
+          'drupal_type' => $contentType->id(),
+          'auto_syndicate' => $form_state->getValue('auto_syndicate_' . $contentType->id())[1]
         )
       )->execute();
     }

@@ -131,32 +131,5 @@ class SyndicatedContentBasicTestCase extends DrupalWebTestCase
         $this->assertField('edit-syndication-update-button',       'Button exists: unpublish');
         $this->assertField('edit-syndication-unsubscribe-button',  'Button exists: publish');
     }
-/*
-    function testUpdateListener()
-    {
-        /// public access
-        $this->drupalLogout();
-
-        $request_options = array(
-            CURLOPT_POST   => TRUE,
-            CURLOPT_URL    => url("syndicated_content/subscription"),
-            CURLOPT_NOBODY => FALSE,
-            CURLOPT_POSTFIELDS => '{"media_id":"FAKEID"}',
-            CURLOPT_HTTPHEADER => array('Content-type: application/json;'),
-        );
-        $response = $this->curlExec($request_options);
-        $this->assertResponse(400,'Bad Media ID = 400 : '.curl_getinfo($this->curlHandle, CURLINFO_HTTP_CODE) );
-        /// should respond 400 to a nonexistant id
-        /// should respond 200 with a valid media_id in BODY
-        #$this->drupalPost($url, null, null, null, null, null, '{"media_id":"11"}');
-        #$this->assertResponse(400,'JSON Good Media ID = 200');
-        /// should respond 200 with a valid media_id in a POST
-        #$this->drupalPost($url, null, array("media_id"=>"11"));
-        #$this->assertResponse(200,'POST Good Media ID = 200');
-        /// should respond 200 with a valid media_id in a GET
-        #$this->drupalGet($url.'?'.drupal_http_build_query(array("media_id"=>"11")));
-        #$this->assertResponse(200,'GET Good Media ID = 200');
-    }
-*/
 
 }

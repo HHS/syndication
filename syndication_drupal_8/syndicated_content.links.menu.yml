@@ -4,3 +4,9 @@ syndicated_content.syndicated_content_config_form:
   description: 'Syndiacated content.'
   parent: system.admin_config_services
   weight: 99
+syndicated_content.autolist:
+  title: 'Syndicated Content List'
+  description: 'List of syndicated content.'
+  parent: system.admin_config_services
+  weight: 100
+  url: internal:/syndicated-content

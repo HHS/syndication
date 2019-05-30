@@ -1,102 +1,42 @@
 <?php
 
-function syndicated_content_install()
-{
-    drupal_set_message(t('Syndicated Content module installed'));
-}
-
-function syndicated_content_uninstall()
-{
-    drupal_set_message(t('Syndicated Content module uninstalled'));
-    db_truncate('syndicated_content');
-    db_truncate('syndicated_content_sources');
-    db_truncate('syndicated_content_types');
-}
-
-function syndicated_content_enable()
-{
-    drupal_set_message(t('Syndicated Content module enabled'));
-
-    /// Re-Introduce Content Type
-    $bundle = array(
-        'type'     => 'syndicated_content',
-        'name'     => t('Syndicated Content'),
-        'description' => t('Load content from a remote source.'),
-        'base'     => 'node_content',
-        'custom'   => FALSE,
-        'modified' => TRUE,
-        'locked'   => FALSE
-    );
-    $bundle = node_type_set_defaults($bundle);
-    $existing_bundles = node_type_get_names();
-    if ( !isset($existing_bundles['syndicated_content']) )
-    {
-        node_type_save($bundle);
-        node_types_rebuild();
-    }
-}
-
-function syndicated_content_disable()
-{
-    drupal_set_message(t('Syndicated Content module disabled'));
-    /// Remove Content Type
-    $existing_types = node_type_get_names();
-    if ( isset($existing_types['syndicated_content']) ) {
-        node_type_delete('syndicated_content');
-        node_types_rebuild();
-    }
-}
 /**
-* Custom function ability
-*/
-function syndicated_content_update_7000() {
-  // Add meta_canonical
-    $spec = array(
-        'description'   => t('Drupal Custom Field'),
-        'type'          => 'varchar',
-        'length'        => 128,
-        'default'       => ''
-    );
-    db_add_field('syndicated_content_types', 'drupal_field', $spec);
-}
-/**
-* Adds SSL Bypass to SSL hosts with bad certificates
-*/
-function syndicated_content_update_7001() {
-    $spec = array(
-        'description'   => t('Bypass SSL'),
-        'type'          => 'int',
-        'length'        => 1,
-        'default'       => 0
-    );
-    db_add_field('syndicated_content_sources', 'ssl_auth', $spec);
-}
-/**
-* Adds Real URL for Syndication
-*/
-function syndicated_content_update_7003() {
-    $spec = array(
-        'description'   => t('CMS Real URL'),
-        'type'          => 'varchar',
-        'length'        => 128,
-        'default'       => ''
-    );
-    db_add_field('syndicated_content_sources', 'cms_url', $spec);
-}
-
-/**
- * Adds archive field
+ * Implements hook_install
  */
-function syndicated_content_update_7004() {
-    $spec = array(
-      'description'   => t('Archive Syndication'),
-      'type'          => 'int',
-      'length'        => 1,
-      'default'       => 0
-    );
-    db_add_field('syndicated_content', 'archive', $spec);
+function syndicated_content_install(){
+
 }
 
+/**
+ * Implements hook_uninstall
+ */
+function syndicated_content_uninstall(){
+
+}
+
+
+/**
+ * Hook update
+ */
+function syndicated_content_update_8010() {
+
+  $spec = array(
+    'type' => 'int',
+    'description' => t('Auto syndicate'),
+    'length' => 1,
+    'default' => 0,
+    'not null' => FALSE
+  );
+
+  $schema = \Drupal::database()->schema();
+  $schema->addField('syndicated_content_types', 'auto_syndicate', $spec);
+}
+
+/**
+ * Implements hook_schema
+ *
+ * @return mixed
+ */
 function syndicated_content_schema()
 {
     $schema['syndicated_content_sources'] = array(
@@ -187,6 +127,12 @@ function syndicated_content_schema()
                 'type'        => 'varchar',
                 'length'      => 128,
                 'default'     => ''),
+          'auto_syndicate' => array(
+            'description' => 'Auto syndicate',
+            'type'        => 'int',
+            'length'      => 1,
+            'default'     => 0),
+
         ),
         /// no pk, all many-to-many
     );

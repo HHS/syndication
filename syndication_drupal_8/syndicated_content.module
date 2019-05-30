@@ -4,6 +4,8 @@
  * A module that displays pages syndicated from a remote resource.
  */
 
+use Drupal\Core\Url;
+use Drupal\Core\Link;
 use Drupal\Core\Entity\EntityInterface;
 
 
@@ -158,6 +160,33 @@ function syndicated_content_form_node_admin_content_alter(&$form, \Drupal\Core\F
  */
 function syndicated_content_form_alter( &$form, \Drupal\Core\Form\FormStateInterface &$form_state, $form_id ) {
 
+    // get the content types that are set to auto syndicate
+    $conn = \Drupal::database();
+
+    $check_auto_syndicated_field = $conn->schema()->fieldExists('syndicated_content_types', 'auto_syndicate');
+
+    if($check_auto_syndicated_field) {
+
+      $drupaldata = $conn->select('syndicated_content_types', 'sct')
+        ->fields('sct', array('drupal_type'))
+        ->condition('auto_syndicate', 1)
+        ->execute()
+        ->fetchAll();
+
+      // loop through the content types to  auto syndiated and add custom submit handler.
+      foreach ($drupaldata as $type) {
+
+        if($form_id == 'node_' . $type->drupal_type . '_form') {
+          $form['actions']['submit']['#submit'][] = 'auto_publish_submit';
+        }
+      }
+
+    } else {
+
+      drupal_set_message("Please run the update script to get the auto syndicate function.");
+    }
+
+
 
   $user = \Drupal::currentUser();
   if($user->hasPermission('syndication publish')) {
@@ -263,6 +292,22 @@ function syndicated_content_form_alter( &$form, \Drupal\Core\Form\FormStateInter
 }
 
 /**
+ * Submit callback function
+ */
+function auto_publish_submit($form, &$form_state) {
+
+  $syndication_language =  1;
+  $syndication_action =  'publish';
+  $node_id = $form_state->getValues()['nid'];
+
+  _syndicated_content_node_validate($node_id, $syndication_language, $syndication_action);
+
+  return _syndicated_content_node_update($node_id, $syndication_language, $syndication_action);
+}
+
+
+
+/**
  * @param $variables
  */
 function syndicated_content_preprocess_node(&$variables) {
@@ -287,13 +332,19 @@ function syndicated_content_preprocess_node(&$variables) {
  */
 function syndicated_content_node_insert( \Drupal\node\NodeInterface $node ) {
 
+  $body = '<div class="syndicate">' . $node->body->value . '</div>';
+
+  $node->body = array('format' => 'full_html', 'value' => $body);
+  $node->save();
+
+
   module_load_include('php','syndicated_content','includes/syndicated_content.data');
 
   $node_id = $node->id();
-  $syndication_language = $_REQUEST['syndication_publish_language'];
-  $syndication_action = $_REQUEST['syndication_action'];
+  //$syndication_language =  1; //$_REQUEST['syndication_publish_language'];
+  //$syndication_action =  "publish"; //$_REQUEST['syndication_action'];
 
-  //_syndicated_content_node_validate($node_id, $syndication_language, $syndication_action)
+  //_syndicated_content_node_validate($node_id, $syndication_language, $syndication_action);
   //return _syndicated_content_node_update($node_id, $syndication_language, $syndication_action);
 }
 
@@ -456,14 +507,6 @@ function syndicated_content_node_update( \Drupal\node\NodeInterface $node) {
       break;
   }
 }
-
-/* This has been disabled in Drupal 8
-function syndicated_content_node_validate( $node, $form, &$form_state )
-{
-    module_load_include('php','syndicated_content','includes/syndicated_content.data');
-    return _syndicated_content_node_validate( $node, $form, $form_state );
-}
-*/
 
 
 // NODE VIEW Wrapper
