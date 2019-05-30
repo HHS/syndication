@@ -63,7 +63,7 @@ Admin has configuration rights by default. You can give other users Syndiction c
 
 Download Link
 ----------------------
-[Download Latest Release]([Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication_drupal_8.1.18.1.5.zip?raw=true))
+[Download Latest Release]([Download Latest Release](https://github.com/HHS/syndication/blob/master/binaries/syndication_drupal_8.2.0.5.30.zip?raw=true))
 
 CHANGE LOG
 ------------
