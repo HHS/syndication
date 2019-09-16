@@ -812,8 +812,10 @@ class SyndicationAPIClient
         if($ssl_auth == 1) {
                 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         }
-        
+      $start = microtime(true);
         $content = curl_exec($curl);
+      $end = (microtime(true) - $start);
+      kint($end);
         rewind($verbose);
         $verbose_log = stream_get_contents($verbose);
         $http = curl_getinfo($curl);
@@ -821,6 +823,7 @@ class SyndicationAPIClient
 
         if ($content === false)
         {
+          kint('Content returned is false');
             curl_close($curl);
             throw new Exception('Syndication: No Response: '. $http['http_code'], $http['http_code'] );
             return null;
@@ -1728,6 +1731,7 @@ class Syndication extends SyndicationApiClient
 
 
         } catch ( Exception $e ) {
+          kint($e->getMessage());die;
             return $this->createResponse($e,'API Call');
         }
     }
