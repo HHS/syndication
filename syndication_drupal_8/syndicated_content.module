@@ -364,8 +364,18 @@ function syndicated_content_node_update( \Drupal\node\NodeInterface $node) {
 
     // start publish
     case 'publish':
+      $item = new \stdClass();
+      $item->nid = $node_id;
+      $item->syndication_language = $syndication_language;
+      $item->syndication_action = $syndication_action;
 
-      return _syndicated_content_node_update($node_id, $syndication_language, $syndication_action);
+      $queue = \Drupal::queue('syndicated_content_message_queue');
+      $queue->createQueue();
+      $queue->createItem($item);
+      $messenger_service = \Drupal::service('messenger');
+      $messenger_service->addMessage("Item has been added to the queue.");
+      //_syndicated_content_node_update($node_id, $syndication_language, $syndication_action);
+
       break;
 
     // start unpublish
