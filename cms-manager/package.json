@@ -2,7 +2,7 @@
   "name": "syndication_admin",
   "version": "0.1.0",
   "dependencies": {
-    "bower": "1.3.8",
+    "bower": "1.8.8",
     "grunt": "^0.4.5",
     "grunt-contrib-copy": "^0.8.2",
     "grunt-shell": "^0.7.0"
